@@ -30,43 +30,62 @@ const Auth = () => {
   useEffect(() => {
     let mounted = true;
     
-    // Set up auth state listener FIRST
+    // Primeiro, verifica se já tem uma sessão ativa
+    const checkInitialSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!mounted) return;
+        
+        console.log('Initial session check:', session ? 'Session exists' : 'No session');
+        
+        if (session?.user) {
+          // Se já está logado e tentando acessar /auth, redireciona
+          console.log('User already logged in, redirecting...');
+          navigate('/', { replace: true });
+          return;
+        }
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+      } catch (error) {
+        console.error('Error checking initial session:', error);
+      }
+    };
+    
+    checkInitialSession();
+    
+    // Depois configura o listener para mudanças de auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!mounted) return;
         
         console.log('Auth state change:', event, session ? 'Session exists' : 'No session');
+        
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Only redirect after successful login, not on initial load
+        // Se o usuário fez login com sucesso, redireciona para home
         if (event === 'SIGNED_IN' && session?.user) {
-          console.log('Redirecting to home after successful sign in');
-          setTimeout(() => navigate('/'), 100); // Small delay to ensure state updates
+          console.log('Sign in successful, redirecting to home...');
+          // Usa um timeout para garantir que o estado foi atualizado
+          setTimeout(() => {
+            navigate('/', { replace: true });
+          }, 200);
+        }
+        
+        // Se o usuário fez logout, garante que está na página de auth
+        if (event === 'SIGNED_OUT') {
+          console.log('User signed out');
+          // Não redireciona se já estiver na página de auth
         }
       }
     );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
-      
-      console.log('Initial session check:', session ? 'Session exists' : 'No session');
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      // Only redirect if already logged in and on auth page
-      if (session?.user && location.pathname === '/auth') {
-        console.log('Already logged in, redirecting to home');
-        navigate('/');
-      }
-    });
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, location.pathname]);
+  }, [navigate]);
 
   const handleSignUp = async () => {
     console.log('Attempting sign up...');
@@ -176,16 +195,16 @@ const Auth = () => {
           title: "Conta criada com sucesso!",
           description: "Verifique seu email para confirmar a conta.",
         });
+        // Clear form for signup
+        setFormData({ email: '', password: '', name: '' });
       } else {
+        // Para login, não redirecionar aqui - deixar o auth state change fazer isso
         toast({
           title: "Login realizado!",
-          description: "Bem-vindo de volta!",
+          description: "Redirecionando...",
         });
-        // Don't navigate here - let the auth state change handle it
+        // Não limpar o form ainda - será limpo após o redirect
       }
-
-      // Clear form
-      setFormData({ email: '', password: '', name: '' });
     } catch (error) {
       console.error('Auth error:', error);
       setError('Erro inesperado. Tente novamente.');

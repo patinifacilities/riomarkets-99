@@ -84,7 +84,7 @@ const UserRankItem = React.memo(({ user, position }: UserRankItemProps) => {
           <p className="text-sm text-[#999999]">Rioz Coin</p>
         </div>
         <button 
-          className="min-h-[44px] px-4 py-2 bg-[#FF1493] hover:bg-[#FF1493]/90 text-white rounded-md font-medium transition-all duration-200 hover:scale-105"
+          className="min-h-[44px] px-4 py-2 bg-[#FF1493] hover:bg-[#FF1493]/90 text-white rounded-lg font-medium transition-all duration-200 hover:scale-105"
           aria-label={`Ver perfil de ${user.nome}`}
         >
           Ver Perfil

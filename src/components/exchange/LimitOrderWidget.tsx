@@ -214,7 +214,7 @@ export const LimitOrderWidget: React.FC<LimitOrderWidgetProps> = ({ side }) => {
 
         {/* Validation Error */}
         {!validation.isValid && (
-          <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+          <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
             <AlertTriangle className="h-4 w-4 text-destructive" />
             <span className="text-sm text-destructive">{validation.error}</span>
           </div>
@@ -222,7 +222,7 @@ export const LimitOrderWidget: React.FC<LimitOrderWidgetProps> = ({ side }) => {
 
         {/* Insufficient Balance Warning */}
         {insufficientBalance && (
-          <div className="flex items-center gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+          <div className="flex items-center gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
             <span className="text-sm text-yellow-800">Saldo insuficiente</span>
           </div>

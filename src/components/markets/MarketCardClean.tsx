@@ -37,14 +37,14 @@ function CardFooter({
       <div className="flex items-center gap-3">
         <button 
           aria-label={isWatched ? "Remover dos salvos" : "Salvar mercado"} 
-          className="p-2 rounded-md hover:bg-muted/50 transition-colors focus-visible:ring-2 focus-visible:ring-primary min-w-[44px] min-h-[44px] flex items-center justify-center" 
+           className="p-2 rounded-lg hover:bg-muted/50 transition-colors focus-visible:ring-2 focus-visible:ring-primary min-w-[44px] min-h-[44px] flex items-center justify-center"
           onClick={onToggleWatch}
         >
           <Bookmark className={cn("w-5 h-5", isWatched && "fill-current text-primary")} />
         </button>
         <button 
           aria-label="Compartilhar mercado" 
-          className="p-2 rounded-md hover:bg-muted/50 transition-colors focus-visible:ring-2 focus-visible:ring-primary min-w-[44px] min-h-[44px] flex items-center justify-center" 
+          className="p-2 rounded-lg hover:bg-muted/50 transition-colors focus-visible:ring-2 focus-visible:ring-primary min-w-[44px] min-h-[44px] flex items-center justify-center" 
           onClick={onShare}
         >
           <Share2 className="w-5 h-5" />

@@ -89,7 +89,7 @@ const MarketCard = ({ market }: MarketCardProps) => {
         {/* Options */}
         <div className="p-4 space-y-3">
           <div 
-            className="flex items-center justify-between p-3 rounded-md bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50"
+             className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50"
           >
             <div className="flex items-center gap-3">
               <div className="text-sm font-medium text-foreground">
@@ -107,7 +107,7 @@ const MarketCard = ({ market }: MarketCardProps) => {
           </div>
           
           <div 
-            className="flex items-center justify-between p-3 rounded-md bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50"
+            className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50"
           >
             <div className="flex items-center gap-3">
               <div className="text-sm font-medium text-foreground">

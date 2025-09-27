@@ -291,7 +291,7 @@ export const ExchangeWidget = () => {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Você recebe</label>
                   <div className="relative">
-                    <div className="border rounded-md px-3 py-3 bg-muted/50">
+                     <div className="border rounded-lg px-3 py-3 bg-muted/50">
                       <div className="text-lg font-medium">
                         {preview ? (
                           ExchangeService.formatCurrency(preview.outputAmount, 'RIOZ')
@@ -371,7 +371,7 @@ export const ExchangeWidget = () => {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Você recebe</label>
                   <div className="relative">
-                    <div className="border rounded-md px-3 py-3 bg-muted/50">
+                    <div className="border rounded-lg px-3 py-3 bg-muted/50">
                       <div className="text-lg font-medium">
                         {preview ? (
                           ExchangeService.formatCurrency(preview.outputAmount, 'BRL')
@@ -407,14 +407,14 @@ export const ExchangeWidget = () => {
 
           {/* Error Messages */}
           {!validation.valid && validation.error && (
-            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+             <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-lg">
               {validation.error}
             </div>
           )}
 
           {/* Exchange Error */}
           {exchangeError && (
-            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-lg">
               {exchangeError}
             </div>
           )}
