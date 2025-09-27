@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Search, TrendingUp } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import MarketCardClean from '@/components/markets/MarketCardClean';
+import MarketCardKalshi from '@/components/markets/MarketCardKalshi';
 import FilterToolbar from '@/components/ui/FilterToolbar';
 import { MarketGridSkeleton } from '@/components/ui/MarketCardSkeleton';
 import TopAnalysts from '@/components/ui/TopAnalysts';
@@ -203,7 +203,7 @@ const Home = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-16 pb-[env(safe-area-inset-bottom)]">
             {sortedAndFilteredMarkets.map(market => (
-              <MarketCardClean key={market.id} market={market} />
+              <MarketCardKalshi key={market.id} market={market} />
             ))}
           </div>
         )}

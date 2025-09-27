@@ -49,6 +49,9 @@ const Wallet = () => {
             <WalletIcon className="w-8 h-8 text-primary" />
             <h1 className="text-4xl font-bold">Carteira</h1>
           </div>
+          <Button className="mb-4">
+            Adicionar Saldo
+          </Button>
           <p className="text-muted-foreground max-w-[65ch] mx-auto">
             Gerencie seu saldo e acompanhe suas opiniões ativas
           </p>

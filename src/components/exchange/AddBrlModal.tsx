@@ -11,7 +11,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus } from 'lucide-react';
+import { Plus, CreditCard, Smartphone, Bitcoin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -43,10 +43,10 @@ export const AddBrlModal = ({ onSuccess }: AddBrlModalProps) => {
       return;
     }
 
-    if (amountValue > 10000) {
+    if (amountValue > 100000) {
       toast({
         title: "Valor muito alto",
-        description: "O valor máximo para depósito é R$ 10.000,00.",
+        description: "O valor máximo para depósito é R$ 100.000,00.",
         variant: "destructive",
       });
       return;
@@ -101,7 +101,7 @@ export const AddBrlModal = ({ onSuccess }: AddBrlModalProps) => {
           <DialogTitle>Adicionar BRL</DialogTitle>
           <DialogDescription>
             Simule um depósito em reais para testar a Exchange. 
-            Valor máximo: R$ 10.000,00.
+            Valor máximo: R$ 100.000,00.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -112,7 +112,7 @@ export const AddBrlModal = ({ onSuccess }: AddBrlModalProps) => {
               type="number"
               placeholder="0.00"
               min="0.01"
-              max="10000"
+              max="100000"
               step="0.01"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
@@ -128,10 +128,30 @@ export const AddBrlModal = ({ onSuccess }: AddBrlModalProps) => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="pix">PIX</SelectItem>
-                <SelectItem value="credit-card">Cartão de Crédito</SelectItem>
-                <SelectItem value="debit-card">Cartão de Débito</SelectItem>
-                <SelectItem value="crypto">Cripto</SelectItem>
+                <SelectItem value="pix">
+                  <div className="flex items-center gap-2">
+                    <Smartphone className="w-4 h-4" />
+                    <span>PIX</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="credit-card">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="w-4 h-4" />
+                    <span>Cartão de Crédito</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="debit-card">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="w-4 h-4" />
+                    <span>Cartão de Débito</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="crypto">
+                  <div className="flex items-center gap-2">
+                    <Bitcoin className="w-4 h-4" />
+                    <span>Cripto</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>

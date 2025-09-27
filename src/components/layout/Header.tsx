@@ -21,7 +21,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useState } from 'react';
 import { TickerBar } from '@/components/ui/ticker-bar';
-import logoImage from '@/assets/rio-markets-logo.png';
+import logoImage from '@/assets/rio-markets-logo-white.png';
 
 const Header = () => {
   const location = useLocation();

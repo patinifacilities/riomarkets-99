@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
+import riozLogo from '@/assets/rio-markets-logo-white.png';
 
 interface FooterLink {
   label: string;
@@ -48,9 +49,9 @@ export function Footer() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <img 
-                src="/assets/rio-markets-logo.png" 
+                src={riozLogo} 
                 alt="Rio Markets Logo" 
-                className="h-7 w-7 rounded"
+                className="h-7 w-7"
               />
               <span className="text-lg font-bold">Rio Markets</span>
             </div>

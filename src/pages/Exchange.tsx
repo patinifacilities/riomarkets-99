@@ -2,13 +2,10 @@ import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useExchangeStore } from '@/stores/useExchangeStore';
 import { ExchangeWidget } from '@/components/exchange/ExchangeWidget';
-import { RatesTicker } from '@/components/exchange/RatesTicker';
 import { BalancesCard } from '@/components/exchange/BalancesCard';
 import { ExchangeHistory } from '@/components/exchange/ExchangeHistory';
-import { OrderBookWidget } from '@/components/exchange/OrderBookWidget';
-import { OrderBookTicker } from '@/components/exchange/OrderBookTicker';
-import { DepthChart } from '@/components/exchange/DepthChart';
 import { FunctionalOrderBook } from '@/components/exchange/FunctionalOrderBook';
+import { BalanceDonutChart } from '@/components/exchange/BalanceDonutChart';
 import { track } from '@/lib/analytics';
 
 const Exchange = () => {
@@ -52,7 +49,7 @@ const Exchange = () => {
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-6xl">
-      {/* Header with Rate Ticker */}
+      {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
@@ -63,7 +60,6 @@ const Exchange = () => {
               Converta suas moedas com segurança e transparência
             </p>
           </div>
-          <RatesTicker />
         </div>
       </div>
 
@@ -72,7 +68,7 @@ const Exchange = () => {
         {/* Exchange Widget */}
         <div className="xl:col-span-1 space-y-6">
           <ExchangeWidget />
-          <BalancesCard />
+          <BalanceDonutChart />
         </div>
         
         {/* Functional Order Book */}
