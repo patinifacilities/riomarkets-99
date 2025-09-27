@@ -211,10 +211,14 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                 <span>SIM {yesPercentage}%</span>
                 <span>NÃO {noPercentage}%</span>
               </div>
-              <div className="h-1 bg-muted rounded-full overflow-hidden">
+              <div className="h-1 bg-muted rounded-full overflow-hidden flex">
                 <div 
                   className="h-full bg-[#00ff90] transition-all duration-300"
                   style={{ width: `${yesPercentage}%` }}
+                />
+                <div 
+                  className="h-full bg-[#ff2389] transition-all duration-300"
+                  style={{ width: `${noPercentage}%` }}
                 />
               </div>
             </div>

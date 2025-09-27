@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import BetModal from '@/components/markets/BetModal';
 import PoolProgressBar from '@/components/markets/PoolProgressBar';
+import ProbabilityChart from '@/components/markets/ProbabilityChart';
 import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorModal';
 
 const MarketDetail = () => {
@@ -166,6 +167,12 @@ const MarketDetail = () => {
                 naoPercent={pool?.percent_nao || 0}
               />
             </div>
+
+            {/* Probability Chart */}
+            <ProbabilityChart 
+              marketId={market.id}
+              createdAt={market.created_at}
+            />
 
             {/* Options */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

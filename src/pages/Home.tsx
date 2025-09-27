@@ -19,6 +19,7 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState('recentes');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -30,6 +31,13 @@ const Home = () => {
     { id: 'tech', label: 'Tecnologia', value: 'tecnologia' },
     { id: 'entertainment', label: 'Entretenimento', value: 'entretenimento' },
     { id: 'climate', label: 'Clima', value: 'clima' }
+  ];
+
+  // Status filters
+  const statusFilters = [
+    { id: 'active', label: 'Ativos', value: 'aberto' },
+    { id: 'ending', label: 'Encerrando', value: 'encerrando' },
+    { id: 'closed', label: 'Encerrados', value: 'fechado' }
   ];
   
   const { data: markets = [], isLoading } = useMarkets(selectedCategory);
@@ -55,6 +63,21 @@ const Home = () => {
     navigate({ search: params.toString() }, { replace: true });
   };
 
+  const getDaysUntilEnd = (endDate: string): number => {
+    const now = new Date();
+    const end = new Date(endDate);
+    const diffTime = end.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const getMarketStatus = (market: any): string => {
+    const daysLeft = getDaysUntilEnd(market.end_date);
+    if (market.status !== 'aberto') return market.status;
+    if (daysLeft <= 7) return 'encerrando';
+    return 'aberto';
+  };
+
   const filteredMarkets = markets.filter(market => {
     // Filter by search term
     const matchesSearch = market.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -67,7 +90,15 @@ const Home = () => {
              return topic && market.categoria === topic.value;
            });
     
-    return matchesSearch && matchesTopics;
+    // Filter by status
+    const marketStatus = getMarketStatus(market);
+    const matchesStatus = selectedStatus.length === 0 || 
+           selectedStatus.some(statusId => {
+             const status = statusFilters.find(s => s.id === statusId);
+             return status && marketStatus === status.value;
+           });
+    
+    return matchesSearch && matchesTopics && matchesStatus;
   });
 
   // Função de ordenação
@@ -112,6 +143,19 @@ const Home = () => {
 
   const handleRemoveTopic = (topicId: string) => {
     setSelectedTopics(prev => prev.filter(id => id !== topicId));
+  };
+
+  // Handle status filter changes
+  const handleStatusSelect = (statusId: string) => {
+    setSelectedStatus(prev => 
+      prev.includes(statusId) 
+        ? prev.filter(id => id !== statusId)
+        : [...prev, statusId]
+    );
+  };
+
+  const handleRemoveStatus = (statusId: string) => {
+    setSelectedStatus(prev => prev.filter(id => id !== statusId));
   };
 
   return (
@@ -177,18 +221,35 @@ const Home = () => {
         onSortChange={handleSortChange}
       />
 
-      {/* Topic Filters */}
-      <div className="container mx-auto px-4 pb-4">
-        <div className="flex items-center gap-3 mb-4">
-          <Filter className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm font-medium text-muted-foreground">Filtrar por tópico:</span>
+      {/* Filters Section */}
+      <div className="container mx-auto px-4 pb-4 space-y-6">
+        {/* Topic Filters */}
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <Filter className="w-5 h-5 text-muted-foreground" />
+            <span className="text-lg font-semibold text-foreground">Filtrar por tópico:</span>
+          </div>
+          <FilterChips
+            chips={topicFilters}
+            selectedChips={selectedTopics}
+            onChipSelect={handleTopicSelect}
+            onRemoveChip={handleRemoveTopic}
+          />
         </div>
-        <FilterChips
-          chips={topicFilters}
-          selectedChips={selectedTopics}
-          onChipSelect={handleTopicSelect}
-          onRemoveChip={handleRemoveTopic}
-        />
+
+        {/* Status Filters */}
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <Filter className="w-5 h-5 text-muted-foreground" />
+            <span className="text-lg font-semibold text-foreground">Filtrar por status:</span>
+          </div>
+          <FilterChips
+            chips={statusFilters}
+            selectedChips={selectedStatus}
+            onChipSelect={handleStatusSelect}
+            onRemoveChip={handleRemoveStatus}
+          />
+        </div>
       </div>
 
       {/* Markets Grid */}

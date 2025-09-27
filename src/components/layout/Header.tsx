@@ -265,67 +265,35 @@ const Header = () => {
                   variant="ghost" 
                   size="sm"
                   onClick={() => navigate('/profile')}
-                  className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 hidden sm:flex rounded-lg"
+                  className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 flex items-center gap-2 rounded-xl"
                 >
                   <User className="w-4 h-4" />
+                  <span className="hidden sm:inline text-sm">Perfil</span>
                 </Button>
                 
-                <div className="text-right hidden sm:block">
+                <div className="text-right hidden lg:block">
                   <p className="text-sm font-medium text-white">{profile.nome}</p>
                   <p className="text-xs text-gray-300 capitalize">{profile.nivel}</p>
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="relative h-8 w-8 rounded-full">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-primary text-primary-foreground">
-                          {profile.nome.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link to="/profile" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    Perfil
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/wallet" className="cursor-pointer">
-                    <Wallet className="mr-2 h-4 w-4" />
-                    Carteira
-                  </Link>
-                </DropdownMenuItem>
-                 <DropdownMenuItem asChild>
-                   <Link to="/exchange" className="cursor-pointer">
-                     <ArrowRightLeft className="mr-2 h-4 w-4" />
-                     Exchange
-                   </Link>
-                 </DropdownMenuItem>
-                 <DropdownMenuItem asChild>
-                   <Link to="/transactions" className="cursor-pointer">
-                     <Receipt className="mr-2 h-4 w-4" />
-                     Transações
-                   </Link>
-                 </DropdownMenuItem>
-                 <DropdownMenuSeparator />
-                 <DropdownMenuItem onClick={signOut} className="cursor-pointer text-red-600">
-                   <LogOut className="mr-2 h-4 w-4" />
-                   Sair
-                 </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                
+                {/* Logout Button */}
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={signOut}
+                  className="h-9 px-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/50 flex items-center gap-2 rounded-xl text-red-400 hover:text-red-300"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden sm:inline text-sm">Sair</span>
+                </Button>
               </>
             ) : (
-              !isMobile && (
-                <Link to="/auth">
-                  <Button className="gap-2 shadow-success rounded-xl">
-                    <LogIn className="w-4 h-4" />
-                    Entrar
-                  </Button>
-                </Link>
-              )
+              <Link to="/auth">
+                <Button className="gap-2 shadow-success rounded-xl">
+                  <LogIn className="w-4 h-4" />
+                  Entrar
+                </Button>
+              </Link>
             )}
           </div>
         </div>
