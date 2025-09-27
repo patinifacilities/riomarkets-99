@@ -1,48 +1,42 @@
 import { useState } from 'react';
-import { Wallet as WalletIcon, TrendingUp, TrendingDown, History, BarChart3, AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Wallet, TrendingUp, TrendingDown, Users, Plus, Download, History, BarChart3 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
+import { useWalletTransactions, useUserOrders } from '@/hooks/useWallet';
+import { useMarkets } from '@/hooks/useMarkets';
+import { useMarketRewards } from '@/hooks/useMarketRewards';
+import { AddBrlModal } from '@/components/exchange/AddBrlModal';
 import TransactionItem from '@/components/wallet/TransactionItem';
 import OrderItem from '@/components/wallet/OrderItem';
 import ExportCSVButton from '@/components/ui/export-csv-button';
-import { AddBrlModal } from '@/components/exchange/AddBrlModal';
-import { useWalletTransactions, useUserOrders } from '@/hooks/useWallet';
-import { useMarkets } from '@/hooks/useMarkets';
-import { useAuth } from '@/hooks/useAuth';
-import { useMarketRewards } from '@/hooks/useMarketRewards';
 
-const Wallet = () => {
-  const [depositModalOpen, setDepositModalOpen] = useState(false);
+const WalletPage = () => {
   const { user } = useAuth();
-  const { data: transactions = [], isLoading: transactionsLoading } = useWalletTransactions(user?.id);
-  const { data: orders = [], isLoading: ordersLoading } = useUserOrders(user?.id);
-  const { data: markets = [] } = useMarkets();
-  
-  // Get a sample market for pool data (in a real app, this would be global pool data)
-  const sampleMarket = markets[0];
-  const { data: poolData } = useMarketRewards(sampleMarket?.id || '');
-  
-  // Calculate global pool percentages (mock data for demo)
-  const globalPoolSim = 65;
-  const globalPoolNao = 35;
-  const globalPoolTotal = 150000;
+  const { data: profile } = useProfile(user?.id);
+  const { data: transactions, isLoading: loadingTransactions } = useWalletTransactions(user?.id);
+  const { data: orders, isLoading: loadingOrders } = useUserOrders(user?.id);
+  const { data: markets } = useMarkets();
+  const { data: rewards } = useMarketRewards('sample-market-id');
+  const [showDepositModal, setShowDepositModal] = useState(false);
 
-  const totalCredits = transactions
-    .filter(t => t.tipo === 'credito')
-    .reduce((sum, t) => sum + t.valor, 0);
+  // Calculate totals
+  const totalCredits = transactions?.filter(t => t.tipo === 'credito').reduce((sum, t) => sum + t.valor, 0) || 0;
+  const totalDebits = transactions?.filter(t => t.tipo === 'debito').reduce((sum, t) => sum + t.valor, 0) || 0;
+  const currentBalance = profile?.saldo_moeda || 0;
+  const totalInOrders = orders?.filter(o => o.status === 'ativa').reduce((sum, o) => sum + o.quantidade_moeda, 0) || 0;
 
-  const totalDebits = transactions
-    .filter(t => t.tipo === 'debito')
-    .reduce((sum, t) => sum + t.valor, 0);
+  // Sort all orders by date
+  const allOrders = orders?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) || [];
 
-  const activeOrders = orders.filter(order => order.status === 'ativa');
-  const totalInActiveOrders = activeOrders.reduce((sum, order) => sum + order.quantidade_moeda, 0);
-  
-  // All orders for complete history
-  const allOrders = orders.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
-  const currentBalance = totalCredits - totalDebits;
+  // Calculate global pool data (mock data for now)
+  const globalPoolSim = 65000;
+  const globalPoolNao = 35000;
+  const totalPool = globalPoolSim + globalPoolNao;
+  const simPercent = totalPool > 0 ? (globalPoolSim / totalPool) * 100 : 50;
+  const naoPercent = totalPool > 0 ? (globalPoolNao / totalPool) * 100 : 50;
 
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
@@ -134,114 +128,103 @@ const Wallet = () => {
                 </div>
               </div>
             </div>
-            <div className="text-center mt-4 pt-4 border-t border-border">
-              <div className="text-sm text-muted-foreground">
-                Total do Pool: <span className="font-semibold text-foreground">{globalPoolTotal.toLocaleString()} Rioz Coin</span>
-              </div>
+            <div className="bg-danger/10 border border-danger/20 rounded-lg p-4">
+              <p className="text-sm text-danger font-medium mb-2">⚠️ Aviso sobre Taxa de Liquidação</p>
+              <p className="text-xs text-muted-foreground">
+                20% do pool perdedor será destinado à manutenção da plataforma quando os mercados forem liquidados.
+              </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Taxa de Liquidação Warning */}
-        <div className="mb-6 p-4 rounded-lg border border-[#FF1493]/30 bg-[#FF1493]/5">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-[#FF1493]" />
-            <p className="text-[#FF1493] text-sm font-medium">
-              Taxa de liquidação: 20% do pool perdedor vai para a plataforma
-            </p>
-          </div>
-        </div>
-
-        {/* CTAs de Opinião */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <Button 
-            className="min-h-[56px] font-semibold text-lg"
-            style={{ backgroundColor: '#00ff90', color: 'white' }}
-            aria-label="Dar opinião apostando em SIM"
-            onClick={() => window.location.href = '/'}
-          >
-            <TrendingUp className="w-5 h-5 mr-2" />
-            Opinar SIM
-          </Button>
-          <Button 
-            className="min-h-[56px] font-semibold text-lg"
-            style={{ backgroundColor: '#ff2389', color: 'white' }}
-            aria-label="Dar opinião apostando em NÃO"
-            onClick={() => window.location.href = '/'}
-          >
-            <TrendingDown className="w-5 h-5 mr-2" />
-            Opinar NÃO
-          </Button>
-        </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Button 
+                className="bg-[#00FF91] hover:bg-[#00FF91]/90 text-black"
+                onClick={() => {/* Handle SIM action */}}
+              >
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Dar Opinião SIM
+              </Button>
+              <Button 
+                className="bg-[#FF1493] hover:bg-[#FF1493]/90 text-white"
+                onClick={() => {/* Handle NÃO action */}}
+              >
+                <TrendingDown className="w-4 h-4 mr-2" />
+                Dar Opinião NÃO
+              </Button>
+            </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Transactions History */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <History className="w-5 h-5" />
-                Histórico de Transações
-              </CardTitle>
-              <ExportCSVButton
-                data={transactions}
-                filename="historico_transacoes"
-                headers={['Tipo', 'Valor', 'Descrição', 'Data']}
-              />
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Histórico de Transações</CardTitle>
+                <ExportCSVButton 
+                  data={transactions || []}
+                  filename="transacoes"
+                  headers={['ID', 'Tipo', 'Valor', 'Descrição']}
+                />
+              </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {transactionsLoading ? (
-                <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            <CardContent>
+              {loadingTransactions ? (
+                <div className="space-y-3">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="h-16 bg-muted/20 rounded animate-pulse" />
+                  ))}
+                </div>
+              ) : transactions && transactions.length > 0 ? (
+                <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                  {transactions.map((transaction) => (
+                    <TransactionItem key={transaction.id} transaction={transaction} />
+                  ))}
                 </div>
               ) : (
-                transactions.map(transaction => (
-                  <TransactionItem key={transaction.id} transaction={transaction} />
-                ))
+                <div className="text-center py-8 text-muted-foreground">
+                  <Wallet className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>Nenhuma transação encontrada</p>
+                </div>
               )}
             </CardContent>
           </Card>
 
-          {/* All Orders History */}
-          <Card>
+          {/* Order History */}
+          <Card className="bg-gradient-card border-border/50">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5" />
-                Histórico de Opiniões
-              </CardTitle>
+              <CardTitle>Histórico de Ordens</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {ordersLoading ? (
-                <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            <CardContent>
+              {loadingOrders ? (
+                <div className="space-y-3">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="h-16 bg-muted/20 rounded animate-pulse" />
+                  ))}
                 </div>
-              ) : allOrders.length === 0 ? (
-                <div className="text-center py-8">
-                  <TrendingDown className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground">Nenhuma análise encontrada</p>
+              ) : allOrders.length > 0 ? (
+                <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                  {allOrders.map((order) => (
+                    <OrderItem key={order.id} order={order} markets={markets || []} />
+                  ))}
                 </div>
               ) : (
-                allOrders.map(order => {
-                  const market = markets.find(m => m.id === order.market_id);
-                  return (
-                    <OrderItem
-                      key={order.id}
-                      order={order}
-                      market={market}
-                    />
-                  );
-                })
+                <div className="text-center py-8 text-muted-foreground">
+                  <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>Nenhuma ordem encontrada</p>
+                </div>
               )}
             </CardContent>
           </Card>
         </div>
       </div>
 
-      <AddBrlModal 
-        open={depositModalOpen}
-        onOpenChange={setDepositModalOpen}
-      />
+        {/* Add BRL Modal */}
+        <AddBrlModal 
+          open={showDepositModal} 
+          onOpenChange={setShowDepositModal}
+        />
     </div>
   );
 };
 
-export default Wallet;
+export default WalletPage;

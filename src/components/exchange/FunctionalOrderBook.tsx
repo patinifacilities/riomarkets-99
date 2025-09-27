@@ -1,394 +1,164 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Activity, ArrowUp, ArrowDown, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
-import { TrendingUp, TrendingDown, ArrowUpDown } from 'lucide-react';
-import { useExchangeStore } from '@/stores/useExchangeStore';
 
-interface OrderBookEntry {
+interface OrderBookLevel {
   price: number;
-  amount: number;
+  quantity: number;
   total: number;
+  ordersCount: number;
 }
 
-interface Order {
-  id: string;
-  type: 'buy' | 'sell';
-  price: number;
-  amount: number;
-  timestamp: number;
+interface FunctionalOrderBookProps {
+  className?: string;
 }
 
-export const FunctionalOrderBook = () => {
-  const [buyOrders, setBuyOrders] = useState<OrderBookEntry[]>([]);
-  const [sellOrders, setSellOrders] = useState<OrderBookEntry[]>([]);
-  const [userOrders, setUserOrders] = useState<Order[]>([]);
-  const [orderType, setOrderType] = useState<'buy' | 'sell'>('buy');
-  const [marketType, setMarketType] = useState<'market' | 'limit'>('market');
-  const [price, setPrice] = useState('');
-  const [amount, setAmount] = useState('');
-  const [sliderValue, setSliderValue] = useState([0]);
-  const { balance } = useExchangeStore();
+export const FunctionalOrderBook: React.FC<FunctionalOrderBookProps> = ({ className }) => {
+  // Mock data for orderbook - no user names, just amounts and percentages
+  const buyOrders: OrderBookLevel[] = [
+    { price: 5.48, quantity: 1500, total: 8220, ordersCount: 3 },
+    { price: 5.47, quantity: 2200, total: 12034, ordersCount: 5 },
+    { price: 5.46, quantity: 1800, total: 9828, ordersCount: 2 },
+    { price: 5.45, quantity: 3200, total: 17440, ordersCount: 7 },
+    { price: 5.44, quantity: 1200, total: 6528, ordersCount: 2 },
+  ];
 
-  // Initialize with mock data
-  useEffect(() => {
-    const initialBuyOrders: OrderBookEntry[] = [
-      { price: 0.95, amount: 1000, total: 950 },
-      { price: 0.92, amount: 1500, total: 1380 },
-      { price: 0.90, amount: 2000, total: 1800 },
-      { price: 0.88, amount: 1200, total: 1056 },
-      { price: 0.85, amount: 800, total: 680 },
-    ];
+  const sellOrders: OrderBookLevel[] = [
+    { price: 5.52, quantity: 1100, total: 6072, ordersCount: 2 },
+    { price: 5.53, quantity: 1800, total: 9954, ordersCount: 4 },
+    { price: 5.54, quantity: 2100, total: 11634, ordersCount: 3 },
+    { price: 5.55, quantity: 1600, total: 8880, ordersCount: 6 },
+    { price: 5.56, quantity: 2400, total: 13344, ordersCount: 5 },
+  ];
 
-    const initialSellOrders: OrderBookEntry[] = [
-      { price: 1.05, amount: 800, total: 840 },
-      { price: 1.08, amount: 1200, total: 1296 },
-      { price: 1.10, amount: 2000, total: 2200 },
-      { price: 1.12, amount: 1500, total: 1680 },
-      { price: 1.15, amount: 1000, total: 1150 },
-    ];
-
-    setBuyOrders(initialBuyOrders);
-    setSellOrders(initialSellOrders);
-  }, []);
-
-  const handleSliderChange = (value: number[]) => {
-    setSliderValue(value);
-    const percentage = value[0] / 100;
-    
-    if (orderType === 'buy' && balance?.brl_balance) {
-      const maxAmount = balance.brl_balance * percentage;
-      setAmount(maxAmount.toFixed(2));
-    } else if (orderType === 'sell' && balance?.rioz_balance) {
-      const maxAmount = balance.rioz_balance * percentage;
-      setAmount(maxAmount.toFixed(2));
-    }
-  };
-
-  const handlePlaceOrder = async () => {
-    if (!amount || (marketType === 'limit' && !price)) return;
-
-    const orderPrice = marketType === 'market' 
-      ? (orderType === 'buy' ? sellOrders[0]?.price || 1.0 : buyOrders[0]?.price || 1.0)
-      : parseFloat(price);
-
-    const newOrder: Order = {
-      id: `order_${Date.now()}`,
-      type: orderType,
-      price: orderPrice,
-      amount: parseFloat(amount),
-      timestamp: Date.now()
-    };
-
-    // Se é ordem de mercado, executar imediatamente através do exchange store
-    if (marketType === 'market') {
-      try {
-        const side = orderType === 'buy' ? 'buy_rioz' : 'sell_rioz';
-        const inputCurrency = orderType === 'buy' ? 'BRL' : 'RIOZ';
-        await useExchangeStore.getState().performExchange(side, parseFloat(amount), inputCurrency);
-        
-        // Clear form after successful execution
-        setPrice('');
-        setAmount('');
-        setSliderValue([0]);
-        return;
-      } catch (error) {
-        console.error('Erro ao executar ordem de mercado:', error);
-        return;
-      }
-    }
-
-    setUserOrders(prev => [newOrder, ...prev].slice(0, 10));
-
-    // Enhanced matching logic
-    if (orderType === 'buy') {
-      const newBuyOrder = { price: orderPrice, amount: parseFloat(amount), total: orderPrice * parseFloat(amount) };
-      
-      // Check for matching sell orders
-      const matchingSells = sellOrders.filter(sell => sell.price <= orderPrice);
-      if (matchingSells.length > 0) {
-        let remainingAmount = parseFloat(amount);
-        const updatedSells = [...sellOrders];
-        
-        for (const sell of matchingSells) {
-          if (remainingAmount <= 0) break;
-          
-          if (sell.amount <= remainingAmount) {
-            remainingAmount -= sell.amount;
-            const sellIndex = updatedSells.findIndex(s => s.price === sell.price && s.amount === sell.amount);
-            if (sellIndex !== -1) updatedSells.splice(sellIndex, 1);
-          } else {
-            const sellIndex = updatedSells.findIndex(s => s.price === sell.price && s.amount === sell.amount);
-            if (sellIndex !== -1) {
-              updatedSells[sellIndex].amount -= remainingAmount;
-              updatedSells[sellIndex].total = updatedSells[sellIndex].price * updatedSells[sellIndex].amount;
-            }
-            remainingAmount = 0;
-          }
-        }
-        
-        setSellOrders(updatedSells);
-        
-        if (remainingAmount > 0) {
-          setBuyOrders(prev => [
-            { ...newBuyOrder, amount: remainingAmount, total: orderPrice * remainingAmount },
-            ...prev
-          ].sort((a, b) => b.price - a.price).slice(0, 5));
-        }
-      } else {
-        setBuyOrders(prev => [newBuyOrder, ...prev].sort((a, b) => b.price - a.price).slice(0, 5));
-      }
-    } else {
-      const newSellOrder = { price: orderPrice, amount: parseFloat(amount), total: orderPrice * parseFloat(amount) };
-      
-      // Check for matching buy orders
-      const matchingBuys = buyOrders.filter(buy => buy.price >= orderPrice);
-      if (matchingBuys.length > 0) {
-        let remainingAmount = parseFloat(amount);
-        const updatedBuys = [...buyOrders];
-        
-        for (const buy of matchingBuys) {
-          if (remainingAmount <= 0) break;
-          
-          if (buy.amount <= remainingAmount) {
-            remainingAmount -= buy.amount;
-            const buyIndex = updatedBuys.findIndex(b => b.price === buy.price && b.amount === buy.amount);
-            if (buyIndex !== -1) updatedBuys.splice(buyIndex, 1);
-          } else {
-            const buyIndex = updatedBuys.findIndex(b => b.price === buy.price && b.amount === buy.amount);
-            if (buyIndex !== -1) {
-              updatedBuys[buyIndex].amount -= remainingAmount;
-              updatedBuys[buyIndex].total = updatedBuys[buyIndex].price * updatedBuys[buyIndex].amount;
-            }
-            remainingAmount = 0;
-          }
-        }
-        
-        setBuyOrders(updatedBuys);
-        
-        if (remainingAmount > 0) {
-          setSellOrders(prev => [
-            { ...newSellOrder, amount: remainingAmount, total: orderPrice * remainingAmount },
-            ...prev
-          ].sort((a, b) => a.price - b.price).slice(0, 5));
-        }
-      } else {
-        setSellOrders(prev => [newSellOrder, ...prev].sort((a, b) => a.price - b.price).slice(0, 5));
-      }
-    }
-
-    setPrice('');
-    setAmount('');
-    setSliderValue([0]);
-  };
-
-  const spread = sellOrders.length > 0 && buyOrders.length > 0 
-    ? sellOrders[0].price - buyOrders[0].price 
-    : 0;
+  const currentPrice = 5.50;
+  const spread = sellOrders[0]?.price - buyOrders[0]?.price || 0;
+  const spreadPercent = ((spread / currentPrice) * 100) || 0;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Order Book */}
-      <div className="lg:col-span-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ArrowUpDown className="w-5 h-5" />
-              Order Book
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Spread */}
-            <div className="text-center py-2 border border-border rounded-lg">
-              <div className="text-sm text-muted-foreground">Spread</div>
-              <div className="font-bold">{spread.toFixed(4)} RZ</div>
+    <Card className={`bg-gradient-card border-border/50 ${className}`}>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Activity className="w-5 h-5" />
+          Order Book - RIOZ/BRL
+        </CardTitle>
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <span>Preço atual: R$ {currentPrice.toFixed(2)}</span>
+          <span>Spread: {spread.toFixed(3)} ({spreadPercent.toFixed(2)}%)</span>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Sell Orders */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <ArrowUp className="w-4 h-4 text-red-400" />
+            <h4 className="font-semibold text-red-400">Vendas</h4>
+            <Badge variant="outline" className="border-red-400/30 text-red-400">
+              {sellOrders.length}
+            </Badge>
+          </div>
+          
+          <div className="space-y-1">
+            <div className="grid grid-cols-4 gap-2 text-xs text-muted-foreground mb-1 px-2">
+              <span>Preço (R$)</span>
+              <span className="text-right">Qtd (RZ)</span>
+              <span className="text-right">Total (R$)</span>
+              <span className="text-right">Ordens</span>
             </div>
-
-            {/* Sell Orders */}
-            <div>
-              <div className="flex justify-between text-sm text-muted-foreground mb-2">
-                <span>Preço (RZ)</span>
-                <span>Quantidade</span>
-                <span>Total (RZ)</span>
-              </div>
-              <div className="space-y-1">
-                {sellOrders.map((order, index) => (
-                  <div key={index} className="flex justify-between text-sm bg-danger/10 p-2 rounded">
-                    <span className="text-danger font-medium">{order.price.toFixed(4)}</span>
-                    <span>{order.amount.toLocaleString()}</span>
-                    <span>{order.total.toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Buy Orders */}
-            <div>
-              <div className="space-y-1">
-                {buyOrders.map((order, index) => (
-                  <div key={index} className="flex justify-between text-sm bg-success/10 p-2 rounded">
-                    <span className="text-success font-medium">{order.price.toFixed(4)}</span>
-                    <span>{order.amount.toLocaleString()}</span>
-                    <span>{order.total.toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Place Order */}
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Fazer Ordem</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Order Type Toggle */}
-            <div className="grid grid-cols-2 gap-2">
-              <Button
-                variant={orderType === 'buy' ? 'default' : 'outline'}
-                onClick={() => setOrderType('buy')}
-                className={orderType === 'buy' ? 'bg-success hover:bg-success/90' : ''}
+            
+            {sellOrders.reverse().map((order, index) => (
+              <div 
+                key={index}
+                className="grid grid-cols-4 gap-2 p-2 rounded hover:bg-red-500/5 border border-red-500/10 transition-colors"
               >
-                <TrendingUp className="w-4 h-4 mr-2" />
-                Comprar
-              </Button>
-              <Button
-                variant={orderType === 'sell' ? 'default' : 'outline'}
-                onClick={() => setOrderType('sell')}
-                className={orderType === 'sell' ? 'bg-danger hover:bg-danger/90' : ''}
+                <span className="text-sm font-mono text-red-400">{order.price.toFixed(2)}</span>
+                <span className="text-sm font-mono text-right">{order.quantity.toLocaleString()}</span>
+                <span className="text-sm font-mono text-right">{order.total.toLocaleString()}</span>
+                <span className="text-xs text-muted-foreground text-right">{order.ordersCount}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Current Price Indicator */}
+        <div className="border-y border-border py-3 text-center">
+          <div className="text-lg font-bold text-primary">
+            R$ {currentPrice.toFixed(2)}
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Último preço negociado
+          </div>
+        </div>
+
+        {/* Buy Orders */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <ArrowDown className="w-4 h-4 text-green-400" />
+            <h4 className="font-semibold text-green-400">Compras</h4>
+            <Badge variant="outline" className="border-green-400/30 text-green-400">
+              {buyOrders.length}
+            </Badge>
+          </div>
+          
+          <div className="space-y-1">
+            <div className="grid grid-cols-4 gap-2 text-xs text-muted-foreground mb-1 px-2">
+              <span>Preço (R$)</span>
+              <span className="text-right">Qtd (RZ)</span>
+              <span className="text-right">Total (R$)</span>
+              <span className="text-right">Ordens</span>
+            </div>
+            
+            {buyOrders.map((order, index) => (
+              <div 
+                key={index}
+                className="grid grid-cols-4 gap-2 p-2 rounded hover:bg-green-500/5 border border-green-500/10 transition-colors"
               >
-                <TrendingDown className="w-4 h-4 mr-2" />
-                Vender
-              </Button>
-            </div>
-
-            {/* Market Type Selector */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Tipo de Ordem</label>
-              <Select value={marketType} onValueChange={(value: 'market' | 'limit') => setMarketType(value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="market">Mercado</SelectItem>
-                  <SelectItem value="limit">Limite</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Price Input */}
-            {marketType === 'limit' && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Preço (RZ)</label>
-                <Input
-                  type="number"
-                  step="0.0001"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="0.0000"
-                />
+                <span className="text-sm font-mono text-green-400">{order.price.toFixed(2)}</span>
+                <span className="text-sm font-mono text-right">{order.quantity.toLocaleString()}</span>
+                <span className="text-sm font-mono text-right">{order.total.toLocaleString()}</span>
+                <span className="text-xs text-muted-foreground text-right">{order.ordersCount}</span>
               </div>
-            )}
+            ))}
+          </div>
+        </div>
 
-            {/* Balance Slider */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Saldo Disponível: {orderType === 'buy' 
-                  ? `R$ ${balance?.brl_balance?.toFixed(2) || '0.00'}` 
-                  : `${balance?.rioz_balance?.toFixed(2) || '0.00'} RZ`
-                }
-              </label>
-              <Slider
-                value={sliderValue}
-                onValueChange={handleSliderChange}
-                max={100}
-                step={1}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>0%</span>
-                <span>25%</span>
-                <span>50%</span>
-                <span>75%</span>
-                <span>100%</span>
+        {/* Market Depth Summary */}
+        <div className="border-t border-border pt-4">
+          <div className="flex items-center justify-between text-sm mb-3">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-muted-foreground" />
+              <span className="text-muted-foreground">Profundidade:</span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center p-2 rounded bg-green-500/10">
+              <div className="text-xs text-muted-foreground">Vol. Compra</div>
+              <div className="font-semibold text-green-400">
+                {buyOrders.reduce((sum, order) => sum + order.quantity, 0).toLocaleString()} RZ
               </div>
             </div>
-
-            {/* Amount Input */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Quantidade {orderType === 'buy' ? '(R$)' : '(RZ)'}
-              </label>
-              <Input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0"
-              />
-            </div>
-
-            {/* Total */}
-            {amount && (
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <div className="text-sm text-muted-foreground">
-                  {orderType === 'buy' ? 'RZ a receber' : 'R$ a receber'}
-                </div>
-                <div className="font-bold">
-                  {orderType === 'buy' 
-                    ? `${(parseFloat(amount) / (sellOrders[0]?.price || 1)).toFixed(4)} RZ`
-                    : `R$ ${(parseFloat(amount) * (buyOrders[0]?.price || 1)).toFixed(2)}`
-                  }
-                </div>
+            <div className="text-center p-2 rounded bg-red-500/10">
+              <div className="text-xs text-muted-foreground">Vol. Venda</div>
+              <div className="font-semibold text-red-400">
+                {sellOrders.reduce((sum, order) => sum + order.quantity, 0).toLocaleString()} RZ
               </div>
-            )}
-
-            {/* Place Order Button */}
-            <Button
-              onClick={handlePlaceOrder}
-              disabled={!amount || (marketType === 'limit' && !price)}
-              className="w-full"
-            >
-              {orderType === 'buy' ? 'Comprar' : 'Vender'}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* User Orders */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Minhas Ordens</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {userOrders.length === 0 ? (
-                <div className="text-center text-muted-foreground py-4">
-                  Nenhuma ordem ativa
-                </div>
-              ) : (
-                userOrders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-2 border border-border rounded">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={order.type === 'buy' ? 'default' : 'destructive'}>
-                        {order.type === 'buy' ? 'COMPRA' : 'VENDA'}
-                      </Badge>
-                      <span className="text-sm">{order.amount} @ {order.price.toFixed(4)}</span>
-                    </div>
-                    <Button size="sm" variant="outline">
-                      Cancelar
-                    </Button>
-                  </div>
-                ))
-              )}
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+          </div>
+        </div>
+
+        <div className="text-center">
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="text-primary border-primary/30 hover:bg-primary/10"
+          >
+            Atualizar Book
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

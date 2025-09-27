@@ -1,4 +1,4 @@
-import { TrendingUp, Wallet, Trophy, Settings, LogOut, User, LogIn, Receipt, Newspaper, ArrowRightLeft, Menu } from 'lucide-react';
+import { TrendingUp, Wallet, Trophy, Settings, LogOut, User, LogIn, Receipt, Newspaper, ArrowRightLeft, Menu, Plus } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
@@ -30,8 +30,8 @@ const Header = () => {
   const { user, session, signOut, loading } = useAuth();
   const { data: profile } = useProfile(user?.id);
 
-  // Simple authentication check
-  const isLoggedIn = !loading && !!session && !!user && !!profile;
+  // Authentication check - only require session and user, profile should be optional for initial render
+  const isLoggedIn = !loading && !!session && !!user;
 
   console.log('Header auth state:', { 
     loading, 
@@ -102,9 +102,12 @@ const Header = () => {
                           <p className="text-xs text-gray-300 capitalize">{profile.nivel}</p>
                         </div>
                       </div>
-                      <div className="px-2 py-2 mt-2 rounded-lg bg-gradient-primary text-primary-foreground font-semibold text-center">
-                        {profile.saldo_moeda.toLocaleString()} Rioz
+                    <Link to="/wallet" onClick={handleMobileNavClick}>
+                      <div className="px-2 py-2 mt-2 rounded-lg bg-gradient-primary text-primary-foreground font-semibold text-center cursor-pointer hover:opacity-90 transition-opacity">
+                        <Wallet className="w-4 h-4 inline mr-2" />
+                        {profile?.saldo_moeda?.toLocaleString() || 0} RZ
                       </div>
+                    </Link>
                     </div>
                   )}
                   
@@ -251,6 +254,31 @@ const Header = () => {
           <div className="flex items-center gap-3">
             {isLoggedIn ? (
               <>
+                {/* Wallet Balance */}
+                <Link to="/wallet">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-xl"
+                  >
+                    <Wallet className="w-4 h-4" />
+                    {profile?.saldo_moeda || 0} RZ
+                  </Button>
+                </Link>
+                
+                {/* Deposit Button */}
+                <Link to="/wallet">
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    className="gap-2 shadow-success rounded-xl"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Depositar
+                  </Button>
+                </Link>
+                
+                {/* Logout Button */}
                 <Button 
                   variant="ghost" 
                   size="sm"

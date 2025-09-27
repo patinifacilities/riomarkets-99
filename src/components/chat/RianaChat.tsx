@@ -129,9 +129,9 @@ export function RianaChat() {
       <button
         onClick={toggle}
         className="fixed bottom-5 right-5 z-40 rounded-full px-5 py-3 text-black font-semibold
-                   bg-[color:var(--brand-green)] shadow-[0_0_30px_rgba(0,255,145,0.35)]
-                   hover:opacity-90 hover:shadow-[0_0_40px_rgba(0,255,145,0.5)] 
-                   focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-green)]
+                   bg-primary shadow-[0_0_30px_hsl(var(--primary)/0.35)]
+                   hover:opacity-90 hover:shadow-[0_0_40px_hsl(var(--primary)/0.5)] 
+                   focus:outline-none focus-visible:ring-2 focus-visible:ring-primary
                    transition-all duration-300 min-h-[48px] min-w-[48px]"
         aria-label="Abrir chat com a Riana"
       >

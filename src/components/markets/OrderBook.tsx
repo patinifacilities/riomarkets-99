@@ -5,11 +5,11 @@ import { ArrowUp, ArrowDown, TrendingUp, Activity } from 'lucide-react';
 
 interface OrderBookEntry {
   id: string;
-  user: string;
   option: 'sim' | 'nao';
   amount: number;
   probability: number;
   timestamp: string;
+  ordersCount: number;
 }
 
 interface OrderBookProps {
@@ -17,13 +17,15 @@ interface OrderBookProps {
 }
 
 const OrderBook = ({ marketId }: OrderBookProps) => {
-  // Mock order book data - replace with real API call
+  // Mock order book data - no user names, professional orderbook style
   const orders: OrderBookEntry[] = [
-    { id: '1', user: 'Analista123', option: 'sim', amount: 1500, probability: 0.65, timestamp: '10:30' },
-    { id: '2', user: 'TradePro', option: 'nao', amount: 2000, probability: 0.35, timestamp: '10:28' },
-    { id: '3', user: 'SmartBet', option: 'sim', amount: 800, probability: 0.68, timestamp: '10:25' },
-    { id: '4', user: 'MarketGuru', option: 'nao', amount: 1200, probability: 0.32, timestamp: '10:22' },
-    { id: '5', user: 'DataAnalyst', option: 'sim', amount: 500, probability: 0.62, timestamp: '10:20' },
+    { id: '1', option: 'sim', amount: 1500, probability: 0.65, timestamp: '10:30', ordersCount: 3 },
+    { id: '2', option: 'nao', amount: 2000, probability: 0.35, timestamp: '10:28', ordersCount: 5 },
+    { id: '3', option: 'sim', amount: 800, probability: 0.68, timestamp: '10:25', ordersCount: 2 },
+    { id: '4', option: 'nao', amount: 1200, probability: 0.32, timestamp: '10:22', ordersCount: 4 },
+    { id: '5', option: 'sim', amount: 500, probability: 0.62, timestamp: '10:20', ordersCount: 1 },
+    { id: '6', option: 'sim', amount: 2200, probability: 0.70, timestamp: '10:18', ordersCount: 6 },
+    { id: '7', option: 'nao', amount: 1800, probability: 0.30, timestamp: '10:15', ordersCount: 3 },
   ];
 
   const simOrders = orders.filter(order => order.option === 'sim').slice(0, 5);
@@ -37,79 +39,86 @@ const OrderBook = ({ marketId }: OrderBookProps) => {
           Order Book - Mercado de Opiniões
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Ordens de outros usuários aguardando para serem preenchidas
+          Profundidade do mercado para este evento
         </p>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* SIM Orders */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <ArrowUp className="w-4 h-4 text-[#00FF91]" />
-              <h4 className="font-semibold text-[#00FF91]">Ordens SIM</h4>
-              <Badge variant="outline" className="border-[#00FF91]/30 text-[#00FF91]">
-                {simOrders.length}
-              </Badge>
-            </div>
-            <div className="space-y-2">
-              {simOrders.length === 0 ? (
-                <div className="text-center py-4 text-muted-foreground text-sm">
-                  Nenhuma ordem SIM pendente
-                </div>
-              ) : (
-                simOrders.map((order) => (
-                  <div 
-                    key={order.id}
-                    className="p-3 rounded-lg border border-[#00FF91]/20 bg-[#00FF91]/5 hover:bg-[#00FF91]/10 transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-muted-foreground">{order.timestamp}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-mono">{order.amount.toLocaleString()} RZ</span>
-                      <span className="text-xs text-[#00FF91]">
-                        {(order.probability * 100).toFixed(0)}%
-                      </span>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+      <CardContent className="space-y-4">
+        {/* SIM Orders (Sell side) */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <ArrowUp className="w-4 h-4 text-[#00FF91]" />
+            <h4 className="font-semibold text-[#00FF91]">SIM</h4>
+            <Badge variant="outline" className="border-[#00FF91]/30 text-[#00FF91]">
+              {simOrders.length}
+            </Badge>
           </div>
-
-          {/* NÃO Orders */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <ArrowDown className="w-4 h-4 text-[#FF1493]" />
-              <h4 className="font-semibold text-[#FF1493]">Ordens NÃO</h4>
-              <Badge variant="outline" className="border-[#FF1493]/30 text-[#FF1493]">
-                {naoOrders.length}
-              </Badge>
+          
+          <div className="space-y-1">
+            <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground mb-1 px-2">
+              <span>Probabilidade</span>
+              <span className="text-right">Tamanho (RZ)</span>
+              <span className="text-right">Ordens</span>
             </div>
-            <div className="space-y-2">
-              {naoOrders.length === 0 ? (
-                <div className="text-center py-4 text-muted-foreground text-sm">
-                  Nenhuma ordem NÃO pendente
+            
+            {simOrders.length === 0 ? (
+              <div className="text-center py-4 text-muted-foreground text-sm">
+                Nenhuma ordem SIM
+              </div>
+            ) : (
+              simOrders.reverse().map((order) => (
+                <div 
+                  key={order.id}
+                  className="grid grid-cols-3 gap-2 p-2 rounded hover:bg-[#00FF91]/5 border border-[#00FF91]/10 transition-colors"
+                >
+                  <span className="text-sm font-mono text-[#00FF91]">{(order.probability * 100).toFixed(0)}%</span>
+                  <span className="text-sm font-mono text-right">{order.amount.toLocaleString()}</span>
+                  <span className="text-xs text-muted-foreground text-right">{order.ordersCount}</span>
                 </div>
-              ) : (
-                naoOrders.map((order) => (
-                  <div 
-                    key={order.id}
-                    className="p-3 rounded-lg border border-[#FF1493]/20 bg-[#FF1493]/5 hover:bg-[#FF1493]/10 transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-muted-foreground">{order.timestamp}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-mono">{order.amount.toLocaleString()} RZ</span>
-                      <span className="text-xs text-[#FF1493]">
-                        {(order.probability * 100).toFixed(0)}%
-                      </span>
-                    </div>
-                  </div>
-                ))
-              )}
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Market Separator */}
+        <div className="border-y border-border py-2 text-center">
+          <div className="text-sm text-muted-foreground">
+            Spread do mercado
+          </div>
+        </div>
+
+        {/* NÃO Orders (Buy side) */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <ArrowDown className="w-4 h-4 text-[#FF1493]" />
+            <h4 className="font-semibold text-[#FF1493]">NÃO</h4>
+            <Badge variant="outline" className="border-[#FF1493]/30 text-[#FF1493]">
+              {naoOrders.length}
+            </Badge>
+          </div>
+          
+          <div className="space-y-1">
+            <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground mb-1 px-2">
+              <span>Probabilidade</span>
+              <span className="text-right">Tamanho (RZ)</span>
+              <span className="text-right">Ordens</span>
             </div>
+            
+            {naoOrders.length === 0 ? (
+              <div className="text-center py-4 text-muted-foreground text-sm">
+                Nenhuma ordem NÃO
+              </div>
+            ) : (
+              naoOrders.map((order) => (
+                <div 
+                  key={order.id}
+                  className="grid grid-cols-3 gap-2 p-2 rounded hover:bg-[#FF1493]/5 border border-[#FF1493]/10 transition-colors"
+                >
+                  <span className="text-sm font-mono text-[#FF1493]">{(order.probability * 100).toFixed(0)}%</span>
+                  <span className="text-sm font-mono text-right">{order.amount.toLocaleString()}</span>
+                  <span className="text-xs text-muted-foreground text-right">{order.ordersCount}</span>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
