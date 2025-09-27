@@ -1,21 +1,25 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Search, TrendingUp, Filter } from 'lucide-react';
+import { Filter, LogIn, UserPlus, BarChart3, Zap, Target, Shield, Sparkles } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import MarketCardKalshi from '@/components/markets/MarketCardKalshi';
-
 import { FilterChips } from '@/components/ui/filter-chips';
 import { MarketGridSkeleton } from '@/components/ui/MarketCardSkeleton';
+import FAQ from '@/components/ui/FAQ';
 import TopAnalysts from '@/components/ui/TopAnalysts';
+import { useCategories } from '@/hooks/useCategories';
 import { useMarkets } from '@/hooks/useMarkets';
 import { groupMarketsByStatus } from '@/lib/market-utils';
-import { track } from '@/lib/analytics';
-import FAQ from '@/components/ui/FAQ';
+import { TypewriterText } from '@/components/ui/TypewriterText';
 import { ComplianceBanner } from '@/components/compliance/ComplianceBanner';
 import { OnboardingTrigger } from '@/components/onboarding/OnboardingTrigger';
+import { track } from '@/lib/analytics';
+import { Search, TrendingUp } from 'lucide-react';
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState('recentes');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
@@ -165,7 +169,11 @@ const Home = () => {
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
           <div className="text-center mb-6 md:mb-8">
             <h1 className="font-extrabold text-[34px] md:text-[44px] lg:text-[56px] leading-[1.05] mb-4 text-white [text-wrap:balance]">
-              Mercados Preditivos <span id="typewriter-text" className="text-[#00FF91]">Inteligentes</span>
+              <TypewriterText 
+                baseText="Mercados Preditivos"
+                texts={["Inteligentes", "Lucrativos", "Rápidos"]}
+                className="text-[#00FF91]"
+              />
             </h1>
             <p className="text-base md:text-lg max-w-[60ch] mx-auto text-[color:var(--text-secondary)]">
               Analise eventos futuros com dados preditivos inteligentes. Teste suas habilidades e suba no ranking em <span className="text-[#00FF91]">Rioz Coin</span>.
@@ -211,6 +219,22 @@ const Home = () => {
           </div>
         </section>
 
+        {/* Search and Filters */}
+        <div className="container mx-auto px-4 md:px-8 mb-8">
+          <div className="flex flex-col md:flex-row gap-4 items-center mb-6">
+            {/* Search Bar */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Buscar mercados..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+              />
+            </div>
+          </div>
+        </div>
+
       {/* Combined Filters Section */}
       <div className="container mx-auto px-4 pb-4">
         <div className="flex items-center gap-3 mb-4">
@@ -219,7 +243,7 @@ const Home = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Topic Filters */}
+          {/* Topic Filters - 50% larger */}
           <div>
             <h4 className="text-sm font-medium text-muted-foreground mb-3">Por tópico:</h4>
             <FilterChips
@@ -227,10 +251,11 @@ const Home = () => {
               selectedChips={selectedTopics}
               onChipSelect={handleTopicSelect}
               onRemoveChip={handleRemoveTopic}
+              chipClassName="px-6 py-3 text-base"
             />
           </div>
 
-          {/* Status Filters */}
+          {/* Status Filters - 50% larger */}
           <div>
             <h4 className="text-sm font-medium text-muted-foreground mb-3">Por status:</h4>
             <FilterChips
@@ -238,6 +263,7 @@ const Home = () => {
               selectedChips={selectedStatus}
               onChipSelect={handleStatusSelect}
               onRemoveChip={handleRemoveStatus}
+              chipClassName="px-6 py-3 text-base"
             />
           </div>
         </div>

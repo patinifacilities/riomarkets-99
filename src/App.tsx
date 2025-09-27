@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import Home from '@/pages/Home';
 import Auth from '@/pages/Auth';
-import Profile from '@/pages/Profile';
-import Wallet from '@/pages/Wallet';
+import ProfilePage from '@/pages/Profile';
+import WalletPage from '@/pages/Wallet';
 import Exchange from '@/pages/Exchange';
 import Transactions from '@/pages/Transactions';
 import Ranking from '@/pages/Ranking';
@@ -24,46 +24,6 @@ import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorM
 
 function App() {
   useEffect(() => {
-    // Typewriter animation
-    const words = ['Inteligentes', 'Lucrativos', 'Rápidos'];
-    let currentWordIndex = 0;
-    let currentCharIndex = 0;
-    let isDeleting = false;
-    let typeSpeed = 100;
-    const deleteSpeed = 50;
-    const pauseTime = 2000;
-
-    const typewriterElement = document.getElementById('typewriter-text');
-    
-    function type() {
-      if (!typewriterElement) return;
-
-      const currentWord = words[currentWordIndex];
-      
-      if (isDeleting) {
-        typewriterElement.textContent = currentWord.substring(0, currentCharIndex - 1);
-        currentCharIndex--;
-        typeSpeed = deleteSpeed;
-      } else {
-        typewriterElement.textContent = currentWord.substring(0, currentCharIndex + 1);
-        currentCharIndex++;
-        typeSpeed = 100;
-      }
-
-      if (!isDeleting && currentCharIndex === currentWord.length) {
-        isDeleting = true;
-        typeSpeed = pauseTime;
-      } else if (isDeleting && currentCharIndex === 0) {
-        isDeleting = false;
-        currentWordIndex = (currentWordIndex + 1) % words.length;
-      }
-
-      setTimeout(type, typeSpeed);
-    }
-
-    // Start the animation
-    setTimeout(type, 1000);
-
     // Track page view
     track('app_initialized');
   }, []);
@@ -74,8 +34,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/wallet" element={<Wallet />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/wallet" element={<WalletPage />} />
           <Route path="/exchange" element={<Exchange />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/ranking" element={<Ranking />} />

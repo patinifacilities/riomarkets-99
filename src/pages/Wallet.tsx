@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Wallet, TrendingUp, TrendingDown, Users, Plus, Download, History, BarChart3 } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Users } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useWalletTransactions, useUserOrders } from '@/hooks/useWallet';
 import { useMarkets } from '@/hooks/useMarkets';
-import { useMarketRewards } from '@/hooks/useMarketRewards';
 import { AddBrlModal } from '@/components/exchange/AddBrlModal';
 import TransactionItem from '@/components/wallet/TransactionItem';
 import OrderItem from '@/components/wallet/OrderItem';
@@ -19,7 +17,6 @@ const WalletPage = () => {
   const { data: transactions, isLoading: loadingTransactions } = useWalletTransactions(user?.id);
   const { data: orders, isLoading: loadingOrders } = useUserOrders(user?.id);
   const { data: markets } = useMarkets();
-  const { data: rewards } = useMarketRewards('sample-market-id');
   const [showDepositModal, setShowDepositModal] = useState(false);
 
   // Calculate totals
@@ -38,104 +35,108 @@ const WalletPage = () => {
   const simPercent = totalPool > 0 ? (globalPoolSim / totalPool) * 100 : 50;
   const naoPercent = totalPool > 0 ? (globalPoolNao / totalPool) * 100 : 50;
 
+  if (!user) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <h1 className="text-2xl font-bold mb-4">Acesso negado</h1>
+        <p className="text-muted-foreground">Você precisa estar logado para acessar sua carteira.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <WalletIcon className="w-8 h-8 text-primary" />
-            <h1 className="text-4xl font-bold">Carteira</h1>
-          </div>
-          <div className="flex gap-3 mb-4">
-            <Button onClick={() => setDepositModalOpen(true)}>
-              Adicionar Saldo
-            </Button>
-            <Button variant="outline" style={{ color: '#ff2389', borderColor: '#ff2389' }}>
-              Sacar
-            </Button>
-          </div>
-          <p className="text-muted-foreground max-w-[65ch] mx-auto">
-            Gerencie seu saldo e acompanhe suas opiniões ativas
+      <div className="container mx-auto px-4 py-6">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
+            <Wallet className="w-8 h-8" />
+            Minha Carteira
+          </h1>
+          <p className="text-muted-foreground">
+            Gerencie seus fundos e acompanhe suas transações
           </p>
         </div>
 
         {/* Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-primary border-primary/20">
-            <CardContent className="p-8">
-              <div className="text-center">
-                <WalletIcon className="w-12 h-12 text-primary-foreground mx-auto mb-4" />
-                <p className="text-primary-foreground/80 text-sm mb-2">Saldo Disponível</p>
-                <p className="text-4xl font-bold text-primary-foreground mb-1">
-                  {currentBalance.toLocaleString()}
-                </p>
-                <p className="text-primary-foreground/60 text-sm">Rioz Coin</p>
+          <Card className="bg-gradient-card border-primary/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Saldo Disponível</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {currentBalance.toLocaleString()} RZ
+                  </p>
+                </div>
+                <Wallet className="w-8 h-8 text-primary" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-accent/20 bg-accent/5">
-            <CardContent className="p-8">
-              <div className="text-center">
-                <TrendingUp className="w-12 h-12 text-accent mx-auto mb-4" />
-                <p className="text-muted-foreground text-sm mb-2">Em Opiniões Ativas</p>
-                <p className="text-3xl font-bold text-foreground mb-1">
-                  {totalInActiveOrders.toLocaleString()}
-                </p>
-                <p className="text-muted-foreground text-sm">Rioz Coin</p>
+          <Card className="bg-gradient-card border-accent/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Em Ordens Ativas</p>
+                  <p className="text-2xl font-bold text-accent">
+                    {totalInOrders.toLocaleString()} RZ
+                  </p>
+                </div>
+                <TrendingUp className="w-8 h-8 text-accent" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-border/50">
-            <CardContent className="p-8">
-              <div className="text-center">
-                <History className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground text-sm mb-2">Total Movimentado</p>
-                <p className="text-3xl font-bold text-foreground mb-1">
-                  {(totalCredits + totalDebits).toLocaleString()}
-                </p>
-                <p className="text-muted-foreground text-sm">Rioz Coin</p>
+          <Card className="bg-gradient-card border-success/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Movimentação Total</p>
+                  <p className="text-2xl font-bold text-success">
+                    {(totalCredits - totalDebits).toLocaleString()} RZ
+                  </p>
+                </div>
+                <TrendingDown className="w-8 h-8 text-success" />
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Pool Atual Section */}
-        <Card className="mb-8">
+        {/* Global Pool Status */}
+        <Card className="bg-gradient-card border-border/50 mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5" />
-              Pool Atual Global
+              <Users className="w-5 h-5" />
+              Status do Pool Global de Predições
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="text-center">
-                <div className="text-[#00FF91] text-2xl font-bold mb-1">
-                  {globalPoolSim}% SIM
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {Math.round(globalPoolTotal * globalPoolSim / 100).toLocaleString()} Rioz Coin
-                </div>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-[#00FF91]/10 rounded-lg">
+                <div className="text-sm text-muted-foreground mb-1">Pool SIM</div>
+                <div className="text-xl font-bold text-[#00FF91]">{simPercent.toFixed(1)}%</div>
+                <div className="text-xs text-muted-foreground">{globalPoolSim.toLocaleString()} RZ</div>
               </div>
-              <div className="text-center">
-                <div className="text-[#FF1493] text-2xl font-bold mb-1">
-                  {globalPoolNao}% NÃO
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {Math.round(globalPoolTotal * globalPoolNao / 100).toLocaleString()} Rioz Coin
-                </div>
+              
+              <div className="text-center p-4 bg-primary/10 rounded-lg">
+                <div className="text-sm text-muted-foreground mb-1">Pool Total</div>
+                <div className="text-xl font-bold text-primary">{totalPool.toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground">Rioz Coin</div>
+              </div>
+              
+              <div className="text-center p-4 bg-[#FF1493]/10 rounded-lg">
+                <div className="text-sm text-muted-foreground mb-1">Pool NÃO</div>
+                <div className="text-xl font-bold text-[#FF1493]">{naoPercent.toFixed(1)}%</div>
+                <div className="text-xs text-muted-foreground">{globalPoolNao.toLocaleString()} RZ</div>
               </div>
             </div>
+
             <div className="bg-danger/10 border border-danger/20 rounded-lg p-4">
               <p className="text-sm text-danger font-medium mb-2">⚠️ Aviso sobre Taxa de Liquidação</p>
               <p className="text-xs text-muted-foreground">
                 20% do pool perdedor será destinado à manutenção da plataforma quando os mercados forem liquidados.
               </p>
             </div>
-          </CardContent>
-        </Card>
 
             <div className="grid grid-cols-2 gap-4">
               <Button 
@@ -153,10 +154,12 @@ const WalletPage = () => {
                 Dar Opinião NÃO
               </Button>
             </div>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Transactions History */}
-          <Card>
+          {/* Transaction History */}
+          <Card className="bg-gradient-card border-border/50">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Histórico de Transações</CardTitle>
@@ -203,9 +206,12 @@ const WalletPage = () => {
                 </div>
               ) : allOrders.length > 0 ? (
                 <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                  {allOrders.map((order) => (
-                    <OrderItem key={order.id} order={order} markets={markets || []} />
-                  ))}
+                  {allOrders.map((order) => {
+                    const market = markets?.find(m => m.id === order.market_id);
+                    return (
+                      <OrderItem key={order.id} order={order} market={market} />
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
@@ -216,13 +222,13 @@ const WalletPage = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
 
         {/* Add BRL Modal */}
         <AddBrlModal 
           open={showDepositModal} 
           onOpenChange={setShowDepositModal}
         />
+      </div>
     </div>
   );
 };

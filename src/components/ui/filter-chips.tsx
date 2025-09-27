@@ -14,6 +14,7 @@ interface FilterChipsProps {
   onChipSelect: (chipId: string) => void;
   onRemoveChip: (chipId: string) => void;
   className?: string;
+  chipClassName?: string;
 }
 
 export function FilterChips({ 
@@ -21,7 +22,8 @@ export function FilterChips({
   selectedChips, 
   onChipSelect, 
   onRemoveChip,
-  className 
+  className,
+  chipClassName = "px-4 py-2 text-sm"
 }: FilterChipsProps) {
   return (
     <div className={className}>

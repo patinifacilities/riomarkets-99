@@ -1,4 +1,4 @@
-import { TrendingUp, Wallet, Trophy, Settings, LogOut, User, LogIn, Receipt, Newspaper, ArrowRightLeft, Menu, Plus } from 'lucide-react';
+import { TrendingUp, Wallet, Trophy, Settings, LogOut, User, LogIn, Receipt, Newspaper, ArrowRightLeft, Menu, Plus, UserCircle } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
@@ -278,16 +278,16 @@ const Header = () => {
                   </Button>
                 </Link>
                 
-                {/* Logout Button */}
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={signOut}
-                  className="gap-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/50 text-red-400 hover:text-red-300 rounded-xl"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sair
-                </Button>
+                {/* Profile Icon */}
+                <Link to="/profile">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-full p-2"
+                  >
+                    <UserCircle className="w-6 h-6" />
+                  </Button>
+                </Link>
               </>
             ) : !loading ? (
               <Link to="/auth">
