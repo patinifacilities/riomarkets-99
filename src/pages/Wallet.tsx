@@ -120,7 +120,7 @@ const WalletPage = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Em Ordens Ativas</p>
                   <p className="text-2xl font-bold text-accent">
-                    {totalInOrders.toLocaleString()} RZ
+                    {totalInOrders.toLocaleString()} RIOZ
                   </p>
                 </div>
                 <TrendingUp className="w-8 h-8 text-accent" />
