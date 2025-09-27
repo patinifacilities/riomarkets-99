@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wallet, TrendingUp, TrendingDown, Users } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Users, Plus, ArrowRightLeft } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useWalletTransactions, useUserOrders } from '@/hooks/useWallet';
@@ -221,6 +221,24 @@ const WalletPage = () => {
               )}
             </CardContent>
           </Card>
+        </div>
+
+        {/* Deposit and Withdraw Buttons */}
+        <div className="flex gap-4 mb-6">
+          <Button 
+            onClick={() => setShowDepositModal(true)}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Depositar
+          </Button>
+          <Button 
+            variant="outline"
+            className="border-primary/30 text-primary hover:bg-primary/10"
+          >
+            <ArrowRightLeft className="w-4 h-4 mr-2" />
+            Sacar
+          </Button>
         </div>
 
         {/* Add BRL Modal */}

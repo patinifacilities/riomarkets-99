@@ -1,20 +1,18 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, CreditCard, Smartphone, Bitcoin } from 'lucide-react';
+import { CreditCard, Building, Smartphone, QrCode } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
 
 interface AddBrlModalProps {
   open: boolean;
@@ -27,57 +25,61 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
   const [paymentMethod, setPaymentMethod] = useState('pix');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { user } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!user) return;
-    
-    const amountValue = parseFloat(amount);
-    if (isNaN(amountValue) || amountValue <= 0) {
+  const paymentMethods = [
+    {
+      id: 'pix',
+      label: 'PIX',
+      description: 'Transferência instantânea',
+      icon: <QrCode className="w-5 h-5" />
+    },
+    {
+      id: 'card',
+      label: 'Cartão de Crédito',
+      description: 'Visa, Mastercard, Elo',
+      icon: <CreditCard className="w-5 h-5" />
+    },
+    {
+      id: 'bank',
+      label: 'Transferência Bancária',
+      description: 'TED/DOC',
+      icon: <Building className="w-5 h-5" />
+    },
+    {
+      id: 'app',
+      label: 'Carteira Digital',
+      description: 'PicPay, Mercado Pago',
+      icon: <Smartphone className="w-5 h-5" />
+    }
+  ];
+
+  const handleSubmit = async () => {
+    if (!amount || parseFloat(amount) <= 0) {
       toast({
         title: "Valor inválido",
-        description: "Por favor, insira um valor válido maior que zero.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (amountValue > 100000) {
-      toast({
-        title: "Valor muito alto",
-        description: "O valor máximo para depósito é R$ 100.000,00.",
+        description: "Por favor, insira um valor válido para depósito.",
         variant: "destructive",
       });
       return;
     }
 
     setIsLoading(true);
-
     try {
-      // Simular depósito BRL - usando RPC para incrementar
-      const { error } = await supabase.rpc('increment_brl_balance', {
-        user_id: user.id,
-        amount_centavos: Math.round(amountValue * 100) // Converter para centavos
-      });
-
-      if (error) throw error;
-
+      // Simular processamento
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
       toast({
-        title: "Depósito realizado!",
-        description: `R$ ${amountValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} via ${paymentMethod.toUpperCase()} adicionados à sua conta.`,
+        title: "Solicitação enviada",
+        description: `Depósito de R$ ${amount} via ${paymentMethods.find(m => m.id === paymentMethod)?.label} solicitado com sucesso.`,
       });
-
+      
       setAmount('');
-      setPaymentMethod('pix');
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
-      console.error('Error adding BRL:', error);
       toast({
-        title: "Erro no depósito",
-        description: "Não foi possível processar o depósito. Tente novamente.",
+        title: "Erro",
+        description: "Falha ao processar depósito. Tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -89,81 +91,82 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Adicionar BRL</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5" />
+            Depositar BRL
+          </DialogTitle>
           <DialogDescription>
-            Simule um depósito em reais para testar a Exchange. 
-            Valor máximo: R$ 100.000,00.
+            Escolha o método de pagamento e valor para depositar em sua conta.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+
+        <div className="space-y-6">
+          {/* Amount Input */}
           <div className="space-y-2">
-            <Label htmlFor="amount">Valor (BRL)</Label>
-            <Input
-              id="amount"
-              type="number"
-              placeholder="0.00"
-              min="0.01"
-              max="100000"
-              step="0.01"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="text-right [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              disabled={isLoading}
-            />
+            <Label htmlFor="amount">Valor do depósito</Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                R$
+              </span>
+              <Input
+                id="amount"
+                type="number"
+                placeholder="0,00"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="pl-10"
+                min="1"
+                step="0.01"
+              />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="payment-method">Método de Pagamento</Label>
-            <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pix">
-                  <div className="flex items-center gap-2">
-                    <Smartphone className="w-4 h-4" />
-                    <span>PIX</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="credit-card">
-                  <div className="flex items-center gap-2">
-                    <CreditCard className="w-4 h-4" />
-                    <span>Cartão de Crédito</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="debit-card">
-                  <div className="flex items-center gap-2">
-                    <CreditCard className="w-4 h-4" />
-                    <span>Cartão de Débito</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="crypto">
-                  <div className="flex items-center gap-2">
-                    <Bitcoin className="w-4 h-4" />
-                    <span>Cripto</span>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="flex-1"
+          {/* Payment Method Selection */}
+          <div className="space-y-3">
+            <Label>Método de pagamento</Label>
+            <RadioGroup
+              value={paymentMethod}
+              onValueChange={setPaymentMethod}
+              className="space-y-3"
             >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              disabled={isLoading || !amount}
-              className="flex-1 bg-gradient-success hover:opacity-80"
-            >
-              {isLoading ? 'Processando...' : 'Depositar'}
-            </Button>
+              {paymentMethods.map((method) => (
+                <div key={method.id} className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
+                  <RadioGroupItem value={method.id} id={method.id} />
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="text-primary">
+                      {method.icon}
+                    </div>
+                    <div>
+                      <Label htmlFor={method.id} className="font-medium cursor-pointer">
+                        {method.label}
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {method.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </RadioGroup>
           </div>
-        </form>
+        </div>
+
+        <DialogFooter className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isLoading}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={isLoading}
+            className="bg-primary hover:bg-primary/90"
+          >
+            {isLoading ? "Processando..." : "Depositar"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

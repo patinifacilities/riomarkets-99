@@ -250,7 +250,7 @@ const Header = () => {
             })}
           </nav>
 
-          {/* Desktop User Menu */}
+        {/* Desktop User Menu */}
           <div className="flex items-center gap-3">
             {isLoggedIn ? (
               <>
@@ -267,27 +267,25 @@ const Header = () => {
                 </Link>
                 
                 {/* Deposit Button */}
-                <Link to="/wallet">
-                  <Button 
-                    variant="default" 
-                    size="sm"
-                    className="gap-2 shadow-success rounded-xl"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Depositar
-                  </Button>
-                </Link>
+                <Button 
+                  variant="default" 
+                  size="sm"
+                  onClick={() => setWalletHoverOpen(true)}
+                  className="gap-2 shadow-success rounded-xl"
+                >
+                  <Plus className="w-4 h-4" />
+                  Depositar
+                </Button>
                 
                 {/* Profile Icon */}
-                <Link to="/profile">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-full p-2"
-                  >
-                    <UserCircle className="w-6 h-6" />
-                  </Button>
-                </Link>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => navigate('/profile')}
+                  className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-full p-2"
+                >
+                  <UserCircle className="w-6 h-6" />
+                </Button>
               </>
             ) : !loading ? (
               <Link to="/auth">
@@ -298,6 +296,12 @@ const Header = () => {
               </Link>
             ) : null}
           </div>
+
+        {/* Wallet Hover Card */}
+        <WalletHoverCard 
+          isOpen={walletHoverOpen} 
+          onClose={() => setWalletHoverOpen(false)} 
+        />
         </div>
       </div>
     </header>

@@ -169,8 +169,9 @@ const Home = () => {
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
           <div className="text-center mb-6 md:mb-8">
             <h1 className="font-extrabold text-[34px] md:text-[44px] lg:text-[56px] leading-[1.05] mb-4 text-white [text-wrap:balance]">
+              <span className="text-white">Mercados Preditivos </span>
               <TypewriterText 
-                baseText="Mercados Preditivos"
+                baseText=""
                 texts={["Inteligentes", "Lucrativos", "Rápidos"]}
                 className="text-[#00FF91]"
               />
@@ -219,21 +220,6 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Search and Filters */}
-        <div className="container mx-auto px-4 md:px-8 mb-8">
-          <div className="flex flex-col md:flex-row gap-4 items-center mb-6">
-            {/* Search Bar */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Buscar mercados..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
-              />
-            </div>
-          </div>
-        </div>
 
       {/* Combined Filters Section */}
       <div className="container mx-auto px-4 pb-4">
@@ -251,7 +237,7 @@ const Home = () => {
               selectedChips={selectedTopics}
               onChipSelect={handleTopicSelect}
               onRemoveChip={handleRemoveTopic}
-              chipClassName="px-6 py-3 text-base"
+              chipClassName="px-9 py-4 text-lg"
             />
           </div>
 
@@ -263,7 +249,20 @@ const Home = () => {
               selectedChips={selectedStatus}
               onChipSelect={handleStatusSelect}
               onRemoveChip={handleRemoveStatus}
-              chipClassName="px-6 py-3 text-base"
+              chipClassName="px-9 py-4 text-lg"
+            />
+          </div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mt-6">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Buscar mercados..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
             />
           </div>
         </div>

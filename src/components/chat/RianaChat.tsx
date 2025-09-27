@@ -128,7 +128,7 @@ export function RianaChat() {
       {/* Floating button */}
       <button
         onClick={toggle}
-        className="fixed bottom-5 right-5 z-40 rounded-full px-5 py-3 text-black font-semibold
+        className="fixed bottom-5 right-5 z-40 rounded-full px-5 py-3 text-primary-foreground font-semibold
                    bg-primary shadow-[0_0_30px_hsl(var(--primary)/0.35)]
                    hover:opacity-90 hover:shadow-[0_0_40px_hsl(var(--primary)/0.5)] 
                    focus:outline-none focus-visible:ring-2 focus-visible:ring-primary
