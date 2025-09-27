@@ -53,9 +53,13 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
     // Remove non-numeric characters
     const numericValue = value.replace(/\D/g, '');
     
-    // Convert to number and format with thousand separators
-    const number = parseInt(numericValue) || 0;
-    return number.toLocaleString('pt-BR');
+    // Convert to number (in centavos) and format as BRL
+    const centavos = parseInt(numericValue) || 0;
+    const reais = centavos / 100;
+    return reais.toLocaleString('pt-BR', { 
+      minimumFractionDigits: 2, 
+      maximumFractionDigits: 2 
+    });
   };
 
   const handleAmountChange = (value: string) => {
@@ -64,10 +68,20 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
   };
 
   const handleSubmit = async () => {
-    if (!amount || parseInt(amount.replace(/\D/g, '')) <= 0) {
+    const numericAmount = parseInt(amount.replace(/\D/g, ''));
+    if (!amount || numericAmount <= 0) {
       toast({
         title: "Valor inválido",
         description: "Por favor, insira um valor válido para depósito.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (numericAmount < 1000) { // 10.00 in centavos
+      toast({
+        title: "Valor mínimo",
+        description: "O valor mínimo de depósito é R$ 10,00.",
         variant: "destructive",
       });
       return;

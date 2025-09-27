@@ -213,7 +213,7 @@ const MarketDetail = () => {
                         }}
                         aria-label={`Opinar em ${opcao.toUpperCase()}`}
                       >
-                        Opinar em {opcao.toUpperCase()}
+                        Opinar {opcao.toUpperCase()}
                       </Button>
                     </CardContent>
                   </Card>

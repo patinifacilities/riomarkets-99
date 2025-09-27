@@ -23,10 +23,21 @@ interface WithdrawModalProps {
 export const WithdrawModal = ({ open, onOpenChange, onSuccess }: WithdrawModalProps) => {
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('pix');
+  const [pixKeyType, setPixKeyType] = useState('email');
   const [pixKey, setPixKey] = useState('');
   const [cryptoWallet, setCryptoWallet] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  // Mock user balance - in real app, get from useExchangeStore or similar
+  const userBrlBalance = 1000; // Example balance
+
+  const pixKeyTypes = [
+    { id: 'email', label: 'Email', placeholder: 'exemplo@email.com' },
+    { id: 'cpf', label: 'CPF', placeholder: '000.000.000-00' },
+    { id: 'phone', label: 'Telefone', placeholder: '(11) 99999-9999' },
+    { id: 'random', label: 'Chave Aleatória', placeholder: 'Cole a chave gerada pelo banco' }
+  ];
 
   const paymentMethods = [
     {
@@ -58,10 +69,21 @@ export const WithdrawModal = ({ open, onOpenChange, onSuccess }: WithdrawModalPr
   };
 
   const handleSubmit = async () => {
-    if (!amount || parseInt(amount.replace(/\D/g, '')) <= 0) {
+    const numericAmount = parseInt(amount.replace(/\D/g, '')) / 100; // Convert to reais
+    
+    if (!amount || numericAmount <= 0) {
       toast({
         title: "Valor inválido",
         description: "Por favor, insira um valor válido para saque.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (numericAmount > userBrlBalance) {
+      toast({
+        title: "Saldo insuficiente",
+        description: `Você possui apenas R$ ${userBrlBalance.toFixed(2)} disponível para saque.`,
         variant: "destructive",
       });
       return;
@@ -174,15 +196,44 @@ export const WithdrawModal = ({ open, onOpenChange, onSuccess }: WithdrawModalPr
 
           {/* PIX Key Input */}
           {paymentMethod === 'pix' && (
-            <div className="space-y-2">
-              <Label htmlFor="pixKey">Chave PIX</Label>
-              <Input
-                id="pixKey"
-                type="text"
-                placeholder="Digite sua chave PIX"
-                value={pixKey}
-                onChange={(e) => setPixKey(e.target.value)}
-              />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Tipo de Chave PIX</Label>
+                <RadioGroup
+                  value={pixKeyType}
+                  onValueChange={setPixKeyType}
+                  className="grid grid-cols-2 gap-2"
+                >
+                  {pixKeyTypes.map((type) => (
+                    <div key={type.id} className="flex items-center space-x-2">
+                      <RadioGroupItem value={type.id} id={type.id} />
+                      <Label htmlFor={type.id} className="text-sm cursor-pointer">
+                        {type.label}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="pixKey">
+                  {pixKeyTypes.find(t => t.id === pixKeyType)?.label}
+                </Label>
+                <Input
+                  id="pixKey"
+                  type="text"
+                  placeholder={pixKeyTypes.find(t => t.id === pixKeyType)?.placeholder}
+                  value={pixKey}
+                  onChange={(e) => setPixKey(e.target.value)}
+                />
+              </div>
+              
+              <div className="p-3 bg-amber-50 dark:bg-amber-950 rounded-lg border border-amber-200 dark:border-amber-800">
+                <p className="text-xs text-amber-800 dark:text-amber-200">
+                  ⚠️ <strong>Importante:</strong> Só será possível sacar para conta bancária cadastrada com o mesmo CPF. 
+                  Se o CPF for diferente, o valor será estornado para seu saldo.
+                </p>
+              </div>
             </div>
           )}
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { QrCode, Copy, CheckCircle } from 'lucide-react';
+import { QrCode, Copy, CheckCircle, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface PixPaymentModalProps {
@@ -20,7 +20,39 @@ interface PixPaymentModalProps {
 
 export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPaymentModalProps) => {
   const [copied, setCopied] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes in seconds
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (!open) {
+      setTimeLeft(15 * 60);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          onOpenChange(false);
+          toast({
+            title: "Tempo esgotado",
+            description: "O código PIX expirou. Tente novamente.",
+            variant: "destructive",
+          });
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [open, onOpenChange, toast]);
+
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
 
   // Generate mock PIX code (in real app, this would come from payment processor)
   const pixCode = `00020126580014br.gov.bcb.pix013636c92c2b-3a13-4d1c-b7ee-${Date.now()}520400005303986540${amount.replace(/\D/g, '')}.005802BR5915RioMarkets LTDA6009SAO PAULO62070503***6304`;
@@ -45,8 +77,8 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
 
   const handleConfirmPayment = () => {
     toast({
-      title: "Pagamento confirmado!",
-      description: "Seu depósito será processado em alguns minutos.",
+      title: "Pagamento sendo processado",
+      description: "Seu pagamento está sendo processado e em breve será creditado em sua conta.",
     });
     onOpenChange(false);
     onSuccess?.();
@@ -66,6 +98,14 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Timer */}
+          <div className="flex items-center justify-center gap-2 p-3 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200 dark:border-orange-800">
+            <Clock className="w-4 h-4 text-orange-600" />
+            <span className="text-sm font-medium text-orange-800 dark:text-orange-200">
+              Código expira em: {formatTime(timeLeft)}
+            </span>
+          </div>
+
           {/* QR Code Placeholder */}
           <div className="flex justify-center">
             <div className="w-48 h-48 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/20">

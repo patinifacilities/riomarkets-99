@@ -10,6 +10,7 @@ import { Market } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { MarketPool } from '@/hooks/useMarketPools';
+import { BetSlider } from './BetSlider';
 
 interface BetModalProps {
   open: boolean;
@@ -163,19 +164,12 @@ const BetModal = ({
             <span className="font-semibold">{userBalance} Rioz Coin</span>
           </div>
 
-          {/* Bet Amount Input */}
-          <div className="space-y-2">
-            <Label htmlFor="betAmount">Valor da análise</Label>
-            <Input
-              id="betAmount"
-              type="number"
-              placeholder="Mín: 10 | Máx: 10.000"
-              value={betAmount}
-              onChange={(e) => setBetAmount(e.target.value)}
-              min="10"
-              max="10000"
-            />
-          </div>
+          {/* Bet Amount Slider */}
+          <BetSlider
+            balance={userBalance}
+            onAmountChange={(amount) => setBetAmount(amount.toString())}
+            estimatedReward={recompensa}
+          />
 
           {/* Potential Return */}
           {betValue >= 10 && (

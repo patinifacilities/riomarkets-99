@@ -1,259 +1,138 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useOrderBookStore, OrderBookLevel } from '@/stores/useOrderBookStore';
-import { ArrowUp, ArrowDown, TrendingUp, TrendingDown } from 'lucide-react';
-import { formatCurrency } from '@/lib/currency';
+import { TrendingUp, TrendingDown } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
-interface OrderBookRowProps {
-  level: OrderBookLevel;
+interface OrderBookLevel {
+  price: number;
+  quantity: number;
+  total_value: number;
+  orders_count: number;
   side: 'buy' | 'sell';
-  maxQuantity: number;
-  onClick?: (price: number) => void;
 }
 
-const OrderBookRow: React.FC<OrderBookRowProps> = ({ level, side, maxQuantity, onClick }) => {
-  const depthPercent = (level.quantity / maxQuantity) * 100;
-  
-  return (
-    <div 
-      className={`relative flex items-center justify-between px-3 py-1.5 text-xs cursor-pointer transition-colors hover:bg-muted/50 ${
-        side === 'buy' ? 'hover:bg-green-500/10' : 'hover:bg-red-500/10'
-      }`}
-      onClick={() => onClick?.(level.price)}
-      role="button"
-      tabIndex={0}
-      aria-label={`${side} order at ${formatCurrency(level.price, 'BRL')} for ${level.quantity.toLocaleString()} RIOZ`}
-    >
-      {/* Depth indicator */}
-      <div 
-        className={`absolute left-0 top-0 h-full opacity-20 ${
-          side === 'buy' ? 'bg-green-500' : 'bg-red-500'
-        }`}
-        style={{ width: `${depthPercent}%` }}
-      />
-      
-      {/* Content */}
-      <div className="relative z-10 flex items-center justify-between w-full">
-        <span className={`font-mono font-medium ${
-          side === 'buy' ? 'text-green-400' : 'text-red-400'
-        }`}>
-          {formatCurrency(level.price, 'BRL')}
-        </span>
-        <span className="text-muted-foreground font-mono">
-          {level.quantity.toLocaleString()}
-        </span>
-        <span className="text-muted-foreground font-mono text-xs">
-          {formatCurrency(level.total_value, 'BRL')}
-        </span>
-      </div>
-    </div>
-  );
-};
+export const OrderBookWidget = () => {
+  const [levels, setLevels] = useState<OrderBookLevel[]>([]);
+  const [loading, setLoading] = useState(true);
 
-const SpreadIndicator: React.FC<{ 
-  bestAsk: number; 
-  bestBid: number; 
-  spread: number; 
-  spreadPercent: number;
-}> = ({ bestAsk, bestBid, spread, spreadPercent }) => (
-  <div className="px-3 py-4 bg-muted/30 border-y">
-    <div className="flex items-center justify-between mb-2">
-      <div className="flex items-center gap-2">
-        <ArrowUp className="w-4 h-4 text-red-400" />
-        <span className="text-red-400 font-mono text-sm">
-          {formatCurrency(bestAsk, 'BRL')}
-        </span>
-        <Badge variant="secondary" className="text-xs">
-          Melhor Venda
-        </Badge>
-      </div>
-    </div>
-    
-    <div className="flex items-center justify-center py-2">
-      <Badge variant="outline" className="text-xs">
-        Spread: {formatCurrency(spread, 'BRL')} ({spreadPercent.toFixed(2)}%)
-      </Badge>
-    </div>
-    
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <ArrowDown className="w-4 h-4 text-green-400" />
-        <span className="text-green-400 font-mono text-sm">
-          {formatCurrency(bestBid, 'BRL')}
-        </span>
-        <Badge variant="secondary" className="text-xs">
-          Melhor Compra
-        </Badge>
-      </div>
-    </div>
-  </div>
-);
-
-const OrderBookHeader: React.FC<{ lastPrice: number; priceChange?: number }> = ({ 
-  lastPrice, 
-  priceChange = 0 
-}) => (
-  <div className="flex items-center justify-between px-3 py-2 border-b">
-    <div className="flex items-center gap-2">
-      <span className="font-semibold">Order Book</span>
-      <Badge variant="outline" className="text-xs">RIOZ/BRL</Badge>
-    </div>
-    <div className="flex items-center gap-2">
-      {priceChange !== 0 && (
-        priceChange > 0 ? (
-          <TrendingUp className="w-4 h-4 text-green-400" />
-        ) : (
-          <TrendingDown className="w-4 h-4 text-red-400" />
-        )
-      )}
-      <span className={`font-mono font-bold ${
-        priceChange > 0 ? 'text-green-400' : priceChange < 0 ? 'text-red-400' : 'text-foreground'
-      }`}>
-        {formatCurrency(lastPrice, 'BRL')}
-      </span>
-    </div>
-  </div>
-);
-
-const TableHeader: React.FC = () => (
-  <div className="flex items-center justify-between px-3 py-2 text-xs font-medium text-muted-foreground border-b bg-muted/20">
-    <span>Preço (BRL)</span>
-    <span>Quantidade (RIOZ)</span>
-    <span>Total (BRL)</span>
-  </div>
-);
-
-export const OrderBookWidget: React.FC<{ 
-  onPriceClick?: (price: number) => void;
-  compact?: boolean;
-}> = ({ onPriceClick, compact = false }) => {
-  const {
-    orderBookData,
-    orderBookLoading,
-    orderBookError,
-    maxLevels,
-    startRealTimeUpdates
-  } = useOrderBookStore();
-
-  // Start real-time updates on mount
   useEffect(() => {
-    const cleanup = startRealTimeUpdates();
-    return cleanup;
-  }, [startRealTimeUpdates]);
+    const fetchOrderbook = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('orderbook_levels')
+          .select('*')
+          .eq('symbol', 'RIOZBRL')
+          .order('price', { ascending: false });
 
-  // Calculate max quantity for depth visualization
-  const maxQuantity = useMemo(() => {
-    if (!orderBookData) return 0;
-    const allLevels = [...orderBookData.bids, ...orderBookData.asks];
-    return Math.max(...allLevels.map(level => level.quantity));
-  }, [orderBookData]);
+        if (error) throw error;
+        setLevels((data || []) as OrderBookLevel[]);
+      } catch (error) {
+        console.error('Error fetching orderbook:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Limit levels displayed
-  const displayBids = useMemo(() => 
-    orderBookData?.bids.slice(0, maxLevels) || [], 
-    [orderBookData?.bids, maxLevels]
-  );
-  
-  const displayAsks = useMemo(() => 
-    orderBookData?.asks.slice(0, maxLevels) || [], 
-    [orderBookData?.asks, maxLevels]
-  );
+    fetchOrderbook();
 
-  if (orderBookLoading && !orderBookData) {
+    // Subscribe to real-time updates
+    const channel = supabase
+      .channel('orderbook_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orderbook_levels' },
+        () => {
+          fetchOrderbook();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const buyOrders = levels.filter(l => l.side === 'buy').slice(0, 10);
+  const sellOrders = levels.filter(l => l.side === 'sell').slice(0, 10);
+
+  if (loading) {
     return (
-      <Card className="h-full">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Order Book</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {Array.from({ length: 15 }).map((_, i) => (
-            <Skeleton key={i} className="h-8 w-full" />
-          ))}
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (orderBookError) {
-    return (
-      <Card className="h-full">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-lg text-red-400">Erro no Order Book</CardTitle>
+          <CardTitle className="text-sm">Order Book</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">{orderBookError}</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!orderBookData) {
-    return (
-      <Card className="h-full">
-        <CardHeader>
-          <CardTitle className="text-lg">Order Book</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Nenhum dado disponível</p>
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+          </div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-0">
-        <OrderBookHeader 
-          lastPrice={orderBookData.last_price}
-        />
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm flex items-center gap-2">
+          <TrendingUp className="h-4 w-4" />
+          Order Book RIOZ/BRL
+        </CardTitle>
       </CardHeader>
-      
-      <CardContent className="flex-1 p-0">
-        <TableHeader />
-        
-        {/* Asks (Sell orders) - displayed in reverse order (lowest first) */}
-        <div className="max-h-64 overflow-y-auto">
-          {displayAsks.reverse().map((level, index) => (
-            <OrderBookRow
-              key={`ask-${level.price}-${index}`}
-              level={level}
-              side="sell"
-              maxQuantity={maxQuantity}
-              onClick={onPriceClick}
-            />
-          ))}
-        </div>
-        
-        {/* Spread indicator */}
-        <SpreadIndicator
-          bestAsk={orderBookData.best_ask}
-          bestBid={orderBookData.best_bid}
-          spread={orderBookData.spread}
-          spreadPercent={orderBookData.spread_percent}
-        />
-        
-        {/* Bids (Buy orders) */}
-        <div className="max-h-64 overflow-y-auto">
-          {displayBids.map((level, index) => (
-            <OrderBookRow
-              key={`bid-${level.price}-${index}`}
-              level={level}
-              side="buy"
-              maxQuantity={maxQuantity}
-              onClick={onPriceClick}
-            />
-          ))}
-        </div>
-        
-        {/* Footer info */}
-        <div className="px-3 py-2 text-xs text-muted-foreground border-t bg-muted/10">
-          <div className="flex justify-between items-center">
-            <span>Última atualização: {new Date(orderBookData.last_updated).toLocaleTimeString()}</span>
-            <Badge variant="outline" className="text-xs">
-              {displayBids.length + displayAsks.length} níveis
-            </Badge>
+      <CardContent className="p-0">
+        <div className="space-y-1">
+          {/* Header */}
+          <div className="grid grid-cols-3 gap-2 px-4 py-2 text-xs text-muted-foreground border-b">
+            <div>Preço (BRL)</div>
+            <div className="text-right">Qtd (RIOZ)</div>
+            <div className="text-right">Total (BRL)</div>
+          </div>
+
+          {/* Sell Orders */}
+          <div className="space-y-0.5">
+            {sellOrders.slice().reverse().map((level, index) => (
+              <div 
+                key={`sell-${index}`}
+                className="grid grid-cols-3 gap-2 px-4 py-1 text-xs hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+              >
+                <div className="text-red-600 font-mono">
+                  {level.price.toFixed(4)}
+                </div>
+                <div className="text-right text-muted-foreground">
+                  {level.quantity.toLocaleString()}
+                </div>
+                <div className="text-right text-muted-foreground">
+                  {level.total_value.toLocaleString()}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Spread */}
+          <div className="py-2 px-4 bg-muted/30 border-y">
+            <div className="text-center text-xs text-muted-foreground">
+              Spread: R$ {buyOrders[0] && sellOrders[0] ? 
+                (sellOrders[0].price - buyOrders[0].price).toFixed(4) : '0.0000'}
+            </div>
+          </div>
+
+          {/* Buy Orders */}
+          <div className="space-y-0.5">
+            {buyOrders.map((level, index) => (
+              <div 
+                key={`buy-${index}`}
+                className="grid grid-cols-3 gap-2 px-4 py-1 text-xs hover:bg-green-50 dark:hover:bg-green-950/30 transition-colors"
+              >
+                <div className="text-green-600 font-mono">
+                  {level.price.toFixed(4)}
+                </div>
+                <div className="text-right text-muted-foreground">
+                  {level.quantity.toLocaleString()}
+                </div>
+                <div className="text-right text-muted-foreground">
+                  {level.total_value.toLocaleString()}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </CardContent>

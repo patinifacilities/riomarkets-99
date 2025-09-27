@@ -10,6 +10,10 @@ export interface Profile {
   is_admin: boolean;
   created_at: string;
   updated_at: string;
+  username?: string;
+  phone?: string;
+  profile_pic_url?: string;
+  cpf?: string;
 }
 
 export const useProfile = (userId?: string) => {

@@ -12,6 +12,9 @@ import { useProfile } from '@/hooks/useProfile';
 import { useExchangeStore } from '@/stores/useExchangeStore';
 import { useToast } from '@/hooks/use-toast';
 import { track } from '@/lib/analytics';
+import { BalancesCard } from '@/components/exchange/BalancesCard';
+import { OrderBookWidget } from '@/components/exchange/OrderBookWidget';
+import { TradeSlider } from '@/components/exchange/TradeSlider';
 
 const ExchangeOld = () => {
   const { user } = useAuth();
@@ -19,7 +22,7 @@ const ExchangeOld = () => {
   const { toast } = useToast();
   
   const [orderType, setOrderType] = useState<'market' | 'limit'>('market');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState(0);
   const [limitPrice, setLimitPrice] = useState('');
   const [activeTab, setActiveTab] = useState<'buy' | 'sell'>('buy');
   
@@ -39,7 +42,7 @@ const ExchangeOld = () => {
   }, [user, fetchRate, fetchBalance]);
 
   const handleExchange = async () => {
-    if (!amount || parseFloat(amount) <= 0) {
+    if (!amount || amount <= 0) {
       toast({
         title: "Valor inválido",
         description: "Por favor, insira um valor válido.",
@@ -48,22 +51,21 @@ const ExchangeOld = () => {
       return;
     }
 
-    const numAmount = parseFloat(amount);
     const side = activeTab === 'buy' ? 'buy_rioz' : 'sell_rioz';
     
     try {
-      await performExchange(side, numAmount, 'RIOZ');
-      setAmount('');
+      await performExchange(side, amount, 'RIOZ');
+      setAmount(0);
       setLimitPrice('');
       
       toast({
         title: "Transação realizada",
-        description: `${activeTab === 'buy' ? 'Compra' : 'Venda'} de ${numAmount} RIOZ realizada com sucesso.`,
+        description: `${activeTab === 'buy' ? 'Compra' : 'Venda'} de ${amount} RIOZ realizada com sucesso.`,
       });
       
       track('exchange_completed', { 
         side, 
-        amount: numAmount, 
+        amount: amount, 
         order_type: orderType 
       });
     } catch (error) {
@@ -77,9 +79,8 @@ const ExchangeOld = () => {
 
   const calculateTotal = () => {
     if (!amount || !rate) return 0;
-    const numAmount = parseFloat(amount);
     const price = orderType === 'limit' && limitPrice ? parseFloat(limitPrice) : rate.price;
-    return numAmount * price;
+    return amount * price;
   };
 
   if (!user) {
@@ -107,46 +108,15 @@ const ExchangeOld = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Balance Card */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Wallet className="w-5 h-5" />
-              Saldos
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between items-center p-3 bg-muted/20 rounded-lg">
-              <span className="text-sm text-muted-foreground">RIOZ</span>
-              <span className="font-semibold">{balance?.rioz_balance || 0}</span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-muted/20 rounded-lg">
-              <span className="text-sm text-muted-foreground">BRL</span>
-              <span className="font-semibold">R$ {(balance?.brl_balance || 0).toFixed(2)}</span>
-            </div>
-            
-            {rate && (
-              <div className="pt-4 border-t">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Taxa atual</span>
-                  <div className="text-right">
-                    <div className="font-semibold">R$ {rate.price.toFixed(4)}</div>
-                    <div className={`text-xs flex items-center gap-1 ${
-                      rate.change24h >= 0 ? 'text-green-500' : 'text-red-500'
-                    }`}>
-                      {rate.change24h >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                      {Math.abs(rate.change24h).toFixed(2)}%
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <div className="lg:col-span-1 space-y-4">
+          <BalancesCard />
+          <OrderBookWidget />
+        </div>
 
         {/* Trading Interface */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-3" data-exchange-widget>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Negociar</CardTitle>
@@ -167,26 +137,22 @@ const ExchangeOld = () => {
             <Tabs value={activeTab} onValueChange={(value: 'buy' | 'sell') => setActiveTab(value)}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="buy" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">
-                  Comprar
+                  Comprar RIOZ
                 </TabsTrigger>
                 <TabsTrigger value="sell" className="data-[state=active]:bg-red-500 data-[state=active]:text-white">
-                  Vender
+                  Vender RIOZ
                 </TabsTrigger>
               </TabsList>
               
               <TabsContent value="buy" className="space-y-4 mt-6">
                 <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="buy-amount">Quantidade RIOZ</Label>
-                    <Input
-                      id="buy-amount"
-                      type="number"
-                      placeholder="0.00"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="mt-2"
-                    />
-                  </div>
+                  <TradeSlider
+                    balance={balance?.brl_balance || 0}
+                    currency="BRL"
+                    price={rate?.price || 1}
+                    onAmountChange={setAmount}
+                    side="buy"
+                  />
                   
                   {orderType === 'limit' && (
                     <div>
@@ -225,17 +191,13 @@ const ExchangeOld = () => {
               
               <TabsContent value="sell" className="space-y-4 mt-6">
                 <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="sell-amount">Quantidade RIOZ</Label>
-                    <Input
-                      id="sell-amount"
-                      type="number"
-                      placeholder="0.00"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="mt-2"
-                    />
-                  </div>
+                  <TradeSlider
+                    balance={balance?.rioz_balance || 0}
+                    currency="RIOZ"
+                    price={rate?.price || 1}
+                    onAmountChange={setAmount}
+                    side="sell"
+                  />
                   
                   {orderType === 'limit' && (
                     <div>

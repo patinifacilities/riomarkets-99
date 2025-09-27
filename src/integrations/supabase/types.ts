@@ -461,34 +461,43 @@ export type Database = {
       }
       profiles: {
         Row: {
+          cpf: string | null
           created_at: string
           email: string
           id: string
           is_admin: boolean
           nivel: string
           nome: string
+          profile_pic_url: string | null
           saldo_moeda: number
           updated_at: string
+          username: string | null
         }
         Insert: {
+          cpf?: string | null
           created_at?: string
           email: string
           id: string
           is_admin?: boolean
           nivel?: string
           nome: string
+          profile_pic_url?: string | null
           saldo_moeda?: number
           updated_at?: string
+          username?: string | null
         }
         Update: {
+          cpf?: string | null
           created_at?: string
           email?: string
           id?: string
           is_admin?: boolean
           nivel?: string
           nome?: string
+          profile_pic_url?: string | null
           saldo_moeda?: number
           updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
