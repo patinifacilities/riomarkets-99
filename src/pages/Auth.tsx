@@ -30,23 +30,17 @@ const Auth = () => {
   useEffect(() => {
     let mounted = true;
     
-    // Primeiro, verifica se já tem uma sessão ativa
+    // Verifica se já tem uma sessão ativa
     const checkInitialSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!mounted) return;
         
-        console.log('Initial session check:', session ? 'Session exists' : 'No session');
-        
         if (session?.user) {
-          // Se já está logado e tentando acessar /auth, redireciona
-          console.log('User already logged in, redirecting...');
+          // Se já está logado, redireciona imediatamente
           navigate('/', { replace: true });
           return;
         }
-        
-        setSession(session);
-        setUser(session?.user ?? null);
       } catch (error) {
         console.error('Error checking initial session:', error);
       }
@@ -54,29 +48,14 @@ const Auth = () => {
     
     checkInitialSession();
     
-    // Depois configura o listener para mudanças de auth
+    // Configura o listener para mudanças de auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!mounted) return;
         
-        console.log('Auth state change:', event, session ? 'Session exists' : 'No session');
-        
-        setSession(session);
-        setUser(session?.user ?? null);
-        
         // Se o usuário fez login com sucesso, redireciona para home
         if (event === 'SIGNED_IN' && session?.user) {
-          console.log('Sign in successful, redirecting to home...');
-          // Usa um timeout para garantir que o estado foi atualizado
-          setTimeout(() => {
-            navigate('/', { replace: true });
-          }, 200);
-        }
-        
-        // Se o usuário fez logout, garante que está na página de auth
-        if (event === 'SIGNED_OUT') {
-          console.log('User signed out');
-          // Não redireciona se já estiver na página de auth
+          navigate('/', { replace: true });
         }
       }
     );
