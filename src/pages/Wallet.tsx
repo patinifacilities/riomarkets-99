@@ -49,9 +49,14 @@ const Wallet = () => {
             <WalletIcon className="w-8 h-8 text-primary" />
             <h1 className="text-4xl font-bold">Carteira</h1>
           </div>
-          <Button className="mb-4">
-            Adicionar Saldo
-          </Button>
+          <div className="flex gap-3 mb-4">
+            <Button>
+              Adicionar Saldo
+            </Button>
+            <Button variant="outline" style={{ color: '#ff2389', borderColor: '#ff2389' }}>
+              Sacar
+            </Button>
+          </div>
           <p className="text-muted-foreground max-w-[65ch] mx-auto">
             Gerencie seu saldo e acompanhe suas opiniões ativas
           </p>
@@ -147,15 +152,19 @@ const Wallet = () => {
         {/* CTAs de Opinião */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           <Button 
-            className="min-h-[56px] bg-success hover:bg-success/90 text-primary-foreground font-semibold text-lg"
+            className="min-h-[56px] font-semibold text-lg"
+            style={{ backgroundColor: '#00ff90', color: 'white' }}
             aria-label="Dar opinião apostando em SIM"
+            onClick={() => window.location.href = '/'}
           >
             <TrendingUp className="w-5 h-5 mr-2" />
             Opinar SIM
           </Button>
           <Button 
-            className="min-h-[56px] bg-danger hover:bg-danger/90 text-danger-foreground font-semibold text-lg"
+            className="min-h-[56px] font-semibold text-lg"
+            style={{ backgroundColor: '#ff2389', color: 'white' }}
             aria-label="Dar opinião apostando em NÃO"
+            onClick={() => window.location.href = '/'}
           >
             <TrendingDown className="w-5 h-5 mr-2" />
             Opinar NÃO

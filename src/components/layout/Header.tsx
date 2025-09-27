@@ -21,6 +21,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useState } from 'react';
 import { TickerBar } from '@/components/ui/ticker-bar';
+import { WalletHoverCard } from '@/components/wallet/WalletHoverCard';
 import logoImage from '@/assets/rio-markets-logo-white.png';
 
 const Header = () => {
@@ -30,6 +31,7 @@ const Header = () => {
   const { data: profile } = useProfile(user?.id);
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [walletHoverOpen, setWalletHoverOpen] = useState(false);
 
   const navItems = [
     { href: '/', icon: TrendingUp, label: 'Mercados' },
@@ -238,16 +240,34 @@ const Header = () => {
             {isAuthenticated && profile ? (
               <>
                 {/* Wallet Button - Show balance */}
+                <div className="relative">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onMouseEnter={() => setWalletHoverOpen(true)}
+                    onMouseLeave={() => setWalletHoverOpen(false)}
+                    onClick={() => navigate('/wallet')}
+                    className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 hidden sm:flex"
+                  >
+                    <Wallet className="w-4 h-4 mr-2" />
+                    <span className="font-mono text-sm">
+                      {profile.saldo_moeda.toLocaleString()} RZ
+                    </span>
+                  </Button>
+                  <WalletHoverCard 
+                    isOpen={walletHoverOpen} 
+                    onClose={() => setWalletHoverOpen(false)} 
+                  />
+                </div>
+
+                {/* Profile Button */}
                 <Button 
                   variant="ghost" 
-                  size="sm" 
-                  onClick={() => navigate('/wallet')}
+                  size="sm"
+                  onClick={() => navigate('/profile')}
                   className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 hidden sm:flex"
                 >
-                  <Wallet className="w-4 h-4 mr-2" />
-                  <span className="font-mono text-sm">
-                    {profile.saldo_moeda.toLocaleString()} RZ
-                  </span>
+                  <User className="w-4 h-4" />
                 </Button>
                 
                 <div className="text-right hidden sm:block">
@@ -266,7 +286,7 @@ const Header = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link to={`/profile/${user?.id}`} className="cursor-pointer">
+                      <Link to="/profile" className="cursor-pointer">
                         <User className="mr-2 h-4 w-4" />
                         Perfil
                       </Link>
@@ -289,33 +309,17 @@ const Header = () => {
                          Transações
                        </Link>
                      </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      onClick={signOut}
-                      className="cursor-pointer text-danger"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sair
-                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
             ) : (
               !isMobile && (
-                <div className="flex items-center gap-3">
-                  {isAuthenticated && (
-                    <Link to="/wallet" className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors">
-                      <Wallet className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-medium">{profile?.saldo_moeda || 0} RZ</span>
-                    </Link>
-                  )}
-                  <Link to="/auth">
-                    <Button className="gap-2 shadow-success">
-                      <LogIn className="w-4 h-4" />
-                      Entrar
-                    </Button>
-                  </Link>
-                </div>
+                <Link to="/auth">
+                  <Button className="gap-2 shadow-success">
+                    <LogIn className="w-4 h-4" />
+                    Entrar
+                  </Button>
+                </Link>
               )
             )}
           </div>

@@ -125,7 +125,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   return (
     <>
       <div className={cn(
-        "bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200",
+        "bg-card border border-border rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200 dark:bg-card",
         className
       )}>
         <Link to={`/market/${market.id}`} className="block">
@@ -151,7 +151,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                     />
                   )}
                 </div>
-                <Badge variant="secondary" className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full">
+                <Badge variant="secondary" className="text-xs px-2 py-1 bg-muted text-muted-foreground rounded-full">
                   {getCategoryDisplayName(market.categoria)}
                 </Badge>
               </div>
@@ -173,7 +173,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
             </div>
 
             {/* Title */}
-            <h3 className="text-sm font-medium text-gray-900 line-clamp-2 leading-tight mb-3">
+            <h3 className="text-sm font-medium text-foreground line-clamp-2 leading-tight mb-3">
               {market.titulo}
             </h3>
 
@@ -182,37 +182,27 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
               <Button
                 onClick={(e) => handleBetClick(e, yesOption?.label || 'sim')}
                 disabled={market.status !== 'aberto'}
-                className={cn(
-                  "h-12 rounded-md border text-sm font-medium transition-colors relative overflow-hidden",
-                  "bg-green-50 border-green-200 text-green-800 hover:bg-green-100"
-                )}
+                style={{ backgroundColor: '#00ff9020', borderColor: '#00ff90', color: '#00ff90' }}
+                className="h-12 rounded-md border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80"
               >
-                <div className="flex flex-col items-center gap-1">
-                  <span className="font-semibold">SIM</span>
-                  <span className="text-xs">{yesPercentage}¢</span>
-                </div>
+                <span className="font-semibold">SIM</span>
               </Button>
               
               <Button
                 onClick={(e) => handleBetClick(e, noOption?.label || 'não')}
                 disabled={market.status !== 'aberto'}
-                className={cn(
-                  "h-12 rounded-md border text-sm font-medium transition-colors relative overflow-hidden",
-                  "bg-red-50 border-red-200 text-red-800 hover:bg-red-100"
-                )}
+                style={{ backgroundColor: '#ff238920', borderColor: '#ff2389', color: '#ff2389' }}
+                className="h-12 rounded-md border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80"
               >
-                <div className="flex flex-col items-center gap-1">
-                  <span className="font-semibold">NÃO</span>
-                  <span className="text-xs">{noPercentage}¢</span>
-                </div>
+                <span className="font-semibold">NÃO</span>
               </Button>
             </div>
           </div>
         </Link>
 
         {/* Footer */}
-        <div className="px-4 pb-3 border-t border-gray-100">
-          <div className="flex items-center justify-between text-xs text-gray-500 pt-3">
+        <div className="px-4 pb-3 border-t border-border">
+          <div className="flex items-center justify-between text-xs text-muted-foreground pt-3">
             <div className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
               <span>{formatTimeLeft(market.end_date)}</span>

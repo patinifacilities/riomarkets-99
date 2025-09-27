@@ -16,11 +16,8 @@ interface CategoryItem {
 const CategoryBar = memo(({ selectedCategoryId, onCategorySelect }: CategoryBarProps) => {
   const { data: categories = [], isLoading } = useCategories();
 
-  // Create UI items array: "Todos" + database categories
-  const categoryItems: CategoryItem[] = [
-    { id: 'all', nome: 'Todos' },
-    ...categories
-  ];
+  // Create UI items array: only database categories (remove "Todos")
+  const categoryItems: CategoryItem[] = [...categories];
 
   if (isLoading) {
     return (

@@ -87,7 +87,7 @@ const Home = () => {
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
           <div className="text-center mb-6 md:mb-8">
             <h1 className="font-extrabold text-[34px] md:text-[44px] lg:text-[56px] leading-[1.05] mb-4 text-white [text-wrap:balance]">
-              Mercados Preditivos <span className="text-[#00FF91]">Inteligentes</span>
+              Mercados Preditivos <span id="typewriter-text" className="text-[#00FF91]">Inteligentes</span>
             </h1>
             <p className="text-base md:text-lg max-w-[60ch] mx-auto text-[color:var(--text-secondary)]">
               Analise eventos futuros com dados preditivos inteligentes. Teste suas habilidades e suba no ranking em <span className="text-[#00FF91]">Rioz Coin</span>.
@@ -118,19 +118,27 @@ const Home = () => {
           <div className="flex flex-wrap justify-center items-center gap-6 mt-8 text-sm text-[color:var(--text-secondary)]">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-[#00FF91]"></div>
-              <span>Liquidação transparente</span>
+              <span>Alta Liquidez</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-[#00FF91]"></div>
-              <span>Terminologia educativa</span>
+              <span>100% Legalizado</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-[#00FF91]"></div>
-              <span>Segurança Supabase</span>
+              <span>Você no Controle</span>
+              </div>
+            </div>
+            
+            {/* Background Animation */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute top-10 left-10 w-32 h-32 bg-primary/10 rounded-full animate-pulse"></div>
+              <div className="absolute top-32 right-20 w-24 h-24 bg-accent/10 rounded-full animate-pulse delay-1000"></div>
+              <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-primary/5 rounded-full animate-pulse delay-500"></div>
+              <div className="absolute bottom-32 right-1/3 w-28 h-28 bg-accent/5 rounded-full animate-pulse delay-1500"></div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* Filter Toolbar */}
       <FilterToolbar 

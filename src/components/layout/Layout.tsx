@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useOnboarding } from '@/stores/useOnboarding';
 
-const Layout = () => {
+const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const { user, loading } = useAuth();
   const { data: profile } = useProfile(user?.id);

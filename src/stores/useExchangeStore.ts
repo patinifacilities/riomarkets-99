@@ -200,9 +200,10 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
       if (error) throw error;
       
       // Refresh balance and history after successful exchange
+      const store = get();
       await Promise.all([
-        get().fetchBalance(),
-        get().fetchHistory()
+        store.fetchBalance(),
+        store.fetchHistory()
       ]);
       
       set({ exchangeLoading: false });

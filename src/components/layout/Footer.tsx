@@ -47,13 +47,12 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-4">
           {/* Branding section */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center">
               <img 
                 src={riozLogo} 
                 alt="Rio Markets Logo" 
-                className="h-7 w-7"
+                className="h-8 w-auto"
               />
-              <span className="text-lg font-bold">Rio Markets</span>
             </div>
             <p className="text-sm text-white/70 max-w-[32ch] leading-relaxed">
               Mercados preditivos inteligentes em tempo real.
