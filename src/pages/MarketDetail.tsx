@@ -18,7 +18,7 @@ import BetModal from '@/components/markets/BetModal';
 import PoolProgressBar from '@/components/markets/PoolProgressBar';
 import ProbabilityChart from '@/components/markets/ProbabilityChart';
 import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorModal';
-import OrderBook from '@/components/markets/OrderBook';
+import SimpleOrderBook from '@/components/markets/SimpleOrderBook';
 
 const MarketDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -183,7 +183,7 @@ const MarketDetail = () => {
             {/* Options */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {market.opcoes.map((opcao: string) => {
-                const recompensa = market.recompensas[opcao] || 1.5;
+                const recompensa = market.odds?.[opcao] || market.recompensas?.[opcao] || 1.5;
                 const isYes = opcao === 'sim';
                 
                 return (
@@ -229,7 +229,13 @@ const MarketDetail = () => {
             </div>
 
             {/* Order Book */}
-            <OrderBook marketId={market.id} />
+            <SimpleOrderBook 
+              marketId={market.id}
+              simPercent={pool?.percent_sim || 0}
+              naoPercent={pool?.percent_nao || 0}
+              simOdds={market.odds?.sim || 1.5}
+              naoOdds={market.odds?.não || market.odds?.nao || 1.5}
+            />
           </div>
 
           {/* User Info Panel */}

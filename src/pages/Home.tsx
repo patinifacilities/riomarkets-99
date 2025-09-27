@@ -167,20 +167,22 @@ const Home = () => {
       {/* Hero Section - Trading Aligned */}
       <section className="relative min-h-[42vh] md:min-h-[52vh] flex flex-col items-center justify-center bg-[color:var(--bg-app)]">
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
-          {/* Enhanced Animated background */}
-          <div className="absolute inset-0 -z-10 opacity-30">
+          {/* Enhanced Animated background - Increased area */}
+          <div className="absolute inset-0 -z-10 opacity-40">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-accent/20 animate-pulse"></div>
-            <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-primary/10 rounded-full blur-xl animate-bounce"></div>
-            <div className="absolute top-1/3 right-1/4 w-24 h-24 bg-accent/10 rounded-full blur-xl animate-bounce" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute top-10 left-10 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-bounce"></div>
+            <div className="absolute top-20 right-20 w-48 h-48 bg-accent/20 rounded-full blur-3xl animate-bounce" style={{ animationDelay: '1s' }}></div>
             
-            {/* Additional floating elements */}
-            <div className="absolute top-1/4 left-1/2 w-16 h-16 bg-[#00FF91]/20 rounded-full blur-lg animate-pulse" style={{ animationDelay: '2s' }}></div>
-            <div className="absolute bottom-1/3 right-1/3 w-20 h-20 bg-primary/15 rounded-full blur-xl animate-bounce" style={{ animationDelay: '3s' }}></div>
-            <div className="absolute bottom-1/4 left-1/3 w-12 h-12 bg-accent/20 rounded-full blur-md animate-pulse" style={{ animationDelay: '4s' }}></div>
-            <div className="absolute top-2/3 left-1/5 w-14 h-14 bg-[#ff2389]/10 rounded-full blur-lg animate-bounce" style={{ animationDelay: '2.5s' }}></div>
+            {/* Additional floating elements - Larger areas */}
+            <div className="absolute top-1/4 left-1/2 w-32 h-32 bg-[#00FF91]/25 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute bottom-10 right-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl animate-bounce" style={{ animationDelay: '3s' }}></div>
+            <div className="absolute bottom-20 left-20 w-24 h-24 bg-accent/25 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+            <div className="absolute top-1/3 left-1/5 w-28 h-28 bg-[#ff2389]/15 rounded-full blur-2xl animate-bounce" style={{ animationDelay: '2.5s' }}></div>
+            <div className="absolute bottom-1/3 right-1/3 w-36 h-36 bg-primary-glow/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.8s' }}></div>
+            <div className="absolute top-2/3 right-1/5 w-20 h-20 bg-accent/30 rounded-full blur-xl animate-bounce" style={{ animationDelay: '3.5s' }}></div>
             
             {/* Gradient overlay animation */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/8 to-transparent animate-pulse" style={{ animationDelay: '1.5s' }}></div>
           </div>
           
           <div className="text-center mb-6 md:mb-8">

@@ -56,7 +56,10 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
     try {
       const { error } = await supabase
         .from('markets')
-        .update({ odds: odds })
+        .update({ 
+          odds: odds,
+          recompensas: odds // Update both odds and recompensas for backward compatibility
+        })
         .eq('id', market.id);
 
       if (error) throw error;

@@ -15,7 +15,7 @@ import { track } from '@/lib/analytics';
 import { BalancesCard } from '@/components/exchange/BalancesCard';
 import { OrderBookWidget } from '@/components/exchange/OrderBookWidget';
 import { TradeSlider } from '@/components/exchange/TradeSlider';
-import { TopMarketsCard } from '@/components/exchange/TopMarketsCard';
+
 
 const ExchangeOld = () => {
   const { user } = useAuth();
@@ -109,14 +109,10 @@ const ExchangeOld = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left side - Top Markets */}
-        <div className="lg:col-span-1 order-3 lg:order-1">
-          <TopMarketsCard />
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Order Book - Positioned above trading interface */}
-        <div className="lg:col-span-2 space-y-4 order-1 lg:order-2">
+        {/* Order Book */}
+        <div className="lg:col-span-1 space-y-4 order-1 lg:order-1">
           <OrderBookWidget />
           
           {/* Trading Interface */}
