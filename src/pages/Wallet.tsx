@@ -267,10 +267,20 @@ const WalletPage = () => {
         <AddBrlModal 
           open={showDepositModal} 
           onOpenChange={setShowDepositModal}
+          onSuccess={() => {
+            refetchProfile();
+            refetchTransactions();
+            fetchBalance();
+          }}
         />
         <WithdrawModal 
           open={showWithdrawModal} 
           onOpenChange={setShowWithdrawModal}
+          onSuccess={() => {
+            refetchProfile();
+            refetchTransactions();
+            fetchBalance();
+          }}
         />
       </div>
     </div>
