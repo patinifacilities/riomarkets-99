@@ -10,21 +10,21 @@ export const useAuth = () => {
   useEffect(() => {
     let mounted = true;
     
-    // Get initial session first
+    // Get initial session
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
+        
         if (!mounted) return;
         
         if (error) {
           console.error('Error getting session:', error);
-          setLoading(false);
-          return;
+        } else {
+          console.log('useAuth - Initial session:', session ? 'Found session' : 'No session');
+          setSession(session);
+          setUser(session?.user ?? null);
         }
         
-        console.log('useAuth - Initial session check:', session ? 'Session exists' : 'No session');
-        setSession(session);
-        setUser(session?.user ?? null);
         setLoading(false);
       } catch (error) {
         console.error('Error in getInitialSession:', error);
@@ -36,15 +36,19 @@ export const useAuth = () => {
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         if (!mounted) return;
+        
         console.log('useAuth - Auth state change:', event);
+        
+        // Update state immediately
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
       }
     );
 
+    // Get initial session
     getInitialSession();
 
     return () => {
@@ -54,9 +58,13 @@ export const useAuth = () => {
   }, []);
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Error signing out:', error);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error signing out:', error);
+      }
+    } catch (error) {
+      console.error('Error in signOut:', error);
     }
   };
 
@@ -65,6 +73,6 @@ export const useAuth = () => {
     session,
     loading,
     signOut,
-    isAuthenticated: !!session?.user
+    isAuthenticated: !!session && !!user
   };
 };
