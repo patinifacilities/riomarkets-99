@@ -1,0 +1,182 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Prediction Markets Platform Design System */
+
+@layer base {
+  :root {
+    /* Base colors - Premium Dark Theme */
+    --background: 0 0% 6%;
+    --foreground: 210 20% 98%;
+
+    /* Card system */
+    --card: 0 0% 9%;
+    --card-foreground: 210 20% 98%;
+
+    --popover: 0 0% 9%;
+    --popover-foreground: 210 20% 98%;
+
+    /* Brand colors - Verde Neon + Rosa Neon */
+    --primary: 160 100% 50%;
+    --primary-foreground: 0 0% 6%;
+    --primary-glow: 160 100% 60%;
+
+    --secondary: 0 0% 6%;
+    --secondary-foreground: 210 20% 98%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+
+    /* Trading colors - Verde Neon */
+    --success: 160 100% 50%;
+    --success-foreground: 0 0% 6%;
+    --success-muted: 160 100% 50% / 0.1;
+
+    /* Rosa Neon for negatives */
+    --danger: 328 100% 54%;
+    --danger-foreground: 210 20% 98%;
+    --danger-muted: 328 100% 54% / 0.1;
+    
+    --destructive: 328 100% 54%;
+    --destructive-foreground: 210 20% 98%;
+
+    /* Accent colors */
+    --accent: 160 100% 50%;
+    --accent-foreground: 0 0% 6%;
+    --accent-muted: 160 100% 50% / 0.1;
+
+    /* Borders and inputs - Dark theme optimized */
+    --border: 0 0% 20%;
+    --input: 0 0% 15%;
+    --ring: 160 100% 50%;
+
+    /* Focus ring - Verde Neon */
+    --focus-ring: 160 100% 50%;
+    --focus-ring-offset: 2px;
+
+    /* Gradients - Neon Enhanced */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(160 100% 60%));
+    --gradient-danger: linear-gradient(135deg, hsl(var(--danger)), hsl(328 100% 64%));
+    --gradient-card: linear-gradient(145deg, hsl(160 100% 50% / 0.05) 0%, hsl(160 100% 50% / 0.02) 100%);
+    
+    /* Shadows - Neon Glow Effects */
+    --shadow-success: 0 10px 30px -10px hsl(var(--success) / 0.4), 0 0 20px hsl(var(--success) / 0.1);
+    --shadow-danger: 0 10px 30px -10px hsl(var(--danger) / 0.4), 0 0 20px hsl(var(--danger) / 0.1);
+    --shadow-accent: 0 10px 30px -12px hsl(var(--accent) / 0.3), 0 0 15px hsl(var(--accent) / 0.1);
+    --shadow-elevated: 0 20px 40px -12px hsl(0 0% 0% / 0.6);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Trading-aligned tokens */
+    --bg-app: 215 15% 7%;
+    --bg-card: 215 15% 10%;
+    --border-soft: 215 15% 18%;
+    --glow-green: 0 0 24px rgba(0,255,145,.35);
+    --glow-pink: 0 0 24px rgba(255,20,147,.35);
+    
+    /* Brand Colors */
+    --brand-green: #00FF91;
+    --brand-pink: #FF1493;
+    --text-primary: #F6F7F9;
+    --text-secondary: #AEB4BE;
+    
+    /* Design tokens */
+    --radius: 0.75rem;
+    --card-radius: 1rem;
+
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-primary: 160 100% 50%;
+    --sidebar-primary-foreground: 0 0% 6%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 160 100% 50%;
+    
+    /* Card colors - Clean dark surface */
+    --card-clean: 0 0% 9%;
+    --card-clean-foreground: 210 20% 98%;
+    --card-border-clean: 0 0% 20%;
+    
+    /* Button colors for binary cards - Verde Neon + Rosa Neon */
+    --btn-yes-bg: 160 100% 50% / 0.1;
+    --btn-yes-text: 160 100% 50%;
+    --btn-yes-border: 160 100% 50% / 0.3;
+    --btn-no-bg: 328 100% 54% / 0.1;
+    --btn-no-text: 328 100% 54%;
+    --btn-no-border: 328 100% 54% / 0.3;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}
+
+/* Global styles for compliance banner and accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .no-motion {
+    transition: none !important;
+    animation: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* Safe spacing when compliance banner is active */
+body.has-compliance-banner {
+  padding-bottom: 72px;
+}
+
+@media (max-width: 768px) {
+  body.has-compliance-banner {
+    padding-bottom: 88px;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Focus styles for accessibility */
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid hsl(var(--focus-ring));
+    outline-offset: var(--focus-ring-offset);
+    border-radius: 4px;
+  }
+
+  /* Remove default focus styles */
+  button:focus,
+  [role="button"]:focus,
+  a:focus,
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+  }
+}

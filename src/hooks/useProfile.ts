@@ -1,0 +1,47 @@
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+export interface Profile {
+  id: string;
+  nome: string;
+  email: string;
+  saldo_moeda: number;
+  nivel: 'iniciante' | 'analista' | 'guru' | 'root';
+  is_admin: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export const useProfile = (userId?: string) => {
+  return useQuery({
+    queryKey: ['profile', userId],
+    queryFn: async (): Promise<Profile | null> => {
+      if (!userId) return null;
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) return null;
+      return data as Profile;
+    },
+    enabled: !!userId,
+  });
+};
+
+export const useProfiles = () => {
+  return useQuery({
+    queryKey: ['profiles'],
+    queryFn: async (): Promise<Profile[]> => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('saldo_moeda', { ascending: false });
+
+      if (error) throw error;
+      return (data || []) as Profile[];
+    },
+  });
+};
