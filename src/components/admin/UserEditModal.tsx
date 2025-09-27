@@ -39,7 +39,7 @@ interface User {
 }
 
 interface UserEditModalProps {
-  user: User;
+  user: User | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
@@ -49,6 +49,11 @@ export const UserEditModal = ({ user, open, onOpenChange, onSuccess }: UserEditM
   const [adjustAmount, setAdjustAmount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  // Guard clause - if user is null, don't render anything
+  if (!user) {
+    return null;
+  }
 
   const isAdmin = user.is_admin;
 
