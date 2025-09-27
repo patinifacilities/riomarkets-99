@@ -137,7 +137,7 @@ const ExchangeOld = () => {
                 <TabsTrigger value="buy" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">
                   Comprar RIOZ
                 </TabsTrigger>
-                <TabsTrigger value="sell" className="data-[state=active]:bg-red-500 data-[state=active]:text-white">
+                <TabsTrigger value="sell" className="data-[state=active]:bg-[#ff2389] data-[state=active]:text-white">
                   Vender RIOZ
                 </TabsTrigger>
               </TabsList>
@@ -225,7 +225,7 @@ const ExchangeOld = () => {
                   <Button 
                     onClick={handleExchange}
                     disabled={!amount}
-                    className="w-full bg-red-500 hover:bg-red-600"
+                    className="w-full bg-[#ff2389] hover:bg-[#ff2389]/90"
                   >
                     Vender RIOZ
                   </Button>

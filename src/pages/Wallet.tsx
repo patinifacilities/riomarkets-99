@@ -38,10 +38,11 @@ const WalletPage = () => {
     }
   }, [showDepositModal, showWithdrawModal, user, refetchProfile, refetchTransactions, fetchBalance]);
 
-  // Calculate totals
+  // Calculate totals - Use real balance from exchange store
   const totalCredits = transactions?.filter(t => t.tipo === 'credito').reduce((sum, t) => sum + t.valor, 0) || 0;
   const totalDebits = transactions?.filter(t => t.tipo === 'debito').reduce((sum, t) => sum + t.valor, 0) || 0;
-  const currentBalance = profile?.saldo_moeda || 0;
+  const currentBalance = balance?.rioz_balance || profile?.saldo_moeda || 0;
+  const brlBalance = balance?.brl_balance || 0;
   const totalInOrders = orders?.filter(o => o.status === 'ativa').reduce((sum, o) => sum + o.quantidade_moeda, 0) || 0;
 
   // Sort all orders by date
@@ -103,9 +104,9 @@ const WalletPage = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Saldo Disponível</p>
+                  <p className="text-sm text-muted-foreground">Saldo RIOZ Coin</p>
                   <p className="text-2xl font-bold text-primary">
-                    {currentBalance.toLocaleString()} RZ
+                    {currentBalance.toLocaleString()} RIOZ
                   </p>
                 </div>
                 <Wallet className="w-8 h-8 text-primary" />
@@ -131,9 +132,9 @@ const WalletPage = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Saldo em R$</p>
+                  <p className="text-sm text-muted-foreground">Saldo em R$/BRL</p>
                   <p className="text-2xl font-bold text-success">
-                    R$ {((totalCredits - totalDebits) * 5.50).toFixed(2)}
+                    R$ {brlBalance.toFixed(2)}
                   </p>
                 </div>
                 <DollarSign className="w-8 h-8 text-success" />
@@ -181,17 +182,17 @@ const WalletPage = () => {
             <div className="grid grid-cols-2 gap-4">
               <Button 
                 className="bg-[#00FF91] hover:bg-[#00FF91]/90 text-black"
-                onClick={() => window.location.href = '/'}
+                onClick={() => window.location.href = '/#markets-section'}
               >
                 <TrendingUp className="w-4 h-4 mr-2" />
-                Dar Opinião SIM
+                Dar Opinião SIM/NÃO
               </Button>
               <Button 
                 className="bg-[#FF1493] hover:bg-[#FF1493]/90 text-white"
-                onClick={() => window.location.href = '/'}
+                onClick={() => window.location.href = '/#markets-section'}
               >
                 <TrendingDown className="w-4 h-4 mr-2" />
-                Dar Opinião NÃO
+                Dar Opinião SIM/NÃO
               </Button>
             </div>
           </CardContent>

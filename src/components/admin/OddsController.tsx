@@ -23,6 +23,69 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
     setOdds(market.recompensas || {});
   }, [market.recompensas]);
 
+  // For binary markets with exactly 2 options, we handle them specially
+  const isBinaryMarket = market.opcoes.length === 2;
+  const [option1, option2] = market.opcoes;
+
+  const handleBinaryOddsChange = (value: number[]) => {
+    const leftValue = value[0] / 100; // Convert from 100-1000 scale to 1.00-10.00
+    const rightValue = ((1000 - value[0]) / 100) + 1; // Inverse scale for the right side
+    
+    const newOdds = {
+      [option1]: leftValue,
+      [option2]: rightValue
+    };
+    setOdds(newOdds);
+  };
+
+  const updateBinaryOddsInDatabase = async (value: number[]) => {
+    setIsUpdating(true);
+    try {
+      const leftValue = value[0] / 100;
+      const rightValue = ((1000 - value[0]) / 100) + 1;
+      
+      const updatedOdds = {
+        [option1]: leftValue,
+        [option2]: rightValue
+      };
+
+      const { error } = await supabase
+        .from('markets')
+        .update({ recompensas: updatedOdds, odds: updatedOdds })
+        .eq('id', market.id);
+
+      if (error) throw error;
+
+      // Log admin action
+      await supabase
+        .from('audit_logs')
+        .insert({
+          action: 'odds_adjustment',
+          resource_type: 'market',
+          resource_id: market.id,
+          user_id: (await supabase.auth.getUser()).data.user?.id,
+          new_values: updatedOdds,
+          old_values: odds
+        });
+
+      onOddsUpdate?.();
+      
+      toast({
+        title: "Odds atualizadas",
+        description: `${option1}: ${leftValue.toFixed(2)}x | ${option2}: ${rightValue.toFixed(2)}x`,
+      });
+    } catch (error) {
+      console.error('Error updating odds:', error);
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar odds",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   const handleOddsChange = (option: string, value: number[]) => {
     const newOdds = {
       ...odds,
@@ -85,32 +148,71 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {market.opcoes.map((option) => (
-          <div key={option} className="space-y-2">
+        {isBinaryMarket ? (
+          // Special binary slider with two colors
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium">{option}</Label>
-              <Badge variant="outline">
-                {(odds[option] || 1).toFixed(2)}x
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium">{option1}</Label>
+                <Badge variant="outline">
+                  {(odds[option1] || 1).toFixed(2)}x
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium">{option2}</Label>
+                <Badge variant="outline" className="bg-[#ff2389]/10 border-[#ff2389] text-[#ff2389]">
+                  {(odds[option2] || 1).toFixed(2)}x
+                </Badge>
+              </div>
             </div>
             
-            <Slider
-              value={[(odds[option] || 1) * 100]} // Convert to 100-1000 scale
-              onValueChange={(value) => handleOddsChange(option, value)}
-              onValueCommit={(value) => updateOddsInDatabase(option, value[0] / 100)}
-              min={100}
-              max={1000}
-              step={1}
-              className="w-full"
-              disabled={isUpdating}
-            />
+            <div className="relative">
+              <Slider
+                value={[(odds[option1] || 1) * 100]} // Convert to 100-1000 scale
+                onValueChange={handleBinaryOddsChange}
+                onValueCommit={updateBinaryOddsInDatabase}
+                min={100}
+                max={900}
+                step={1}
+                className="w-full [&_[role=slider]]:bg-gradient-to-r [&_[role=slider]]:from-primary [&_[role=slider]]:to-[#ff2389] [&_.slider-track]:bg-gradient-to-r [&_.slider-track]:from-primary/20 [&_.slider-track]:to-[#ff2389]/20"
+                disabled={isUpdating}
+              />
+            </div>
             
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>1.00x</span>
-              <span>10.00x</span>
+              <span className="text-primary">{option1}</span>
+              <span className="text-[#ff2389]">{option2}</span>
             </div>
           </div>
-        ))}
+        ) : (
+          // Individual sliders for non-binary markets
+          market.opcoes.map((option) => (
+            <div key={option} className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium">{option}</Label>
+                <Badge variant="outline">
+                  {(odds[option] || 1).toFixed(2)}x
+                </Badge>
+              </div>
+              
+              <Slider
+                value={[(odds[option] || 1) * 100]} // Convert to 100-1000 scale
+                onValueChange={(value) => handleOddsChange(option, value)}
+                onValueCommit={(value) => updateOddsInDatabase(option, value[0] / 100)}
+                min={100}
+                max={1000}
+                step={1}
+                className="w-full"
+                disabled={isUpdating}
+              />
+              
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>1.00x</span>
+                <span>10.00x</span>
+              </div>
+            </div>
+          ))
+        )}
       </CardContent>
     </Card>
   );

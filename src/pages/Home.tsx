@@ -222,8 +222,8 @@ const Home = () => {
 
 
       {/* Combined Filters Section */}
-      <div className="container mx-auto px-4 pb-4">
-        <div className="flex items-center gap-3 mb-4">
+      <div className="container mx-auto px-4 pb-4 bg-gradient-to-b from-background/80 to-background/40 border-t border-border/20">
+        <div className="flex items-center gap-3 mb-4 pt-4">
           <Filter className="w-5 h-5 text-muted-foreground" />
           <span className="text-lg font-semibold text-foreground">Filtros:</span>
         </div>

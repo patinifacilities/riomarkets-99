@@ -60,12 +60,20 @@ const MarketCard = ({ market }: MarketCardProps) => {
       <CardContent className="p-0">
         {/* Market Header */}
         <div className="p-4 border-b border-border/30">
-          <div className="flex items-start justify-between">
+            <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
-                  <div className="w-3 h-3 bg-primary rounded-full"></div>
-                </div>
+                {market.thumbnail_url ? (
+                  <img 
+                    src={market.thumbnail_url} 
+                    alt={market.categoria}
+                    className="w-6 h-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
+                    <div className="w-3 h-3 bg-primary rounded-full"></div>
+                  </div>
+                )}
                 <Badge variant="secondary" className="text-xs px-2 py-1 bg-muted/50">
                   {market.categoria}
                 </Badge>

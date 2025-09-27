@@ -43,7 +43,7 @@ const BetModal = ({
 
   const validateBet = (): string | null => {
     if (!userId) return 'Você precisa estar logado para opinar';
-    if (betValue < 10) return 'Valor mínimo: 10 Rioz Coin';
+    if (betValue < 5) return 'Valor mínimo: 5 Rioz Coin';
     if (betValue > 10000) return 'Valor máximo: 10.000 Rioz Coin';
     if (betValue > userBalance) return 'Saldo insuficiente';
     if (market.status !== 'aberto') return 'Este mercado não está mais aberto';
@@ -172,7 +172,7 @@ const BetModal = ({
           />
 
           {/* Potential Return */}
-          {betValue >= 10 && (
+          {betValue >= 5 && (
             <div className="p-3 rounded-lg border border-primary/20" style={{ backgroundColor: 'hsl(169 100% 50% / 0.1)' }}>
               <div className="flex items-center gap-2 mb-2">
                 <Calculator className="w-4 h-4 text-primary" />

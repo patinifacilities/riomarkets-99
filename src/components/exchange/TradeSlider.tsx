@@ -14,7 +14,21 @@ interface TradeSliderProps {
 export const TradeSlider = ({ balance, currency, price = 1, onAmountChange, side }: TradeSliderProps) => {
   const [percentage, setPercentage] = useState([0]);
   
-  const maxAmount = side === 'buy' ? (balance / price) : balance;
+  // For 100% purchases, calculate with fee deduction
+  const calculateMaxAmount = () => {
+    if (side === 'buy') {
+      if (percentage[0] === 100) {
+        // For 100%, deduct 2% fee from available BRL first, then calculate RIOZ amount
+        const availableAfterFee = balance / 1.02; // Reverse the 2% fee
+        return availableAfterFee / price;
+      }
+      return (balance / price);
+    }
+    // For selling, allow 100% but fee will be deducted from the amount
+    return balance;
+  };
+  
+  const maxAmount = calculateMaxAmount();
   const currentAmount = (percentage[0] / 100) * maxAmount;
 
   useEffect(() => {

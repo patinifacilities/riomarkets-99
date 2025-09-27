@@ -64,7 +64,7 @@ export const BalancesCard = () => {
                   {rate ? `≈ ${ExchangeService.formatCurrency(balance.rioz_balance * rate.price, 'BRL')}` : ''}
                 </span>
               </div>
-              <div className="text-2xl font-bold tabular-nums">
+              <div className="text-xl font-bold tabular-nums break-words">
                 {ExchangeService.formatCurrency(balance.rioz_balance, 'RIOZ')}
               </div>
             </div>
@@ -76,7 +76,7 @@ export const BalancesCard = () => {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Real Brasileiro</span>
               </div>
-              <div className="text-2xl font-bold tabular-nums">
+              <div className="text-xl font-bold tabular-nums break-words">
                 {ExchangeService.formatCurrency(balance.brl_balance, 'BRL')}
               </div>
             </div>
@@ -86,7 +86,7 @@ export const BalancesCard = () => {
             {/* Total Value */}
             <div className="space-y-2">
               <span className="text-sm text-muted-foreground">Valor Total</span>
-              <div className="text-lg font-semibold tabular-nums text-[#00FF91]">
+              <div className="text-base font-semibold tabular-nums text-[#00FF91] break-words">
                 {ExchangeService.formatCurrency(getTotalValueInBRL(), 'BRL')}
               </div>
             </div>

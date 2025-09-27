@@ -25,7 +25,9 @@ const CreateMarketForm = ({ onSuccess, onCancel }: CreateMarketFormProps) => {
     category: '',
     endDate: '',
     marketType: 'binary' as MarketType,
-    customOptions: ['sim', 'não']
+    customOptions: ['sim', 'não'],
+    thumbnailUrl: '',
+    customOdds: {} as Record<string, number>
   });
 
   const marketTypeTemplates = {
@@ -35,10 +37,17 @@ const CreateMarketForm = ({ onSuccess, onCancel }: CreateMarketFormProps) => {
   };
 
   const handleMarketTypeChange = (type: MarketType) => {
+    const options = [...marketTypeTemplates[type].options];
+    const defaultOdds = options.reduce((acc, option) => {
+      acc[option] = 2.0;
+      return acc;
+    }, {} as Record<string, number>);
+    
     setNewMarket(prev => ({
       ...prev,
       marketType: type,
-      customOptions: [...marketTypeTemplates[type].options]
+      customOptions: options,
+      customOdds: defaultOdds
     }));
   };
 
@@ -57,9 +66,37 @@ const CreateMarketForm = ({ onSuccess, onCancel }: CreateMarketFormProps) => {
   };
 
   const handleOptionChange = (index: number, value: string) => {
+    setNewMarket(prev => {
+      const oldOption = prev.customOptions[index];
+      const newOptions = prev.customOptions.map((opt, i) => i === index ? value : opt);
+      const newOdds = { ...prev.customOdds };
+      
+      // Update odds key if option name changed
+      if (oldOption && oldOption !== value) {
+        if (newOdds[oldOption] !== undefined) {
+          newOdds[value] = newOdds[oldOption];
+          delete newOdds[oldOption];
+        }
+      } else if (!newOdds[value]) {
+        newOdds[value] = 2.0; // Default odds
+      }
+      
+      return {
+        ...prev,
+        customOptions: newOptions,
+        customOdds: newOdds
+      };
+    });
+  };
+
+  const handleOddsChange = (option: string, value: string) => {
+    const numValue = parseFloat(value) || 1.0;
     setNewMarket(prev => ({
       ...prev,
-      customOptions: prev.customOptions.map((opt, i) => i === index ? value : opt)
+      customOdds: {
+        ...prev.customOdds,
+        [option]: numValue
+      }
     }));
   };
 
@@ -118,10 +155,9 @@ const CreateMarketForm = ({ onSuccess, onCancel }: CreateMarketFormProps) => {
       // Generate simple market ID
       const marketId = `m_${Date.now()}`;
       
-      // Create equal recompensa for all options
-      const baseRecompensa = 2.0;
+      // Use custom odds or default
       const recompensas = validOptions.reduce((acc, option) => {
-        acc[option] = baseRecompensa;
+        acc[option] = newMarket.customOdds[option] || 2.0;
         return acc;
       }, {} as Record<string, number>);
 
@@ -136,7 +172,8 @@ const CreateMarketForm = ({ onSuccess, onCancel }: CreateMarketFormProps) => {
           opcoes: validOptions,
           odds: recompensas,
           status: 'aberto',
-          end_date: new Date(newMarket.endDate).toISOString()
+          end_date: new Date(newMarket.endDate).toISOString(),
+          thumbnail_url: newMarket.thumbnailUrl || null
         });
 
       if (error) throw error;
@@ -152,7 +189,9 @@ const CreateMarketForm = ({ onSuccess, onCancel }: CreateMarketFormProps) => {
         category: '', 
         endDate: '', 
         marketType: 'binary' as MarketType, 
-        customOptions: ['sim', 'não'] 
+        customOptions: ['sim', 'não'],
+        thumbnailUrl: '',
+        customOdds: { 'sim': 2.0, 'não': 2.0 }
       });
       onSuccess();
     } catch (error) {
@@ -228,6 +267,18 @@ const CreateMarketForm = ({ onSuccess, onCancel }: CreateMarketFormProps) => {
         </div>
 
         <div>
+          <label className="text-sm font-medium mb-2 block">Imagem do Mercado (URL)</label>
+          <Input
+            placeholder="https://exemplo.com/imagem.jpg"
+            value={newMarket.thumbnailUrl}
+            onChange={(e) => setNewMarket({...newMarket, thumbnailUrl: e.target.value})}
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            URL da imagem que será exibida no card do mercado
+          </p>
+        </div>
+
+        <div>
           <label className="text-sm font-medium mb-2 block">Data de Encerramento</label>
           <Input
             type="datetime-local"
@@ -237,25 +288,38 @@ const CreateMarketForm = ({ onSuccess, onCancel }: CreateMarketFormProps) => {
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">Opções de Análise</label>
-          <div className="space-y-2">
+          <label className="text-sm font-medium mb-2 block">Opções de Análise e Odds</label>
+          <div className="space-y-3">
             {newMarket.customOptions.map((option, index) => (
-              <div key={index} className="flex gap-2 items-center">
+              <div key={index} className="grid grid-cols-2 gap-2 items-center">
                 <Input
                   placeholder={`Opção ${index + 1}`}
                   value={option}
                   onChange={(e) => handleOptionChange(index, e.target.value)}
                   disabled={newMarket.marketType === 'three_way'} // Three-way options are fixed
                 />
-                {newMarket.marketType === 'multi' && newMarket.customOptions.length > 4 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleRemoveOption(index)}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                )}
+                <div className="flex gap-2 items-center">
+                  <Input
+                    type="number"
+                    placeholder="Odds"
+                    min="1.0"
+                    max="10.0"
+                    step="0.1"
+                    value={newMarket.customOdds[option] || 2.0}
+                    onChange={(e) => handleOddsChange(option, e.target.value)}
+                    className="w-20"
+                  />
+                  <span className="text-sm text-muted-foreground">x</span>
+                  {newMarket.marketType === 'multi' && newMarket.customOptions.length > 4 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleRemoveOption(index)}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
             ))}
           </div>

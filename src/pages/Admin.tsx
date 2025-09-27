@@ -128,10 +128,13 @@ const Admin = () => {
     return <Navigate to="/" replace />;
   }
 
-  // Calculate platform metrics
+  // Calculate platform metrics from open markets
+  const openMarkets = markets.filter(m => m.status === 'aberto');
   const totalPoolValue = Object.values(pools).reduce((sum, pool) => sum + pool.totalCoins, 0);
   const estimatedRevenue = totalPoolValue * 0.2;
-  const totalBets = Object.values(pools).reduce((sum, pool) => sum + pool.simCount + pool.naoCount, 0);
+  
+  // Calculate total opinions placed across all markets
+  const totalOpinions = Object.values(pools).reduce((sum, pool) => sum + pool.simCount + pool.naoCount, 0);
   const activeAnalysts = Object.values(pools).reduce((sum, pool) => sum + (pool.simCount > 0 || pool.naoCount > 0 ? 1 : 0), 0);
 
   const exportLogs = () => {
@@ -259,7 +262,7 @@ const Admin = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Total de Análises</p>
-                  <p className="text-2xl font-bold">{totalBets}</p>
+                  <p className="text-2xl font-bold">{totalOpinions}</p>
                 </div>
               </div>
             </CardContent>
