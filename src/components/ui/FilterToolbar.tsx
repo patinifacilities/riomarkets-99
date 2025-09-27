@@ -34,19 +34,6 @@ const FilterToolbar = ({
               className="pl-10 h-12 bg-bg-card border-border-soft text-foreground shadow-[var(--glow-green)]/0 hover:shadow-[var(--glow-green)] transition-shadow"
             />
           </div>
-          
-          {/* Ordenação */}
-          <Select value={sortBy} onValueChange={onSortChange}>
-            <SelectTrigger className="w-48 h-12 bg-bg-card border-border-soft">
-              <SelectValue placeholder="Ordenar por" />
-            </SelectTrigger>
-            <SelectContent className="bg-bg-card border-border-soft">
-              <SelectItem value="recentes">Mais recentes</SelectItem>
-              <SelectItem value="populares">Mais populares</SelectItem>
-              <SelectItem value="liquidez">Maior liquidez</SelectItem>
-              <SelectItem value="prazo">Prazo menor</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
         
         {/* Chips de categoria - tamanho aumentado em 50% */}

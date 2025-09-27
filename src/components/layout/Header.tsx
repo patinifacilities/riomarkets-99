@@ -256,7 +256,36 @@ const Header = () => {
           <div className="flex items-center gap-3">
             {showUserButtons ? (
               <>
-                {/* Deposit Button */}
+                <Button 
+                  variant="default" 
+                  size="sm"
+                  onClick={() => navigate('/wallet')}
+                  className="gap-2 shadow-success rounded-xl"
+                >
+                  <TrendingUp className="w-4 h-4" />
+                  Depositar
+                </Button>
+
+                {/* Wallet Button - Show balance */}
+                <div className="relative">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onMouseEnter={() => setWalletHoverOpen(true)}
+                    onMouseLeave={() => setWalletHoverOpen(false)}
+                    onClick={() => navigate('/wallet')}
+                    className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 flex items-center gap-2 rounded-xl"
+                  >
+                    <Wallet className="w-4 h-4" />
+                    <span className="font-mono text-sm">
+                      {profile.saldo_moeda.toLocaleString()} RZ
+                    </span>
+                  </Button>
+                  <WalletHoverCard 
+                    isOpen={walletHoverOpen} 
+                    onClose={() => setWalletHoverOpen(false)} 
+                  />
+                </div>
                 <Button 
                   variant="default" 
                   size="sm"

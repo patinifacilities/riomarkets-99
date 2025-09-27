@@ -1,254 +1,330 @@
-import { useState } from 'react';
-import { User, Mail, Phone, CreditCard, Shield, Key, LogOut, Settings, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
+import { User, Mail, Phone, CreditCard, Shield, LogOut, Edit3, Save, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { Navigate } from 'react-router-dom';
 
 const Profile = () => {
   const { user, signOut } = useAuth();
-  const { data: profile } = useProfile();
+  const { data: profile, refetch } = useProfile(user?.id);
   const { toast } = useToast();
-  const navigate = useNavigate();
-
   const [isEditing, setIsEditing] = useState(false);
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    nome: profile?.nome || '',
-    email: profile?.email || '',
-    telefone: '',
-    cpf: '000.000.000-00'
+    nome: '',
+    email: '',
+    phone: ''
   });
 
-  const handleSave = () => {
-    toast({
-      title: "Perfil atualizado",
-      description: "Suas informações foram salvas com sucesso.",
-    });
-    setIsEditing(false);
+  // Check if user is logged in
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  // Initialize form data when profile loads
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        nome: profile.nome || '',
+        email: profile.email || '',
+        phone: ''
+      });
+    }
+  }, [profile]);
+
+  const handleEdit = () => {
+    if (profile) {
+      setFormData({
+        nome: profile.nome || '',
+        email: profile.email || '',
+        phone: ''
+      });
+    }
+    setIsEditing(true);
   };
 
-  const handleLogout = () => {
-    signOut();
-    navigate('/');
+  const handleCancel = () => {
+    setIsEditing(false);
+    if (profile) {
+      setFormData({
+        nome: profile.nome || '',
+        email: profile.email || '',
+        phone: ''
+      });
+    }
+  };
+
+  const handleSave = async () => {
+    if (!user || !formData.nome.trim()) {
+      toast({
+        title: "Erro",
+        description: "Nome é obrigatório",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          nome: formData.nome.trim()
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      await refetch();
+      setIsEditing(false);
+      
+      toast({
+        title: "Perfil atualizado!",
+        description: "Suas informações foram salvas com sucesso."
+      });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar perfil. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        user.email!,
+        { redirectTo: `${window.location.origin}/auth` }
+      );
+
+      if (error) throw error;
+
+      toast({
+        title: "Email enviado!",
+        description: "Verifique seu email para redefinir sua senha."
+      });
+    } catch (error) {
+      console.error('Error sending password reset:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao enviar email. Tente novamente.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut();
     toast({
       title: "Logout realizado",
-      description: "Você foi desconectado com sucesso.",
+      description: "Você foi desconectado com sucesso."
     });
   };
 
-  const handleChangePassword = () => {
-    toast({
-      title: "Alterar senha",
-      description: "Um link para alterar sua senha foi enviado para seu email.",
-    });
-  };
-
-  if (!user || !profile) {
+  if (!profile) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Acesso negado</h1>
-          <p className="text-muted-foreground">Você precisa estar logado para acessar esta página.</p>
-        </div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen bg-background p-4">
+      <div className="container mx-auto max-w-4xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <User className="w-8 h-8 text-primary" />
-            <h1 className="text-4xl font-bold">Perfil do Usuário</h1>
-          </div>
-          <p className="text-muted-foreground">
-            Gerencie suas informações pessoais e configurações de segurança
-          </p>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Meu Perfil</h1>
+          <p className="text-muted-foreground">Gerencie suas informações pessoais e configurações</p>
         </div>
 
-        {/* Profile Picture & Basic Info */}
-        <Card className="mb-8">
-          <CardContent className="p-8">
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              <Avatar className="h-24 w-24">
-                <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-                  {profile.nome.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="text-center md:text-left">
-                <h2 className="text-2xl font-bold">{profile.nome}</h2>
-                <p className="text-muted-foreground">{profile.email}</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium capitalize">
-                    {profile.nivel}
-                  </span>
-                  {profile.is_admin && (
-                    <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
-                      Admin
-                    </span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Profile Info */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Basic Information */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    Informações Pessoais
+                  </CardTitle>
+                  {!isEditing ? (
+                    <Button onClick={handleEdit} variant="outline" size="sm">
+                      <Edit3 className="w-4 h-4 mr-2" />
+                      Editar informações
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button onClick={handleSave} size="sm" disabled={loading}>
+                        <Save className="w-4 h-4 mr-2" />
+                        Salvar
+                      </Button>
+                      <Button onClick={handleCancel} variant="outline" size="sm">
+                        <X className="w-4 h-4 mr-2" />
+                        Cancelar
+                      </Button>
+                    </div>
                   )}
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-4 mb-6">
+                  <Avatar className="h-16 w-16">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-xl">
+                      {profile.nome.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="text-xl font-semibold">{profile.nome}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant={profile.is_admin ? "destructive" : "secondary"}>
+                        {profile.is_admin ? "Admin" : profile.nivel}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Personal Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Informações Pessoais
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="nome">Nome completo</Label>
-                <Input
-                  id="nome"
-                  value={formData.nome}
-                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                  disabled={!isEditing}
-                />
-              </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="nome">Nome Completo</Label>
+                    <Input
+                      id="nome"
+                      value={formData.nome}
+                      onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
+                      disabled={!isEditing}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      value={formData.email}
+                      disabled={true}
+                      className="mt-1 opacity-60"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Email não pode ser alterado por segurança
+                    </p>
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">Telefone</Label>
+                    <Input
+                      id="phone"
+                      value={formData.phone}
+                      onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                      disabled={!isEditing}
+                      placeholder="(11) 99999-9999"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label>CPF</Label>
+                    <Input
+                      value="***.***.***-**"
+                      disabled={true}
+                      className="mt-1 opacity-60"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      CPF não pode ser alterado por segurança
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  disabled={!isEditing}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="telefone">Telefone</Label>
-                <Input
-                  id="telefone"
-                  value={formData.telefone}
-                  onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
-                  disabled={!isEditing}
-                  placeholder="(11) 99999-9999"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="cpf">CPF</Label>
-                <Input
-                  id="cpf"
-                  value={formData.cpf}
-                  disabled
-                  className="bg-muted"
-                />
-                <p className="text-xs text-muted-foreground">
-                  CPF não pode ser alterado por motivos de segurança
-                </p>
-              </div>
-
-              <div className="flex gap-2 pt-4">
-                {isEditing ? (
-                  <>
-                    <Button onClick={handleSave} className="flex-1">
-                      Salvar alterações
-                    </Button>
-                    <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1">
-                      Cancelar
-                    </Button>
-                  </>
-                ) : (
-                  <Button onClick={() => setIsEditing(true)} className="w-full">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Editar informações
+            {/* Security Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="w-5 h-5" />
+                  Configurações de Segurança
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <h4 className="font-medium">Alterar Senha</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Receba um email para redefinir sua senha
+                    </p>
+                  </div>
+                  <Button onClick={handlePasswordChange} variant="outline">
+                    Alterar Senha
                   </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                </div>
 
-          {/* Security Settings */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5" />
-                Segurança
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Change Password */}
-              <div className="flex items-center justify-between p-4 border border-border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Key className="w-5 h-5 text-muted-foreground" />
+                <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
-                    <p className="font-medium">Alterar senha</p>
+                    <h4 className="font-medium">Autenticação de Dois Fatores</h4>
                     <p className="text-sm text-muted-foreground">
-                      Última alteração há 30 dias
+                      Adicione uma camada extra de segurança
                     </p>
                   </div>
+                  <Button variant="outline" disabled>
+                    Em breve
+                  </Button>
                 </div>
-                <Button variant="outline" onClick={handleChangePassword}>
-                  <ChevronRight className="w-4 h-4" />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Account Balance */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="w-5 h-5" />
+                  Saldo da Conta
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center p-4">
+                  <div className="text-3xl font-bold text-primary mb-2">
+                    {profile.saldo_moeda.toLocaleString()} RZ
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    ≈ R$ {(profile.saldo_moeda * 5.50).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
+                  <Button className="w-full" onClick={() => window.location.href = '/wallet'}>
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Gerenciar Carteira
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Account Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Ações da Conta</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button 
+                  onClick={handleLogout}
+                  variant="destructive" 
+                  className="w-full"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sair da Conta
                 </Button>
-              </div>
-
-              {/* Two-Factor Authentication */}
-              <div className="flex items-center justify-between p-4 border border-border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium">Autenticação 2FA</p>
-                    <p className="text-sm text-muted-foreground">
-                      Proteja sua conta com verificação em duas etapas
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  checked={twoFactorEnabled}
-                  onCheckedChange={setTwoFactorEnabled}
-                />
-              </div>
-
-              <Separator />
-
-              {/* Account Balance */}
-              <div className="p-4 bg-primary/5 rounded-lg">
-                <div className="flex items-center gap-3 mb-2">
-                  <CreditCard className="w-5 h-5 text-primary" />
-                  <p className="font-medium">Saldo da conta</p>
-                </div>
-                <p className="text-2xl font-bold text-primary">
-                  {profile.saldo_moeda.toLocaleString()} RZ
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  ≈ R$ {(profile.saldo_moeda * 0.1).toFixed(2)}
-                </p>
-              </div>
-
-              <Separator />
-
-              {/* Logout */}
-              <Button 
-                variant="destructive" 
-                onClick={handleLogout}
-                className="w-full"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Deslogar
-              </Button>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
