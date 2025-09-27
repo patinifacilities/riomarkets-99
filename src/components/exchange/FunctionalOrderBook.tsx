@@ -68,7 +68,7 @@ export const FunctionalOrderBook = () => {
     }
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!amount || (marketType === 'limit' && !price)) return;
 
     const orderPrice = marketType === 'market' 
@@ -82,6 +82,24 @@ export const FunctionalOrderBook = () => {
       amount: parseFloat(amount),
       timestamp: Date.now()
     };
+
+    // Se é ordem de mercado, executar imediatamente através do exchange store
+    if (marketType === 'market') {
+      try {
+        const side = orderType === 'buy' ? 'buy_rioz' : 'sell_rioz';
+        const inputCurrency = orderType === 'buy' ? 'BRL' : 'RIOZ';
+        await useExchangeStore.getState().performExchange(side, parseFloat(amount), inputCurrency);
+        
+        // Clear form after successful execution
+        setPrice('');
+        setAmount('');
+        setSliderValue([0]);
+        return;
+      } catch (error) {
+        console.error('Erro ao executar ordem de mercado:', error);
+        return;
+      }
+    }
 
     setUserOrders(prev => [newOrder, ...prev].slice(0, 10));
 

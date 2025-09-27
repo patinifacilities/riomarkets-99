@@ -156,7 +156,7 @@ const MarketCardClean = React.memo(function MarketCardClean({ market, className 
             {/* Header with thumbnail, category and status */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-primary text-lg font-bold flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-muted/30 flex items-center justify-center flex-shrink-0">
                   {market.thumbnail_url ? (
                     <LazyImage 
                       src={market.thumbnail_url}
@@ -165,7 +165,14 @@ const MarketCardClean = React.memo(function MarketCardClean({ market, className 
                       placeholder={<span className="text-base">{getPlaceholderThumbnail(market.categoria)}</span>}
                     />
                   ) : (
-                    getPlaceholderThumbnail(market.categoria)
+                    <img 
+                      src={`/assets/icons/${market.categoria.toLowerCase()}.png`}
+                      alt={market.categoria}
+                      className="w-6 h-6 object-contain"
+                      onError={(e) => {
+                        e.currentTarget.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2300FF91"><circle cx="12" cy="12" r="10"/></svg>';
+                      }}
+                    />
                   )}
                 </div>
                 

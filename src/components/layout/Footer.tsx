@@ -47,12 +47,11 @@ export function Footer() {
           {/* Branding section */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div 
-                className="h-7 w-7 rounded bg-gradient-to-br from-[#00FF91] to-[#FF1493] flex items-center justify-center text-black font-bold text-sm" 
-                aria-hidden="true"
-              >
-                R
-              </div>
+              <img 
+                src="/assets/rio-markets-logo.png" 
+                alt="Rio Markets Logo" 
+                className="h-7 w-7 rounded"
+              />
               <span className="text-lg font-bold">Rio Markets</span>
             </div>
             <p className="text-sm text-white/70 max-w-[32ch] leading-relaxed">

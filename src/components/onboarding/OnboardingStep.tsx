@@ -17,7 +17,11 @@ export function OnboardingStep({ step, className = "" }: OnboardingStepProps) {
     <div className={`text-center space-y-4 ${className}`}>
       <div className="flex justify-center">
         <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-          <IconComponent className="w-8 h-8 text-primary" />
+          {content.id === 1 ? (
+            <IconComponent />
+          ) : (
+            <IconComponent className="w-8 h-8 text-primary" />
+          )}
         </div>
       </div>
       

@@ -1,6 +1,8 @@
-import { ExternalLink } from "lucide-react";
+import { useState } from "react";
+import { ExternalLink, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LazyImage } from "@/components/ui/lazy-image";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { PressArticle } from "@/services/press";
@@ -11,12 +13,18 @@ interface PressCardProps {
 }
 
 export function PressCard({ article }: PressCardProps) {
+  const [showModal, setShowModal] = useState(false);
+
   const handleReadMore = () => {
     track('click_press_article', {
       article_id: article.id,
       vehicle: article.vehicle,
       title: article.title
     });
+    setShowModal(true);
+  };
+
+  const handleOpenExternal = () => {
     window.open(article.url, '_blank', 'noopener,noreferrer');
   };
 
@@ -29,59 +37,137 @@ export function PressCard({ article }: PressCardProps) {
   };
 
   return (
-    <article className="bg-card rounded-xl border border-border hover:border-primary/40 transition-all duration-200 group">
-      {/* Vehicle Logo */}
-      <div className="p-4 pb-0">
-        {article.logo_url ? (
-          <div className="h-10 flex items-center">
-            <LazyImage
-              src={article.logo_url}
-              alt={`Logo do ${article.vehicle}`}
-              className="h-full w-auto object-contain bg-white rounded px-2 py-1"
-              placeholder={
-                <div className="h-10 w-20 bg-muted rounded flex items-center justify-center">
-                  <span className="text-xs text-muted-foreground">{article.vehicle}</span>
-                </div>
-              }
-            />
+    <>
+      <article className="bg-card rounded-xl border border-border hover:border-primary/40 transition-all duration-200 group cursor-pointer" onClick={handleReadMore}>
+        {/* News Image */}
+        <div className="aspect-video w-full bg-muted rounded-t-xl overflow-hidden">
+          <LazyImage
+            src={`https://picsum.photos/400/225?random=${article.id}`}
+            alt={`Imagem da matéria: ${article.title}`}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            placeholder={
+              <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                <span className="text-sm text-muted-foreground">{article.vehicle}</span>
+              </div>
+            }
+          />
+        </div>
+
+        {/* Vehicle Logo */}
+        <div className="p-4 pb-0">
+          {article.logo_url ? (
+            <div className="h-8 flex items-center">
+              <LazyImage
+                src={article.logo_url}
+                alt={`Logo do ${article.vehicle}`}
+                className="h-full w-auto object-contain bg-white rounded px-2 py-1"
+                placeholder={
+                  <div className="h-8 w-16 bg-muted rounded flex items-center justify-center">
+                    <span className="text-xs text-muted-foreground">{article.vehicle}</span>
+                  </div>
+                }
+              />
+            </div>
+          ) : (
+            <div className="h-8 flex items-center">
+              <div className="bg-white rounded px-2 py-1 text-black text-xs font-medium">
+                {article.vehicle}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="p-4 space-y-3">
+          <h3 className="text-foreground font-semibold leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+            {article.title}
+          </h3>
+          
+          {article.summary && (
+            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+              {article.summary}
+            </p>
+          )}
+          
+          <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
+            <span className="font-medium">{article.vehicle}</span>
+            <span>{formatDate(article.published_at)}</span>
           </div>
-        ) : (
-          <div className="h-10 flex items-center">
-            <div className="bg-white rounded px-2 py-1 text-black text-sm font-medium">
-              {article.vehicle}
+        </div>
+      </article>
+
+      {/* Reading Modal */}
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-xl font-bold line-clamp-2 pr-8">
+                {article.title}
+              </DialogTitle>
+            </div>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              {article.logo_url && (
+                <img 
+                  src={article.logo_url} 
+                  alt={article.vehicle}
+                  className="h-6 w-auto object-contain bg-white rounded px-1"
+                />
+              )}
+              <span className="font-medium">{article.vehicle}</span>
+              <span>•</span>
+              <span>{formatDate(article.published_at)}</span>
+            </div>
+          </DialogHeader>
+          
+          <div className="overflow-auto max-h-[60vh] space-y-4">
+            {/* Article Image */}
+            <div className="aspect-video w-full bg-muted rounded-lg overflow-hidden">
+              <LazyImage
+                src={`https://picsum.photos/800/450?random=${article.id}`}
+                alt={`Imagem da matéria: ${article.title}`}
+                className="w-full h-full object-cover"
+                placeholder={
+                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                    <span className="text-muted-foreground">Carregando imagem...</span>
+                  </div>
+                }
+              />
+            </div>
+
+            {/* Article Content */}
+            <div className="prose prose-invert max-w-none">
+              {article.summary && (
+                <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+                  {article.summary}
+                </p>
+              )}
+              
+              <div className="text-foreground space-y-4">
+                <p>
+                  Esta é uma visualização da matéria "{article.title}" publicada por {article.vehicle}.
+                </p>
+                <p>
+                  O Rio Markets tem sido destaque na mídia especializada em mercados preditivos e inovações financeiras. 
+                  Nossa plataforma representa uma nova forma de análise de mercado baseada em inteligência coletiva.
+                </p>
+                <p>
+                  Para ler o conteúdo completo da matéria, clique no botão abaixo para ser redirecionado ao site oficial.
+                </p>
+              </div>
             </div>
           </div>
-        )}
-      </div>
 
-      {/* Content */}
-      <div className="p-4 space-y-3">
-        <h3 className="text-foreground font-semibold leading-tight line-clamp-2 group-hover:text-primary transition-colors">
-          {article.title}
-        </h3>
-        
-        {article.summary && (
-          <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-            {article.summary}
-          </p>
-        )}
-        
-        <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
-          <span className="font-medium">{article.vehicle}</span>
-          <span>{formatDate(article.published_at)}</span>
-        </div>
-        
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={handleReadMore}
-          className="text-primary hover:text-primary-glow hover:underline p-0 h-auto justify-start group-hover:translate-x-1 transition-transform"
-          aria-label={`Ler matéria completa no ${article.vehicle}`}
-        >
-          Ler matéria completa
-          <ExternalLink className="ml-1 h-3 w-3" />
-        </Button>
-      </div>
-    </article>
+          <div className="flex justify-between pt-4 border-t">
+            <Button variant="outline" onClick={() => setShowModal(false)}>
+              Fechar
+            </Button>
+            <Button onClick={handleOpenExternal} className="gap-2">
+              Ler matéria completa
+              <ExternalLink className="w-4 h-4" />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

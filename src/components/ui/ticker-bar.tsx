@@ -45,30 +45,32 @@ export const TickerBar = () => {
   const currentItem = tickerItems[currentIndex];
 
   return (
-    <div className="bg-card border-b border-border overflow-hidden">
-      <div className="container mx-auto px-4 py-2">
-        <div className="flex items-center justify-center gap-6 text-sm">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-muted-foreground font-medium">MERCADO:</span>
-            <span className="text-foreground font-semibold truncate">{currentItem.title}</span>
+    <div className="bg-card border-b border-border overflow-hidden relative">
+      <div className="flex animate-scroll-right whitespace-nowrap py-2">
+        {tickerItems.concat(tickerItems).map((item, index) => (
+          <div key={index} className="flex items-center gap-6 text-sm mx-8 flex-shrink-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-muted-foreground font-medium">MERCADO:</span>
+              <span className="text-foreground font-semibold truncate">{item.title}</span>
+            </div>
+            
+            <div className="flex items-center gap-1">
+              {item.trend === 'up' ? (
+                <TrendingUp className="w-4 h-4 text-success" />
+              ) : (
+                <TrendingDown className="w-4 h-4 text-danger" />
+              )}
+              <span className={`font-bold ${item.trend === 'up' ? 'text-success' : 'text-danger'}`}>
+                {item.percentage.toFixed(1)}%
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">VOLUME:</span>
+              <span className="text-foreground font-semibold">{item.price.toLocaleString()} RZ</span>
+            </div>
           </div>
-          
-          <div className="flex items-center gap-1">
-            {currentItem.trend === 'up' ? (
-              <TrendingUp className="w-4 h-4 text-success" />
-            ) : (
-              <TrendingDown className="w-4 h-4 text-danger" />
-            )}
-            <span className={`font-bold ${currentItem.trend === 'up' ? 'text-success' : 'text-danger'}`}>
-              {currentItem.percentage.toFixed(1)}%
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <span className="text-muted-foreground">VOLUME:</span>
-            <span className="text-foreground font-semibold">{currentItem.price.toLocaleString()} RZ</span>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

@@ -1,14 +1,22 @@
-import { BarChart3, Shield, TrendingUp } from 'lucide-react';
+import React from 'react';
+import { Shield, TrendingUp } from 'lucide-react';
+import RioMarketsLogo from '@/assets/rio-markets-logo.png';
 
 export type OnboardingStepContent = {
   id: number;
   title: string;
   description: string;
   tip?: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string }> | (() => JSX.Element);
   ctaText?: string;
   ctaHref?: string;
 };
+
+const LogoIcon = () => React.createElement('img', { 
+  src: RioMarketsLogo, 
+  alt: 'Rio Markets Logo', 
+  className: 'w-8 h-8' 
+});
 
 export const ONBOARDING_STEPS: OnboardingStepContent[] = [
   {
@@ -16,7 +24,7 @@ export const ONBOARDING_STEPS: OnboardingStepContent[] = [
     title: 'Analise o futuro, aprenda com o mercado',
     description: 'O Rio Markets é uma plataforma de mercados preditivos. Você publica análises sobre eventos e recebe recompensas conforme a precisão.',
     tip: 'Sem linguagem de apostas. Aqui é educação + previsibilidade.',
-    icon: BarChart3,
+    icon: LogoIcon,
   },
   {
     id: 2,

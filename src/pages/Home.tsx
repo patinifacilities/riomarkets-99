@@ -84,8 +84,6 @@ const Home = () => {
     <div className="min-h-screen bg-bg-app pt-[env(safe-area-inset-top)]">
       {/* Hero Section - Trading Aligned */}
       <section className="relative min-h-[42vh] md:min-h-[52vh] flex flex-col items-center justify-center bg-[color:var(--bg-app)]">
-        {/* green soft overlay for readability */}
-        <div className="absolute inset-0 opacity-[.9] pointer-events-none bg-[radial-gradient(ellipse_at_top_left,rgba(0,255,145,.20),rgba(0,255,145,.10)_40%,transparent_65%)]" />
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
           <div className="text-center mb-6 md:mb-8">
             <h1 className="font-extrabold text-[34px] md:text-[44px] lg:text-[56px] leading-[1.05] mb-4 text-white [text-wrap:balance]">

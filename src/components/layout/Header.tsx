@@ -302,12 +302,20 @@ const Header = () => {
               </>
             ) : (
               !isMobile && (
-                <Link to="/auth">
-                  <Button className="gap-2 shadow-success">
-                    <LogIn className="w-4 h-4" />
-                    Entrar
-                  </Button>
-                </Link>
+                <div className="flex items-center gap-3">
+                  {isAuthenticated && (
+                    <Link to="/wallet" className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors">
+                      <Wallet className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-medium">{profile?.saldo_moeda || 0} RZ</span>
+                    </Link>
+                  )}
+                  <Link to="/auth">
+                    <Button className="gap-2 shadow-success">
+                      <LogIn className="w-4 h-4" />
+                      Entrar
+                    </Button>
+                  </Link>
+                </div>
               )
             )}
           </div>

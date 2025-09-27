@@ -67,9 +67,6 @@ const Exchange = () => {
         </div>
       </div>
 
-      {/* Order Book Ticker */}
-      <OrderBookTicker className="mb-6" />
-
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         {/* Exchange Widget */}
@@ -82,11 +79,6 @@ const Exchange = () => {
         <div className="xl:col-span-3">
           <FunctionalOrderBook />
         </div>
-      </div>
-
-      {/* Depth Chart */}
-      <div className="mt-8">
-        <DepthChart />
       </div>
 
       {/* History Section */}
