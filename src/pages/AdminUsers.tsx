@@ -1,68 +1,26 @@
 import { useState } from 'react';
-import { Users, Search, Plus, Minus, Lock, Unlock } from 'lucide-react';
+import { Users, Search, ArrowLeft, Edit } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useProfiles } from '@/hooks/useProfile';
-import { supabase } from '@/integrations/supabase/client';
+import { UserEditModal } from '@/components/admin/UserEditModal';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [adjustAmount, setAdjustAmount] = useState(0);
+  const [editingUser, setEditingUser] = useState<any>(null);
   const { data: users = [], isLoading, refetch } = useProfiles();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const filteredUsers = users.filter(user =>
     user.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAdjustBalance = async (userId: string, amount: number) => {
-    try {
-      // Criar transação de ajuste
-      const { error: transactionError } = await supabase
-        .from('wallet_transactions')
-        .insert({
-          id: crypto.randomUUID(),
-          user_id: userId,
-          tipo: amount > 0 ? 'credito' : 'debito',
-          valor: Math.abs(amount),
-          descricao: `Ajuste administrativo: ${amount > 0 ? '+' : '-'}${Math.abs(amount)} Rioz Coin`
-        });
-
-      if (transactionError) throw transactionError;
-
-      // Atualizar saldo do usuário
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          saldo_moeda: selectedUser.saldo_moeda + amount
-        })
-        .eq('id', userId);
-
-      if (updateError) throw updateError;
-
-      toast({
-        title: 'Saldo ajustado com sucesso',
-        description: `${amount > 0 ? 'Creditado' : 'Debitado'} ${Math.abs(amount)} Rioz Coin`,
-      });
-
-      refetch();
-      setSelectedUser(null);
-      setAdjustAmount(0);
-    } catch (error) {
-      console.error('Erro ao ajustar saldo:', error);
-      toast({
-        title: 'Erro',
-        description: 'Falha ao ajustar saldo do usuário',
-        variant: 'destructive',
-      });
-    }
-  };
 
   const getLevelColor = (level: string) => {
     const colors = {
@@ -78,6 +36,13 @@ const AdminUsers = () => {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="p-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
           <Users className="w-8 h-8 text-primary" />
           <h1 className="text-3xl font-bold">Gerenciar Usuários</h1>
         </div>
@@ -144,81 +109,14 @@ const AdminUsers = () => {
                       </div>
 
                       <div className="flex gap-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setSelectedUser(user)}
-                            >
-                              Ajustar Saldo
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Ajustar Saldo - {user.nome}</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <div>
-                                <label className="text-sm font-medium">Saldo Atual</label>
-                                <p className="text-2xl font-bold text-primary">
-                                  {user.saldo_moeda.toLocaleString()} Rioz Coin
-                                </p>
-                              </div>
-                              
-                              <div>
-                                <label className="text-sm font-medium">Valor do Ajuste</label>
-                                <Input
-                                  type="number"
-                                  value={adjustAmount}
-                                  onChange={(e) => setAdjustAmount(Number(e.target.value))}
-                                  placeholder="Digite o valor (+ para crédito, - para débito)"
-                                />
-                              </div>
-
-                              <div className="flex gap-2">
-                                <Button
-                                  onClick={() => setAdjustAmount(1000)}
-                                  variant="outline"
-                                  size="sm"
-                                  className="flex-1"
-                                >
-                                  <Plus className="w-4 h-4 mr-1" />
-                                  +1,000
-                                </Button>
-                                <Button
-                                  onClick={() => setAdjustAmount(-1000)}
-                                  variant="outline"
-                                  size="sm"
-                                  className="flex-1"
-                                >
-                                  <Minus className="w-4 h-4 mr-1" />
-                                  -1,000
-                                </Button>
-                              </div>
-
-                              <div className="flex gap-2">
-                                <Button
-                                  onClick={() => handleAdjustBalance(user.id, adjustAmount)}
-                                  disabled={adjustAmount === 0}
-                                  className="flex-1"
-                                >
-                                  Confirmar Ajuste
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  onClick={() => {
-                                    setSelectedUser(null);
-                                    setAdjustAmount(0);
-                                  }}
-                                  className="flex-1"
-                                >
-                                  Cancelar
-                                </Button>
-                              </div>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditingUser(user)}
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Editar
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -234,6 +132,17 @@ const AdminUsers = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Edit User Modal */}
+        <UserEditModal
+          open={!!editingUser}
+          onOpenChange={(open) => !open && setEditingUser(null)}
+          user={editingUser}
+          onSuccess={() => {
+            refetch();
+            setEditingUser(null);
+          }}
+        />
       </div>
     </div>
   );

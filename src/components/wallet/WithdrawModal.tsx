@@ -11,21 +11,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { CreditCard, QrCode, Bitcoin } from 'lucide-react';
+import { ArrowRightLeft, QrCode, Bitcoin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { PixPaymentModal } from '@/components/wallet/PixPaymentModal';
 
-interface AddBrlModalProps {
+interface WithdrawModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }
 
-export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps) => {
+export const WithdrawModal = ({ open, onOpenChange, onSuccess }: WithdrawModalProps) => {
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('pix');
+  const [pixKey, setPixKey] = useState('');
+  const [cryptoWallet, setCryptoWallet] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showPixModal, setShowPixModal] = useState(false);
   const { toast } = useToast();
 
   const paymentMethods = [
@@ -34,12 +34,6 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
       label: 'PIX',
       description: 'Transferência instantânea',
       icon: <QrCode className="w-5 h-5" />
-    },
-    {
-      id: 'card',
-      label: 'Cartão de Crédito',
-      description: 'Visa, Mastercard, Elo',
-      icon: <CreditCard className="w-5 h-5" />
     },
     {
       id: 'crypto',
@@ -53,7 +47,7 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
     // Remove non-numeric characters
     const numericValue = value.replace(/\D/g, '');
     
-    // Convert to number and format with thousand separators
+    // Convert to number and format
     const number = parseInt(numericValue) || 0;
     return number.toLocaleString('pt-BR');
   };
@@ -67,34 +61,49 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
     if (!amount || parseInt(amount.replace(/\D/g, '')) <= 0) {
       toast({
         title: "Valor inválido",
-        description: "Por favor, insira um valor válido para depósito.",
+        description: "Por favor, insira um valor válido para saque.",
         variant: "destructive",
       });
       return;
     }
 
-    if (paymentMethod === 'pix') {
-      setShowPixModal(true);
+    if (paymentMethod === 'pix' && !pixKey) {
+      toast({
+        title: "Chave PIX obrigatória",
+        description: "Por favor, insira sua chave PIX.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (paymentMethod === 'crypto' && !cryptoWallet) {
+      toast({
+        title: "Carteira cripto obrigatória",
+        description: "Por favor, insira o endereço da sua carteira.",
+        variant: "destructive",
+      });
       return;
     }
 
     setIsLoading(true);
     try {
-      // Simular processamento para outros métodos
+      // Simular processamento
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       toast({
         title: "Solicitação enviada",
-        description: `Depósito de R$ ${amount} via ${paymentMethods.find(m => m.id === paymentMethod)?.label} solicitado com sucesso.`,
+        description: `Saque de R$ ${amount} via ${paymentMethods.find(m => m.id === paymentMethod)?.label} solicitado com sucesso.`,
       });
       
       setAmount('');
+      setPixKey('');
+      setCryptoWallet('');
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Falha ao processar depósito. Tente novamente.",
+        description: "Falha ao processar saque. Tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -107,18 +116,18 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5" />
-            Depositar BRL
+            <ArrowRightLeft className="w-5 h-5" />
+            Sacar Fundos
           </DialogTitle>
           <DialogDescription>
-            Escolha o método de pagamento e valor para depositar em sua conta.
+            Escolha o método de saque e valor para retirar de sua conta.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* Amount Input */}
           <div className="space-y-2">
-            <Label htmlFor="amount">Valor do depósito</Label>
+            <Label htmlFor="amount">Valor do saque</Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
                 R$
@@ -136,7 +145,7 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
 
           {/* Payment Method Selection */}
           <div className="space-y-3">
-            <Label>Método de pagamento</Label>
+            <Label>Método de saque</Label>
             <RadioGroup
               value={paymentMethod}
               onValueChange={setPaymentMethod}
@@ -162,6 +171,34 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
               ))}
             </RadioGroup>
           </div>
+
+          {/* PIX Key Input */}
+          {paymentMethod === 'pix' && (
+            <div className="space-y-2">
+              <Label htmlFor="pixKey">Chave PIX</Label>
+              <Input
+                id="pixKey"
+                type="text"
+                placeholder="Digite sua chave PIX"
+                value={pixKey}
+                onChange={(e) => setPixKey(e.target.value)}
+              />
+            </div>
+          )}
+
+          {/* Crypto Wallet Input */}
+          {paymentMethod === 'crypto' && (
+            <div className="space-y-2">
+              <Label htmlFor="cryptoWallet">Endereço da Carteira</Label>
+              <Input
+                id="cryptoWallet"
+                type="text"
+                placeholder="Digite o endereço da sua carteira"
+                value={cryptoWallet}
+                onChange={(e) => setCryptoWallet(e.target.value)}
+              />
+            </div>
+          )}
         </div>
 
         <DialogFooter className="flex gap-3">
@@ -177,22 +214,10 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
             disabled={isLoading}
             className="bg-primary hover:bg-primary/90"
           >
-            {isLoading ? "Processando..." : "Depositar"}
+            {isLoading ? "Processando..." : "Sacar"}
           </Button>
         </DialogFooter>
       </DialogContent>
-      
-      {/* PIX Payment Modal */}
-      <PixPaymentModal
-        open={showPixModal}
-        onOpenChange={setShowPixModal}
-        amount={amount}
-        onSuccess={() => {
-          setAmount('');
-          onOpenChange(false);
-          onSuccess?.();
-        }}
-      />
     </Dialog>
   );
 };

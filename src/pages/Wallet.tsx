@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wallet, TrendingUp, TrendingDown, Users, Plus, ArrowRightLeft } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Users, Plus, ArrowRightLeft, DollarSign } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useWalletTransactions, useUserOrders } from '@/hooks/useWallet';
 import { useMarkets } from '@/hooks/useMarkets';
 import { AddBrlModal } from '@/components/exchange/AddBrlModal';
+import { WithdrawModal } from '@/components/wallet/WithdrawModal';
 import TransactionItem from '@/components/wallet/TransactionItem';
 import OrderItem from '@/components/wallet/OrderItem';
 import ExportCSVButton from '@/components/ui/export-csv-button';
@@ -18,6 +19,7 @@ const WalletPage = () => {
   const { data: orders, isLoading: loadingOrders } = useUserOrders(user?.id);
   const { data: markets } = useMarkets();
   const [showDepositModal, setShowDepositModal] = useState(false);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
   // Calculate totals
   const totalCredits = transactions?.filter(t => t.tipo === 'credito').reduce((sum, t) => sum + t.valor, 0) || 0;
@@ -47,14 +49,35 @@ const WalletPage = () => {
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
       <div className="container mx-auto px-4 py-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-            <Wallet className="w-8 h-8" />
-            Minha Carteira
-          </h1>
-          <p className="text-muted-foreground">
-            Gerencie seus fundos e acompanhe suas transações
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
+              <Wallet className="w-8 h-8" />
+              Minha Carteira
+            </h1>
+            <p className="text-muted-foreground">
+              Gerencie seus fundos e acompanhe suas transações
+            </p>
+          </div>
+          
+          {/* Action Buttons - Top Right */}
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => setShowDepositModal(true)}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Depositar
+            </Button>
+            <Button 
+              onClick={() => setShowWithdrawModal(true)}
+              variant="outline"
+              className="border-primary/30 text-primary hover:bg-primary/10"
+            >
+              <ArrowRightLeft className="w-4 h-4 mr-2" />
+              Sacar
+            </Button>
+          </div>
         </div>
 
         {/* Balance Cards */}
@@ -91,12 +114,12 @@ const WalletPage = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Movimentação Total</p>
+                  <p className="text-sm text-muted-foreground">Saldo em R$</p>
                   <p className="text-2xl font-bold text-success">
-                    {(totalCredits - totalDebits).toLocaleString()} RZ
+                    R$ {((totalCredits - totalDebits) * 5.50).toFixed(2)}
                   </p>
                 </div>
-                <TrendingDown className="w-8 h-8 text-success" />
+                <DollarSign className="w-8 h-8 text-success" />
               </div>
             </CardContent>
           </Card>
@@ -223,28 +246,14 @@ const WalletPage = () => {
           </Card>
         </div>
 
-        {/* Deposit and Withdraw Buttons */}
-        <div className="flex gap-4 mb-6">
-          <Button 
-            onClick={() => setShowDepositModal(true)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Depositar
-          </Button>
-          <Button 
-            variant="outline"
-            className="border-primary/30 text-primary hover:bg-primary/10"
-          >
-            <ArrowRightLeft className="w-4 h-4 mr-2" />
-            Sacar
-          </Button>
-        </div>
-
-        {/* Add BRL Modal */}
+        {/* Modals */}
         <AddBrlModal 
           open={showDepositModal} 
           onOpenChange={setShowDepositModal}
+        />
+        <WithdrawModal 
+          open={showWithdrawModal} 
+          onOpenChange={setShowWithdrawModal}
         />
       </div>
     </div>

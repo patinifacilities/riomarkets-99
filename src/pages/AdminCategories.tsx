@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, Settings } from 'lucide-react';
+import { Plus, Search, Settings, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,9 +10,11 @@ import CategoriesTable from '@/components/admin/CategoriesTable';
 import CategoryModal from '@/components/admin/CategoryModal';
 import DeleteConfirmDialog from '@/components/admin/DeleteConfirmDialog';
 import { Category } from '@/hooks/useCategories';
+import { useNavigate } from 'react-router-dom';
 
 const AdminCategories = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
@@ -87,6 +89,13 @@ const AdminCategories = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              onClick={() => navigate(-1)}
+              className="p-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
             <Settings className="w-8 h-8 text-primary" />
             <h1 className="text-3xl font-bold">Gerenciar Categorias</h1>
           </div>
