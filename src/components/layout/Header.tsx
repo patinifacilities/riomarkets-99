@@ -250,15 +250,17 @@ const Header = () => {
           {/* Desktop User Menu */}
           <div className="flex items-center gap-3">
             {isLoggedIn ? (
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={signOut}
-                className="gap-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/50 text-red-400 hover:text-red-300 rounded-xl"
-              >
-                <LogOut className="w-4 h-4" />
-                Sair
-              </Button>
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={signOut}
+                  className="gap-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/50 text-red-400 hover:text-red-300 rounded-xl"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sair
+                </Button>
+              </>
             ) : !loading ? (
               <Link to="/auth">
                 <Button className="gap-2 shadow-success rounded-xl">

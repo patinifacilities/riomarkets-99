@@ -30,23 +30,22 @@ const Auth = () => {
   useEffect(() => {
     let mounted = true;
     
-    // Verifica se já tem uma sessão ativa
-    const checkInitialSession = async () => {
+    // Quando acessar /auth, sempre deslogar primeiro para garantir que pode fazer login
+    const handleInitialAuth = async () => {
       try {
+        // Sempre fazer logout primeiro quando acessar /auth
         const { data: { session } } = await supabase.auth.getSession();
-        if (!mounted) return;
         
         if (session?.user) {
-          // Se já está logado, redireciona imediatamente
-          navigate('/', { replace: true });
-          return;
+          console.log('User is logged in, logging out to access auth page...');
+          await supabase.auth.signOut();
         }
       } catch (error) {
-        console.error('Error checking initial session:', error);
+        console.error('Error handling initial auth:', error);
       }
     };
     
-    checkInitialSession();
+    handleInitialAuth();
     
     // Configura o listener para mudanças de auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -55,6 +54,7 @@ const Auth = () => {
         
         // Se o usuário fez login com sucesso, redireciona para home
         if (event === 'SIGNED_IN' && session?.user) {
+          console.log('Login successful, redirecting to home...');
           navigate('/', { replace: true });
         }
       }
