@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useExchangeStore } from '@/stores/useExchangeStore';
+import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import { ExchangeService } from '@/services/exchange';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +11,8 @@ import { AddBrlModal } from './AddBrlModal';
 
 export const BalancesCard = () => {
   const { balance, balanceLoading, fetchBalance, rate } = useExchangeStore();
+  const { user } = useAuth();
+  const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const [depositModalOpen, setDepositModalOpen] = useState(false);
 
   useEffect(() => {
@@ -22,11 +26,12 @@ export const BalancesCard = () => {
 
   const handleRefresh = () => {
     fetchBalance();
+    refetchProfile();
   };
 
   const getTotalValueInBRL = () => {
-    if (!balance || !rate) return 0;
-    return balance.brl_balance + (balance.rioz_balance * rate.price);
+    if (!balance || !rate || !profile) return 0;
+    return balance.brl_balance + (profile.saldo_moeda * rate.price);
   };
 
   return (
@@ -61,11 +66,11 @@ export const BalancesCard = () => {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Rioz Coin</span>
                 <span className="text-xs text-muted-foreground">
-                  {rate ? `≈ ${ExchangeService.formatCurrency(balance.rioz_balance * rate.price, 'BRL')}` : ''}
+                  {rate && profile ? `≈ ${ExchangeService.formatCurrency((profile.saldo_moeda || 0) * rate.price, 'BRL')}` : ''}
                 </span>
               </div>
-              <div className="text-xl font-bold tabular-nums break-words">
-                {ExchangeService.formatCurrency(balance.rioz_balance, 'RIOZ')}
+              <div className="text-lg font-bold tabular-nums">
+                {(profile?.saldo_moeda || 0).toLocaleString('pt-BR')} RZ
               </div>
             </div>
 

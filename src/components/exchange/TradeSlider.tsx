@@ -18,11 +18,11 @@ export const TradeSlider = ({ balance, currency, price = 1, onAmountChange, side
   const calculateMaxAmount = () => {
     if (side === 'buy') {
       if (percentage[0] === 100) {
-        // For 100%, deduct 2% fee from available BRL first, then calculate RIOZ amount
-        const availableAfterFee = balance / 1.02; // Reverse the 2% fee
-        return availableAfterFee / price;
+        // For 100%, deduct 2% fee from available RIOZ first, then calculate BRL amount
+        const availableAfterFee = balance / 1.02; // Reverse the 2% fee to get true 100%
+        return availableAfterFee;
       }
-      return (balance / price);
+      return balance;
     }
     // For selling, allow 100% but fee will be deducted from the amount
     return balance;
@@ -51,7 +51,10 @@ export const TradeSlider = ({ balance, currency, price = 1, onAmountChange, side
             {currentAmount.toFixed(2)} {side === 'buy' ? 'RIOZ' : 'RIOZ'}
           </div>
           <div className="text-sm text-muted-foreground">
-            ≈ R$ {(currentAmount * (side === 'buy' ? price : price)).toFixed(2)}
+            {side === 'buy' ? 
+              `Custo: ${currentAmount.toFixed(2)} RIOZ` : 
+              `≈ R$ ${(currentAmount * price).toFixed(2)}`
+            }
           </div>
         </div>
       </div>
@@ -79,7 +82,7 @@ export const TradeSlider = ({ balance, currency, price = 1, onAmountChange, side
         </div>
         
         <div className="text-xs text-muted-foreground text-center">
-          Disponível: {balance.toFixed(2)} {currency}
+          Disponível: {balance.toFixed(2)} {side === 'buy' ? 'RIOZ' : 'RIOZ'}
         </div>
       </div>
     </div>

@@ -9,6 +9,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useMarket } from '@/hooks/useMarkets';
 import { useMarketPool } from '@/hooks/useMarketPoolsNew';
 import { useUser } from '@/hooks/useUsers';
+import { useProfile } from '@/hooks/useProfile';
+import { useAuth } from '@/hooks/useAuth';
 import { useRewardCalculator } from '@/store/useRewardCalculator';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -25,9 +27,9 @@ const MarketDetail = () => {
   const { toast } = useToast();
   const { openCalculator } = useRewardCalculator();
   
-  // Mock user ID - replace with real auth later
-  const mockUserId = "550e8400-e29b-41d4-a716-446655440000";
-  const { data: user } = useUser(mockUserId);
+  // Get real authenticated user
+  const { user: authUser } = useAuth();
+  const { data: userProfile } = useProfile(authUser?.id);
   
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [betAmount, setBetAmount] = useState<string>('');
@@ -166,6 +168,9 @@ const MarketDetail = () => {
               <PoolProgressBar 
                 simPercent={pool?.percent_sim || 0} 
                 naoPercent={pool?.percent_nao || 0}
+                showOdds={true}
+                simOdds={market.odds?.sim || 1.5}
+                naoOdds={market.odds?.nao || 1.5}
               />
             </div>
 
@@ -237,7 +242,7 @@ const MarketDetail = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                     <span className="text-sm">Saldo disponível:</span>
-                    <span className="font-semibold">{user?.saldo_moeda || 0} Rioz Coin</span>
+                    <span className="font-semibold">{userProfile?.saldo_moeda || 0} RZ</span>
                   </div>
                   
                   <div className="p-3 bg-accent/10 rounded-lg border border-accent/20">
@@ -301,15 +306,15 @@ const MarketDetail = () => {
       </div>
 
       {/* Bet Modal */}
-      {market && user && (
+      {market && userProfile && authUser && (
         <BetModal
           open={showBetModal}
           onOpenChange={setShowBetModal}
           market={market}
           selectedOption={selectedOption}
-          userBalance={user.saldo_moeda}
-          userId={mockUserId}
-          recompensa={1} // Will be calculated by rewards system
+          userBalance={userProfile.saldo_moeda}
+          userId={authUser.id}
+          recompensa={market.odds?.[selectedOption] || 1.5}
           onBetSuccess={handleBetSuccess}
         />
       )}

@@ -4,9 +4,12 @@ interface PoolProgressBarProps {
   simPercent: number;
   naoPercent: number;
   className?: string;
+  showOdds?: boolean;
+  simOdds?: number;
+  naoOdds?: number;
 }
 
-const PoolProgressBar = ({ simPercent, naoPercent, className = "" }: PoolProgressBarProps) => {
+const PoolProgressBar = ({ simPercent, naoPercent, className = "", showOdds = false, simOdds = 1.5, naoOdds = 1.5 }: PoolProgressBarProps) => {
   return (
     <div className={`space-y-2 ${className}`}>
       <div className="flex items-center justify-between text-sm">
@@ -16,8 +19,18 @@ const PoolProgressBar = ({ simPercent, naoPercent, className = "" }: PoolProgres
           <span className="text-muted-foreground">
             {simPercent.toFixed(1)}%
           </span>
+          {showOdds && (
+            <span className="text-[#00FF91] font-semibold text-xs bg-[#00FF91]/10 px-2 py-1 rounded">
+              {simOdds.toFixed(2)}x
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
+          {showOdds && (
+            <span className="text-[#FF1493] font-semibold text-xs bg-[#FF1493]/10 px-2 py-1 rounded">
+              {naoOdds.toFixed(2)}x
+            </span>
+          )}
           <span className="text-muted-foreground">
             {naoPercent.toFixed(1)}%
           </span>

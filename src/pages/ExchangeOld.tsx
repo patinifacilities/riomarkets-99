@@ -145,8 +145,8 @@ const ExchangeOld = () => {
               <TabsContent value="buy" className="space-y-4 mt-6">
                 <div className="space-y-4">
                   <TradeSlider
-                    balance={balance?.brl_balance || 0}
-                    currency="BRL"
+                    balance={profile?.saldo_moeda || 0}
+                    currency="RIOZ"
                     price={rate?.price || 1}
                     onAmountChange={setAmount}
                     side="buy"
@@ -190,7 +190,7 @@ const ExchangeOld = () => {
               <TabsContent value="sell" className="space-y-4 mt-6">
                 <div className="space-y-4">
                   <TradeSlider
-                    balance={balance?.rioz_balance || 0}
+                    balance={profile?.saldo_moeda || 0}
                     currency="RIOZ"
                     price={rate?.price || 1}
                     onAmountChange={setAmount}
