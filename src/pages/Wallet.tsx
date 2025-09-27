@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Wallet, TrendingUp, TrendingDown, Users, Plus, ArrowRightLeft, DollarSign } from 'lucide-react';
@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useWalletTransactions, useUserOrders } from '@/hooks/useWallet';
 import { useMarkets } from '@/hooks/useMarkets';
+import { useExchangeStore } from '@/stores/useExchangeStore';
 import { AddBrlModal } from '@/components/exchange/AddBrlModal';
 import { WithdrawModal } from '@/components/wallet/WithdrawModal';
 import TransactionItem from '@/components/wallet/TransactionItem';
@@ -14,12 +15,28 @@ import ExportCSVButton from '@/components/ui/export-csv-button';
 
 const WalletPage = () => {
   const { user } = useAuth();
-  const { data: profile } = useProfile(user?.id);
-  const { data: transactions, isLoading: loadingTransactions } = useWalletTransactions(user?.id);
+  const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
+  const { data: transactions, isLoading: loadingTransactions, refetch: refetchTransactions } = useWalletTransactions(user?.id);
   const { data: orders, isLoading: loadingOrders } = useUserOrders(user?.id);
   const { data: markets } = useMarkets();
+  const { balance, fetchBalance } = useExchangeStore();
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      fetchBalance();
+    }
+  }, [user, fetchBalance]);
+
+  useEffect(() => {
+    // Refresh data when modals close
+    if (!showDepositModal && !showWithdrawModal && user) {
+      refetchProfile();
+      refetchTransactions();
+      fetchBalance();
+    }
+  }, [showDepositModal, showWithdrawModal, user, refetchProfile, refetchTransactions, fetchBalance]);
 
   // Calculate totals
   const totalCredits = transactions?.filter(t => t.tipo === 'credito').reduce((sum, t) => sum + t.valor, 0) || 0;
@@ -164,14 +181,14 @@ const WalletPage = () => {
             <div className="grid grid-cols-2 gap-4">
               <Button 
                 className="bg-[#00FF91] hover:bg-[#00FF91]/90 text-black"
-                onClick={() => {/* Handle SIM action */}}
+                onClick={() => window.location.href = '/'}
               >
                 <TrendingUp className="w-4 h-4 mr-2" />
                 Dar Opinião SIM
               </Button>
               <Button 
                 className="bg-[#FF1493] hover:bg-[#FF1493]/90 text-white"
-                onClick={() => {/* Handle NÃO action */}}
+                onClick={() => window.location.href = '/'}
               >
                 <TrendingDown className="w-4 h-4 mr-2" />
                 Dar Opinião NÃO

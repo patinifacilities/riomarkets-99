@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
+import { 
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -20,35 +20,51 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Edit, Trash2, Shield, DollarSign } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Edit, Trash2, Shield, DollarSign, Minus, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
+interface User {
+  id: string;
+  nome: string;
+  email: string;
+  saldo_moeda: number;
+  nivel: string;
+  is_admin: boolean;
+  created_at: string;
+}
+
 interface UserEditModalProps {
+  user: User;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: any;
   onSuccess?: () => void;
 }
 
-export const UserEditModal = ({ open, onOpenChange, user, onSuccess }: UserEditModalProps) => {
+export const UserEditModal = ({ user, open, onOpenChange, onSuccess }: UserEditModalProps) => {
   const [adjustAmount, setAdjustAmount] = useState(0);
-  const [isAdmin, setIsAdmin] = useState(user?.is_admin || false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  const isAdmin = user.is_admin;
+
   const logAdminAction = async (action: string, details: any) => {
     try {
-      await supabase.from('audit_logs').insert({
-        action,
-        resource_type: 'user',
-        resource_id: user.id,
-        user_id: (await supabase.auth.getUser()).data.user?.id,
-        new_values: details,
-        severity: 'info'
-      });
+      const { data: currentUser } = await supabase.auth.getUser();
+      await supabase
+        .from('audit_logs')
+        .insert({
+          action,
+          resource_type: 'user',
+          resource_id: user.id,
+          user_id: currentUser.user?.id,
+          new_values: details,
+          severity: 'info'
+        });
     } catch (error) {
       console.error('Failed to log admin action:', error);
     }
@@ -72,7 +88,7 @@ export const UserEditModal = ({ open, onOpenChange, user, onSuccess }: UserEditM
 
       if (transactionError) throw transactionError;
 
-      // Update user balance
+      // Update user profile balance
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
@@ -109,6 +125,36 @@ export const UserEditModal = ({ open, onOpenChange, user, onSuccess }: UserEditM
     }
   };
 
+  const handleDeleteUser = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.admin.deleteUser(user.id);
+      if (error) throw error;
+
+      // Log admin action
+      await logAdminAction('user_deletion', {
+        user_email: user.email,
+        user_name: user.nome
+      });
+
+      toast({
+        title: 'Usuário excluído com sucesso',
+        description: `O usuário ${user.nome} foi removido do sistema`,
+      });
+
+      onSuccess?.();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: 'Erro',
+        description: 'Falha ao excluir usuário',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleToggleAdmin = async () => {
     setIsLoading(true);
     try {
@@ -126,188 +172,169 @@ export const UserEditModal = ({ open, onOpenChange, user, onSuccess }: UserEditM
         new_admin_status: !isAdmin
       });
 
-      setIsAdmin(!isAdmin);
       toast({
-        title: 'Status de admin atualizado',
-        description: `Usuário ${!isAdmin ? 'promovido a' : 'removido de'} administrador`,
+        title: `Status de admin ${!isAdmin ? 'concedido' : 'removido'}`,
+        description: `${user.nome} ${!isAdmin ? 'agora é' : 'não é mais'} administrador`,
       });
 
       onSuccess?.();
     } catch (error) {
-      console.error('Error updating admin status:', error);
+      console.error('Error toggling admin status:', error);
       toast({
         title: 'Erro',
-        description: 'Falha ao atualizar status de administrador',
+        description: 'Falha ao alterar status de administrador',
         variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
     }
   };
-
-  const handleDeleteUser = async () => {
-    setIsLoading(true);
-    try {
-      // Log admin action before deletion
-      await logAdminAction('user_deletion', {
-        user_email: user.email,
-        user_name: user.nome,
-        user_balance: user.saldo_moeda
-      });
-
-      // Delete user profile (this will cascade to related data due to FK constraints)
-      const { error } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      toast({
-        title: 'Usuário excluído',
-        description: 'A conta do usuário foi excluída com sucesso',
-      });
-
-      onOpenChange(false);
-      onSuccess?.();
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      toast({
-        title: 'Erro',
-        description: 'Falha ao excluir usuário',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-      setShowDeleteConfirm(false);
-    }
-  };
-
-  if (!user) return null;
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Edit className="w-5 h-5" />
-              Editar Usuário - {user.nome}
-            </DialogTitle>
-            <DialogDescription>
-              Gerencie as informações e permissões do usuário.
-            </DialogDescription>
-          </DialogHeader>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Edit className="w-5 h-5" />
+            Editar Usuário
+          </DialogTitle>
+          <DialogDescription>
+            Gerencie informações e permissões do usuário {user.nome}
+          </DialogDescription>
+        </DialogHeader>
 
-          <div className="space-y-6">
-            {/* User Info */}
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <h4 className="font-medium mb-2">Informações do Usuário</h4>
-              <p className="text-sm text-muted-foreground">Email: {user.email}</p>
-              <p className="text-sm text-muted-foreground">Saldo atual: {user.saldo_moeda.toLocaleString()} RZ</p>
-              <p className="text-sm text-muted-foreground">Nível: {user.nivel}</p>
+        <div className="space-y-6">
+          {/* User Info */}
+          <div className="space-y-3">
+            <div>
+              <Label className="text-sm font-medium">Nome</Label>
+              <p className="text-sm">{user.nome}</p>
             </div>
-
-            {/* Balance Adjustment */}
-            <div className="space-y-3">
-              <Label className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                Ajustar Saldo
-              </Label>
-              <div className="flex gap-2">
-                <Input
-                  type="number"
-                  value={adjustAmount}
-                  onChange={(e) => setAdjustAmount(Number(e.target.value))}
-                  placeholder="+ para crédito, - para débito"
-                />
-                <Button
-                  onClick={handleAdjustBalance}
-                  disabled={adjustAmount === 0 || isLoading}
-                  variant="outline"
-                >
-                  Aplicar
-                </Button>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => setAdjustAmount(1000)}
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                >
-                  +1,000
-                </Button>
-                <Button
-                  onClick={() => setAdjustAmount(-1000)}
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                >
-                  -1,000
-                </Button>
+            <div>
+              <Label className="text-sm font-medium">Email</Label>
+              <p className="text-sm">{user.email}</p>
+            </div>
+            <div>
+              <Label className="text-sm font-medium">Saldo Atual</Label>
+              <p className="text-sm font-mono">{user.saldo_moeda.toLocaleString()} Rioz Coin</p>
+            </div>
+            <div>
+              <Label className="text-sm font-medium">Status</Label>
+              <div className="flex items-center gap-2">
+                <Badge variant={isAdmin ? "destructive" : "secondary"}>
+                  {isAdmin ? 'Administrador' : 'Usuário'}
+                </Badge>
+                <Badge variant="outline">{user.nivel}</Badge>
               </div>
             </div>
+          </div>
 
-            {/* Admin Status */}
-            <div className="flex items-center justify-between">
-              <Label className="flex items-center gap-2">
-                <Shield className="w-4 h-4" />
-                Status de Administrador
-              </Label>
-              <Switch
-                checked={isAdmin}
-                onCheckedChange={handleToggleAdmin}
-                disabled={isLoading}
-              />
-            </div>
+          <Separator />
 
-            {/* Delete User */}
-            <div className="border-t pt-4">
+          {/* Balance Adjustment */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Ajustar Saldo</Label>
+            <div className="flex items-center gap-2">
               <Button
-                onClick={() => setShowDeleteConfirm(true)}
-                variant="destructive"
-                className="w-full"
+                variant="outline"
+                size="icon"
+                onClick={() => setAdjustAmount(prev => prev - 100)}
                 disabled={isLoading}
               >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Excluir Conta do Usuário
+                <Minus className="w-4 h-4" />
+              </Button>
+              <Input
+                type="number"
+                value={adjustAmount}
+                onChange={(e) => setAdjustAmount(parseInt(e.target.value) || 0)}
+                placeholder="0"
+                className="text-center"
+                disabled={isLoading}
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setAdjustAmount(prev => prev + 100)}
+                disabled={isLoading}
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleAdjustBalance}
+                disabled={adjustAmount === 0 || isLoading}
+                className="flex-1"
+                size="sm"
+              >
+                <DollarSign className="w-4 h-4 mr-2" />
+                Aplicar Ajuste
               </Button>
             </div>
           </div>
 
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isLoading}
-            >
-              Fechar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          <Separator />
 
-      {/* Delete Confirmation */}
-      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Excluir usuário?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta ação não pode ser desfeita. Isso excluirá permanentemente a conta de {user.nome} e todos os dados associados.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteUser}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+          {/* Admin Actions */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Ações Administrativas</Label>
+            
+            <div className="flex gap-2">
+              <Button
+                onClick={handleToggleAdmin}
+                disabled={isLoading}
+                variant={isAdmin ? "destructive" : "default"}
+                size="sm"
+                className="flex-1"
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                {isAdmin ? 'Remover Admin' : 'Tornar Admin'}
+              </Button>
+              
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    disabled={isLoading}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Excluir
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Tem certeza que deseja excluir o usuário {user.nome}? 
+                      Esta ação não pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteUser}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Excluir Usuário
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isLoading}
+          >
+            Fechar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

@@ -109,14 +109,12 @@ const ExchangeOld = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Balance Card */}
-        <div className="lg:col-span-1 space-y-4">
-          <BalancesCard />
+        {/* Order Book - Positioned above trading interface */}
+        <div className="lg:col-span-3 space-y-4">
           <OrderBookWidget />
-        </div>
-
-        {/* Trading Interface */}
-        <Card className="lg:col-span-3" data-exchange-widget>
+          
+          {/* Trading Interface */}
+          <Card data-exchange-widget>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Negociar</CardTitle>
@@ -236,6 +234,12 @@ const ExchangeOld = () => {
             </Tabs>
           </CardContent>
         </Card>
+        </div>
+
+        {/* Balance Card - Right sidebar */}
+        <div className="lg:col-span-1">
+          <BalancesCard />
+        </div>
       </div>
     </div>
   );

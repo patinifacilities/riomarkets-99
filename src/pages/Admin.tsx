@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Edit, CheckCircle, XCircle, Settings, DollarSign, TrendingUp, Users, FileText, Play, Download, Shield, Activity, Newspaper } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +18,7 @@ import EditMarketModal from '@/components/admin/EditMarketModal';
 import MarketTestModal from '@/components/admin/MarketTestModal';
 import { AdminLogin } from '@/components/admin/AdminLogin';
 import { NewsManagement } from '@/components/admin/NewsManagement';
+import { OddsController } from '@/components/admin/OddsController';
 
 const Admin = () => {
   const { user, loading: authLoading } = useAuth();
@@ -26,6 +27,7 @@ const Admin = () => {
   const { data: markets = [], isLoading, refetch } = useMarkets();
   const { data: pools = {} } = useMarketPools();
   const [logs, setLogs] = useState<any[]>([]);
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [liquidationModal, setLiquidationModal] = useState<{
     isOpen: boolean;
@@ -39,6 +41,27 @@ const Admin = () => {
     isOpen: boolean;
   }>({ isOpen: false });
   const [adminLoggedIn, setAdminLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (user?.id && profile?.is_admin) {
+      fetchAuditLogs();
+    }
+  }, [user?.id, profile?.is_admin]);
+
+  const fetchAuditLogs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('audit_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+      setAuditLogs(data || []);
+    } catch (error) {
+      console.error('Error fetching audit logs:', error);
+    }
+  };
 
   const handleCreateSuccess = () => {
     setShowCreateForm(false);
@@ -150,7 +173,14 @@ const Admin = () => {
           <div className="flex items-center gap-3">
             <Shield className="w-8 h-8 text-primary" />
             <div>
-              <h1 className="text-3xl font-bold">Administração</h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold">Administração</h1>
+                {profile?.is_admin && (
+                  <Badge variant="destructive" className="text-xs">
+                    ADMIN
+                  </Badge>
+                )}
+              </div>
               <p className="text-muted-foreground mt-1 max-w-[65ch]">
                 Gerencie mercados, categorias, usuários e monitore métricas da plataforma
               </p>
@@ -350,6 +380,14 @@ const Admin = () => {
                         </div>
                       )}
 
+                      {/* Odds Controller for open markets */}
+                      {market.status === 'aberto' && (
+                        <OddsController 
+                          market={market} 
+                          onOddsUpdate={refetch}
+                        />
+                      )}
+
                       {market.status === 'fechado' && (
                         <div className="space-y-3">
                           <div className="text-sm font-medium">Liquidar Mercado:</div>
@@ -422,25 +460,33 @@ const Admin = () => {
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
-                {logs.length === 0 ? (
+                {auditLogs.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Activity className="w-12 h-12 mx-auto mb-4 opacity-50" />
                     <p className="font-medium mb-2">Nenhum log disponível</p>
                     <p className="text-sm">Os logs de ações administrativas aparecerão aqui</p>
                   </div>
                 ) : (
-                  logs.map((log, index) => (
+                  auditLogs.map((log, index) => (
                     <div key={index} className="p-4 rounded-lg border border-border bg-card/50">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline">{log.type}</Badge>
-                          <span className="font-medium">{log.action}</span>
+                          <Badge variant="outline">{log.action}</Badge>
+                          <span className="font-medium">{log.resource_type}</span>
                         </div>
-                        <span className="text-sm text-muted-foreground">{log.date}</span>
+                        <span className="text-sm text-muted-foreground">
+                          {new Date(log.created_at).toLocaleString('pt-BR')}
+                        </span>
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        Usuário: {log.user} | {log.details}
-                      </p>
+                      <div className="text-sm text-muted-foreground">
+                        <p>Recurso: {log.resource_id}</p>
+                        {log.old_values && (
+                          <p>Antes: {JSON.stringify(log.old_values)}</p>
+                        )}
+                        {log.new_values && (
+                          <p>Depois: {JSON.stringify(log.new_values)}</p>
+                        )}
+                      </div>
                     </div>
                   ))
                 )}
