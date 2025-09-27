@@ -1028,6 +1028,23 @@ export type Database = {
           success: boolean
         }[]
       }
+      execute_market_order: {
+        Args: {
+          p_amount_input: number
+          p_current_price: number
+          p_input_currency: string
+          p_side: string
+          p_user_id: string
+        }
+        Returns: {
+          amount_converted: number
+          fee_charged: number
+          message: string
+          new_brl_balance: number
+          new_rioz_balance: number
+          success: boolean
+        }[]
+      }
       execute_pending_limit_orders: {
         Args: { p_current_price: number }
         Returns: {
