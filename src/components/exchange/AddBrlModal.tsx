@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,6 +23,7 @@ interface AddBrlModalProps {
 export const AddBrlModal = ({ onSuccess }: AddBrlModalProps) => {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('pix');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
@@ -63,10 +65,11 @@ export const AddBrlModal = ({ onSuccess }: AddBrlModalProps) => {
 
       toast({
         title: "Depósito realizado!",
-        description: `R$ ${amountValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} adicionados à sua conta.`,
+        description: `R$ ${amountValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} via ${paymentMethod.toUpperCase()} adicionados à sua conta.`,
       });
 
       setAmount('');
+      setPaymentMethod('pix');
       setOpen(false);
       onSuccess?.();
     } catch (error) {
@@ -113,9 +116,24 @@ export const AddBrlModal = ({ onSuccess }: AddBrlModalProps) => {
               step="0.01"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="text-right"
+              className="text-right [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               disabled={isLoading}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="payment-method">Método de Pagamento</Label>
+            <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pix">PIX</SelectItem>
+                <SelectItem value="credit-card">Cartão de Crédito</SelectItem>
+                <SelectItem value="debit-card">Cartão de Débito</SelectItem>
+                <SelectItem value="crypto">Cripto</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex gap-2">
             <Button

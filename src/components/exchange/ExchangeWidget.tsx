@@ -213,9 +213,7 @@ export const ExchangeWidget = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center py-8">
-          <div className="animate-spin mx-auto mb-4">
-            <Loader2 className="h-8 w-8 text-[#00FF91]" />
-          </div>
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-muted-foreground">
             Buscando taxa de câmbio atual...
           </p>

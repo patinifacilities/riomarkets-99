@@ -1,5 +1,5 @@
 import { TrendingUp, Wallet, Trophy, Settings, LogOut, User, LogIn, Receipt, Newspaper, ArrowRightLeft, Menu } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
   DropdownMenu, 
@@ -25,6 +25,7 @@ import logoImage from '@/assets/rio-markets-logo.png';
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, signOut, isAuthenticated } = useAuth();
   const { data: profile } = useProfile(user?.id);
   const isMobile = useIsMobile();
@@ -33,7 +34,6 @@ const Header = () => {
   const navItems = [
     { href: '/', icon: TrendingUp, label: 'Mercados' },
     { href: '/exchange', icon: ArrowRightLeft, label: 'Exchange', authRequired: true },
-    { href: '/wallet', icon: Wallet, label: 'Carteira', authRequired: true },
     { href: '/transactions', icon: Receipt, label: 'Transações', authRequired: true },
     { href: '/ranking', icon: Trophy, label: 'Ranking' },
     { href: '/press', icon: Newspaper, label: 'Na mídia' },
@@ -221,7 +221,7 @@ const Header = () => {
                     size="sm" 
                     className={`gap-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00FF91] ${
                       isActive 
-                        ? 'text-black underline underline-offset-4' 
+                        ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
                         : 'text-foreground/80 hover:text-foreground'
                     }`}
                   >
@@ -237,12 +237,22 @@ const Header = () => {
           <div className="flex items-center gap-3">
             {isAuthenticated && profile ? (
               <>
+                {/* Wallet Button - Show balance */}
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => navigate('/wallet')}
+                  className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 hidden sm:flex"
+                >
+                  <Wallet className="w-4 h-4 mr-2" />
+                  <span className="font-mono text-sm">
+                    {profile.saldo_moeda.toLocaleString()} RZ
+                  </span>
+                </Button>
+                
                 <div className="text-right hidden sm:block">
                   <p className="text-sm font-medium text-white">{profile.nome}</p>
                   <p className="text-xs text-gray-300 capitalize">{profile.nivel}</p>
-                </div>
-                <div className="px-3 py-2 rounded-lg bg-gradient-primary text-primary-foreground font-semibold hidden sm:block">
-                  {profile.saldo_moeda.toLocaleString()} Rioz
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

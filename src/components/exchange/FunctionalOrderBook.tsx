@@ -3,7 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 import { TrendingUp, TrendingDown, ArrowUpDown } from 'lucide-react';
+import { useExchangeStore } from '@/stores/useExchangeStore';
 
 interface OrderBookEntry {
   price: number;
@@ -24,8 +27,11 @@ export const FunctionalOrderBook = () => {
   const [sellOrders, setSellOrders] = useState<OrderBookEntry[]>([]);
   const [userOrders, setUserOrders] = useState<Order[]>([]);
   const [orderType, setOrderType] = useState<'buy' | 'sell'>('buy');
+  const [marketType, setMarketType] = useState<'market' | 'limit'>('market');
   const [price, setPrice] = useState('');
   const [amount, setAmount] = useState('');
+  const [sliderValue, setSliderValue] = useState([0]);
+  const { balance } = useExchangeStore();
 
   // Initialize with mock data
   useEffect(() => {
@@ -49,34 +55,116 @@ export const FunctionalOrderBook = () => {
     setSellOrders(initialSellOrders);
   }, []);
 
+  const handleSliderChange = (value: number[]) => {
+    setSliderValue(value);
+    const percentage = value[0] / 100;
+    
+    if (orderType === 'buy' && balance?.brl_balance) {
+      const maxAmount = balance.brl_balance * percentage;
+      setAmount(maxAmount.toFixed(2));
+    } else if (orderType === 'sell' && balance?.rioz_balance) {
+      const maxAmount = balance.rioz_balance * percentage;
+      setAmount(maxAmount.toFixed(2));
+    }
+  };
+
   const handlePlaceOrder = () => {
-    if (!price || !amount) return;
+    if (!amount || (marketType === 'limit' && !price)) return;
+
+    const orderPrice = marketType === 'market' 
+      ? (orderType === 'buy' ? sellOrders[0]?.price || 1.0 : buyOrders[0]?.price || 1.0)
+      : parseFloat(price);
 
     const newOrder: Order = {
       id: `order_${Date.now()}`,
       type: orderType,
-      price: parseFloat(price),
+      price: orderPrice,
       amount: parseFloat(amount),
       timestamp: Date.now()
     };
 
-    setUserOrders(prev => [newOrder, ...prev].slice(0, 10)); // Keep last 10 orders
+    setUserOrders(prev => [newOrder, ...prev].slice(0, 10));
 
-    // Add some mock matching logic
+    // Enhanced matching logic
     if (orderType === 'buy') {
-      setBuyOrders(prev => [
-        { price: parseFloat(price), amount: parseFloat(amount), total: parseFloat(price) * parseFloat(amount) },
-        ...prev
-      ].sort((a, b) => b.price - a.price).slice(0, 5));
+      const newBuyOrder = { price: orderPrice, amount: parseFloat(amount), total: orderPrice * parseFloat(amount) };
+      
+      // Check for matching sell orders
+      const matchingSells = sellOrders.filter(sell => sell.price <= orderPrice);
+      if (matchingSells.length > 0) {
+        let remainingAmount = parseFloat(amount);
+        const updatedSells = [...sellOrders];
+        
+        for (const sell of matchingSells) {
+          if (remainingAmount <= 0) break;
+          
+          if (sell.amount <= remainingAmount) {
+            remainingAmount -= sell.amount;
+            const sellIndex = updatedSells.findIndex(s => s.price === sell.price && s.amount === sell.amount);
+            if (sellIndex !== -1) updatedSells.splice(sellIndex, 1);
+          } else {
+            const sellIndex = updatedSells.findIndex(s => s.price === sell.price && s.amount === sell.amount);
+            if (sellIndex !== -1) {
+              updatedSells[sellIndex].amount -= remainingAmount;
+              updatedSells[sellIndex].total = updatedSells[sellIndex].price * updatedSells[sellIndex].amount;
+            }
+            remainingAmount = 0;
+          }
+        }
+        
+        setSellOrders(updatedSells);
+        
+        if (remainingAmount > 0) {
+          setBuyOrders(prev => [
+            { ...newBuyOrder, amount: remainingAmount, total: orderPrice * remainingAmount },
+            ...prev
+          ].sort((a, b) => b.price - a.price).slice(0, 5));
+        }
+      } else {
+        setBuyOrders(prev => [newBuyOrder, ...prev].sort((a, b) => b.price - a.price).slice(0, 5));
+      }
     } else {
-      setSellOrders(prev => [
-        { price: parseFloat(price), amount: parseFloat(amount), total: parseFloat(price) * parseFloat(amount) },
-        ...prev
-      ].sort((a, b) => a.price - b.price).slice(0, 5));
+      const newSellOrder = { price: orderPrice, amount: parseFloat(amount), total: orderPrice * parseFloat(amount) };
+      
+      // Check for matching buy orders
+      const matchingBuys = buyOrders.filter(buy => buy.price >= orderPrice);
+      if (matchingBuys.length > 0) {
+        let remainingAmount = parseFloat(amount);
+        const updatedBuys = [...buyOrders];
+        
+        for (const buy of matchingBuys) {
+          if (remainingAmount <= 0) break;
+          
+          if (buy.amount <= remainingAmount) {
+            remainingAmount -= buy.amount;
+            const buyIndex = updatedBuys.findIndex(b => b.price === buy.price && b.amount === buy.amount);
+            if (buyIndex !== -1) updatedBuys.splice(buyIndex, 1);
+          } else {
+            const buyIndex = updatedBuys.findIndex(b => b.price === buy.price && b.amount === buy.amount);
+            if (buyIndex !== -1) {
+              updatedBuys[buyIndex].amount -= remainingAmount;
+              updatedBuys[buyIndex].total = updatedBuys[buyIndex].price * updatedBuys[buyIndex].amount;
+            }
+            remainingAmount = 0;
+          }
+        }
+        
+        setBuyOrders(updatedBuys);
+        
+        if (remainingAmount > 0) {
+          setSellOrders(prev => [
+            { ...newSellOrder, amount: remainingAmount, total: orderPrice * remainingAmount },
+            ...prev
+          ].sort((a, b) => a.price - b.price).slice(0, 5));
+        }
+      } else {
+        setSellOrders(prev => [newSellOrder, ...prev].sort((a, b) => a.price - b.price).slice(0, 5));
+      }
     }
 
     setPrice('');
     setAmount('');
+    setSliderValue([0]);
   };
 
   const spread = sellOrders.length > 0 && buyOrders.length > 0 
@@ -162,21 +250,63 @@ export const FunctionalOrderBook = () => {
               </Button>
             </div>
 
-            {/* Price Input */}
+            {/* Market Type Selector */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Preço (RZ)</label>
-              <Input
-                type="number"
-                step="0.0001"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="0.0000"
+              <label className="text-sm font-medium">Tipo de Ordem</label>
+              <Select value={marketType} onValueChange={(value: 'market' | 'limit') => setMarketType(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="market">Mercado</SelectItem>
+                  <SelectItem value="limit">Limite</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Price Input */}
+            {marketType === 'limit' && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Preço (RZ)</label>
+                <Input
+                  type="number"
+                  step="0.0001"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="0.0000"
+                />
+              </div>
+            )}
+
+            {/* Balance Slider */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Saldo Disponível: {orderType === 'buy' 
+                  ? `R$ ${balance?.brl_balance?.toFixed(2) || '0.00'}` 
+                  : `${balance?.rioz_balance?.toFixed(2) || '0.00'} RZ`
+                }
+              </label>
+              <Slider
+                value={sliderValue}
+                onValueChange={handleSliderChange}
+                max={100}
+                step={1}
+                className="w-full"
               />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>0%</span>
+                <span>25%</span>
+                <span>50%</span>
+                <span>75%</span>
+                <span>100%</span>
+              </div>
             </div>
 
             {/* Amount Input */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Quantidade</label>
+              <label className="text-sm font-medium">
+                Quantidade {orderType === 'buy' ? '(R$)' : '(RZ)'}
+              </label>
               <Input
                 type="number"
                 value={amount}
@@ -186,17 +316,24 @@ export const FunctionalOrderBook = () => {
             </div>
 
             {/* Total */}
-            {price && amount && (
+            {amount && (
               <div className="p-3 bg-muted/50 rounded-lg">
-                <div className="text-sm text-muted-foreground">Total</div>
-                <div className="font-bold">{(parseFloat(price) * parseFloat(amount)).toFixed(2)} RZ</div>
+                <div className="text-sm text-muted-foreground">
+                  {orderType === 'buy' ? 'RZ a receber' : 'R$ a receber'}
+                </div>
+                <div className="font-bold">
+                  {orderType === 'buy' 
+                    ? `${(parseFloat(amount) / (sellOrders[0]?.price || 1)).toFixed(4)} RZ`
+                    : `R$ ${(parseFloat(amount) * (buyOrders[0]?.price || 1)).toFixed(2)}`
+                  }
+                </div>
               </div>
             )}
 
             {/* Place Order Button */}
             <Button
               onClick={handlePlaceOrder}
-              disabled={!price || !amount}
+              disabled={!amount || (marketType === 'limit' && !price)}
               className="w-full"
             >
               {orderType === 'buy' ? 'Comprar' : 'Vender'}

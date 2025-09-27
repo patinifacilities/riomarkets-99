@@ -1,196 +1,140 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { useOrderBookStore } from '@/stores/useOrderBookStore';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { formatCurrency } from '@/lib/currency';
 
-interface DepthChartData {
+interface DepthDataPoint {
   price: number;
   buyDepth: number;
   sellDepth: number;
-  side: 'buy' | 'sell';
 }
 
-const CustomTooltip: React.FC<any> = ({ active, payload, label }) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    const isBuy = data.side === 'buy';
-    
-    return (
-      <div className="bg-background border rounded-lg shadow-lg p-3">
-        <p className="font-mono font-semibold mb-1">
-          {formatCurrency(label, 'BRL')}
-        </p>
-        <p className={`text-sm ${isBuy ? 'text-green-400' : 'text-red-400'}`}>
-          {isBuy ? 'Compra' : 'Venda'}: {data[isBuy ? 'buyDepth' : 'sellDepth'].toLocaleString()} RIOZ
-        </p>
-      </div>
-    );
-  }
-  return null;
-};
+export const DepthChart = () => {
+  const { orderBookData, fetchOrderBook } = useOrderBookStore();
+  const [depthData, setDepthData] = useState<DepthDataPoint[]>([]);
 
-export const DepthChart: React.FC<{ height?: number }> = ({ height = 300 }) => {
-  const {
-    depthData,
-    depthLoading,
-    depthError,
-    orderBookData,
-    startRealTimeUpdates
-  } = useOrderBookStore();
-
-  // Start real-time updates on mount
   useEffect(() => {
-    const cleanup = startRealTimeUpdates();
-    return cleanup;
-  }, [startRealTimeUpdates]);
+    if (!orderBookData) {
+      fetchOrderBook();
+      return;
+    }
 
-  // Process depth data for chart
-  const chartData = useMemo(() => {
-    if (!depthData || !orderBookData) return [];
-
-    const data: DepthChartData[] = [];
+    // Generate depth chart data from order book
+    const combinedData: DepthDataPoint[] = [];
     
-    // Add buy side data (reversed to show from current price outward)
-    depthData.buy_depth.forEach(point => {
-      data.push({
-        price: point.price,
-        buyDepth: point.cumulative_quantity,
-        sellDepth: 0,
-        side: 'buy'
+    // Process buy orders (bids) - cumulative from highest to lowest price
+    let buyDepth = 0;
+    const sortedBids = [...orderBookData.bids].sort((a, b) => b.price - a.price);
+    
+    sortedBids.forEach((bid) => {
+      buyDepth += bid.quantity;
+      combinedData.push({
+        price: bid.price,
+        buyDepth: buyDepth,
+        sellDepth: 0
       });
     });
+
+    // Process sell orders (asks) - cumulative from lowest to highest price  
+    let sellDepth = 0;
+    const sortedAsks = [...orderBookData.asks].sort((a, b) => a.price - b.price);
     
-    // Add sell side data
-    depthData.sell_depth.forEach(point => {
-      data.push({
-        price: point.price,
+    sortedAsks.forEach((ask) => {
+      sellDepth += ask.quantity;
+      combinedData.push({
+        price: ask.price,
         buyDepth: 0,
-        sellDepth: point.cumulative_quantity,
-        side: 'sell'
+        sellDepth: sellDepth
       });
     });
+
+    // Sort by price and fill gaps
+    const sortedData = combinedData.sort((a, b) => a.price - b.price);
     
-    // Sort by price
-    return data.sort((a, b) => a.price - b.price);
-  }, [depthData, orderBookData]);
+    // Fill in missing values
+    let lastBuyDepth = 0;
+    let lastSellDepth = 0;
+    
+    const filledData = sortedData.map((point) => {
+      if (point.buyDepth > 0) lastBuyDepth = point.buyDepth;
+      if (point.sellDepth > 0) lastSellDepth = point.sellDepth;
+      
+      return {
+        price: point.price,
+        buyDepth: point.buyDepth || lastBuyDepth,
+        sellDepth: point.sellDepth || lastSellDepth
+      };
+    });
 
-  if (depthLoading && !depthData) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Profundidade de Mercado</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="w-full" style={{ height }} />
-        </CardContent>
-      </Card>
-    );
-  }
+    setDepthData(filledData);
+  }, [orderBookData, fetchOrderBook]);
 
-  if (depthError) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg text-red-400">Erro no Gráfico</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center" style={{ height }}>
-            <p className="text-muted-foreground">{depthError}</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  const formatPrice = (value: number) => {
+    return `R$ ${value.toFixed(4)}`;
+  };
 
-  if (!chartData.length) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Profundidade de Mercado</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center" style={{ height }}>
-            <p className="text-muted-foreground">Nenhum dado disponível</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  const formatDepth = (value: number) => {
+    return `${value.toLocaleString()} RZ`;
+  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Profundidade de Mercado</CardTitle>
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <CardTitle>Profundidade de Mercado</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={depthData}>
+              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+              <XAxis 
+                dataKey="price" 
+                tickFormatter={formatPrice}
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis 
+                tickFormatter={(value) => `${value}`}
+                tick={{ fontSize: 12 }}
+              />
+              <Tooltip 
+                formatter={(value: number, name: string) => [
+                  formatDepth(value), 
+                  name === 'buyDepth' ? 'Compra' : 'Venda'
+                ]}
+                labelFormatter={formatPrice}
+              />
+              <Area
+                type="stepAfter"
+                dataKey="buyDepth"
+                stackId="1"
+                stroke="hsl(var(--success))"
+                fill="hsl(var(--success))"
+                fillOpacity={0.3}
+                strokeWidth={2}
+              />
+              <Area
+                type="stepBefore"
+                dataKey="sellDepth"
+                stackId="2"
+                stroke="hsl(var(--danger))"
+                fill="hsl(var(--danger))"
+                fillOpacity={0.3}
+                strokeWidth={2}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+        
+        <div className="flex justify-between mt-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-green-500 rounded-sm" />
+            <div className="w-3 h-3 bg-success rounded opacity-50"></div>
             <span>Ordens de Compra</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-red-500 rounded-sm" />
+            <div className="w-3 h-3 bg-danger rounded opacity-50"></div>
             <span>Ordens de Venda</span>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={height}>
-          <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="buyGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0.1} />
-              </linearGradient>
-              <linearGradient id="sellGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0.1} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.2} />
-            <XAxis 
-              dataKey="price" 
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 11 }}
-              tickFormatter={(value) => formatCurrency(value, 'BRL')}
-            />
-            <YAxis 
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 11 }}
-              tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Area
-              type="stepAfter"
-              dataKey="buyDepth"
-              stroke="hsl(var(--chart-2))"
-              fillOpacity={1}
-              fill="url(#buyGradient)"
-              strokeWidth={2}
-            />
-            <Area
-              type="stepBefore"
-              dataKey="sellDepth"
-              stroke="hsl(var(--destructive))"
-              fillOpacity={1}
-              fill="url(#sellGradient)"
-              strokeWidth={2}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-        
-        {orderBookData && (
-          <div className="mt-4 flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-sm text-muted-foreground mb-1">Preço Atual</div>
-              <div className="font-mono font-bold text-lg">
-                {formatCurrency(orderBookData.last_price, 'BRL')}
-              </div>
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   );
