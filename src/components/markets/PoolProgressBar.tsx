@@ -42,9 +42,9 @@ const PoolProgressBar = ({ simPercent, naoPercent, className = "", showOdds = fa
       <div className="relative">
         <Progress 
           value={simPercent} 
-          className="h-2 bg-[#2A2F36]"
+          className="h-3 bg-[#2A2F36]"
         />
-        <div className="absolute inset-0 h-2 bg-[#00FF91] rounded-full transition-[width] duration-500" 
+        <div className="absolute inset-0 h-3 bg-gradient-to-r from-[#00FF91] to-[#FF1493] rounded-full transition-[width] duration-500" 
              style={{ 
                width: `${simPercent}%`,
                minWidth: simPercent > 0 && simPercent < 5 ? '4px' : '0'

@@ -109,7 +109,7 @@ const MarketCard = ({ market }: MarketCardProps) => {
               </div>
               <div className="text-right">
                 <div className="text-sm font-semibold text-foreground mb-1">
-                  {yesRecompensa ? `${(yesRecompensa * 100).toFixed(0)}¢` : '--'}
+                  {yesRecompensa ? `${yesRecompensa.toFixed(2)}x` : '--'}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {pool?.percent_sim ? `${pool.percent_sim.toFixed(0)}%` : '--'}
@@ -130,7 +130,7 @@ const MarketCard = ({ market }: MarketCardProps) => {
               </div>
               <div className="text-right">
                 <div className="text-sm font-semibold text-foreground mb-1">
-                  {noRecompensa ? `${(noRecompensa * 100).toFixed(0)}¢` : '--'}
+                  {noRecompensa ? `${noRecompensa.toFixed(2)}x` : '--'}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {pool?.percent_nao ? `${pool.percent_nao.toFixed(0)}%` : '--'}

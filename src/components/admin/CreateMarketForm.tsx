@@ -173,6 +173,7 @@ const CreateMarketForm = ({ onSuccess, onCancel }: CreateMarketFormProps) => {
           market_type: newMarket.marketType,
           opcoes: validOptions,
           odds: recompensas,
+          recompensas: recompensas, // Add recompensas field for backward compatibility
           status: 'aberto',
           end_date: new Date(newMarket.endDate).toISOString(),
           thumbnail_url: newMarket.thumbnailUrl || null
