@@ -153,11 +153,11 @@ const WalletPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-[#00FF91]/10 rounded-lg">
-                <div className="text-sm text-muted-foreground mb-1">Pool SIM</div>
-                <div className="text-xl font-bold text-[#00FF91]">{simPercent.toFixed(1)}%</div>
-                <div className="text-xs text-muted-foreground">{globalPoolSim.toLocaleString()} RZ</div>
-              </div>
+                <div className="text-center p-4 bg-[#00FF91]/10 rounded-lg">
+                  <div className="text-sm text-muted-foreground mb-1">Pool SIM</div>
+                  <div className="text-xl font-bold text-[#00FF91]">{simPercent.toFixed(1)}%</div>
+                  <div className="text-xs text-muted-foreground">{globalPoolSim.toLocaleString()} RIOZ</div>
+                </div>
               
               <div className="text-center p-4 bg-primary/10 rounded-lg">
                 <div className="text-sm text-muted-foreground mb-1">Pool Total</div>
@@ -165,11 +165,11 @@ const WalletPage = () => {
                 <div className="text-xs text-muted-foreground">Rioz Coin</div>
               </div>
               
-              <div className="text-center p-4 bg-[#FF1493]/10 rounded-lg">
-                <div className="text-sm text-muted-foreground mb-1">Pool NÃO</div>
-                <div className="text-xl font-bold text-[#FF1493]">{naoPercent.toFixed(1)}%</div>
-                <div className="text-xs text-muted-foreground">{globalPoolNao.toLocaleString()} RZ</div>
-              </div>
+                <div className="text-center p-4 bg-[#FF1493]/10 rounded-lg">
+                  <div className="text-sm text-muted-foreground mb-1">Pool NÃO</div>
+                  <div className="text-xl font-bold text-[#FF1493]">{naoPercent.toFixed(1)}%</div>
+                  <div className="text-xs text-muted-foreground">{globalPoolNao.toLocaleString()} RIOZ</div>
+                </div>
             </div>
 
             <div className="bg-danger/10 border border-danger/20 rounded-lg p-4">

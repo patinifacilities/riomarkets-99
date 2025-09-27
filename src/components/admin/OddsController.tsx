@@ -16,20 +16,33 @@ interface OddsControllerProps {
 
 export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) => {
   const [odds, setOdds] = useState<Record<string, number>>(market.recompensas || {});
+  const [originalOdds, setOriginalOdds] = useState<Record<string, number>>(market.recompensas || {});
+  const [hasChanges, setHasChanges] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    setOdds(market.recompensas || {});
+    const marketOdds = market.recompensas || {};
+    setOdds(marketOdds);
+    setOriginalOdds(marketOdds);
+    setHasChanges(false);
   }, [market.recompensas]);
+
+  // Check for changes whenever odds change
+  useEffect(() => {
+    const hasOddsChanged = Object.keys(odds).some(key => 
+      Math.abs(odds[key] - (originalOdds[key] || 1)) > 0.01
+    );
+    setHasChanges(hasOddsChanged);
+  }, [odds, originalOdds]);
 
   // For binary markets with exactly 2 options, we handle them specially
   const isBinaryMarket = market.opcoes.length === 2;
   const [option1, option2] = market.opcoes;
 
   const handleBinaryOddsChange = (value: number[]) => {
-    const leftValue = value[0] / 100; // Convert from 100-1000 scale to 1.00-10.00
-    const rightValue = ((1000 - value[0]) / 100) + 1; // Inverse scale for the right side
+    const leftValue = Math.min(4, Math.max(1, value[0] / 100)); // Limit to 4x max
+    const rightValue = Math.min(4, Math.max(1, (400 - value[0]) / 100)); // Inverse scale with 4x limit
     
     const newOdds = {
       [option1]: leftValue,
@@ -38,20 +51,12 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
     setOdds(newOdds);
   };
 
-  const updateBinaryOddsInDatabase = async (value: number[]) => {
+  const confirmOddsUpdate = async () => {
     setIsUpdating(true);
     try {
-      const leftValue = value[0] / 100;
-      const rightValue = ((1000 - value[0]) / 100) + 1;
-      
-      const updatedOdds = {
-        [option1]: leftValue,
-        [option2]: rightValue
-      };
-
       const { error } = await supabase
         .from('markets')
-        .update({ odds: updatedOdds })
+        .update({ odds: odds })
         .eq('id', market.id);
 
       if (error) throw error;
@@ -64,15 +69,21 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
           resource_type: 'market',
           resource_id: market.id,
           user_id: (await supabase.auth.getUser()).data.user?.id,
-          new_values: updatedOdds,
-          old_values: odds
+          new_values: odds,
+          old_values: originalOdds
         });
 
+      setOriginalOdds(odds);
+      setHasChanges(false);
       onOddsUpdate?.();
+      
+      const oddsText = Object.entries(odds)
+        .map(([key, value]) => `${key}: ${value.toFixed(2)}x`)
+        .join(' | ');
       
       toast({
         title: "Odds atualizadas",
-        description: `${option1}: ${leftValue.toFixed(2)}x | ${option2}: ${rightValue.toFixed(2)}x`,
+        description: oddsText,
       });
     } catch (error) {
       console.error('Error updating odds:', error);
@@ -87,57 +98,14 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
   };
 
   const handleOddsChange = (option: string, value: number[]) => {
+    const newValue = Math.min(4, Math.max(1, value[0] / 100)); // Limit to 4x max
     const newOdds = {
       ...odds,
-      [option]: value[0] / 100 // Convert from 100-1000 scale to 1.00-10.00
+      [option]: newValue
     };
     setOdds(newOdds);
   };
 
-  const updateOddsInDatabase = async (option: string, newValue: number) => {
-    setIsUpdating(true);
-    try {
-      const updatedOdds = {
-        ...odds,
-        [option]: newValue
-      };
-
-      const { error } = await supabase
-        .from('markets')
-        .update({ odds: updatedOdds })
-        .eq('id', market.id);
-
-      if (error) throw error;
-
-      // Log admin action
-      await supabase
-        .from('audit_logs')
-        .insert({
-          action: 'odds_adjustment',
-          resource_type: 'market',
-          resource_id: market.id,
-          user_id: (await supabase.auth.getUser()).data.user?.id,
-          new_values: { [option]: newValue },
-          old_values: { [option]: odds[option] }
-        });
-
-      onOddsUpdate?.();
-      
-      toast({
-        title: "Odds atualizadas",
-        description: `${option}: ${newValue.toFixed(2)}x`,
-      });
-    } catch (error) {
-      console.error('Error updating odds:', error);
-      toast({
-        title: "Erro",
-        description: "Falha ao atualizar odds",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUpdating(false);
-    }
-  };
 
   return (
     <Card className="mt-4">
@@ -168,11 +136,10 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
             
             <div className="relative">
               <Slider
-                value={[(odds[option1] || 1) * 100]} // Convert to 100-1000 scale
+                value={[(odds[option1] || 1) * 100]} // Convert to 100-400 scale (4x max)
                 onValueChange={handleBinaryOddsChange}
-                onValueCommit={updateBinaryOddsInDatabase}
                 min={100}
-                max={900}
+                max={400}
                 step={1}
                 className="w-full [&_[role=slider]]:bg-gradient-to-r [&_[role=slider]]:from-primary [&_[role=slider]]:to-[#ff2389] [&_.slider-track]:bg-gradient-to-r [&_.slider-track]:from-primary/20 [&_.slider-track]:to-[#ff2389]/20"
                 disabled={isUpdating}
@@ -196,11 +163,10 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
               </div>
               
               <Slider
-                value={[(odds[option] || 1) * 100]} // Convert to 100-1000 scale
+                value={[(odds[option] || 1) * 100]} // Convert to 100-400 scale (4x max)
                 onValueChange={(value) => handleOddsChange(option, value)}
-                onValueCommit={(value) => updateOddsInDatabase(option, value[0] / 100)}
                 min={100}
-                max={1000}
+                max={400}
                 step={1}
                 className="w-full"
                 disabled={isUpdating}
@@ -208,10 +174,23 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
               
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>1.00x</span>
-                <span>10.00x</span>
+                <span>4.00x</span>
               </div>
             </div>
           ))
+        )}
+        
+        {/* Confirm Button - Only show when there are changes */}
+        {hasChanges && (
+          <div className="pt-4 border-t">
+            <Button 
+              onClick={confirmOddsUpdate}
+              disabled={isUpdating}
+              className="w-full bg-primary hover:bg-primary/90"
+            >
+              {isUpdating ? 'Aplicando...' : 'Confirmar Novos Odds'}
+            </Button>
+          </div>
         )}
       </CardContent>
     </Card>

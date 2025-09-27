@@ -94,7 +94,7 @@ export const OrderBookWidget = () => {
                 key={`sell-${index}`}
                 className="grid grid-cols-3 gap-2 px-4 py-1 text-xs hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
               >
-                <div className="text-red-600 font-mono">
+                <div className="font-mono" style={{ color: '#ff2389' }}>
                   {level.price.toFixed(4)}
                 </div>
                 <div className="text-right text-muted-foreground">

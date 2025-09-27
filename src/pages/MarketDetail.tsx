@@ -170,7 +170,7 @@ const MarketDetail = () => {
                 naoPercent={pool?.percent_nao || 0}
                 showOdds={true}
                 simOdds={market.odds?.sim || 1.5}
-                naoOdds={market.odds?.nao || 1.5}
+                naoOdds={market.odds?.não || market.odds?.nao || 1.5}
               />
             </div>
 
@@ -189,8 +189,10 @@ const MarketDetail = () => {
                 return (
                   <Card 
                     key={opcao}
-                    className={`cursor-pointer transition-all duration-200 hover:shadow-lg hover:ring-1 hover:ring-primary ${
-                      isYes ? 'hover:shadow-success' : 'hover:shadow-danger'
+                    className={`cursor-pointer transition-all duration-200 hover:shadow-lg hover:ring-1 ${
+                      isYes 
+                        ? 'hover:ring-primary hover:shadow-success' 
+                        : 'hover:ring-[#ff2389] hover:shadow-danger hover:border-[#ff2389]'
                     }`}
                     onClick={() => handleOpenBetModal(opcao)}
                   >
