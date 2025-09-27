@@ -20,6 +20,8 @@ import { useProfile } from '@/hooks/useProfile';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useState } from 'react';
+import { TickerBar } from '@/components/ui/ticker-bar';
+import logoImage from '@/assets/rio-markets-logo.png';
 
 const Header = () => {
   const location = useLocation();
@@ -53,8 +55,10 @@ const Header = () => {
   };
 
   return (
-    <header className="border-b border-border backdrop-blur-sm sticky top-0 z-50 bg-black">
-      <div className="container mx-auto px-4 py-3">
+    <>
+      <TickerBar />
+      <header className="border-b border-border backdrop-blur-sm sticky top-0 z-50 bg-background/95">
+        <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Mobile Menu Button */}
           {isMobile && (
@@ -174,9 +178,7 @@ const Header = () => {
           )}
 
           <Link to="/" className="flex items-center space-x-3">
-            <span className="text-xl font-bold text-white">
-              Rio Markets
-            </span>
+            <img src={logoImage} alt="Rio Markets" className="h-8 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -302,6 +304,7 @@ const Header = () => {
         </div>
       </div>
     </header>
+    </>
   );
 };
 

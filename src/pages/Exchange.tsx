@@ -8,6 +8,7 @@ import { ExchangeHistory } from '@/components/exchange/ExchangeHistory';
 import { OrderBookWidget } from '@/components/exchange/OrderBookWidget';
 import { OrderBookTicker } from '@/components/exchange/OrderBookTicker';
 import { DepthChart } from '@/components/exchange/DepthChart';
+import { FunctionalOrderBook } from '@/components/exchange/FunctionalOrderBook';
 import { track } from '@/lib/analytics';
 
 const Exchange = () => {
@@ -74,16 +75,12 @@ const Exchange = () => {
         {/* Exchange Widget */}
         <div className="xl:col-span-1 space-y-6">
           <ExchangeWidget />
-        </div>
-        
-        {/* Order Book */}
-        <div className="xl:col-span-2">
-          <OrderBookWidget />
-        </div>
-        
-        {/* Balances */}
-        <div className="xl:col-span-1 space-y-6">
           <BalancesCard />
+        </div>
+        
+        {/* Functional Order Book */}
+        <div className="xl:col-span-3">
+          <FunctionalOrderBook />
         </div>
       </div>
 

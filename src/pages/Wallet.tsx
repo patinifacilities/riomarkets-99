@@ -43,60 +43,54 @@ const Wallet = () => {
 
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-4">
-          <WalletIcon className="w-8 h-8 text-primary" />
-          <h1 className="text-3xl font-bold">Minha Carteira</h1>
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <WalletIcon className="w-8 h-8 text-primary" />
+            <h1 className="text-4xl font-bold">Carteira</h1>
+          </div>
+          <p className="text-muted-foreground max-w-[65ch] mx-auto">
+            Gerencie seu saldo e acompanhe suas opiniões ativas
+          </p>
         </div>
-        
-        {/* Subtítulo explicativo */}
-        <p className="text-muted-foreground mb-8 max-w-[65ch]">
-          Gerencie seu saldo, acompanhe suas análises ativas e visualize o histórico completo de transações e recompensas.
-        </p>
 
         {/* Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-primary border-primary/20 shadow-success">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-primary-foreground/80 text-sm">Saldo Disponível</p>
-                  <p className="text-3xl font-bold text-primary-foreground">
-                    {currentBalance.toLocaleString()}
-                  </p>
-                  <p className="text-primary-foreground/60 text-sm">Rioz Coin</p>
-                </div>
-                <WalletIcon className="w-8 h-8 text-primary-foreground/60" />
+          <Card className="bg-gradient-primary border-primary/20">
+            <CardContent className="p-8">
+              <div className="text-center">
+                <WalletIcon className="w-12 h-12 text-primary-foreground mx-auto mb-4" />
+                <p className="text-primary-foreground/80 text-sm mb-2">Saldo Disponível</p>
+                <p className="text-4xl font-bold text-primary-foreground mb-1">
+                  {currentBalance.toLocaleString()}
+                </p>
+                <p className="text-primary-foreground/60 text-sm">Rioz Coin</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card style={{ backgroundColor: 'hsl(169 100% 50% / 0.1)' }} className="border-border/50">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Em Análises Ativas</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {totalInActiveOrders.toLocaleString()}
-                  </p>
-                  <p className="text-muted-foreground text-sm">Rioz Coin</p>
-                </div>
-                <TrendingUp className="w-8 h-8 text-accent" />
+          <Card className="border-accent/20 bg-accent/5">
+            <CardContent className="p-8">
+              <div className="text-center">
+                <TrendingUp className="w-12 h-12 text-accent mx-auto mb-4" />
+                <p className="text-muted-foreground text-sm mb-2">Em Opiniões Ativas</p>
+                <p className="text-3xl font-bold text-foreground mb-1">
+                  {totalInActiveOrders.toLocaleString()}
+                </p>
+                <p className="text-muted-foreground text-sm">Rioz Coin</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card style={{ backgroundColor: 'hsl(169 100% 50% / 0.1)' }} className="border-border/50">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-sm">Total Movimentado</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {(totalCredits + totalDebits).toLocaleString()}
-                  </p>
-                  <p className="text-muted-foreground text-sm">Rioz Coin</p>
-                </div>
-                <History className="w-8 h-8 text-muted-foreground" />
+          <Card className="border-border/50">
+            <CardContent className="p-8">
+              <div className="text-center">
+                <History className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground text-sm mb-2">Total Movimentado</p>
+                <p className="text-3xl font-bold text-foreground mb-1">
+                  {(totalCredits + totalDebits).toLocaleString()}
+                </p>
+                <p className="text-muted-foreground text-sm">Rioz Coin</p>
               </div>
             </CardContent>
           </Card>
@@ -147,21 +141,21 @@ const Wallet = () => {
           </div>
         </div>
 
-        {/* CTAs de Análise */}
+        {/* CTAs de Opinião */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           <Button 
-            className="min-h-[44px] bg-[#00FF91] hover:bg-[#00FF91]/90 text-black font-semibold"
-            aria-label="Fazer nova análise apostando em SIM"
+            className="min-h-[56px] bg-success hover:bg-success/90 text-primary-foreground font-semibold text-lg"
+            aria-label="Dar opinião apostando em SIM"
           >
-            <TrendingUp className="w-4 h-4 mr-2" />
-            Analisar SIM
+            <TrendingUp className="w-5 h-5 mr-2" />
+            Opinar SIM
           </Button>
           <Button 
-            className="min-h-[44px] bg-[#FF1493] hover:bg-[#FF1493]/90 text-white font-semibold"
-            aria-label="Fazer nova análise apostando em NÃO"
+            className="min-h-[56px] bg-danger hover:bg-danger/90 text-danger-foreground font-semibold text-lg"
+            aria-label="Dar opinião apostando em NÃO"
           >
-            <TrendingDown className="w-4 h-4 mr-2" />
-            Analisar NÃO
+            <TrendingDown className="w-5 h-5 mr-2" />
+            Opinar NÃO
           </Button>
         </div>
 
@@ -197,7 +191,7 @@ const Wallet = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5" />
-                Histórico de Análises
+                Histórico de Opiniões
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">

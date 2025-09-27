@@ -23,7 +23,7 @@ const faqData = [
   },
   {
     question: "Preciso ser especialista para participar?",
-    answer: "Não. Qualquer pessoa pode analisar eventos, e o sistema é educativo, com métricas claras e suporte intuitivo."
+    answer: "Não. Qualquer pessoa pode opinar sobre eventos, e o sistema é educativo, com métricas claras e suporte intuitivo."
   },
   {
     question: "É seguro usar o Rio Markets?",

@@ -137,7 +137,7 @@ const MarketCard = ({ market }: MarketCardProps) => {
             <Link to={`/market/${market.id}`}>
               <Button size="sm" className="gap-2 shadow-success">
                 <TrendingUp className="w-4 h-4" />
-                Analisar
+                Opinar
               </Button>
             </Link>
           </div>

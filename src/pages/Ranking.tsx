@@ -1,46 +1,58 @@
-import { Trophy, TrendingUp, Users, Award } from 'lucide-react';
+import { Trophy, TrendingUp, Users, Award, Target, BarChart3 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import UserRankItem from '@/components/ranking/UserRankItem';
-import { useUsers } from '@/hooks/useUsers';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { fakeUsers } from '@/data/fake-users';
 
 const Ranking = () => {
-  const { data: users = [], isLoading } = useUsers();
-  const sortedUsers = [...users].sort((a, b) => b.saldo_moeda - a.saldo_moeda);
+  const sortedUsers = [...fakeUsers].sort((a, b) => b.saldo_moeda - a.saldo_moeda);
   
   const stats = {
-    currentPosition: 1,
-    totalUsers: users.length,
-    averageBalance: Math.round(users.reduce((sum, user) => sum + user.saldo_moeda, 0) / users.length || 0)
+    totalUsers: fakeUsers.length,
+    averageBalance: Math.round(fakeUsers.reduce((sum, user) => sum + user.saldo_moeda, 0) / fakeUsers.length),
+    totalVolume: fakeUsers.reduce((sum, user) => sum + user.total_depositado, 0),
+    averageAccuracy: Math.round(fakeUsers.reduce((sum, user) => sum + (user.analises_certas / user.total_analises * 100), 0) / fakeUsers.length)
+  };
+
+  const getLevelBadge = (nivel: string) => {
+    switch (nivel) {
+      case 'guru':
+        return <Badge className="bg-primary/20 text-primary border-primary/30">Guru</Badge>;
+      case 'analista':
+        return <Badge className="bg-accent/20 text-accent border-accent/30">Analista</Badge>;
+      case 'iniciante':
+        return <Badge className="bg-muted text-muted-foreground">Iniciante</Badge>;
+      default:
+        return <Badge variant="outline">Usuário</Badge>;
+    }
   };
 
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Trophy className="w-8 h-8 text-primary" />
-            <h1 className="text-5xl font-bold">Ranking de Analistas</h1>
+            <h1 className="text-4xl font-bold">Ranking de Analistas</h1>
           </div>
           <p className="text-muted-foreground max-w-[65ch] mx-auto">
-            Veja como você se compara com outros analistas da plataforma. 
-            Suba no ranking fazendo análises certeiras!
+            Conheça os melhores analistas da plataforma e suas estatísticas de desempenho
           </p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-muted-foreground text-sm">Total de Analistas</p>
+                  <p className="text-muted-foreground text-sm">Total Analistas</p>
                   <p className="text-2xl font-bold text-foreground">
-                    {stats.totalUsers.toLocaleString()}
+                    {stats.totalUsers}
                   </p>
                 </div>
-                <Users className="w-8 h-8 text-accent" />
+                <Users className="w-8 h-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -49,26 +61,38 @@ const Ranking = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-muted-foreground text-sm">Saldo Médio</p>
+                  <p className="text-muted-foreground text-sm">Volume Total</p>
                   <p className="text-2xl font-bold text-foreground">
-                    {stats.averageBalance.toLocaleString()}
+                    {stats.totalVolume.toLocaleString()} RZ
                   </p>
-                  <p className="text-muted-foreground text-xs">Rioz Coin</p>
                 </div>
-                <Trophy className="w-8 h-8 text-muted-foreground" />
+                <BarChart3 className="w-8 h-8 text-accent" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-primary border-primary/20 shadow-success">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-muted-foreground text-sm">Precisão Média</p>
+                  <p className="text-2xl font-bold text-foreground">
+                    {stats.averageAccuracy}%
+                  </p>
+                </div>
+                <Target className="w-8 h-8 text-success" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-primary border-primary/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-primary-foreground/80 text-sm">Líder Atual</p>
                   <p className="text-2xl font-bold text-primary-foreground">
-                    {sortedUsers[0]?.saldo_moeda.toLocaleString() || '0'}
+                    {sortedUsers[0]?.saldo_moeda.toLocaleString() || '0'} RZ
                   </p>
-                  <p className="text-primary-foreground/60 text-xs">Rioz Coin</p>
                 </div>
                 <Award className="w-8 h-8 text-primary-foreground/60" />
               </div>
@@ -114,20 +138,44 @@ const Ranking = () => {
               Ranking Geral
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {isLoading ? (
-              <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <CardContent className="space-y-4">
+            {sortedUsers.map((user, index) => (
+              <div key={user.id} className="flex items-center justify-between p-4 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-card/50 transition-all">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-bold">
+                    {index + 1}
+                  </div>
+                  
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src={user.avatar} alt={user.nome} />
+                    <AvatarFallback className="bg-primary/20 text-primary">
+                      {user.nome.split(' ').map(n => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold">{user.nome}</h3>
+                      {getLevelBadge(user.nivel)}
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>Precisão: <span className="text-success font-medium">{((user.analises_certas / user.total_analises) * 100).toFixed(1)}%</span></span>
+                      <span>({user.analises_certas}/{user.total_analises})</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="text-right">
+                  <div className="font-bold text-lg">{user.saldo_moeda.toLocaleString()} RZ</div>
+                  <div className="text-sm text-muted-foreground">
+                    Ganho: <span className="text-success">+{user.ganho_total.toLocaleString()} RZ</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Depositado: {user.total_depositado.toLocaleString()} RZ
+                  </div>
+                </div>
               </div>
-            ) : (
-              sortedUsers.map((user, index) => (
-                <UserRankItem 
-                  key={user.id} 
-                  user={user} 
-                  position={index + 1}
-                />
-              ))
-            )}
+            ))}
           </CardContent>
         </Card>
       </div>

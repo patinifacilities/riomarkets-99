@@ -202,9 +202,9 @@ const MarketDetail = () => {
                           e.stopPropagation();
                           handleOpenBetModal(opcao);
                         }}
-                        aria-label={`Analisar em ${opcao.toUpperCase()}`}
+                        aria-label={`Opinar em ${opcao.toUpperCase()}`}
                       >
-                        Analisar em {opcao.toUpperCase()}
+                        Opinar em {opcao.toUpperCase()}
                       </Button>
                     </CardContent>
                   </Card>
@@ -250,18 +250,18 @@ const MarketDetail = () => {
                       disabled={market.status !== 'aberto'}
                       className="bg-[#00FF91] hover:bg-[#00FF91]/90 text-black shadow-[#00FF91]/20 min-h-[44px]"
                       size="sm"
-                      aria-label="Analisar SIM"
+                      aria-label="Opinar SIM"
                     >
-                      Analisar SIM
+                      Opinar SIM
                     </Button>
                     <Button 
                       onClick={() => handleOpenBetModal('não')}
                       disabled={market.status !== 'aberto'}
                       className="bg-[#FF1493] hover:bg-[#FF1493]/90 text-white shadow-[#FF1493]/20 min-h-[44px]"
                       size="sm"
-                      aria-label="Analisar NÃO"
+                      aria-label="Opinar NÃO"
                     >
-                      Analisar NÃO
+                      Opinar NÃO
                     </Button>
                   </div>
 

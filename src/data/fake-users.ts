@@ -1,0 +1,122 @@
+export const fakeUsers = [
+  {
+    id: '1',
+    nome: 'Carlos Martins',
+    email: 'carlos.martins@email.com',
+    saldo_moeda: 15650,
+    total_depositado: 5000,
+    nivel: 'guru',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+    ganho_total: 10650,
+    analises_certas: 45,
+    total_analises: 52
+  },
+  {
+    id: '2',
+    nome: 'Ana Paula Silva',
+    email: 'ana.silva@email.com',
+    saldo_moeda: 12340,
+    total_depositado: 4500,
+    nivel: 'guru',
+    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face',
+    ganho_total: 7840,
+    analises_certas: 38,
+    total_analises: 46
+  },
+  {
+    id: '3',
+    nome: 'Rafael Santos',
+    email: 'rafael.santos@email.com',
+    saldo_moeda: 9870,
+    total_depositado: 3000,
+    nivel: 'analista',
+    avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&h=150&fit=crop&crop=face',
+    ganho_total: 6870,
+    analises_certas: 31,
+    total_analises: 42
+  },
+  {
+    id: '4',
+    nome: 'Mariana Costa',
+    email: 'mariana.costa@email.com',
+    saldo_moeda: 8650,
+    total_depositado: 2800,
+    nivel: 'analista',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+    ganho_total: 5850,
+    analises_certas: 29,
+    total_analises: 39
+  },
+  {
+    id: '5',
+    nome: 'João Pedro',
+    email: 'joao.pedro@email.com',
+    saldo_moeda: 7320,
+    total_depositado: 2500,
+    nivel: 'analista',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    ganho_total: 4820,
+    analises_certas: 26,
+    total_analises: 35
+  },
+  {
+    id: '6',
+    nome: 'Fernanda Lima',
+    email: 'fernanda.lima@email.com',
+    saldo_moeda: 5980,
+    total_depositado: 2000,
+    nivel: 'analista',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
+    ganho_total: 3980,
+    analises_certas: 22,
+    total_analises: 31
+  },
+  {
+    id: '7',
+    nome: 'Thiago Oliveira',
+    email: 'thiago.oliveira@email.com',
+    saldo_moeda: 4850,
+    total_depositado: 1800,
+    nivel: 'analista',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+    ganho_total: 3050,
+    analises_certas: 18,
+    total_analises: 28
+  },
+  {
+    id: '8',
+    nome: 'Juliana Rocha',
+    email: 'juliana.rocha@email.com',
+    saldo_moeda: 3240,
+    total_depositado: 1500,
+    nivel: 'iniciante',
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop&crop=face',
+    ganho_total: 1740,
+    analises_certas: 15,
+    total_analises: 25
+  },
+  {
+    id: '9',
+    nome: 'Lucas Fernandes',
+    email: 'lucas.fernandes@email.com',
+    saldo_moeda: 2890,
+    total_depositado: 1200,
+    nivel: 'iniciante',
+    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face',
+    ganho_total: 1690,
+    analises_certas: 13,
+    total_analises: 22
+  },
+  {
+    id: '10',
+    nome: 'Beatriz Alves',
+    email: 'beatriz.alves@email.com',
+    saldo_moeda: 2150,
+    total_depositado: 1000,
+    nivel: 'iniciante',
+    avatar: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face',
+    ganho_total: 1150,
+    analises_certas: 11,
+    total_analises: 19
+  }
+];

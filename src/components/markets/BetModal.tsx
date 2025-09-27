@@ -41,7 +41,7 @@ const BetModal = ({
   const potentialProfit = potentialReturn - betValue;
 
   const validateBet = (): string | null => {
-    if (!userId) return 'Você precisa estar logado para analisar';
+    if (!userId) return 'Você precisa estar logado para opinar';
     if (betValue < 10) return 'Valor mínimo: 10 Rioz Coin';
     if (betValue > 10000) return 'Valor máximo: 10.000 Rioz Coin';
     if (betValue > userBalance) return 'Saldo insuficiente';
@@ -229,9 +229,9 @@ const BetModal = ({
               disabled={!!errorMessage || isLoading}
               className="flex-1 min-h-[44px]"
               size="default"
-              aria-label={`Confirmar análise de ${betValue || 0} Rioz Coin em ${selectedOption.toUpperCase()}`}
+              aria-label={`Confirmar opinião de ${betValue || 0} Rioz Coin em ${selectedOption.toUpperCase()}`}
             >
-              {isLoading ? 'Processando...' : `Analisar ${betValue || 0} Rioz Coin`}
+              {isLoading ? 'Processando...' : `Opinar ${betValue || 0} Rioz Coin`}
             </Button>
           </div>
         </div>

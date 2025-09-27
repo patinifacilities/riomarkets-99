@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Edit, CheckCircle, XCircle, Settings, DollarSign, TrendingUp, Users, FileText, Play, Download, Shield, Activity } from 'lucide-react';
+import { Plus, Edit, CheckCircle, XCircle, Settings, DollarSign, TrendingUp, Users, FileText, Play, Download, Shield, Activity, Newspaper } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,8 @@ import CreateMarketForm from '@/components/admin/CreateMarketForm';
 import LiquidationModal from '@/components/admin/LiquidationModal';
 import EditMarketModal from '@/components/admin/EditMarketModal';
 import MarketTestModal from '@/components/admin/MarketTestModal';
+import { AdminLogin } from '@/components/admin/AdminLogin';
+import { NewsManagement } from '@/components/admin/NewsManagement';
 
 const Admin = () => {
   const { user, loading: authLoading } = useAuth();
@@ -36,6 +38,9 @@ const Admin = () => {
   const [testModal, setTestModal] = useState<{
     isOpen: boolean;
   }>({ isOpen: false });
+  const [adminLoggedIn, setAdminLoggedIn] = useState(
+    localStorage.getItem('admin_logged_in') === 'true'
+  );
 
   const handleCreateSuccess = () => {
     setShowCreateForm(false);
@@ -86,8 +91,9 @@ const Admin = () => {
     );
   }
 
-  if (!user || !profile?.is_admin) {
-    return <Navigate to="/auth" replace />;
+  // Admin login check
+  if (!adminLoggedIn) {
+    return <AdminLogin onSuccess={() => setAdminLoggedIn(true)} />;
   }
 
   // Calculate platform metrics
@@ -245,7 +251,7 @@ const Admin = () => {
 
         {/* Admin Tabs */}
         <Tabs defaultValue="markets" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="markets" aria-label="Gerenciar mercados de análise">
               <Settings className="w-4 h-4 mr-2" />
               Mercados
@@ -257,6 +263,10 @@ const Admin = () => {
             <TabsTrigger value="categories" aria-label="Gerenciar categorias">
               <FileText className="w-4 h-4 mr-2" />
               Categorias
+            </TabsTrigger>
+            <TabsTrigger value="news" aria-label="Gerenciar notícias">
+              <Newspaper className="w-4 h-4 mr-2" />
+              Notícias
             </TabsTrigger>
             <TabsTrigger value="logs" aria-label="Ver logs e auditoria">
               <Activity className="w-4 h-4 mr-2" />
@@ -382,6 +392,10 @@ const Admin = () => {
                 </Button>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="news">
+            <NewsManagement />
           </TabsContent>
 
           <TabsContent value="logs">

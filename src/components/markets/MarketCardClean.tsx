@@ -86,7 +86,7 @@ const MarketCardClean = React.memo(function MarketCardClean({ market, className 
     if (!user) {
       toast({
         title: "Login necessário",
-        description: "Você precisa fazer login para analisar.",
+        description: "Você precisa fazer login para opinar.",
         variant: "destructive",
       });
       return;

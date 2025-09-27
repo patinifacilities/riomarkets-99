@@ -65,5 +65,5 @@ export function isThreeWayLayout(market: Market): boolean {
  * Get aria-label for option button
  */
 export function getOptionAriaLabel(optionLabel: string): string {
-  return `Analisar em ${optionLabel}`;
+  return `Opinar em ${optionLabel}`;
 }

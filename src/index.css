@@ -6,21 +6,21 @@
 
 @layer base {
   :root {
-    /* Base colors - Premium Dark Theme */
-    --background: 0 0% 6%;
+    /* Kalshi-inspired Design System - Clean Modern */
+    --background: 210 13% 5%;
     --foreground: 210 20% 98%;
 
-    /* Card system */
-    --card: 0 0% 9%;
+    /* Card system - Clean and minimal */
+    --card: 210 13% 7%;
     --card-foreground: 210 20% 98%;
 
-    --popover: 0 0% 9%;
+    --popover: 210 13% 7%;
     --popover-foreground: 210 20% 98%;
 
-    /* Brand colors - Verde Neon + Rosa Neon */
-    --primary: 160 100% 50%;
-    --primary-foreground: 0 0% 6%;
-    --primary-glow: 160 100% 60%;
+    /* Brand colors - Professional green with pink accent */
+    --primary: 155 100% 45%;
+    --primary-foreground: 210 13% 5%;
+    --primary-glow: 155 100% 55%;
 
     --secondary: 0 0% 6%;
     --secondary-foreground: 210 20% 98%;
@@ -46,10 +46,10 @@
     --accent-foreground: 0 0% 6%;
     --accent-muted: 160 100% 50% / 0.1;
 
-    /* Borders and inputs - Dark theme optimized */
-    --border: 0 0% 20%;
-    --input: 0 0% 15%;
-    --ring: 160 100% 50%;
+    /* Borders and inputs - Kalshi-style subtle */
+    --border: 210 13% 15%;
+    --input: 210 13% 10%;
+    --ring: 155 100% 45%;
 
     /* Focus ring - Verde Neon */
     --focus-ring: 160 100% 50%;

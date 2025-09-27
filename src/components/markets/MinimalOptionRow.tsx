@@ -66,7 +66,7 @@ export function MinimalOptionRow({
         {/* Right: CTA */}
         <div className="flex-shrink-0 min-w-[44px] flex justify-end">
           <span className="text-sm text-foreground/80 group-hover:text-foreground transition-colors">
-            Analisar ↗
+            Opinar ↗
           </span>
         </div>
       </button>
