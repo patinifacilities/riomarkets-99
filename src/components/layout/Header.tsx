@@ -27,21 +27,18 @@ import logoImage from '@/assets/rio-markets-logo-white.png';
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, session, signOut, isAuthenticated, loading } = useAuth();
+  const { user, session, signOut, loading } = useAuth();
   const { data: profile } = useProfile(user?.id);
 
-  // Simple, clear authentication check
-  const userIsAuthenticated = !loading && !!user && !!session && !!profile;
+  // Simple authentication check
+  const isLoggedIn = !loading && !!session && !!user && !!profile;
 
-  // Debug authentication state
-  console.log('Header - Auth Debug:', { 
-    loading,
+  console.log('Header auth state:', { 
+    loading, 
+    hasSession: !!session, 
     hasUser: !!user, 
-    hasSession: !!session,
-    hasProfile: !!profile,
-    isAuthenticated,
-    userIsAuthenticated,
-    profileIsAdmin: profile?.is_admin 
+    hasProfile: !!profile, 
+    isLoggedIn 
   });
 
   const isMobile = useIsMobile();
@@ -92,7 +89,7 @@ const Header = () => {
                 
                 <div className="flex flex-col mt-6 space-y-1">
                   {/* User Info Section */}
-                  {userIsAuthenticated && (
+                  {isLoggedIn && (
                     <div className="border-b border-border pb-4 mb-4">
                       <div className="flex items-center gap-3 p-2">
                         <Avatar className="h-10 w-10">
@@ -117,7 +114,7 @@ const Header = () => {
                       ? (location.pathname === '/' || location.pathname.startsWith('/market/'))
                       : location.pathname === item.href;
                     
-                    const requiresAuth = item.authRequired && !isAuthenticated;
+              const requiresAuth = item.authRequired && !isLoggedIn;
                     const isDisabled = requiresAuth;
                     
                     if (requiresAuth) {
@@ -165,7 +162,7 @@ const Header = () => {
                   })}
                   
                   {/* Auth Actions */}
-                  {userIsAuthenticated ? (
+                  {isLoggedIn ? (
                     <div className="border-t border-border pt-4 mt-4">
                       <Button 
                         onClick={() => {
@@ -205,7 +202,7 @@ const Header = () => {
                 ? (location.pathname === '/' || location.pathname.startsWith('/market/'))
                 : location.pathname === item.href;
               
-              const requiresAuth = item.authRequired && !isAuthenticated;
+              const requiresAuth = item.authRequired && !isLoggedIn;
               
               if (requiresAuth) {
                 return (
@@ -252,96 +249,16 @@ const Header = () => {
 
           {/* Desktop User Menu */}
           <div className="flex items-center gap-3">
-            {userIsAuthenticated ? (
-              <>
-                <Button 
-                  variant="default" 
-                  size="sm"
-                  onClick={() => navigate('/wallet')}
-                  className="gap-2 shadow-success rounded-xl"
-                >
-                  <TrendingUp className="w-4 h-4" />
-                  Depositar
-                </Button>
-
-                {/* Wallet Button - Show balance */}
-                <div className="relative">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onMouseEnter={() => setWalletHoverOpen(true)}
-                    onMouseLeave={() => setWalletHoverOpen(false)}
-                    onClick={() => navigate('/wallet')}
-                    className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 flex items-center gap-2 rounded-xl"
-                  >
-                    <Wallet className="w-4 h-4" />
-                    <span className="font-mono text-sm">
-                      {profile.saldo_moeda.toLocaleString()} RZ
-                    </span>
-                  </Button>
-                  <WalletHoverCard 
-                    isOpen={walletHoverOpen} 
-                    onClose={() => setWalletHoverOpen(false)} 
-                  />
-                </div>
-                <Button 
-                  variant="default" 
-                  size="sm"
-                  onClick={() => navigate('/wallet')}
-                  className="gap-2 shadow-success rounded-xl"
-                >
-                  <TrendingUp className="w-4 h-4" />
-                  Depositar
-                </Button>
-
-                {/* Wallet Button - Show balance */}
-                <div className="relative">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onMouseEnter={() => setWalletHoverOpen(true)}
-                    onMouseLeave={() => setWalletHoverOpen(false)}
-                    onClick={() => navigate('/wallet')}
-                    className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 flex items-center gap-2 rounded-xl"
-                  >
-                    <Wallet className="w-4 h-4" />
-                    <span className="font-mono text-sm">
-                      {profile.saldo_moeda.toLocaleString()} RZ
-                    </span>
-                  </Button>
-                  <WalletHoverCard 
-                    isOpen={walletHoverOpen} 
-                    onClose={() => setWalletHoverOpen(false)} 
-                  />
-                </div>
-
-                {/* Profile Button */}
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => navigate('/profile')}
-                  className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 flex items-center gap-2 rounded-xl"
-                >
-                  <User className="w-4 h-4" />
-                  <span className="hidden sm:inline text-sm">Perfil</span>
-                </Button>
-                
-                <div className="text-right hidden lg:block">
-                  <p className="text-sm font-medium text-white">{profile.nome}</p>
-                  <p className="text-xs text-gray-300 capitalize">{profile.nivel}</p>
-                </div>
-                
-                {/* Logout Button */}
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={signOut}
-                  className="h-9 px-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/50 flex items-center gap-2 rounded-xl text-red-400 hover:text-red-300"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span className="hidden sm:inline text-sm">Sair</span>
-                </Button>
-              </>
+            {isLoggedIn ? (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={signOut}
+                className="gap-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/50 text-red-400 hover:text-red-300 rounded-xl"
+              >
+                <LogOut className="w-4 h-4" />
+                Sair
+              </Button>
             ) : !loading ? (
               <Link to="/auth">
                 <Button className="gap-2 shadow-success rounded-xl">
