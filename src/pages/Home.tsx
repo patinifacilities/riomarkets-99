@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Search, TrendingUp } from 'lucide-react';
+import { Search, TrendingUp, Filter } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import MarketCardKalshi from '@/components/markets/MarketCardKalshi';
 import FilterToolbar from '@/components/ui/FilterToolbar';
+import { FilterChips } from '@/components/ui/filter-chips';
 import { MarketGridSkeleton } from '@/components/ui/MarketCardSkeleton';
 import TopAnalysts from '@/components/ui/TopAnalysts';
 import { useMarkets } from '@/hooks/useMarkets';
@@ -17,8 +18,19 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState('recentes');
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Topic filters similar to Kalshi
+  const topicFilters = [
+    { id: 'politics', label: 'Política', value: 'politica' },
+    { id: 'economics', label: 'Economia', value: 'economia' },
+    { id: 'sports', label: 'Esportes', value: 'esportes' },
+    { id: 'tech', label: 'Tecnologia', value: 'tecnologia' },
+    { id: 'entertainment', label: 'Entretenimento', value: 'entretenimento' },
+    { id: 'climate', label: 'Clima', value: 'clima' }
+  ];
   
   const { data: markets = [], isLoading } = useMarkets(selectedCategory);
 
@@ -45,8 +57,17 @@ const Home = () => {
 
   const filteredMarkets = markets.filter(market => {
     // Filter by search term
-    return market.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = market.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
            market.descricao.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Filter by topics
+    const matchesTopics = selectedTopics.length === 0 || 
+           selectedTopics.some(topicId => {
+             const topic = topicFilters.find(t => t.id === topicId);
+             return topic && market.categoria === topic.value;
+           });
+    
+    return matchesSearch && matchesTopics;
   });
 
   // Função de ordenação
@@ -78,6 +99,19 @@ const Home = () => {
   const handleSortChange = (value: string) => {
     track('sort_change', { sort_type: value, previous_sort: sortBy });
     setSortBy(value);
+  };
+
+  // Handle topic filter changes
+  const handleTopicSelect = (topicId: string) => {
+    setSelectedTopics(prev => 
+      prev.includes(topicId) 
+        ? prev.filter(id => id !== topicId)
+        : [...prev, topicId]
+    );
+  };
+
+  const handleRemoveTopic = (topicId: string) => {
+    setSelectedTopics(prev => prev.filter(id => id !== topicId));
   };
 
   return (
@@ -142,6 +176,20 @@ const Home = () => {
         sortBy={sortBy}
         onSortChange={handleSortChange}
       />
+
+      {/* Topic Filters */}
+      <div className="container mx-auto px-4 pb-4">
+        <div className="flex items-center gap-3 mb-4">
+          <Filter className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-muted-foreground">Filtrar por tópico:</span>
+        </div>
+        <FilterChips
+          chips={topicFilters}
+          selectedChips={selectedTopics}
+          onChipSelect={handleTopicSelect}
+          onRemoveChip={handleRemoveTopic}
+        />
+      </div>
 
       {/* Markets Grid */}
       <div id="markets-section" className="container mx-auto px-4 py-8">

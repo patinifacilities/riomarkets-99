@@ -247,7 +247,7 @@ const Header = () => {
                     onMouseEnter={() => setWalletHoverOpen(true)}
                     onMouseLeave={() => setWalletHoverOpen(false)}
                     onClick={() => navigate('/wallet')}
-                    className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 flex items-center gap-2 rounded-lg"
+                    className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 flex items-center gap-2 rounded-xl"
                   >
                     <Wallet className="w-4 h-4" />
                     <span className="font-mono text-sm">
@@ -285,37 +285,42 @@ const Header = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile" className="cursor-pointer">
-                        <User className="mr-2 h-4 w-4" />
-                        Perfil
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/wallet" className="cursor-pointer">
-                        <Wallet className="mr-2 h-4 w-4" />
-                        Carteira
-                      </Link>
-                    </DropdownMenuItem>
-                     <DropdownMenuItem asChild>
-                       <Link to="/exchange" className="cursor-pointer">
-                         <ArrowRightLeft className="mr-2 h-4 w-4" />
-                         Exchange
-                       </Link>
-                     </DropdownMenuItem>
-                     <DropdownMenuItem asChild>
-                       <Link to="/transactions" className="cursor-pointer">
-                         <Receipt className="mr-2 h-4 w-4" />
-                         Transações
-                       </Link>
-                     </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    Perfil
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/wallet" className="cursor-pointer">
+                    <Wallet className="mr-2 h-4 w-4" />
+                    Carteira
+                  </Link>
+                </DropdownMenuItem>
+                 <DropdownMenuItem asChild>
+                   <Link to="/exchange" className="cursor-pointer">
+                     <ArrowRightLeft className="mr-2 h-4 w-4" />
+                     Exchange
+                   </Link>
+                 </DropdownMenuItem>
+                 <DropdownMenuItem asChild>
+                   <Link to="/transactions" className="cursor-pointer">
+                     <Receipt className="mr-2 h-4 w-4" />
+                     Transações
+                   </Link>
+                 </DropdownMenuItem>
+                 <DropdownMenuSeparator />
+                 <DropdownMenuItem onClick={signOut} className="cursor-pointer text-red-600">
+                   <LogOut className="mr-2 h-4 w-4" />
+                   Sair
+                 </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
             ) : (
               !isMobile && (
                 <Link to="/auth">
-                  <Button className="gap-2 shadow-success">
+                  <Button className="gap-2 shadow-success rounded-xl">
                     <LogIn className="w-4 h-4" />
                     Entrar
                   </Button>

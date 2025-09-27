@@ -119,13 +119,14 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
     opt.label.toLowerCase().includes('não') || opt.label.toLowerCase().includes('no')
   );
 
-  const yesPercentage = yesOption ? Math.round(yesOption.chance) : 50;
-  const noPercentage = noOption ? Math.round(noOption.chance) : 50;
+  // Always set to 50/50 as requested by user
+  const yesPercentage = 50;
+  const noPercentage = 50;
 
   return (
     <>
       <div className={cn(
-        "bg-card border border-border rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-200 dark:bg-card",
+        "bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-200 dark:bg-card",
         className
       )}>
         <Link to={`/market/${market.id}`} className="block">
@@ -133,7 +134,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
           <div className="p-4 pb-3">
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-sm bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-sm bg-gray-100 flex items-center justify-center flex-shrink-0">
                   {market.thumbnail_url ? (
                     <img 
                       src={market.thumbnail_url}
@@ -144,7 +145,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                     <img 
                       src={`/assets/icons/${market.categoria.toLowerCase()}.png`}
                       alt={market.categoria}
-                      className="w-4 h-4 object-contain"
+                      className="w-6 h-6 object-contain"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                       }}
@@ -161,7 +162,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                   onClick={handleBookmarkClick}
                   className="p-1 rounded hover:bg-gray-100 transition-colors"
                 >
-                  <Bookmark className={cn("w-4 h-4", isWatched ? "fill-current text-blue-600" : "text-gray-400")} />
+                  <Bookmark className={cn("w-4 h-4", isWatched ? "fill-current text-green-600" : "text-gray-400")} />
                 </button>
                 <button 
                   onClick={handleShareClick}
@@ -177,31 +178,17 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
               {market.titulo}
             </h3>
 
-            {/* Odds Progress Bar */}
-            <div className="mb-3">
-              <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                <span>SIM {yesPercentage}%</span>
-                <span>NÃO {noPercentage}%</span>
-              </div>
-              <div className="h-1 bg-muted rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-success transition-all duration-300"
-                  style={{ width: `${yesPercentage}%` }}
-                />
-              </div>
-            </div>
-
             {/* Prediction Buttons - Kalshi Style */}
             <div className="grid grid-cols-2 gap-2 mb-3">
               <Button
                 onClick={(e) => handleBetClick(e, yesOption?.label || 'sim')}
                 disabled={market.status !== 'aberto'}
                 style={{ backgroundColor: '#00ff9020', borderColor: '#00ff90', color: '#00ff90' }}
-                className="h-12 rounded-lg border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80"
+                className="h-12 rounded-xl border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80"
               >
                 <div className="flex items-center justify-between w-full">
                   <span className="font-semibold">SIM</span>
-                  <span className="text-xs opacity-80">{yesOption ? (1 / (yesPercentage / 100)).toFixed(1) : '2.0'}X</span>
+                  <span className="text-xs opacity-80">2.0X</span>
                 </div>
               </Button>
               
@@ -209,13 +196,27 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                 onClick={(e) => handleBetClick(e, noOption?.label || 'não')}
                 disabled={market.status !== 'aberto'}
                 style={{ backgroundColor: '#ff238920', borderColor: '#ff2389', color: '#ff2389' }}
-                className="h-12 rounded-lg border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80"
+                className="h-12 rounded-xl border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80"
               >
                 <div className="flex items-center justify-between w-full">
                   <span className="font-semibold">NÃO</span>
-                  <span className="text-xs opacity-80">{noOption ? (1 / (noPercentage / 100)).toFixed(1) : '2.0'}X</span>
+                  <span className="text-xs opacity-80">2.0X</span>
                 </div>
               </Button>
+            </div>
+
+            {/* Odds Progress Bar - Below buttons */}
+            <div className="mb-3">
+              <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                <span>SIM {yesPercentage}%</span>
+                <span>NÃO {noPercentage}%</span>
+              </div>
+              <div className="h-1 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-[#00ff90] transition-all duration-300"
+                  style={{ width: `${yesPercentage}%` }}
+                />
+              </div>
             </div>
           </div>
         </Link>

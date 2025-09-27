@@ -266,16 +266,16 @@ const MarketDetail = () => {
                     </Button>
                   </div>
 
-                  {/* Calculator button */}
-                  <Button
-                    variant="outline"
-                    onClick={handleSimulateReward}
-                    className="w-full gap-2 border-primary/40 text-primary hover:bg-primary/10 min-h-[44px]"
-                    aria-label="Simular recompensas"
-                  >
-                    <Calculator className="w-4 h-4" />
-                    Simular recompensas
-                  </Button>
+                   {/* Calculator button */}
+                   <Button
+                     variant="outline"
+                     onClick={handleSimulateReward}
+                     className="w-full gap-2 border-primary/40 text-primary hover:bg-primary/10 min-h-[44px] rounded-xl"
+                     aria-label="Simular recompensas"
+                   >
+                     <Calculator className="w-4 h-4" />
+                     Simular recompensas
+                   </Button>
 
                   {market.status !== 'aberto' && (
                     <div className="text-center text-sm text-muted-foreground">

@@ -83,7 +83,7 @@ function App() {
           <Route path="/support" element={<Support />} />
           <Route path="/market/:id" element={<MarketDetail />} />
           <Route path="/market/:id/audit" element={<MarketAudit />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/*" element={<Admin />} />
           <Route path="/admin/categories" element={<AdminCategories />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/reconciliation" element={<AdminReconciliation />} />
