@@ -51,7 +51,7 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
 
       const { error } = await supabase
         .from('markets')
-        .update({ recompensas: updatedOdds, odds: updatedOdds })
+        .update({ odds: updatedOdds })
         .eq('id', market.id);
 
       if (error) throw error;
@@ -104,7 +104,7 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
 
       const { error } = await supabase
         .from('markets')
-        .update({ recompensas: updatedOdds, odds: updatedOdds })
+        .update({ odds: updatedOdds })
         .eq('id', market.id);
 
       if (error) throw error;

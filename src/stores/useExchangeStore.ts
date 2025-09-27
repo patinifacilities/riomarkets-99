@@ -86,12 +86,16 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
     set({ rateLoading: true, rateError: null });
     
     try {
-      const { data, error } = await supabase.functions.invoke('get-rate');
-      
-      if (error) throw error;
+      // Set fixed rate for RIOZ as stable coin at R$1
+      const stableRate = {
+        price: 1.0,
+        change24h: 0,
+        updated_at: new Date().toISOString(),
+        symbol: 'RIOZBRL'
+      };
       
       set({ 
-        rate: data,
+        rate: stableRate,
         rateLoading: false 
       });
     } catch (error) {

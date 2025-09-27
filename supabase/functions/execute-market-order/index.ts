@@ -65,24 +65,8 @@ serve(async (req) => {
       );
     }
 
-    // Get current rate
-    const { data: rateData, error: rateError } = await supabaseClient
-      .from('rates')
-      .select('price')
-      .eq('symbol', 'RIOZBRL')
-      .single();
-
-    if (rateError || !rateData) {
-      return new Response(
-        JSON.stringify({ error: 'Unable to get current rate' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
-
-    const currentPrice = rateData.price;
+    // Fixed price for RIOZ as stable coin
+    const currentPrice = 1.0;
 
     // Execute market order using the database function
     const { data: executionResult, error: executionError } = await supabaseClient

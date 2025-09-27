@@ -167,6 +167,13 @@ const Home = () => {
       {/* Hero Section - Trading Aligned */}
       <section className="relative min-h-[42vh] md:min-h-[52vh] flex flex-col items-center justify-center bg-[color:var(--bg-app)]">
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
+          {/* Animated background */}
+          <div className="absolute inset-0 -z-10 opacity-20">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-accent/20 animate-pulse"></div>
+            <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-primary/10 rounded-full blur-xl animate-bounce"></div>
+            <div className="absolute top-1/3 right-1/4 w-24 h-24 bg-accent/10 rounded-full blur-xl animate-bounce" style={{ animationDelay: '1s' }}></div>
+          </div>
+          
           <div className="text-center mb-6 md:mb-8">
             <h1 className="font-extrabold text-[34px] md:text-[44px] lg:text-[56px] leading-[1.05] mb-4 text-white [text-wrap:balance]">
               <span className="text-white">Mercados Preditivos </span>
