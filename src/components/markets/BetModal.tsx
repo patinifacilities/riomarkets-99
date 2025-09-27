@@ -106,7 +106,7 @@ const BetModal = ({
       if (balanceError) throw balanceError;
 
       toast({
-        title: "Análise confirmada!",
+        title: "Opinião enviada com sucesso!",
         description: `Você investiu ${betValue} Rioz Coin em "${selectedOption}". Boa sorte!`,
       });
 

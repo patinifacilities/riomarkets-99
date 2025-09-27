@@ -144,7 +144,7 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
                 min={100}
                 max={400}
                 step={1}
-                className="w-full [&_[role=slider]]:bg-gradient-to-r [&_[role=slider]]:from-primary [&_[role=slider]]:to-[#ff2389] [&_.slider-track]:bg-gradient-to-r [&_.slider-track]:from-primary/20 [&_.slider-track]:to-[#ff2389]/20 [&_[data-orientation='horizontal']]:bg-[#ff2389]"
+                className="w-full [&_[role=slider]]:bg-gradient-to-r [&_[role=slider]]:from-[#00ff90] [&_[role=slider]]:to-[#ff2389] [&_.slider-track]:bg-gradient-to-r [&_.slider-track]:from-[#00ff90]/20 [&_.slider-track]:to-[#ff2389]/20 [&_[data-orientation='horizontal']]:bg-gradient-to-r [&_[data-orientation='horizontal']]:from-[#00ff90] [&_[data-orientation='horizontal']]:to-[#ff2389]"
                 disabled={isUpdating}
               />
             </div>
@@ -171,7 +171,7 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
                 min={100}
                 max={400}
                 step={1}
-                className="w-full [&_[data-orientation='horizontal']]:bg-[#ff2389]"
+                className="w-full [&_[data-orientation='horizontal']]:bg-gradient-to-r [&_[data-orientation='horizontal']]:from-[#00ff90] [&_[data-orientation='horizontal']]:to-[#ff2389]"
                 disabled={isUpdating}
               />
               

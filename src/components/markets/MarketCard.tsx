@@ -63,13 +63,14 @@ const MarketCard = ({ market }: MarketCardProps) => {
             <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                {market.thumbnail_url ? (
-                  <img 
-                    src={market.thumbnail_url} 
-                    alt={market.categoria}
-                    className="w-6 h-6 rounded-full object-cover"
-                  />
-                ) : (
+                 {market.thumbnail_url ? (
+                   <img 
+                     src={market.thumbnail_url} 
+                     alt={market.categoria}
+                     className="w-6 h-6 rounded-full object-cover object-center"
+                     style={{ objectPosition: 'center', transform: 'scale(1.2)' }}
+                   />
+                 ) : (
                   <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
                     <div className="w-3 h-3 bg-primary rounded-full"></div>
                   </div>

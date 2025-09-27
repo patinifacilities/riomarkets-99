@@ -167,22 +167,24 @@ const Home = () => {
       {/* Hero Section - Trading Aligned */}
       <section className="relative min-h-[42vh] md:min-h-[52vh] flex flex-col items-center justify-center bg-[color:var(--bg-app)]">
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
-          {/* Enhanced Animated background - Increased area */}
-          <div className="absolute inset-0 -z-10 opacity-40">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-accent/20 animate-pulse"></div>
-            <div className="absolute top-10 left-10 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-bounce"></div>
-            <div className="absolute top-20 right-20 w-48 h-48 bg-accent/20 rounded-full blur-3xl animate-bounce" style={{ animationDelay: '1s' }}></div>
+          {/* Enhanced Animated background - Much larger area */}
+          <div className="absolute -inset-32 -z-10 opacity-50">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-transparent to-accent/30 animate-pulse"></div>
+            <div className="absolute top-0 left-0 w-96 h-96 bg-primary/25 rounded-full blur-3xl animate-bounce"></div>
+            <div className="absolute top-10 right-0 w-80 h-80 bg-accent/25 rounded-full blur-3xl animate-bounce" style={{ animationDelay: '1s' }}></div>
             
-            {/* Additional floating elements - Larger areas */}
-            <div className="absolute top-1/4 left-1/2 w-32 h-32 bg-[#00FF91]/25 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-            <div className="absolute bottom-10 right-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl animate-bounce" style={{ animationDelay: '3s' }}></div>
-            <div className="absolute bottom-20 left-20 w-24 h-24 bg-accent/25 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '4s' }}></div>
-            <div className="absolute top-1/3 left-1/5 w-28 h-28 bg-[#ff2389]/15 rounded-full blur-2xl animate-bounce" style={{ animationDelay: '2.5s' }}></div>
-            <div className="absolute bottom-1/3 right-1/3 w-36 h-36 bg-primary-glow/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.8s' }}></div>
-            <div className="absolute top-2/3 right-1/5 w-20 h-20 bg-accent/30 rounded-full blur-xl animate-bounce" style={{ animationDelay: '3.5s' }}></div>
+            {/* Additional floating elements - Much larger areas */}
+            <div className="absolute top-1/4 left-1/2 w-64 h-64 bg-[#00FF91]/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute bottom-0 right-0 w-72 h-72 bg-primary/25 rounded-full blur-3xl animate-bounce" style={{ animationDelay: '3s' }}></div>
+            <div className="absolute bottom-10 left-0 w-56 h-56 bg-accent/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+            <div className="absolute top-1/3 left-1/5 w-48 h-48 bg-[#ff2389]/20 rounded-full blur-3xl animate-bounce" style={{ animationDelay: '2.5s' }}></div>
+            <div className="absolute bottom-1/3 right-1/3 w-88 h-88 bg-primary-glow/25 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.8s' }}></div>
+            <div className="absolute top-2/3 right-1/5 w-44 h-44 bg-accent/35 rounded-full blur-2xl animate-bounce" style={{ animationDelay: '3.5s' }}></div>
+            <div className="absolute top-1/2 left-1/4 w-60 h-60 bg-[#00FF91]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '5s' }}></div>
+            <div className="absolute bottom-1/4 right-1/4 w-52 h-52 bg-primary/20 rounded-full blur-3xl animate-bounce" style={{ animationDelay: '6s' }}></div>
             
             {/* Gradient overlay animation */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/8 to-transparent animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/12 to-transparent animate-pulse" style={{ animationDelay: '1.5s' }}></div>
           </div>
           
           <div className="text-center mb-6 md:mb-8">

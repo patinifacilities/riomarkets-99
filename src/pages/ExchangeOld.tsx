@@ -109,10 +109,10 @@ const ExchangeOld = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        {/* Order Book */}
-        <div className="lg:col-span-1 space-y-4 order-1 lg:order-1">
+        {/* Order Book and Trading Interface */}
+        <div className="space-y-4 order-1 lg:order-1">
           <OrderBookWidget />
           
           {/* Trading Interface */}
@@ -239,7 +239,7 @@ const ExchangeOld = () => {
         </div>
 
         {/* Balance Card - Right sidebar */}
-        <div className="lg:col-span-1 order-2 lg:order-3">
+        <div className="order-2 lg:order-2">
           <BalancesCard />
         </div>
       </div>
