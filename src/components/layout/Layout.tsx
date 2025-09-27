@@ -1,4 +1,4 @@
-import { Outlet, useLocation, Navigate } from 'react-router-dom';
+import { useLocation, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import Header from './Header';
 import { Footer } from './Footer';
@@ -57,8 +57,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main>
-        <Outlet />
+      <main className="flex-1">
+        {children}
       </main>
       <Footer />
       <ComplianceBanner variant="sticky" />

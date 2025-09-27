@@ -17,11 +17,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
 interface AddBrlModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }
 
-export const AddBrlModal = ({ onSuccess }: AddBrlModalProps) => {
-  const [open, setOpen] = useState(false);
+export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps) => {
   const [amount, setAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('pix');
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +71,7 @@ export const AddBrlModal = ({ onSuccess }: AddBrlModalProps) => {
 
       setAmount('');
       setPaymentMethod('pix');
-      setOpen(false);
+      onOpenChange(false);
       onSuccess?.();
     } catch (error) {
       console.error('Error adding BRL:', error);
@@ -85,17 +86,7 @@ export const AddBrlModal = ({ onSuccess }: AddBrlModalProps) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="gap-2 border-success text-success hover:bg-success hover:text-success-foreground"
-        >
-          <Plus className="w-4 h-4" />
-          Adicionar BRL
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Adicionar BRL</DialogTitle>
@@ -159,7 +150,7 @@ export const AddBrlModal = ({ onSuccess }: AddBrlModalProps) => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setOpen(false)}
+              onClick={() => onOpenChange(false)}
               className="flex-1"
             >
               Cancelar

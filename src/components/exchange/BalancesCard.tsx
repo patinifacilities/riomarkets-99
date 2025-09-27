@@ -1,14 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useExchangeStore } from '@/stores/useExchangeStore';
 import { ExchangeService } from '@/services/exchange';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Wallet, RefreshCw, ArrowRightLeft } from 'lucide-react';
+import { Wallet, RefreshCw, ArrowRightLeft, Plus } from 'lucide-react';
 import { AddBrlModal } from './AddBrlModal';
 
 export const BalancesCard = () => {
   const { balance, balanceLoading, fetchBalance, rate } = useExchangeStore();
+  const [depositModalOpen, setDepositModalOpen] = useState(false);
 
   useEffect(() => {
     // Refresh balance every 30 seconds
@@ -92,7 +93,14 @@ export const BalancesCard = () => {
 
             {/* Action Buttons */}
             <div className="space-y-2">
-              <AddBrlModal onSuccess={handleRefresh} />
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setDepositModalOpen(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar BRL
+              </Button>
               
               <Button 
                 variant="default" 
@@ -108,6 +116,12 @@ export const BalancesCard = () => {
                 Converter Agora
               </Button>
             </div>
+
+            <AddBrlModal 
+              open={depositModalOpen}
+              onOpenChange={setDepositModalOpen}
+              onSuccess={handleRefresh}
+            />
           </>
         ) : (
           <div className="text-center text-muted-foreground py-8">

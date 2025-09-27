@@ -419,10 +419,10 @@ export const ExchangeWidget = () => {
             </div>
           )}
 
-           {/* Action Button */}
+          {/* Action Button */}
           <Button
             onClick={handleSubmit}
-            disabled={!validation.valid || exchangeLoading || (balance?.brl_balance || 0) === 0}
+            disabled={!validation.valid || exchangeLoading}
             className="w-full h-12 text-base font-medium"
             size="lg"
           >
@@ -431,7 +431,7 @@ export const ExchangeWidget = () => {
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Processando...
               </>
-            ) : (balance?.brl_balance || 0) === 0 ? (
+            ) : (balance?.brl_balance || 0) === 0 && activeTab === 'buy_rioz' ? (
               'Depositar'
             ) : activeTab === 'buy_rioz' ? (
               'Comprar Rioz'

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Wallet as WalletIcon, TrendingUp, TrendingDown, History, BarChart3, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,12 +6,14 @@ import { Badge } from '@/components/ui/badge';
 import TransactionItem from '@/components/wallet/TransactionItem';
 import OrderItem from '@/components/wallet/OrderItem';
 import ExportCSVButton from '@/components/ui/export-csv-button';
+import { AddBrlModal } from '@/components/exchange/AddBrlModal';
 import { useWalletTransactions, useUserOrders } from '@/hooks/useWallet';
 import { useMarkets } from '@/hooks/useMarkets';
 import { useAuth } from '@/hooks/useAuth';
 import { useMarketRewards } from '@/hooks/useMarketRewards';
 
 const Wallet = () => {
+  const [depositModalOpen, setDepositModalOpen] = useState(false);
   const { user } = useAuth();
   const { data: transactions = [], isLoading: transactionsLoading } = useWalletTransactions(user?.id);
   const { data: orders = [], isLoading: ordersLoading } = useUserOrders(user?.id);
@@ -50,7 +53,7 @@ const Wallet = () => {
             <h1 className="text-4xl font-bold">Carteira</h1>
           </div>
           <div className="flex gap-3 mb-4">
-            <Button>
+            <Button onClick={() => setDepositModalOpen(true)}>
               Adicionar Saldo
             </Button>
             <Button variant="outline" style={{ color: '#ff2389', borderColor: '#ff2389' }}>
@@ -232,6 +235,11 @@ const Wallet = () => {
           </Card>
         </div>
       </div>
+
+      <AddBrlModal 
+        open={depositModalOpen}
+        onOpenChange={setDepositModalOpen}
+      />
     </div>
   );
 };
