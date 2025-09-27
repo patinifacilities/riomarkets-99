@@ -89,6 +89,17 @@ const Admin = () => {
     );
   }
 
+  // Debug admin access
+  console.log('Admin Access Debug:', {
+    authLoading,
+    profileLoading,
+    user: !!user,
+    userEmail: user?.email,
+    profile: !!profile,
+    isAdmin: profile?.is_admin,
+    shouldRedirect: (!user || !profile?.is_admin)
+  });
+
   // Check if user is admin
   if (!user || !profile?.is_admin) {
     return <Navigate to="/" replace />;

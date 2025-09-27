@@ -63,7 +63,6 @@ const OrderBook = ({ marketId }: OrderBookProps) => {
                     className="p-3 rounded-lg border border-[#00FF91]/20 bg-[#00FF91]/5 hover:bg-[#00FF91]/10 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-sm">{order.user}</span>
                       <span className="text-xs text-muted-foreground">{order.timestamp}</span>
                     </div>
                     <div className="flex items-center justify-between">
@@ -99,7 +98,6 @@ const OrderBook = ({ marketId }: OrderBookProps) => {
                     className="p-3 rounded-lg border border-[#FF1493]/20 bg-[#FF1493]/5 hover:bg-[#FF1493]/10 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-sm">{order.user}</span>
                       <span className="text-xs text-muted-foreground">{order.timestamp}</span>
                     </div>
                     <div className="flex items-center justify-between">

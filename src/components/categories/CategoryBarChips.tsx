@@ -61,8 +61,8 @@ const CategoryBarChips = memo(({ selectedCategoryId, onCategorySelect }: Categor
                 className={`
                   flex-shrink-0 snap-center
                   flex items-center gap-2 
-                  px-3 py-1.5 rounded-full border text-sm
-                  min-h-[44px] min-w-[44px]
+                  px-4 py-2.5 rounded-full border text-base
+                  min-h-[54px] min-w-[54px]
                   transition-all duration-200 ease-out
                   focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00FF91]
                   ${isActive 

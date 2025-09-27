@@ -250,6 +250,17 @@ const Header = () => {
           <div className="flex items-center gap-3">
             {isAuthenticated && user && profile ? (
               <>
+                {/* Deposit Button */}
+                <Button 
+                  variant="default" 
+                  size="sm"
+                  onClick={() => navigate('/wallet')}
+                  className="gap-2 shadow-success rounded-xl"
+                >
+                  <TrendingUp className="w-4 h-4" />
+                  Depositar
+                </Button>
+
                 {/* Wallet Button - Show balance */}
                 <div className="relative">
                   <Button 

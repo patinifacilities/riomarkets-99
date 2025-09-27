@@ -31,13 +31,13 @@ const FilterToolbar = ({
               placeholder="Buscar mercados..."
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10 h-10 bg-bg-card border-border-soft text-foreground shadow-[var(--glow-green)]/0 hover:shadow-[var(--glow-green)] transition-shadow"
+              className="pl-10 h-12 bg-bg-card border-border-soft text-foreground shadow-[var(--glow-green)]/0 hover:shadow-[var(--glow-green)] transition-shadow"
             />
           </div>
           
           {/* Ordenação */}
           <Select value={sortBy} onValueChange={onSortChange}>
-            <SelectTrigger className="w-48 h-10 bg-bg-card border-border-soft">
+            <SelectTrigger className="w-48 h-12 bg-bg-card border-border-soft">
               <SelectValue placeholder="Ordenar por" />
             </SelectTrigger>
             <SelectContent className="bg-bg-card border-border-soft">
@@ -49,7 +49,7 @@ const FilterToolbar = ({
           </Select>
         </div>
         
-        {/* Chips de categoria */}
+        {/* Chips de categoria - tamanho aumentado em 50% */}
         <div className="mt-4">
           <CategoryBarChips 
             selectedCategoryId={selectedCategory}
