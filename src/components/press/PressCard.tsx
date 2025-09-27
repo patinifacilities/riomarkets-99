@@ -39,18 +39,11 @@ export function PressCard({ article }: PressCardProps) {
   return (
     <>
       <article className="bg-card rounded-xl border border-border hover:border-primary/40 transition-all duration-200 group cursor-pointer" onClick={handleReadMore}>
-        {/* News Image */}
-        <div className="aspect-video w-full bg-muted rounded-t-xl overflow-hidden">
-          <LazyImage
-            src={`https://picsum.photos/400/225?random=${article.id}`}
-            alt={`Imagem da matéria: ${article.title}`}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            placeholder={
-              <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                <span className="text-sm text-muted-foreground">{article.vehicle}</span>
-              </div>
-            }
-          />
+        {/* Relevance Tag */}
+        <div className="p-4 pb-0">
+          <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+            Alta Relevância
+          </div>
         </div>
 
         {/* Vehicle Logo */}
@@ -120,19 +113,6 @@ export function PressCard({ article }: PressCardProps) {
           </DialogHeader>
           
           <div className="overflow-auto max-h-[60vh] space-y-4">
-            {/* Article Image */}
-            <div className="aspect-video w-full bg-muted rounded-lg overflow-hidden">
-              <LazyImage
-                src={`https://picsum.photos/800/450?random=${article.id}`}
-                alt={`Imagem da matéria: ${article.title}`}
-                className="w-full h-full object-cover"
-                placeholder={
-                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                    <span className="text-muted-foreground">Carregando imagem...</span>
-                  </div>
-                }
-              />
-            </div>
 
             {/* Article Content */}
             <div className="prose prose-invert max-w-none">

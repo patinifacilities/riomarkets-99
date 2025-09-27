@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import BetModal from '@/components/markets/BetModal';
 import PoolProgressBar from '@/components/markets/PoolProgressBar';
+import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorModal';
 
 const MarketDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -301,6 +302,9 @@ const MarketDetail = () => {
           onBetSuccess={handleBetSuccess}
         />
       )}
+
+      {/* Reward Calculator Modal */}
+      <RewardCalculatorModal />
     </div>
   );
 };

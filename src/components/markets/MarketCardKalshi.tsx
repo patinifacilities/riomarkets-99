@@ -177,24 +177,44 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
               {market.titulo}
             </h3>
 
+            {/* Odds Progress Bar */}
+            <div className="mb-3">
+              <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                <span>SIM {yesPercentage}%</span>
+                <span>NÃO {noPercentage}%</span>
+              </div>
+              <div className="h-1 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-success transition-all duration-300"
+                  style={{ width: `${yesPercentage}%` }}
+                />
+              </div>
+            </div>
+
             {/* Prediction Buttons - Kalshi Style */}
             <div className="grid grid-cols-2 gap-2 mb-3">
               <Button
                 onClick={(e) => handleBetClick(e, yesOption?.label || 'sim')}
                 disabled={market.status !== 'aberto'}
                 style={{ backgroundColor: '#00ff9020', borderColor: '#00ff90', color: '#00ff90' }}
-                className="h-12 rounded-md border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80"
+                className="h-12 rounded-lg border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80"
               >
-                <span className="font-semibold">SIM</span>
+                <div className="flex items-center justify-between w-full">
+                  <span className="font-semibold">SIM</span>
+                  <span className="text-xs opacity-80">{yesOption ? (1 / (yesPercentage / 100)).toFixed(1) : '2.0'}X</span>
+                </div>
               </Button>
               
               <Button
                 onClick={(e) => handleBetClick(e, noOption?.label || 'não')}
                 disabled={market.status !== 'aberto'}
                 style={{ backgroundColor: '#ff238920', borderColor: '#ff2389', color: '#ff2389' }}
-                className="h-12 rounded-md border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80"
+                className="h-12 rounded-lg border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80"
               >
-                <span className="font-semibold">NÃO</span>
+                <div className="flex items-center justify-between w-full">
+                  <span className="font-semibold">NÃO</span>
+                  <span className="text-xs opacity-80">{noOption ? (1 / (noPercentage / 100)).toFixed(1) : '2.0'}X</span>
+                </div>
               </Button>
             </div>
           </div>

@@ -20,6 +20,7 @@ import FiatRequests from '@/pages/FiatRequests';
 import NotFound from '@/pages/NotFound';
 import { Toaster } from '@/components/ui/sonner';
 import { track } from '@/lib/analytics';
+import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorModal';
 
 function App() {
   useEffect(() => {
@@ -91,6 +92,7 @@ function App() {
         </Routes>
       </Layout>
       <Toaster />
+      <RewardCalculatorModal />
     </Router>
   );
 }

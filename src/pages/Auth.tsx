@@ -34,8 +34,8 @@ const Auth = () => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Redirect authenticated users to home
-        if (session?.user) {
+        // Only redirect if not already on auth page
+        if (session?.user && location.pathname === '/auth') {
           navigate('/');
         }
       }
@@ -46,7 +46,7 @@ const Auth = () => {
       setSession(session);
       setUser(session?.user ?? null);
       
-      if (session?.user) {
+      if (session?.user && location.pathname === '/auth') {
         navigate('/');
       }
     });

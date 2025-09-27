@@ -247,9 +247,9 @@ const Header = () => {
                     onMouseEnter={() => setWalletHoverOpen(true)}
                     onMouseLeave={() => setWalletHoverOpen(false)}
                     onClick={() => navigate('/wallet')}
-                    className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 hidden sm:flex"
+                    className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 flex items-center gap-2 rounded-lg"
                   >
-                    <Wallet className="w-4 h-4 mr-2" />
+                    <Wallet className="w-4 h-4" />
                     <span className="font-mono text-sm">
                       {profile.saldo_moeda.toLocaleString()} RZ
                     </span>
@@ -265,7 +265,7 @@ const Header = () => {
                   variant="ghost" 
                   size="sm"
                   onClick={() => navigate('/profile')}
-                  className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 hidden sm:flex"
+                  className="h-9 px-3 bg-muted/50 hover:bg-muted border border-border/50 hidden sm:flex rounded-lg"
                 >
                   <User className="w-4 h-4" />
                 </Button>

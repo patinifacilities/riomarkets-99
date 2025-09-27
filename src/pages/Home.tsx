@@ -130,13 +130,6 @@ const Home = () => {
               </div>
             </div>
             
-            {/* Background Animation */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute top-10 left-10 w-32 h-32 bg-primary/10 rounded-full animate-pulse"></div>
-              <div className="absolute top-32 right-20 w-24 h-24 bg-accent/10 rounded-full animate-pulse delay-1000"></div>
-              <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-primary/5 rounded-full animate-pulse delay-500"></div>
-              <div className="absolute bottom-32 right-1/3 w-28 h-28 bg-accent/5 rounded-full animate-pulse delay-1500"></div>
-            </div>
           </div>
         </section>
 
