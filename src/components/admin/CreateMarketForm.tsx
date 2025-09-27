@@ -3,7 +3,9 @@ import { Plus, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,7 +29,7 @@ const CreateMarketForm = ({ onSuccess, onCancel }: CreateMarketFormProps) => {
     marketType: 'binary' as MarketType,
     customOptions: ['sim', 'não'],
     thumbnailUrl: '',
-    customOdds: {} as Record<string, number>
+    customOdds: { 'sim': 2.0, 'não': 2.0 } as Record<string, number>
   });
 
   const marketTypeTemplates = {
@@ -289,37 +291,45 @@ const CreateMarketForm = ({ onSuccess, onCancel }: CreateMarketFormProps) => {
 
         <div>
           <label className="text-sm font-medium mb-2 block">Opções de Análise e Odds</label>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {newMarket.customOptions.map((option, index) => (
-              <div key={index} className="grid grid-cols-2 gap-2 items-center">
+              <div key={index} className="space-y-3 p-4 border rounded-lg">
                 <Input
                   placeholder={`Opção ${index + 1}`}
                   value={option}
                   onChange={(e) => handleOptionChange(index, e.target.value)}
-                  disabled={newMarket.marketType === 'three_way'} // Three-way options are fixed
+                  disabled={newMarket.marketType === 'binary'} // Binary options are fixed
                 />
-                <div className="flex gap-2 items-center">
-                  <Input
-                    type="number"
-                    placeholder="Odds"
-                    min="1.0"
-                    max="10.0"
-                    step="0.1"
-                    value={newMarket.customOdds[option] || 2.0}
-                    onChange={(e) => handleOddsChange(option, e.target.value)}
-                    className="w-20"
+                
+                {/* Odds Slider */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Odds: {(newMarket.customOdds[option] || 2.0).toFixed(2)}x</Label>
+                  </div>
+                  <Slider
+                    value={[(newMarket.customOdds[option] || 2.0) * 100]} // Convert to 100-400 scale
+                    onValueChange={(value) => handleOddsChange(option, (value[0] / 100).toString())}
+                    min={100}
+                    max={400}
+                    step={1}
+                    className="w-full"
                   />
-                  <span className="text-sm text-muted-foreground">x</span>
-                  {newMarket.marketType === 'multi' && newMarket.customOptions.length > 4 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleRemoveOption(index)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  )}
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>1.00x</span>
+                    <span>4.00x</span>
+                  </div>
                 </div>
+                
+                {newMarket.marketType === 'multi' && newMarket.customOptions.length > 4 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleRemoveOption(index)}
+                    className="w-fit"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
               </div>
             ))}
           </div>

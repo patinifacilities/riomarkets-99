@@ -193,15 +193,26 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
     set({ exchangeLoading: true, exchangeError: null });
     
     try {
-      const { data, error } = await supabase.functions.invoke('execute-market-order', {
-        body: {
-          side,
-          amountInput,
-          inputCurrency
-        }
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      // Get current price (fixed at 1.0 BRL)
+      const currentPrice = 1.0;
+
+      // Use the database function directly instead of edge function
+      const { data, error } = await supabase.rpc('execute_market_order', {
+        p_user_id: user.id,
+        p_side: side,
+        p_amount_input: amountInput,
+        p_input_currency: inputCurrency,
+        p_current_price: currentPrice
       });
       
       if (error) throw error;
+
+      if (!data || data.length === 0 || !data[0].success) {
+        throw new Error(data?.[0]?.message || 'Transaction failed');
+      }
       
       // Refresh balance and history after successful exchange
       const store = get();
@@ -211,7 +222,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
       ]);
       
       set({ exchangeLoading: false });
-      return data;
+      return data[0];
     } catch (error) {
       console.error('Error performing exchange:', error);
       const errorMessage = error instanceof Error ? error.message : 'Exchange failed';

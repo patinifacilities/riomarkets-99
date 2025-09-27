@@ -93,13 +93,11 @@ export const UserEditModal = ({ user, open, onOpenChange, onSuccess }: UserEditM
 
       if (transactionError) throw transactionError;
 
-      // Update user profile balance
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          saldo_moeda: user.saldo_moeda + adjustAmount
-        })
-        .eq('id', user.id);
+      // Update user profile balance using the increment_balance function
+      const { error: updateError } = await supabase.rpc('increment_balance', {
+        user_id: user.id,
+        amount: adjustAmount
+      });
 
       if (updateError) throw updateError;
 

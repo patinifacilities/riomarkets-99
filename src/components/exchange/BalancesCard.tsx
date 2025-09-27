@@ -40,7 +40,7 @@ export const BalancesCard = () => {
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Wallet className="h-5 w-5 text-[#00FF91]" />
-            Seus Saldos
+            Saldo
           </div>
           <Button
             variant="ghost"

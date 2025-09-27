@@ -106,7 +106,7 @@ const WalletPage = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Saldo RIOZ Coin</p>
                   <p className="text-2xl font-bold text-primary">
-                    {currentBalance.toLocaleString()} RIOZ
+                    {profile?.saldo_moeda?.toLocaleString() || 0} RIOZ
                   </p>
                 </div>
                 <Wallet className="w-8 h-8 text-primary" />

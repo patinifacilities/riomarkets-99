@@ -92,15 +92,16 @@ const BetModal = ({
           tipo: 'debito',
           valor: betValue,
           descricao: `Análise em: ${market.titulo} (${selectedOption}) — entrada ${recompensa}x recompensa`,
+          market_id: market.id
         });
 
       if (transactionError) throw transactionError;
 
-      // Update user balance
-      const { error: balanceError } = await supabase
-        .from('profiles')
-        .update({ saldo_moeda: userBalance - betValue })
-        .eq('id', userId);
+      // Update user balance using the increment_balance function
+      const { error: balanceError } = await supabase.rpc('increment_balance', {
+        user_id: userId,
+        amount: -betValue
+      });
 
       if (balanceError) throw balanceError;
 
