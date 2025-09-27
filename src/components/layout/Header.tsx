@@ -27,17 +27,19 @@ import logoImage from '@/assets/rio-markets-logo-white.png';
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, signOut, isAuthenticated, loading } = useAuth();
+  const { user, session, signOut, isAuthenticated, loading } = useAuth();
   const { data: profile } = useProfile(user?.id);
 
   // Debug authentication state
   console.log('Header Debug:', { 
     user: !!user, 
+    session: !!session,
     isAuthenticated, 
     loading, 
     profile: !!profile,
     profileIsAdmin: profile?.is_admin 
   });
+
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [walletHoverOpen, setWalletHoverOpen] = useState(false);
@@ -86,7 +88,7 @@ const Header = () => {
                 
                 <div className="flex flex-col mt-6 space-y-1">
                   {/* User Info Section */}
-                  {!loading && isAuthenticated && profile && (
+                  {isAuthenticated && user && profile && (
                     <div className="border-b border-border pb-4 mb-4">
                       <div className="flex items-center gap-3 p-2">
                         <Avatar className="h-10 w-10">
@@ -159,7 +161,7 @@ const Header = () => {
                   })}
                   
                   {/* Auth Actions */}
-                  {!loading && isAuthenticated ? (
+                  {isAuthenticated && user ? (
                     <div className="border-t border-border pt-4 mt-4">
                       <Button 
                         onClick={() => {
@@ -173,7 +175,7 @@ const Header = () => {
                         Sair
                       </Button>
                     </div>
-                  ) : (
+                  ) : !loading && (
                     <div className="border-t border-border pt-4 mt-4">
                       <Link to="/auth" onClick={handleMobileNavClick}>
                         <Button className="w-full justify-start gap-3 h-12">
@@ -246,7 +248,7 @@ const Header = () => {
 
           {/* Desktop User Menu */}
           <div className="flex items-center gap-3">
-            {!loading && isAuthenticated && profile ? (
+            {isAuthenticated && user && profile ? (
               <>
                 {/* Wallet Button - Show balance */}
                 <div className="relative">
@@ -296,14 +298,14 @@ const Header = () => {
                   <span className="hidden sm:inline text-sm">Sair</span>
                 </Button>
               </>
-            ) : (
+            ) : !loading ? (
               <Link to="/auth">
                 <Button className="gap-2 shadow-success rounded-xl">
                   <LogIn className="w-4 h-4" />
                   Entrar
                 </Button>
               </Link>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

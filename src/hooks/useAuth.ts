@@ -48,6 +48,6 @@ export const useAuth = () => {
     session,
     loading,
     signOut,
-    isAuthenticated: !!user
+    isAuthenticated: !!session?.user
   };
 };
