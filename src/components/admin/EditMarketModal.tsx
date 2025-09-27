@@ -159,7 +159,7 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
                   <SelectValue placeholder="Selecione a periodicidade" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Único</SelectItem>
+                  <SelectItem value="unico">Único</SelectItem>
                   <SelectItem value="diario">Diário</SelectItem>
                   <SelectItem value="semanal">Semanal</SelectItem>
                   <SelectItem value="mensal">Mensal</SelectItem>
