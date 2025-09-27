@@ -189,7 +189,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
     set({ exchangeLoading: true, exchangeError: null });
     
     try {
-      const { data, error } = await supabase.functions.invoke('exchange-convert', {
+      const { data, error } = await supabase.functions.invoke('execute-market-order', {
         body: {
           side,
           amountInput,
