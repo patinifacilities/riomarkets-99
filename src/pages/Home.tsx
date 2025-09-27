@@ -3,7 +3,7 @@ import { Search, TrendingUp, Filter } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import MarketCardKalshi from '@/components/markets/MarketCardKalshi';
-import FilterToolbar from '@/components/ui/FilterToolbar';
+
 import { FilterChips } from '@/components/ui/filter-chips';
 import { MarketGridSkeleton } from '@/components/ui/MarketCardSkeleton';
 import TopAnalysts from '@/components/ui/TopAnalysts';
@@ -211,44 +211,35 @@ const Home = () => {
           </div>
         </section>
 
-      {/* Filter Toolbar */}
-      <FilterToolbar 
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        selectedCategory={selectedCategory}
-        onCategoryChange={handleCategoryChange}
-        sortBy={sortBy}
-        onSortChange={handleSortChange}
-      />
-
-      {/* Filters Section */}
-      <div className="container mx-auto px-4 pb-4 space-y-6">
-        {/* Topic Filters */}
-        <div>
-          <div className="flex items-center gap-3 mb-4">
-            <Filter className="w-5 h-5 text-muted-foreground" />
-            <span className="text-lg font-semibold text-foreground">Filtrar por tópico:</span>
-          </div>
-          <FilterChips
-            chips={topicFilters}
-            selectedChips={selectedTopics}
-            onChipSelect={handleTopicSelect}
-            onRemoveChip={handleRemoveTopic}
-          />
+      {/* Combined Filters Section */}
+      <div className="container mx-auto px-4 pb-4">
+        <div className="flex items-center gap-3 mb-4">
+          <Filter className="w-5 h-5 text-muted-foreground" />
+          <span className="text-lg font-semibold text-foreground">Filtros:</span>
         </div>
-
-        {/* Status Filters */}
-        <div>
-          <div className="flex items-center gap-3 mb-4">
-            <Filter className="w-5 h-5 text-muted-foreground" />
-            <span className="text-lg font-semibold text-foreground">Filtrar por status:</span>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Topic Filters */}
+          <div>
+            <h4 className="text-sm font-medium text-muted-foreground mb-3">Por tópico:</h4>
+            <FilterChips
+              chips={topicFilters}
+              selectedChips={selectedTopics}
+              onChipSelect={handleTopicSelect}
+              onRemoveChip={handleRemoveTopic}
+            />
           </div>
-          <FilterChips
-            chips={statusFilters}
-            selectedChips={selectedStatus}
-            onChipSelect={handleStatusSelect}
-            onRemoveChip={handleRemoveStatus}
-          />
+
+          {/* Status Filters */}
+          <div>
+            <h4 className="text-sm font-medium text-muted-foreground mb-3">Por status:</h4>
+            <FilterChips
+              chips={statusFilters}
+              selectedChips={selectedStatus}
+              onChipSelect={handleStatusSelect}
+              onRemoveChip={handleRemoveStatus}
+            />
+          </div>
         </div>
       </div>
 

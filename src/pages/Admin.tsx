@@ -38,9 +38,7 @@ const Admin = () => {
   const [testModal, setTestModal] = useState<{
     isOpen: boolean;
   }>({ isOpen: false });
-  const [adminLoggedIn, setAdminLoggedIn] = useState(
-    localStorage.getItem('admin_logged_in') === 'true'
-  );
+  const [adminLoggedIn, setAdminLoggedIn] = useState(false);
 
   const handleCreateSuccess = () => {
     setShowCreateForm(false);
@@ -91,9 +89,9 @@ const Admin = () => {
     );
   }
 
-  // Admin login check
-  if (!adminLoggedIn) {
-    return <AdminLogin onSuccess={() => setAdminLoggedIn(true)} />;
+  // Check if user is admin
+  if (!user || !profile?.is_admin) {
+    return <Navigate to="/" replace />;
   }
 
   // Calculate platform metrics

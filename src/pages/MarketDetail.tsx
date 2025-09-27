@@ -16,6 +16,7 @@ import BetModal from '@/components/markets/BetModal';
 import PoolProgressBar from '@/components/markets/PoolProgressBar';
 import ProbabilityChart from '@/components/markets/ProbabilityChart';
 import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorModal';
+import OrderBook from '@/components/markets/OrderBook';
 
 const MarketDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -219,6 +220,9 @@ const MarketDetail = () => {
                 );
               })}
             </div>
+
+            {/* Order Book */}
+            <OrderBook marketId={market.id} />
           </div>
 
           {/* User Info Panel */}
