@@ -28,34 +28,49 @@ const Auth = () => {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!mounted) return;
+        
+        console.log('Auth state change:', event, session ? 'Session exists' : 'No session');
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Only redirect if not already on auth page
-        if (session?.user && location.pathname === '/auth') {
-          navigate('/');
+        // Only redirect after successful login, not on initial load
+        if (event === 'SIGNED_IN' && session?.user) {
+          console.log('Redirecting to home after successful sign in');
+          setTimeout(() => navigate('/'), 100); // Small delay to ensure state updates
         }
       }
     );
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      
+      console.log('Initial session check:', session ? 'Session exists' : 'No session');
       setSession(session);
       setUser(session?.user ?? null);
       
+      // Only redirect if already logged in and on auth page
       if (session?.user && location.pathname === '/auth') {
+        console.log('Already logged in, redirecting to home');
         navigate('/');
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [navigate, location.pathname]);
 
   const handleSignUp = async () => {
-    const redirectUrl = `${window.location.origin}/`;
+    console.log('Attempting sign up...');
+    const redirectUrl = `${window.location.origin}/auth`;
     
     const { error } = await supabase.auth.signUp({
       email: formData.email,
@@ -68,15 +83,18 @@ const Auth = () => {
       }
     });
     
+    console.log('Sign up result:', error ? 'Error' : 'Success', error);
     return { error };
   };
 
   const handleSignIn = async () => {
+    console.log('Attempting sign in...');
     const { error } = await supabase.auth.signInWithPassword({
       email: formData.email,
       password: formData.password
     });
     
+    console.log('Sign in result:', error ? 'Error' : 'Success', error);
     return { error };
   };
 
@@ -134,9 +152,11 @@ const Auth = () => {
     }
 
     try {
+      console.log('Submitting form:', isLogin ? 'Login' : 'Sign up');
       const { error } = isLogin ? await handleSignIn() : await handleSignUp();
 
       if (error) {
+        console.error('Auth error:', error);
         if (error.message.includes('Invalid login credentials')) {
           setError('Email ou senha incorretos');
         } else if (error.message.includes('User already registered')) {
@@ -149,6 +169,8 @@ const Auth = () => {
         return;
       }
 
+      console.log('Auth successful!');
+      
       if (!isLogin) {
         toast({
           title: "Conta criada com sucesso!",
@@ -159,6 +181,7 @@ const Auth = () => {
           title: "Login realizado!",
           description: "Bem-vindo de volta!",
         });
+        // Don't navigate here - let the auth state change handle it
       }
 
       // Clear form
