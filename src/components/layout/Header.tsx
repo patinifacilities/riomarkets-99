@@ -30,13 +30,19 @@ const Header = () => {
   const { user, session, signOut, isAuthenticated, loading } = useAuth();
   const { data: profile } = useProfile(user?.id);
 
+  // Simplified authentication check
+  const userIsLoggedIn = !loading && !!user && !!session;
+  const showUserButtons = userIsLoggedIn && !!profile;
+
   // Debug authentication state
   console.log('Header Debug:', { 
+    loading,
     user: !!user, 
     session: !!session,
     isAuthenticated, 
-    loading, 
     profile: !!profile,
+    userIsLoggedIn,
+    showUserButtons,
     profileIsAdmin: profile?.is_admin 
   });
 
@@ -88,7 +94,7 @@ const Header = () => {
                 
                 <div className="flex flex-col mt-6 space-y-1">
                   {/* User Info Section */}
-                  {isAuthenticated && user && profile && (
+                  {showUserButtons && (
                     <div className="border-b border-border pb-4 mb-4">
                       <div className="flex items-center gap-3 p-2">
                         <Avatar className="h-10 w-10">
@@ -161,7 +167,7 @@ const Header = () => {
                   })}
                   
                   {/* Auth Actions */}
-                  {isAuthenticated && user ? (
+                  {showUserButtons ? (
                     <div className="border-t border-border pt-4 mt-4">
                       <Button 
                         onClick={() => {
@@ -248,7 +254,7 @@ const Header = () => {
 
           {/* Desktop User Menu */}
           <div className="flex items-center gap-3">
-            {isAuthenticated && user && profile ? (
+            {showUserButtons ? (
               <>
                 {/* Deposit Button */}
                 <Button 

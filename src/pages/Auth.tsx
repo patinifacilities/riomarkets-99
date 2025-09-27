@@ -89,13 +89,11 @@ const Auth = () => {
 
   const handleSignUp = async () => {
     console.log('Attempting sign up...');
-    const redirectUrl = `${window.location.origin}/auth`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
       options: {
-        emailRedirectTo: redirectUrl,
         data: {
           name: formData.name
         }
@@ -103,7 +101,17 @@ const Auth = () => {
     });
     
     console.log('Sign up result:', error ? 'Error' : 'Success', error);
-    return { error };
+    
+    // If signup successful and user is immediately confirmed, log them in
+    if (!error && data.user && !data.user.email_confirmed_at) {
+      // User needs email confirmation
+      return { error: null, needsConfirmation: true };
+    } else if (!error && data.user && data.user.email_confirmed_at) {
+      // User is automatically logged in
+      return { error: null, needsConfirmation: false };
+    }
+    
+    return { error, needsConfirmation: false };
   };
 
   const handleSignIn = async () => {
@@ -172,38 +180,50 @@ const Auth = () => {
 
     try {
       console.log('Submitting form:', isLogin ? 'Login' : 'Sign up');
-      const { error } = isLogin ? await handleSignIn() : await handleSignUp();
-
-      if (error) {
-        console.error('Auth error:', error);
-        if (error.message.includes('Invalid login credentials')) {
-          setError('Email ou senha incorretos');
-        } else if (error.message.includes('User already registered')) {
-          setError('Este email já está cadastrado. Tente fazer login.');
-        } else if (error.message.includes('Email not confirmed')) {
-          setError('Verifique seu email para confirmar a conta');
-        } else {
-          setError(error.message);
-        }
-        return;
-      }
-
-      console.log('Auth successful!');
       
-      if (!isLogin) {
-        toast({
-          title: "Conta criada com sucesso!",
-          description: "Verifique seu email para confirmar a conta.",
-        });
-        // Clear form for signup
-        setFormData({ email: '', password: '', name: '' });
-      } else {
-        // Para login, não redirecionar aqui - deixar o auth state change fazer isso
+      if (isLogin) {
+        const { error } = await handleSignIn();
+        if (error) {
+          console.error('Auth error:', error);
+          if (error.message.includes('Invalid login credentials')) {
+            setError('Email ou senha incorretos');
+          } else if (error.message.includes('Email not confirmed')) {
+            setError('Verifique seu email para confirmar a conta');
+          } else {
+            setError(error.message);
+          }
+          return;
+        }
+        
         toast({
           title: "Login realizado!",
           description: "Redirecionando...",
         });
-        // Não limpar o form ainda - será limpo após o redirect
+      } else {
+        const { error, needsConfirmation } = await handleSignUp();
+        if (error) {
+          console.error('Auth error:', error);
+          if (error.message.includes('User already registered')) {
+            setError('Este email já está cadastrado. Tente fazer login.');
+          } else {
+            setError(error.message);
+          }
+          return;
+        }
+        
+        if (needsConfirmation) {
+          toast({
+            title: "Conta criada com sucesso!",
+            description: "Verifique seu email para confirmar a conta.",
+          });
+          setFormData({ email: '', password: '', name: '' });
+        } else {
+          toast({
+            title: "Conta criada e login realizado!",
+            description: "Bem-vindo ao Rio Markets!",
+          });
+          // User will be automatically redirected by auth state change
+        }
       }
     } catch (error) {
       console.error('Auth error:', error);
