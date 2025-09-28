@@ -134,6 +134,48 @@ export type Database = {
         }
         Relationships: []
       }
+      exchange_order_book: {
+        Row: {
+          amount_rioz: number
+          created_at: string
+          expires_at: string | null
+          id: string
+          order_type: string
+          price_brl_per_rioz: number
+          remaining_amount: number
+          side: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_rioz: number
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          order_type?: string
+          price_brl_per_rioz: number
+          remaining_amount: number
+          side: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_rioz?: number
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          order_type?: string
+          price_brl_per_rioz?: number
+          remaining_amount?: number
+          side?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       exchange_orders: {
         Row: {
           amount_brl: number

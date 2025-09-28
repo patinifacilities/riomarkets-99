@@ -136,15 +136,24 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
         className
       )}
       style={{
-        background: `linear-gradient(90deg, #00ff90 ${progress * 100}%, #ff2389 ${progress * 100}%)`,
+        background: 'white',
         borderColor: progress > 0.5 ? '#00ff90' : '#ff2389',
       }}
     >
+      {/* Background gradient overlay */}
+      <div 
+        className="absolute inset-0 rounded-full transition-all duration-300"
+        style={{
+          background: `linear-gradient(90deg, #00ff90 0%, #ff2389 100%)`,
+          opacity: progress * 0.8,
+        }}
+      />
+      
       {/* Background text */}
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className="absolute inset-0 flex items-center justify-center z-10">
         <span className={cn(
           "text-sm font-medium transition-colors duration-300",
-          progress > 0.5 ? "text-gray-800" : "text-white"
+          "text-gray-800"
         )}>
           {text}
         </span>

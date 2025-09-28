@@ -148,7 +148,7 @@ const MarketDetail = () => {
                   </div>
                 </div>
                 
-                <p className="text-muted-foreground text-lg leading-relaxed mb-4 max-w-[65ch] mx-auto">
+                 <p className="text-muted-foreground text-lg leading-relaxed mb-4">
                   {market.descricao}
                 </p>
                 
@@ -287,13 +287,12 @@ const MarketDetail = () => {
                 </h3>
                 
                  <div className="space-y-4">
-                    {/* Editable RIOZ Input */}
                     <div>
-                      <Label htmlFor="rioz-amount" className="text-sm font-medium">
-                        Quantidade RIOZ
+                      <Label htmlFor="bet-amount" className="text-sm font-medium">
+                        Quantidade
                       </Label>
                       <Input
-                        id="rioz-amount"
+                        id="bet-amount"
                         type="number"
                         placeholder="Digite a quantidade..."
                         value={betAmount || ''}
