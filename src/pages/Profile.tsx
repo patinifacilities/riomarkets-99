@@ -367,9 +367,9 @@ const Profile = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-medium">Saldo da Conta</h3>
-                <p className="text-sm text-muted-foreground">
-                  {profile.saldo_moeda} Rioz Coins
-                </p>
+                 <p className="text-sm text-muted-foreground">
+                   {(profile.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Rioz Coins
+                 </p>
               </div>
               <Button 
                 variant="outline" 

@@ -226,7 +226,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         window.dispatchEvent(new CustomEvent('balanceUpdated'));
         window.dispatchEvent(new CustomEvent('exchangeBalanceUpdated'));
         window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
-        // Force multiple refresh cycles to ensure update
+        // Force profile refresh to show updated RIOZ balance
         setTimeout(() => {
           window.dispatchEvent(new CustomEvent('balanceUpdated'));
           window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
@@ -235,6 +235,10 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
           window.dispatchEvent(new CustomEvent('balanceUpdated'));
           window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
         }, 500);
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('balanceUpdated'));
+          window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
+        }, 1000);
       }
       
       set({ exchangeLoading: false });

@@ -8,9 +8,20 @@ export function DarkModeToggle() {
 
   useEffect(() => {
     setMounted(true);
-    // Check initial theme
-    const currentTheme = document.documentElement.classList.contains('dark');
-    setIsDark(currentTheme);
+    // Check for stored theme preference
+    const storedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // Apply stored theme or system preference
+    const shouldBeDark = storedTheme === 'dark' || (!storedTheme && systemPrefersDark);
+    
+    if (shouldBeDark) {
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      setIsDark(false);
+    }
   }, []);
 
   if (!mounted) {
