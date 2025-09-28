@@ -67,9 +67,6 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
         throw error;
       }
 
-      // Force immediate refresh to show changes
-      onOddsUpdate?.();
-
       // Log admin action
       const { data: user } = await supabase.auth.getUser();
       if (user?.user?.id) {
@@ -87,6 +84,8 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
 
       setOriginalOdds(odds);
       setHasChanges(false);
+      
+      // Force immediate refresh to show changes
       onOddsUpdate?.();
       
       const oddsText = Object.entries(odds)

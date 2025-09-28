@@ -42,6 +42,13 @@ const ExchangeOld = () => {
     }
   }, [user, fetchRate, fetchBalance]);
 
+  // Force refresh balance after exchange
+  useEffect(() => {
+    if (user) {
+      fetchBalance();
+    }
+  }, [user, fetchBalance]);
+
   const handleExchange = async () => {
     if (!amount || amount <= 0) {
       toast({
@@ -56,6 +63,10 @@ const ExchangeOld = () => {
     
     try {
       await performExchange(side, amount, 'RIOZ');
+      
+      // Force immediate balance refresh
+      await fetchBalance();
+      
       setAmount(0);
       setLimitPrice('');
       
@@ -109,11 +120,18 @@ const ExchangeOld = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Trading Interface and Order Book */}
-        <div className="space-y-6 order-2 lg:order-1">
-          {/* Trading Interface - Now first */}
+        {/* Order Book - Main section */}
+        <div className="lg:col-span-2 order-2 lg:order-1">
+          <div className="min-h-[700px]">
+            <OrderBookWidget />
+          </div>
+        </div>
+
+        {/* Trading Interface and Balance - Right sidebar */}
+        <div className="space-y-6 order-1 lg:order-2">
+          {/* Trading Interface */}
           <Card data-exchange-widget className="min-h-[500px]">
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -134,7 +152,7 @@ const ExchangeOld = () => {
           <CardContent>
             <Tabs value={activeTab} onValueChange={(value: 'buy' | 'sell') => setActiveTab(value)}>
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="buy" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">
+                <TabsTrigger value="buy" className="data-[state=active]:bg-[#00ff90] data-[state=active]:text-black">
                   Comprar RIOZ
                 </TabsTrigger>
                 <TabsTrigger value="sell" className="data-[state=active]:bg-[#ff2389] data-[state=active]:text-white">
@@ -180,7 +198,7 @@ const ExchangeOld = () => {
                   <Button 
                     onClick={handleExchange}
                     disabled={!amount}
-                    className="w-full bg-green-500 hover:bg-green-600"
+                    className="w-full bg-[#00ff90] hover:bg-[#00ff90]/90 text-black"
                   >
                     Comprar RIOZ
                   </Button>
@@ -235,14 +253,7 @@ const ExchangeOld = () => {
           </CardContent>
         </Card>
           
-          {/* Order Book - Now second */}
-          <div className="min-h-[600px]">
-            <OrderBookWidget />
-          </div>
-        </div>
-
-        {/* Balance Card - Right sidebar */}
-        <div className="order-1 lg:order-2">
+          {/* Balance Card */}
           <BalancesCard />
         </div>
       </div>

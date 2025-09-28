@@ -71,30 +71,30 @@ export const OrderBookWidget = () => {
   }
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
-        <CardTitle className="text-sm flex items-center gap-2">
-          <TrendingUp className="h-4 w-4" />
+        <CardTitle className="text-lg flex items-center gap-2">
+          <TrendingUp className="h-5 w-5" />
           Order Book RIOZ/BRL
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-0">
-        <div className="space-y-1">
+      <CardContent className="p-0 h-full">
+        <div className="space-y-1 h-full">
           {/* Header */}
-          <div className="grid grid-cols-3 gap-2 px-4 py-2 text-xs text-muted-foreground border-b">
+          <div className="grid grid-cols-3 gap-2 px-4 py-3 text-sm text-muted-foreground border-b">
             <div>Preço (BRL)</div>
             <div className="text-right">Qtd (RIOZ)</div>
             <div className="text-right">Total (BRL)</div>
           </div>
 
           {/* Sell Orders */}
-          <div className="space-y-0.5">
+          <div className="space-y-0.5 min-h-[200px]">
             {sellOrders.slice().reverse().map((level, index) => (
               <div 
                 key={`sell-${index}`}
-                className="grid grid-cols-3 gap-2 px-4 py-1 text-xs hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                className="grid grid-cols-3 gap-2 px-4 py-2 text-sm hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
               >
-                <div className="font-mono" style={{ color: '#ff2389' }}>
+                <div className="font-mono font-semibold" style={{ color: '#ff2389' }}>
                   {level.price.toFixed(4)}
                 </div>
                 <div className="text-right text-muted-foreground">
@@ -108,21 +108,21 @@ export const OrderBookWidget = () => {
           </div>
 
           {/* Spread */}
-          <div className="py-2 px-4 bg-muted/30 border-y">
-            <div className="text-center text-xs text-muted-foreground">
+          <div className="py-3 px-4 bg-muted/30 border-y">
+            <div className="text-center text-sm font-semibold text-muted-foreground">
               Spread: R$ {buyOrders[0] && sellOrders[0] ? 
                 (sellOrders[0].price - buyOrders[0].price).toFixed(4) : '0.0000'}
             </div>
           </div>
 
           {/* Buy Orders */}
-          <div className="space-y-0.5">
+          <div className="space-y-0.5 min-h-[200px]">
             {buyOrders.map((level, index) => (
               <div 
                 key={`buy-${index}`}
-                className="grid grid-cols-3 gap-2 px-4 py-1 text-xs hover:bg-green-50 dark:hover:bg-green-950/30 transition-colors"
+                className="grid grid-cols-3 gap-2 px-4 py-2 text-sm hover:bg-green-50 dark:hover:bg-green-950/30 transition-colors"
               >
-                <div className="text-green-600 font-mono">
+                <div className="text-[#00ff90] font-mono font-semibold">
                   {level.price.toFixed(4)}
                 </div>
                 <div className="text-right text-muted-foreground">

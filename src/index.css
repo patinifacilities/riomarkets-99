@@ -113,9 +113,19 @@
     100% { transform: "translateX(-100%)" }
   }
 
-  @keyframes scroll-left-continuous {
-    0% { transform: "translateX(0%)" },
-    100% { transform: "translateX(-33.333%)" }
+  /* Seamless ticker animation */
+  .ticker-scroll {
+    animation: ticker-scroll 30s linear infinite;
+    will-change: transform;
+  }
+  
+  @keyframes ticker-scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-33.333%);
+    }
   }
 
   .animate-scroll-right {
@@ -124,10 +134,6 @@
 
   .animate-scroll-left {
     animation: scroll-left 30s linear infinite;
-  }
-
-  .animate-scroll-left-continuous {
-    animation: scroll-left-continuous 60s linear infinite;
   }
   
 

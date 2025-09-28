@@ -284,24 +284,6 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Active Filters Summary */}
-        {(selectedTopics.length > 0 || selectedStatus.length > 0) && (
-          <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-xl">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-2 h-2 bg-primary rounded-full"></div>
-              <span className="text-sm font-medium text-primary">Filtros ativos</span>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {selectedTopics.length > 0 && (
-                <span>{selectedTopics.length} tópico{selectedTopics.length > 1 ? 's' : ''}</span>
-              )}
-              {selectedTopics.length > 0 && selectedStatus.length > 0 && <span> • </span>}
-              {selectedStatus.length > 0 && (
-                <span>{selectedStatus.length} status</span>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Markets Grid */}

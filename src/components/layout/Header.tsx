@@ -22,6 +22,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useState } from 'react';
 import { TickerBar } from '@/components/ui/ticker-bar';
 import { WalletHoverCard } from '@/components/wallet/WalletHoverCard';
+import { DarkModeToggle } from './DarkModeToggle';
 import logoImage from '@/assets/rio-markets-logo-white.png';
 
 const Header = () => {
@@ -266,7 +267,7 @@ const Header = () => {
                   </Button>
                 </Link>
                 
-                {/* Deposit Button */}
+                 {/* Deposit Button */}
                 <Button 
                   variant="default" 
                   size="sm"
@@ -276,6 +277,9 @@ const Header = () => {
                   <Plus className="w-4 h-4" />
                   Depositar
                 </Button>
+                
+                 {/* Dark Mode Toggle */}
+                 <DarkModeToggle />
                 
                  {/* Profile Icon */}
                  <Button 
