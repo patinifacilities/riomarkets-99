@@ -62,19 +62,25 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
         })
         .eq('id', market.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error updating odds:', error);
+        throw error;
+      }
 
       // Log admin action
-      await supabase
-        .from('audit_logs')
-        .insert({
-          action: 'odds_adjustment',
-          resource_type: 'market',
-          resource_id: market.id,
-          user_id: (await supabase.auth.getUser()).data.user?.id,
-          new_values: odds,
-          old_values: originalOdds
-        });
+      const { data: user } = await supabase.auth.getUser();
+      if (user?.user?.id) {
+        await supabase
+          .from('audit_logs')
+          .insert({
+            action: 'odds_adjustment',
+            resource_type: 'market',
+            resource_id: market.id,
+            user_id: user.user.id,
+            new_values: odds,
+            old_values: originalOdds
+          });
+      }
 
       setOriginalOdds(odds);
       setHasChanges(false);
@@ -85,14 +91,14 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
         .join(' | ');
       
       toast({
-        title: "Odds atualizadas",
+        title: "Odds atualizadas com sucesso!",
         description: oddsText,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating odds:', error);
       toast({
-        title: "Erro",
-        description: "Falha ao atualizar odds",
+        title: "Erro ao atualizar odds",
+        description: error.message || "Falha ao atualizar odds. Tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -144,7 +150,7 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
                 min={100}
                 max={400}
                 step={1}
-                className="w-full [&_[role=slider]]:bg-gradient-to-r [&_[role=slider]]:from-[#00ff90] [&_[role=slider]]:to-[#ff2389] [&_.slider-track]:bg-gradient-to-r [&_.slider-track]:from-[#00ff90]/20 [&_.slider-track]:to-[#ff2389]/20 [&_[data-orientation='horizontal']]:bg-gradient-to-r [&_[data-orientation='horizontal']]:from-[#00ff90] [&_[data-orientation='horizontal']]:to-[#ff2389]"
+                className="w-full [&_[data-orientation='horizontal']>.slider-track]:bg-gradient-to-r [&_[data-orientation='horizontal']>.slider-track]:from-[#00ff90]/30 [&_[data-orientation='horizontal']>.slider-track]:to-[#ff2389]/30 [&_[data-orientation='horizontal']>.slider-range]:bg-gradient-to-r [&_[data-orientation='horizontal']>.slider-range]:from-[#00ff90] [&_[data-orientation='horizontal']>.slider-range]:to-[#ff2389] [&_[role=slider]]:border-2 [&_[role=slider]]:border-white"
                 disabled={isUpdating}
               />
             </div>
@@ -171,7 +177,7 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
                 min={100}
                 max={400}
                 step={1}
-                className="w-full [&_[data-orientation='horizontal']]:bg-gradient-to-r [&_[data-orientation='horizontal']]:from-[#00ff90] [&_[data-orientation='horizontal']]:to-[#ff2389]"
+                className="w-full [&_[data-orientation='horizontal']>.slider-track]:bg-gradient-to-r [&_[data-orientation='horizontal']>.slider-track]:from-[#00ff90]/30 [&_[data-orientation='horizontal']>.slider-track]:to-[#ff2389]/30 [&_[data-orientation='horizontal']>.slider-range]:bg-gradient-to-r [&_[data-orientation='horizontal']>.slider-range]:from-[#00ff90] [&_[data-orientation='horizontal']>.slider-range]:to-[#ff2389] [&_[role=slider]]:border-2 [&_[role=slider]]:border-white"
                 disabled={isUpdating}
               />
               

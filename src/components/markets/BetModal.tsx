@@ -44,7 +44,7 @@ const BetModal = ({
   const validateBet = (): string | null => {
     if (!userId) return 'Você precisa estar logado para opinar';
     if (betValue < 5) return 'Valor mínimo: 5 Rioz Coin';
-    if (betValue > 10000) return 'Valor máximo: 10.000 Rioz Coin';
+    if (betValue > 10000000) return 'Valor máximo: 10 milhões Rioz Coin';
     if (betValue > userBalance) return 'Saldo insuficiente';
     if (market.status !== 'aberto') return 'Este mercado não está mais aberto';
     return null;
@@ -165,12 +165,32 @@ const BetModal = ({
             <span className="font-semibold">{userBalance} Rioz Coin</span>
           </div>
 
-          {/* Bet Amount Slider */}
-          <BetSlider
-            balance={userBalance}
-            onAmountChange={(amount) => setBetAmount(amount.toString())}
-            estimatedReward={recompensa}
-          />
+          {/* Manual Input and Bet Amount Slider */}
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="bet-amount" className="text-sm font-medium">
+                Valor da opinião (Rioz Coin)
+              </Label>
+              <Input
+                id="bet-amount"
+                type="number"
+                placeholder="Digite o valor..."
+                value={betAmount}
+                onChange={(e) => setBetAmount(e.target.value)}
+                min="5"
+                max="10000000"
+                className="mt-2"
+              />
+            </div>
+            
+            <div className="text-center text-sm text-muted-foreground">ou</div>
+            
+            <BetSlider
+              balance={Math.min(userBalance, 10000000)}
+              onAmountChange={(amount) => setBetAmount(amount.toString())}
+              estimatedReward={recompensa}
+            />
+          </div>
 
           {/* Potential Return */}
           {betValue >= 5 && (

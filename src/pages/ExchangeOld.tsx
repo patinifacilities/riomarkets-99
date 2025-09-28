@@ -112,11 +112,14 @@ const ExchangeOld = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Order Book and Trading Interface */}
-        <div className="space-y-4 order-1 lg:order-1">
-          <OrderBookWidget />
+        <div className="space-y-6 order-1 lg:order-1">
+          {/* Order Book - Larger size */}
+          <div className="min-h-[600px]">
+            <OrderBookWidget />
+          </div>
           
-          {/* Trading Interface */}
-          <Card data-exchange-widget>
+          {/* Trading Interface - Larger size */}
+          <Card data-exchange-widget className="min-h-[500px]">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Negociar</CardTitle>

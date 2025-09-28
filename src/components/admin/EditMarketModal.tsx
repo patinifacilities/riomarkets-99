@@ -57,7 +57,16 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
     setIsLoading(true);
 
     try {
-      const { error } = await supabase
+      console.log('Updating market with data:', {
+        titulo: editMarket.title,
+        descricao: editMarket.description,
+        categoria: editMarket.category,
+        end_date: new Date(editMarket.endDate).toISOString(),
+        destaque: editMarket.destaque,
+        periodicidade: editMarket.periodicidade || null
+      });
+
+      const { data, error } = await supabase
         .from('markets')
         .update({
           titulo: editMarket.title,
@@ -67,22 +76,28 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
           destaque: editMarket.destaque,
           periodicidade: editMarket.periodicidade || null
         })
-        .eq('id', market.id);
+        .eq('id', market.id)
+        .select();
 
-      if (error) throw error;
+      console.log('Update result:', { data, error });
+
+      if (error) {
+        console.error('Supabase update error:', error);
+        throw error;
+      }
 
       toast({
-        title: "Mercado atualizado!",
-        description: `"${editMarket.title}" foi atualizado com sucesso`,
+        title: "Mercado atualizado com sucesso!",
+        description: `"${editMarket.title}" foi atualizado`,
       });
 
       onSuccess();
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating market:', error);
       toast({
-        title: "Erro",
-        description: "Falha ao atualizar mercado. Tente novamente.",
+        title: "Erro ao atualizar mercado",
+        description: error.message || "Falha ao atualizar mercado. Verifique suas permissões.",
         variant: "destructive"
       });
     } finally {
