@@ -19,6 +19,7 @@ import PoolProgressBar from '@/components/markets/PoolProgressBar';
 import ProbabilityChart from '@/components/markets/ProbabilityChart';
 import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorModal';
 import SimpleOrderBook from '@/components/markets/SimpleOrderBook';
+import { BetSlider } from '@/components/markets/BetSlider';
 
 const MarketDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,7 +33,7 @@ const MarketDetail = () => {
   const { data: userProfile } = useProfile(authUser?.id);
   
   const [selectedOption, setSelectedOption] = useState<string>('');
-  const [betAmount, setBetAmount] = useState<string>('');
+  const [betAmount, setBetAmount] = useState<number>(0);
   const [showBetModal, setShowBetModal] = useState(false);
 
   if (isLoading) {
@@ -77,7 +78,7 @@ const MarketDetail = () => {
   const handleBetSuccess = () => {
     refetchMarket();
     setSelectedOption('');
-    setBetAmount('');
+    setBetAmount(0);
   };
 
   const handleSimulateReward = () => {
@@ -284,18 +285,11 @@ const MarketDetail = () => {
                 </h3>
                 
                  <div className="space-y-4">
-                   <div className="space-y-2">
-                     <div className="flex items-center justify-between text-sm">
-                       <span>Saldo disponível:</span>
-                       <span className="font-semibold">{userProfile?.saldo_moeda || 0} RZ</span>
-                     </div>
-                     <div className="w-full bg-muted rounded-full h-2">
-                       <div 
-                         className="bg-primary h-2 rounded-full transition-all duration-300"
-                         style={{ width: `${Math.min(100, ((userProfile?.saldo_moeda || 0) / 10000) * 100)}%` }}
-                       />
-                     </div>
-                   </div>
+                    <BetSlider 
+                      balance={userProfile?.saldo_moeda || 0}
+                      onAmountChange={(amount) => setBetAmount(amount)}
+                      estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
+                    />
                   
                   <div className="grid grid-cols-2 gap-2">
                     <Button 

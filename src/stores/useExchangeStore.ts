@@ -224,6 +224,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
       // Also update the user profile balance in the profile hook
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('balanceUpdated'));
+        window.dispatchEvent(new CustomEvent('exchangeBalanceUpdated'));
       }
       
       set({ exchangeLoading: false });

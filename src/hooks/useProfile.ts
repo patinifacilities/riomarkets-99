@@ -28,8 +28,18 @@ export const useProfile = (userId?: string) => {
       }
     };
 
+    const handleExchangeBalanceUpdate = () => {
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: ['profile', userId] });
+      }
+    };
+
     window.addEventListener('balanceUpdated', handleBalanceUpdate);
-    return () => window.removeEventListener('balanceUpdated', handleBalanceUpdate);
+    window.addEventListener('exchangeBalanceUpdated', handleExchangeBalanceUpdate);
+    return () => {
+      window.removeEventListener('balanceUpdated', handleBalanceUpdate);
+      window.removeEventListener('exchangeBalanceUpdated', handleExchangeBalanceUpdate);
+    };
   }, [userId, queryClient]);
 
   return useQuery({
