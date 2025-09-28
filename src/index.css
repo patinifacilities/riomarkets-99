@@ -113,9 +113,9 @@
     100% { transform: "translateX(-100%)" }
   }
 
-  @keyframes scroll-left-seamless {
+  @keyframes scroll-left-continuous {
     0% { transform: "translateX(0%)" },
-    100% { transform: "translateX(-50%)" }
+    100% { transform: "translateX(-33.333%)" }
   }
 
   .animate-scroll-right {
@@ -126,14 +126,10 @@
     animation: scroll-left 30s linear infinite;
   }
 
-  .animate-scroll-left-seamless {
-    animation: scroll-left-seamless 30s linear infinite;
+  .animate-scroll-left-continuous {
+    animation: scroll-left-continuous 60s linear infinite;
   }
   
-  @keyframes scroll-left-seamless {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
-  }
 
   /* Dark theme adjustments */
   .dark {

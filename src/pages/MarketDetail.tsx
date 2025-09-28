@@ -158,13 +158,17 @@ const MarketDetail = () => {
                      <Users className="w-4 h-4" />
                      {(pool?.total_pool || 0).toLocaleString()} Rioz Coin total
                    </div>
+                   <div className="flex items-center gap-1">
+                     <TrendingUp className="w-4 h-4" />
+                     {Math.max(100, (pool?.total_pool || 0) * 2).toLocaleString()} análises
+                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Pool Progress Bar */}
             <div>
-              <h3 className="text-lg font-semibold mb-4">Distribuição das Análises</h3>
+              <h3 className="text-lg font-semibold mb-4">Odds do Mercado</h3>
               <PoolProgressBar 
                 simPercent={pool?.percent_sim || 0} 
                 naoPercent={pool?.percent_nao || 0}
@@ -279,27 +283,11 @@ const MarketDetail = () => {
                   Sua Carteira
                 </h3>
                 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <span className="text-sm">Saldo disponível:</span>
-                    <span className="font-semibold">{userProfile?.saldo_moeda || 0} RZ</span>
-                  </div>
-                  
-                  <div className="p-3 bg-accent/10 rounded-lg border border-accent/20">
-                    <div className="text-sm text-accent mb-1">Pool atual:</div>
-                    <div className="text-xs space-y-1">
-                      <div className="text-[#00FF91]">SIM: {pool?.pool_sim || 0} Rioz Coin ({pool?.percent_sim || 0}%)</div>
-                      <div className="text-[#FF1493]">NÃO: {pool?.pool_nao || 0} Rioz Coin ({pool?.percent_nao || 0}%)</div>
-                      <div className="text-muted-foreground">Total: {pool?.total_pool || 0} Rioz Coin</div>
-                    </div>
-                  </div>
-
-                  <div className="p-3 bg-danger/10 rounded-lg border border-danger/20">
-                    <div className="text-sm text-danger mb-1">Taxa de liquidação:</div>
-                    <div className="text-xs text-muted-foreground">
-                      20% do pool perdedor vai para a plataforma
-                    </div>
-                  </div>
+                 <div className="space-y-4">
+                   <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                     <span className="text-sm">Saldo disponível:</span>
+                     <span className="font-semibold">{userProfile?.saldo_moeda || 0} RZ</span>
+                   </div>
                   
                   <div className="grid grid-cols-2 gap-2">
                     <Button 

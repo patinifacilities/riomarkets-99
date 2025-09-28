@@ -182,17 +182,17 @@ const WalletPage = () => {
             <div className="grid grid-cols-2 gap-4">
               <Button 
                 className="bg-[#00FF91] hover:bg-[#00FF91]/90 text-black"
-                onClick={() => window.location.href = '/#markets-section'}
+                onClick={() => window.location.href = '/'}
               >
                 <TrendingUp className="w-4 h-4 mr-2" />
-                Dar Opinião SIM/NÃO
+                Dar Opinião SIM
               </Button>
               <Button 
                 className="bg-[#FF1493] hover:bg-[#FF1493]/90 text-white"
-                onClick={() => window.location.href = '/#markets-section'}
+                onClick={() => window.location.href = '/'}
               >
                 <TrendingDown className="w-4 h-4 mr-2" />
-                Dar Opinião SIM/NÃO
+                Dar Opinião NÃO
               </Button>
             </div>
           </CardContent>

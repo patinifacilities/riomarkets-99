@@ -1,28 +1,39 @@
-import { Clock, Users, TrendingUp, Calculator } from 'lucide-react';
-import { Market } from '@/types';
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Calendar, TrendingUp, TrendingDown, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useMarketPool } from '@/hooks/useMarketPoolsNew';
-import { useRewardCalculator } from '@/store/useRewardCalculator';
-import PoolProgressBar from './PoolProgressBar';
-import { formatVolume, formatTimeLeft } from '@/lib/format';
-import { getPlaceholderThumbnail } from '@/lib/market-utils';
+import { Market } from '@/types';
 
 interface MarketCardProps {
   market: Market;
 }
 
 const MarketCard = ({ market }: MarketCardProps) => {
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const { data: pool } = useMarketPool(market.id);
-  const { openCalculator } = useRewardCalculator();
+
+  const isHovered = hoveredCard === market.id;
   
-  const getDaysUntilEnd = (endDate: Date) => {
+  const getDaysUntilEnd = (endDate: string): number => {
     const now = new Date();
-    const diffTime = endDate.getTime() - now.getTime();
+    const end = new Date(endDate);
+    const diffTime = end.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
+  };
+
+  const daysLeft = getDaysUntilEnd(market.end_date);
+  
+  const getStatusColor = (status: string) => {
+    const colors = {
+      'aberto': 'bg-success-muted text-success',
+      'fechado': 'bg-muted text-muted-foreground',
+      'liquidado': 'bg-accent-muted text-accent'
+    };
+    return colors[status as keyof typeof colors] || 'bg-muted text-muted-foreground';
   };
 
   const getCategoryColor = (category: string) => {
@@ -30,179 +41,212 @@ const MarketCard = ({ market }: MarketCardProps) => {
       'economia': 'bg-success-muted text-success',
       'esportes': 'bg-accent-muted text-accent',
       'política': 'bg-danger-muted text-danger',
-      'clima': 'bg-primary-glow/20 text-primary',
-      'tecnologia': 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300',
-      'entretenimento': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300'
+      'clima': 'bg-primary-glow/20 text-primary'
     };
     return colors[category as keyof typeof colors] || 'bg-muted text-muted-foreground';
   };
 
-  const daysLeft = getDaysUntilEnd(new Date(market.end_date));
-  // Get odds from database (odds field has priority, fallback to recompensas)
-  const yesRecompensa = market.odds?.['sim'] || market.recompensas?.['sim'] || 1.5;
-  const noRecompensa = market.odds?.['nao'] || market.odds?.['não'] || market.recompensas?.['nao'] || market.recompensas?.['não'] || 1.5;
-
-  const handleSimulateReward = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    
-    // Calculate market probability from pool percentages
-    const pMkt = pool?.percent_sim ? pool.percent_sim / 100 : null;
-    
-    openCalculator({
-      marketId: market.id,
-      suggestedValue: 100, // Default suggested value
-      pMkt: pMkt,
-    });
+  const handleBetClick = (option: string) => {
+    // This will be handled by the link to the detail page
+    console.log('Bet on:', option);
   };
 
+  // Calculate percentages and rewards
+  const yesRecompensa = market.odds?.sim || market.recompensas?.sim || 1.5;
+  const noRecompensa = market.odds?.não || market.odds?.nao || market.recompensas?.não || market.recompensas?.nao || 1.5;
+
   return (
-    <Card className="group hover:shadow-md transition-all duration-200 bg-card border border-border/50 hover:border-border rounded-lg overflow-hidden">
-      <CardContent className="p-0">
-        {/* Market Header */}
-        <div className="p-4 border-b border-border/30">
-            <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                 {market.thumbnail_url ? (
-                   <img 
-                     src={market.thumbnail_url} 
-                     alt={market.categoria}
-                     className="w-6 h-6 rounded-full object-cover object-center"
-                     style={{ objectPosition: 'center', transform: 'scale(1.2)' }}
-                   />
-                 ) : (
-                  <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center">
-                    <div className="w-3 h-3 bg-primary rounded-full"></div>
-                  </div>
-                )}
-                <Badge variant="secondary" className="text-xs px-2 py-1 bg-muted/50">
-                  {market.categoria}
-                </Badge>
-              </div>
-              <h3 className="font-medium text-sm leading-tight text-foreground mb-1">
-                {market.titulo}
-              </h3>
-              <div className="text-xs text-muted-foreground">
-                Termina {daysLeft > 0 ? `em ${daysLeft} dias` : 'hoje'}
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-xs text-muted-foreground">Volume</div>
-              <div className="font-semibold text-sm text-foreground">
-                {formatVolume(pool?.total_pool || 0)}
-              </div>
+    <Card className={`market-card transition-all duration-300 hover:shadow-lg border-border/50 ${
+      isHovered ? 'ring-2 ring-[#ff2389]/50 shadow-[#ff2389]/20' : ''
+    }`}>
+      <CardContent className="p-4 space-y-4">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="space-y-2 flex-1">
+            <Badge className={getCategoryColor(market.categoria)}>
+              {market.categoria}
+            </Badge>
+            <Badge className={getStatusColor(market.status)}>
+              {market.status}
+            </Badge>
+          </div>
+          <div className="text-right text-xs text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <Calendar className="w-3 h-3" />
+              {daysLeft > 0 ? `${daysLeft}d` : 'Encerrando'}
             </div>
           </div>
         </div>
 
-        {/* Options */}
-        <div className="p-4 space-y-3">
-          {market.opcoes && market.opcoes.length > 2 ? (
-            // Multiple options - show list
-            market.opcoes.map((opcao: string, index: number) => {
-              const opcaoRecompensa = market.odds?.[opcao] || market.recompensas?.[opcao] || 1.5;
-              const opcaoPercent = opcao === 'sim' ? pool?.percent_sim : pool?.percent_nao;
-              
-              return (
-                <Link 
-                  key={opcao}
-                  to={`/market/${market.id}`}
-                  className="block"
-                >
-                  <div className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50">
-                    <div className="flex items-center gap-3">
-                      <div className="text-sm font-medium text-foreground">
-                        {opcao.toUpperCase()}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-semibold text-foreground mb-1">
-                        {opcaoRecompensa ? `${opcaoRecompensa.toFixed(2)}x` : '--'}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {opcaoPercent ? `${opcaoPercent.toFixed(0)}%` : '--'}
-                      </div>
+        {/* Title */}
+        <Link to={`/market/${market.id}`} className="block">
+          <h3 className="text-sm font-semibold leading-tight hover:text-primary transition-colors line-clamp-2 min-h-[2.5rem]">
+            {market.titulo}
+          </h3>
+        </Link>
+
+        {/* Pool Info */}
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <div className="flex items-center gap-1">
+            <TrendingUp className="w-3 h-3" />
+            {pool?.total_pool || 0} RIOZ total
+          </div>
+          <div className="flex items-center gap-1">
+            <Eye className="w-3 h-3" />
+            {Math.max(100, (pool?.total_pool || 0) * 2)} análises
+          </div>
+        </div>
+
+        {/* Multiple options or binary display */}
+        {market.opcoes.length > 2 ? (
+          // Multiple options - show first 3
+          market.opcoes.slice(0, 3).map((opcao: string, index: number) => {
+            const opcaoRecompensa = market.odds?.[opcao] || market.recompensas?.[opcao] || 1.5;
+            const opcaoPercent = pool?.percent_sim || 0; // This would need to be calculated per option
+            
+            return (
+              <Link 
+                key={opcao}
+                to={`/market/${market.id}`}
+                className="block"
+              >
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50">
+                  <div className="flex items-center gap-3">
+                    <div className="text-sm font-medium text-foreground">
+                      {opcao.toUpperCase()}
                     </div>
                   </div>
-                </Link>
-              );
-            })
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-foreground mb-1">
+                      {opcaoRecompensa ? `${opcaoRecompensa.toFixed(2)}x` : '--'}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {opcaoPercent ? `${opcaoPercent.toFixed(0)}%` : '--'}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })
+        ) : (
+          // Binary options - show SIM/NÃO
+          <>
+            <Link 
+              to={`/market/${market.id}`}
+              className="block"
+            >
+              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50">
+                <div className="flex items-center gap-3">
+                  <div className="text-sm font-medium text-foreground">
+                    SIM
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-semibold text-foreground mb-1">
+                    {yesRecompensa ? `${yesRecompensa.toFixed(2)}x` : '--'}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {pool?.percent_sim ? `${pool.percent_sim.toFixed(0)}%` : '--'}
+                  </div>
+                </div>
+              </div>
+            </Link>
+
+            <Link 
+              to={`/market/${market.id}`}
+              className="block"
+            >
+              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50">
+                <div className="flex items-center gap-3">
+                  <div className="text-sm font-medium text-foreground">
+                    NÃO
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-semibold text-foreground mb-1">
+                    {noRecompensa ? `${noRecompensa.toFixed(2)}x` : '--'}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {pool?.percent_nao ? `${pool.percent_nao.toFixed(0)}%` : '--'}
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </>
+        )}
+
+        {/* Action buttons */}
+        <div className="grid grid-cols-2 gap-2">
+          {market.opcoes.length > 2 ? (
+            <div className="col-span-2 space-y-2">
+              {market.opcoes.slice(0, 3).map((opcao: string) => {
+                const odds = market.odds?.[opcao] || 1.5;
+                return (
+                  <Button
+                    key={opcao}
+                    size="sm"
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2 px-3 rounded-lg"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleBetClick(opcao);
+                    }}
+                  >
+                    {opcao.toUpperCase()} {odds.toFixed(2)}x
+                  </Button>
+                );
+              })}
+              {market.opcoes.length > 3 && (
+                <div className="text-xs text-muted-foreground text-center">
+                  +{market.opcoes.length - 3} mais opções
+                </div>
+              )}
+            </div>
           ) : (
-            // Binary options - show SIM/NÃO
             <>
-              <Link 
-                to={`/market/${market.id}`}
-                className="block"
+              <Button
+                size="sm"
+                className="bg-[#00FF91] hover:bg-[#00FF91]/90 text-black font-medium py-2 px-3 rounded-lg"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleBetClick('sim');
+                }}
               >
-                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50">
-                  <div className="flex items-center gap-3">
-                    <div className="text-sm font-medium text-foreground">
-                      SIM
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-foreground mb-1">
-                      {yesRecompensa ? `${yesRecompensa.toFixed(2)}x` : '--'}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {pool?.percent_sim ? `${pool.percent_sim.toFixed(0)}%` : '--'}
-                    </div>
-                  </div>
-                </div>
-              </Link>
-              
-              <Link 
-                to={`/market/${market.id}`}
-                className="block"
+                SIM {(market.odds?.sim || 1.5).toFixed(2)}x
+              </Button>
+              <Button
+                size="sm"
+                className="bg-[#FF1493] hover:bg-[#FF1493]/90 text-white font-medium py-2 px-3 rounded-lg hover:shadow-[0_0_20px_rgba(255,20,147,0.4)]"
+                onMouseEnter={() => setHoveredCard(market.id)}
+                onMouseLeave={() => setHoveredCard(null)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleBetClick('não');
+                }}
               >
-                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50">
-                  <div className="flex items-center gap-3">
-                    <div className="text-sm font-medium text-foreground">
-                      NÃO
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-foreground mb-1">
-                      {noRecompensa ? `${noRecompensa.toFixed(2)}x` : '--'}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {pool?.percent_nao ? `${pool.percent_nao.toFixed(0)}%` : '--'}
-                    </div>
-                  </div>
-                </div>
-              </Link>
+                NÃO {(market.odds?.não || market.odds?.nao || 1.5).toFixed(2)}x
+              </Button>
             </>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="px-4 pb-4">
-          <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border/30">
-            <div className="flex items-center gap-1">
-              <Users className="w-3 h-3" />
-              <span>{formatVolume(pool?.total_pool || 0)} participantes</span>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSimulateReward}
-                className="gap-1 h-7 px-2 text-xs border-primary/40 text-primary hover:bg-primary/10"
+        {/* Multiple options indicator */}
+        {market.opcoes.length > 3 && (
+          <div className="pt-2">
+            <Link to={`/market/${market.id}`}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full text-xs"
               >
-                <Calculator className="w-3 h-3" />
-                Simular
+                <TrendingUp className="w-3 h-3 mr-1" />
+                Ver todas as {market.opcoes.length} opções
               </Button>
-              
-              <Link to={`/market/${market.id}`}>
-                <Button size="sm" className="gap-1 h-7 px-2 text-xs">
-                  <TrendingUp className="w-3 h-3" />
-                  Opinar
-                </Button>
-              </Link>
-            </div>
+            </Link>
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );

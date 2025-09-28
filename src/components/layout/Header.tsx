@@ -277,15 +277,15 @@ const Header = () => {
                   Depositar
                 </Button>
                 
-                {/* Profile Icon */}
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => navigate('/profile')}
-                  className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-full p-2"
-                >
-                  <UserCircle className="w-6 h-6" />
-                </Button>
+                 {/* Profile Icon */}
+                 <Button 
+                   variant="ghost" 
+                   size="sm"
+                   onClick={() => navigate('/profile')}
+                   className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-full p-2"
+                 >
+                   <UserCircle className="w-6 h-6" />
+                 </Button>
               </>
             ) : !loading ? (
               <Link to="/auth">
