@@ -1,50 +1,59 @@
-import { useEffect } from 'react';
-import { useExchangeStore } from '@/stores/useExchangeStore';
+import { useAuth } from '@/hooks/useAuth';
+import { useBalance } from '@/hooks/useBalance';
 import { ExchangeWidget } from '@/components/exchange/ExchangeWidget';
 import { BalancesCard } from '@/components/exchange/BalancesCard';
+import { TopMarketsCard } from '@/components/exchange/TopMarketsCard';
+import { RatesTicker } from '@/components/exchange/RatesTicker';
 import { ExchangeHistory } from '@/components/exchange/ExchangeHistory';
+import { toast } from "sonner";
 
-const Exchange = () => {
-  const { fetchRate, fetchBalance, subscribeToRateUpdates } = useExchangeStore();
+export default function Exchange() {
+  const { user } = useAuth();
+  const { riozBalance, brlBalance, refetch: refetchBalance } = useBalance();
 
-  useEffect(() => {
-    // Initialize data
-    fetchRate();
-    fetchBalance();
-
-    // Subscribe to real-time rate updates
-    const unsubscribe = subscribeToRateUpdates();
-
-    return () => {
-      unsubscribe();
-    };
-  }, [fetchRate, fetchBalance, subscribeToRateUpdates]);
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Acesso Restrito</h1>
+          <p className="text-muted-foreground">Você precisa estar logado para acessar o exchange.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-4 space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">Exchange RIOZ</h1>
-          <p className="text-muted-foreground">
-            Conversão simples 1:1 - 1 BRL = 1 RIOZ
-          </p>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Left Column - Exchange Widget */}
-          <div className="lg:col-span-1 space-y-6">
-            <ExchangeWidget />
-            <BalancesCard />
+      <div className="container mx-auto px-4 py-8">
+        <div className="space-y-8">
+          {/* Header */}
+          <div className="text-center space-y-4">
+            <h1 className="text-3xl font-bold">Exchange Rio Markets</h1>
+            <p className="text-muted-foreground">
+              Converta suas moedas com segurança e transparência
+            </p>
           </div>
 
-          {/* Right Column - History */}
-          <div className="lg:col-span-2">
-            <ExchangeHistory />
+          {/* Rates Ticker */}
+          <RatesTicker />
+
+          {/* Main Exchange Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <ExchangeWidget />
+            </div>
+
+            {/* Right Column - Balances and Top Markets */}
+            <div className="space-y-6">
+              <BalancesCard />
+              <TopMarketsCard />
+            </div>
           </div>
+
+          {/* Exchange History */}
+          <ExchangeHistory />
         </div>
       </div>
     </div>
   );
-};
-
-export default Exchange;
+}

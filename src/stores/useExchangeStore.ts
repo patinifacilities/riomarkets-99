@@ -87,7 +87,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
     set({ rateLoading: true, rateError: null });
     
     try {
-      // Set fixed rate for RIOZ conversion at 1:1
+      // Set fixed rate for RIOZ as stable coin at R$1
       const stableRate = {
         price: 1.0,
         change24h: 0,
@@ -204,6 +204,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
     set({ exchangeLoading: true, exchangeError: null });
     
     try {
+      // ONLY use the edge function - never update tables directly
       const { data, error } = await supabase.functions.invoke('exchange-convert', {
         body: {
           side,
@@ -216,7 +217,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         throw new Error(error.message || 'Exchange failed');
       }
       
-      // Update local state with new balances
+      // Update local state with the response from edge function
       set({ 
         balance: {
           rioz_balance: data.newBalances.rioz_balance,
@@ -226,8 +227,13 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         exchangeLoading: false
       });
       
-      // Refresh the balance to ensure sync
-      get().fetchBalance();
+      // Refresh balance to ensure sync
+      await get().fetchBalance();
+      
+      // Dispatch events for UI updates
+      window.dispatchEvent(new CustomEvent('balanceUpdated', { 
+        detail: data.newBalances 
+      }));
       
       return data;
     } catch (error) {

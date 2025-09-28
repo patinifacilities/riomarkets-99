@@ -4,8 +4,9 @@ import { RateLimiter, RATE_LIMITS } from '../_shared/rateLimit.ts';
 
 const corsHeaders = createCorsHeaders();
 
-// Simple 1:1 conversion rate - no fees, no complex logic
-const CONVERSION_RATE = 1.0; // 1 BRL = 1 RIOZ
+const FEE_RATE = 0.01; // 1%
+const MIN_BRL = 5.00;
+const MAX_BRL = 1000000.00; // 1 milhão máximo
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -98,30 +99,64 @@ Deno.serve(async (req) => {
     // Start atomic transaction
     const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
 
-    // Simple 1:1 conversion logic
-    let amountRioz: number, amountBrl: number;
+    // Fixed 1:1 rate for RIOZ/BRL
+    const price = 1.0;
+    let amountRioz: number, amountBrl: number, feeRioz: number, feeBrl: number;
 
+    // Calculate amounts based on conversion side with 1% fee
     if (side === 'buy_rioz') {
-      // Buying RIOZ with BRL - 1:1 conversion
-      amountBrl = amount;
-      amountRioz = amount * CONVERSION_RATE; // 1 BRL = 1 RIOZ
-    } else {
-      // Selling RIOZ for BRL - 1:1 conversion  
-      amountRioz = amount;
-      amountBrl = amount * CONVERSION_RATE; // 1 RIOZ = 1 BRL
+      // Comprando RIOZ com BRL
+      if (inputCurrency === 'BRL') {
+        amountBrl = amount;
+        feeBrl = amountBrl * FEE_RATE; // Taxa sobre o BRL
+        const netBrl = amountBrl - feeBrl; // BRL líquido após taxa
+        amountRioz = netBrl / price; // RIOZ que o usuário recebe
+        feeRioz = 0;
+      } else {
+        // Input é RIOZ desejado
+        amountRioz = amount;
+        amountBrl = amountRioz * price;
+        feeBrl = amountBrl * FEE_RATE;
+        feeRioz = 0;
+      }
+    } else { // sell_rioz
+      // Vendendo RIOZ por BRL
+      if (inputCurrency === 'RIOZ') {
+        amountRioz = amount;
+        feeRioz = amountRioz * FEE_RATE; // Taxa sobre o RIOZ
+        const netRioz = amountRioz - feeRioz; // RIOZ líquido após taxa
+        amountBrl = netRioz * price; // BRL que o usuário recebe
+        feeBrl = 0;
+      } else {
+        // Input é BRL desejado
+        amountBrl = amount;
+        amountRioz = amountBrl / price;
+        feeRioz = amountRioz * FEE_RATE;
+        feeBrl = 0;
+      }
     }
 
-    // Get user balance - only from balances table
-    let { data: balanceData, error: balanceError } = await supabaseAdmin
+    // Validate limits for BRL operations
+    const brlAmount = side === 'buy_rioz' ? amountBrl : amountBrl + feeBrl;
+    if (brlAmount < MIN_BRL || brlAmount > MAX_BRL) {
+      statusCode = 400;
+      throw new Error(`Amount must be between R$ ${MIN_BRL.toFixed(2)} and R$ ${MAX_BRL.toFixed(2)}`);
+    }
+
+    // Get user balance from balances table only
+    const { data: balanceData, error: balanceError } = await supabaseAdmin
       .from('balances')
       .select('rioz_balance, brl_balance')
       .eq('user_id', user.id)
       .single();
 
+    let currentRiozBalance = 0;
+    let currentBrlBalance = 0;
+
     if (balanceError) {
-      // Create balance if it doesn't exist
+      // If balance doesn't exist, create it
       if (balanceError.code === 'PGRST116') {
-        const { data: newBalance } = await supabaseAdmin
+        const { data: newBalance, error: createError } = await supabaseAdmin
           .from('balances')
           .insert({
             user_id: user.id,
@@ -130,47 +165,66 @@ Deno.serve(async (req) => {
           })
           .select()
           .single();
-        
-        balanceData = newBalance;
+          
+        if (createError) {
+          statusCode = 500;
+          throw new Error('Failed to create balance');
+        }
       } else {
         statusCode = 500;
         throw new Error('Failed to get user balance');
       }
+    } else {
+      currentRiozBalance = parseFloat(balanceData?.rioz_balance || '0');
+      currentBrlBalance = parseFloat(balanceData?.brl_balance || '0');
     }
-
-    if (!balanceData) {
-      statusCode = 500;
-      throw new Error('Failed to get user balance');
-    }
-
-    const currentRiozBalance = parseFloat(String(balanceData.rioz_balance || 0));
-    const currentBrlBalance = parseFloat(String(balanceData.brl_balance || 0));
     
     // Check sufficient balance
-    if (side === 'buy_rioz' && currentBrlBalance < amountBrl) {
+    if (side === 'buy_rioz' && currentBrlBalance < (amountBrl + feeBrl)) {
       statusCode = 400;
-      throw new Error('Saldo BRL insuficiente');
+      throw new Error('Insufficient BRL balance');
     }
 
-    if (side === 'sell_rioz' && currentRiozBalance < amountRioz) {
+    if (side === 'sell_rioz' && currentRiozBalance < (amountRioz + feeRioz)) {
       statusCode = 400;
-      throw new Error('Saldo RIOZ insuficiente');
+      throw new Error('Insufficient Rioz balance');
     }
 
-    // Calculate new balances
+    // Create exchange order
+    const { data: orderData, error: orderError } = await supabaseAdmin
+      .from('exchange_orders')
+      .insert({
+        user_id: user.id,
+        side,
+        price_brl_per_rioz: price,
+        amount_rioz: amountRioz,
+        amount_brl: amountBrl,
+        fee_rioz: feeRioz,
+        fee_brl: feeBrl,
+        status: 'filled'
+      })
+      .select()
+      .single();
+
+    if (orderError) {
+      console.error('Error creating order:', orderError);
+      statusCode = 500;
+      throw new Error('Failed to create order');
+    }
+
+    // Update balances - ONLY balances table
     let newRiozBalance: number, newBrlBalance: number;
     
     if (side === 'buy_rioz') {
-      // Buy RIOZ: subtract BRL, add RIOZ
-      newBrlBalance = currentBrlBalance - amountBrl;
+      // Compra: Gasta BRL (+ taxa), Ganha RIOZ
+      newBrlBalance = currentBrlBalance - amountBrl - feeBrl;
       newRiozBalance = currentRiozBalance + amountRioz;
     } else {
-      // Sell RIOZ: subtract RIOZ, add BRL
-      newRiozBalance = currentRiozBalance - amountRioz;
+      // Venda: Gasta RIOZ (+ taxa), Ganha BRL
+      newRiozBalance = currentRiozBalance - amountRioz - feeRioz;
       newBrlBalance = currentBrlBalance + amountBrl;
     }
 
-    // Update only the balances table
     const { error: updateError } = await supabaseAdmin
       .from('balances')
       .upsert({
@@ -186,41 +240,62 @@ Deno.serve(async (req) => {
       throw new Error('Failed to update balance');
     }
 
-    // Create exchange order record
-    const { data: orderData, error: orderError } = await supabaseAdmin
-      .from('exchange_orders')
-      .insert({
-        user_id: user.id,
-        side,
-        price_brl_per_rioz: CONVERSION_RATE,
-        amount_rioz: amountRioz,
-        amount_brl: amountBrl,
-        fee_rioz: 0,
-        fee_brl: 0,
-        status: 'filled'
-      })
-      .select()
-      .single();
-
-    if (orderError) {
-      console.error('Error creating order:', orderError);
-    }
-
     console.log(`Exchange completed: ${side} for user ${user.id}`, {
       amountRioz,
       amountBrl,
+      feeRioz,
+      feeBrl,
+      price,
       newRiozBalance,
       newBrlBalance
+    });
+
+    // Log audit event
+    await logger.logAudit({
+      action: 'exchange_completed',
+      resourceType: 'exchange_order',
+      resourceId: orderData.id,
+      newValues: {
+        side,
+        amountRioz,
+        amountBrl,
+        feeRioz,
+        feeBrl,
+        price
+      },
+      severity: 'info'
+    });
+
+    // Log telemetry event for successful conversion
+    await supabaseAdmin.rpc('log_exchange_event', {
+      p_user_id: user.id,
+      p_event_type: 'exchange_conversion_completed',
+      p_event_data: {
+        orderId: orderData.id,
+        side, 
+        amountRioz, 
+        amountBrl, 
+        feeRioz, 
+        feeBrl,
+        price,
+        newRiozBalance,
+        newBrlBalance,
+        correlationId: context.correlationId
+      },
+      p_correlation_id: context.correlationId
     });
 
     await logger.logRequest(statusCode);
 
     return new Response(
       JSON.stringify({
-        orderId: orderData?.id || 'no-order',
-        status: 'success',
+        orderId: orderData.id,
+        status: 'filled',
+        appliedPrice: price,
         amountRioz: amountRioz,
         amountBrl: amountBrl,
+        feeRioz: feeRioz,
+        feeBrl: feeBrl,
         newBalances: {
           rioz_balance: newRiozBalance,
           brl_balance: newBrlBalance
@@ -236,8 +311,24 @@ Deno.serve(async (req) => {
     error = err as Error;
     console.error('Unexpected error in exchange-convert:', error);
     
-    // Simple error logging
-    console.error('Exchange failed:', error.message);
+    // Log telemetry event for failed conversion (if we have user context)
+    if (context.userId) {
+      try {
+        const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
+        await supabaseAdmin.rpc('log_exchange_event', {
+          p_user_id: context.userId,
+          p_event_type: 'exchange_conversion_failed',
+          p_event_data: {
+            error: error.message,
+            statusCode,
+            correlationId: context.correlationId
+          },
+          p_correlation_id: context.correlationId
+        });
+      } catch (telemetryError) {
+        console.error('Failed to log telemetry event:', telemetryError);
+      }
+    }
   }
 
   await logger.logRequest(statusCode, error);
