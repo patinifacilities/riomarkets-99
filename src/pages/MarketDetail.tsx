@@ -344,6 +344,7 @@ const MarketDetail = () => {
                   
                   {selectedOption && betAmount && betAmount > 0 && (
                     <SliderConfirm
+                      disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
                       onConfirm={async () => {
                         if (!authUser?.id) {
                           toast({
@@ -405,7 +406,6 @@ const MarketDetail = () => {
                           });
                         }
                       }}
-                      disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
                       text="Deslize para confirmar opinião"
                       className="mt-4 w-full"
                     />

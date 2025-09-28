@@ -46,9 +46,13 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    if (!user) {
-      navigate('/auth');
-      return;
+    // Only redirect if we're sure the user is not logged in and not still loading
+    if (!user && !profile) {
+      // Use setTimeout to avoid redirect during initial load
+      const timer = setTimeout(() => {
+        navigate('/auth');
+      }, 100);
+      return () => clearTimeout(timer);
     }
     
     if (profile) {

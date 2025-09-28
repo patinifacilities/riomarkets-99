@@ -224,6 +224,21 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         throw new Error(data?.[0]?.message || 'Transaction failed');
       }
       
+      // Update the profile's saldo_moeda to match the new balances
+      if (side === 'buy_rioz') {
+        // When buying RIOZ, update the profile's saldo_moeda with the new RIOZ amount
+        await supabase
+          .from('profiles')
+          .update({ saldo_moeda: data[0].new_rioz_balance || 0 })
+          .eq('id', user.id);
+      } else {
+        // When selling RIOZ, update the profile's saldo_moeda with the new RIOZ amount
+        await supabase
+          .from('profiles')
+          .update({ saldo_moeda: data[0].new_rioz_balance || 0 })
+          .eq('id', user.id);
+      }
+      
       // Refresh balance and history after successful exchange
       const store = get();
       await Promise.all([
@@ -236,19 +251,14 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         window.dispatchEvent(new CustomEvent('balanceUpdated'));
         window.dispatchEvent(new CustomEvent('exchangeBalanceUpdated'));
         window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
-        // Force profile refresh to show updated RIOZ balance
+        
+        // Force multiple profile refresh events to ensure RIOZ balance updates
         setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('balanceUpdated'));
           window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
         }, 100);
         setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('balanceUpdated'));
           window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
         }, 500);
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('balanceUpdated'));
-          window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
-        }, 1000);
       }
       
       set({ exchangeLoading: false });

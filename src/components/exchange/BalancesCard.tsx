@@ -83,7 +83,7 @@ export const BalancesCard = () => {
                 </span>
               </div>
               <div className="text-lg font-bold tabular-nums">
-                {(profile?.saldo_moeda || 0).toLocaleString('pt-BR')} RZ
+                {(balance?.rioz_balance || profile?.saldo_moeda || 0).toLocaleString('pt-BR')} RZ
               </div>
             </div>
 
