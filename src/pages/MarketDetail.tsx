@@ -22,6 +22,7 @@ import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorM
 import SimpleOrderBook from '@/components/markets/SimpleOrderBook';
 import { BetSlider } from '@/components/markets/BetSlider';
 import { SliderConfirm } from '@/components/ui/slider-confirm';
+import { OpenOpinionsCard } from '@/components/markets/OpenOpinionsCard';
 
 const MarketDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -274,6 +275,14 @@ const MarketDetail = () => {
               naoPercent={pool?.percent_nao || 0}
               simOdds={market.odds?.sim || 1.5}
               naoOdds={market.odds?.não || market.odds?.nao || 1.5}
+            />
+
+            {/* Open Opinions Card */}
+            <OpenOpinionsCard 
+              marketId={market.id}
+              onOrderCancelled={() => {
+                refetchMarket();
+              }}
             />
           </div>
 

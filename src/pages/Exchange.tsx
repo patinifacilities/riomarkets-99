@@ -232,7 +232,7 @@ const Exchange = () => {
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4">Exchange RIOZ/BRL</h1>
@@ -268,190 +268,210 @@ const Exchange = () => {
         </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Recent Trades Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-success" />
+                Trocas Recentes
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 max-h-40 overflow-hidden">
+                {Array.from({ length: 8 }, (_, i) => {
+                  const amount = Math.floor(Math.random() * 995000) + 5;
+                  const isBuy = Math.random() > 0.5;
+                  return (
+                    <div key={i} className="flex justify-between items-center text-xs py-1 animate-slide-up" style={{ animationDelay: `${i * 100}ms` }}>
+                      <span className={isBuy ? 'text-success' : 'text-destructive'}>
+                        {isBuy ? 'COMPRA' : 'VENDA'}
+                      </span>
+                      <span className="font-medium">R$ {amount.toLocaleString('pt-BR')}</span>
+                      <span className="text-muted-foreground">agora</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Interface de Troca */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowRightLeft className="h-5 w-5" />
-                  Trade
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Tabs value={activeTab} onValueChange={(value: any) => setActiveTab(value)}>
-                  <TabsList className="grid w-full grid-cols-2 mb-6">
-                    <TabsTrigger value="buy" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ArrowRightLeft className="h-5 w-5" />
+                Trade
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs value={activeTab} onValueChange={(value: any) => setActiveTab(value)}>
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="buy" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    Comprar RIOZ
+                  </TabsTrigger>
+                  <TabsTrigger value="sell" className="data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground">
+                    Vender RIOZ
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="buy" className="space-y-4">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Valor a converter (máximo: R$ {brlBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })})</Label>
+                      <Input
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="0"
+                        max={brlBalance}
+                        step="1"
+                        min="0"
+                      />
+                    </div>
+
+                    {/* Slider Percentage */}
+                    <div className="space-y-3">
+                      <Label>Selecionar percentual do saldo</Label>
+                      <Slider
+                        value={sliderPercent}
+                        onValueChange={handleSliderChange}
+                        max={100}
+                        step={1}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between gap-2 text-sm text-muted-foreground">
+                        {[0, 25, 50, 75, 100].map((percent) => (
+                          <span
+                            key={percent}
+                            className="cursor-pointer hover:text-foreground transition-colors"
+                            onClick={() => setPercentage(percent)}
+                          >
+                            {percent}%
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Calculation Display */}
+                    <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Valor:</span>
+                        <span className="font-medium">R$ {(parseFloat(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Taxa (1%):</span>
+                        <span className="font-medium text-destructive">- R$ {((parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="flex justify-between text-sm border-t pt-2">
+                        <span>Você recebe:</span>
+                        <span className="font-medium text-primary">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      onClick={handleExchange}
+                      disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > brlBalance}
+                      className="w-full"
+                    >
+                      {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <ArrowRightLeft className="h-4 w-4 mr-2" />
+                      )}
                       Comprar RIOZ
-                    </TabsTrigger>
-                    <TabsTrigger value="sell" className="data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground">
+                    </Button>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="sell" className="space-y-4">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Quantidade RIOZ a vender (máximo: {riozBalance.toLocaleString('pt-BR')} RZ)</Label>
+                      <Input
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="0"
+                        max={riozBalance}
+                        step="1"
+                        min="0"
+                      />
+                    </div>
+
+                    {/* Slider Percentage */}
+                    <div className="space-y-3">
+                      <Label>Selecionar percentual do saldo</Label>
+                      <Slider
+                        value={sliderPercent}
+                        onValueChange={handleSliderChange}
+                        max={100}
+                        step={1}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between gap-2 text-sm text-muted-foreground">
+                        {[0, 25, 50, 75, 100].map((percent) => (
+                          <span
+                            key={percent}
+                            className="cursor-pointer hover:text-foreground transition-colors"
+                            onClick={() => setPercentage(percent)}
+                          >
+                            {percent}%
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Calculation Display */}
+                    <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Você vende:</span>
+                        <span className="font-medium">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Taxa (1%):</span>
+                        <span className="font-medium text-destructive">- R$ {((parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="flex justify-between text-sm border-t pt-2">
+                        <span>Você recebe:</span>
+                        <span className="font-medium text-primary">R$ {((parseFloat(amount) || 0) - (parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      onClick={handleExchange}
+                      disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > riozBalance}
+                      variant="destructive"
+                      className="w-full"
+                    >
+                      {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <ArrowRightLeft className="h-4 w-4 mr-2" />
+                      )}
                       Vender RIOZ
-                    </TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="buy" className="space-y-4">
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label>Valor a converter (máximo: R$ {brlBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })})</Label>
-                        <Input
-                          type="number"
-                          value={amount}
-                          onChange={(e) => setAmount(e.target.value)}
-                          placeholder="0"
-                          max={brlBalance}
-                          step="1"
-                          min="0"
-                        />
-                      </div>
+                    </Button>
+                  </div>
+                </TabsContent>
+              </Tabs>
 
-                      {/* Slider Percentage */}
-                      <div className="space-y-3">
-                        <Label>Selecionar percentual do saldo</Label>
-                        <Slider
-                          value={sliderPercent}
-                          onValueChange={handleSliderChange}
-                          max={100}
-                          step={1}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between gap-2">
-                          {[0, 25, 50, 75, 100].map((percent) => (
-                            <Button
-                              key={percent}
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setPercentage(percent)}
-                              className="flex-1"
-                            >
-                              {percent}%
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Calculation Display */}
-                      <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Valor:</span>
-                          <span className="font-medium">R$ {(parseFloat(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Taxa (1%):</span>
-                          <span className="font-medium text-destructive">- R$ {((parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                        <div className="flex justify-between text-sm border-t pt-2">
-                          <span>Você recebe:</span>
-                          <span className="font-medium text-primary">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
-                        </div>
-                      </div>
-                      
-                      <Button 
-                        onClick={handleExchange}
-                        disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > brlBalance}
-                        className="w-full"
-                      >
-                        {loading ? (
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        ) : (
-                          <ArrowRightLeft className="h-4 w-4 mr-2" />
-                        )}
-                        Comprar RIOZ
-                      </Button>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="sell" className="space-y-4">
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label>Quantidade RIOZ a vender (máximo: {riozBalance.toLocaleString('pt-BR')} RZ)</Label>
-                        <Input
-                          type="number"
-                          value={amount}
-                          onChange={(e) => setAmount(e.target.value)}
-                          placeholder="0"
-                          max={riozBalance}
-                          step="1"
-                          min="0"
-                        />
-                      </div>
-
-                      {/* Slider Percentage */}
-                      <div className="space-y-3">
-                        <Label>Selecionar percentual do saldo</Label>
-                        <Slider
-                          value={sliderPercent}
-                          onValueChange={handleSliderChange}
-                          max={100}
-                          step={1}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between gap-2">
-                          {[0, 25, 50, 75, 100].map((percent) => (
-                            <Button
-                              key={percent}
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setPercentage(percent)}
-                              className="flex-1"
-                            >
-                              {percent}%
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Calculation Display */}
-                      <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Você vende:</span>
-                          <span className="font-medium">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Taxa (1%):</span>
-                          <span className="font-medium text-destructive">- R$ {((parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                        <div className="flex justify-between text-sm border-t pt-2">
-                          <span>Você recebe:</span>
-                          <span className="font-medium text-primary">R$ {((parseFloat(amount) || 0) - (parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                      </div>
-                      
-                      <Button 
-                        onClick={handleExchange}
-                        disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > riozBalance}
-                        variant="destructive"
-                        className="w-full"
-                      >
-                        {loading ? (
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        ) : (
-                          <ArrowRightLeft className="h-4 w-4 mr-2" />
-                        )}
-                        Vender RIOZ
-                      </Button>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-
-                {/* Disclaimer */}
-                <div className="mt-6 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-lg p-4">
+              {/* Disclaimer - only show when user interacts */}
+              {(parseFloat(amount) > 0) && (
+                <div className="mt-6 bg-success/10 border border-success/20 rounded-lg p-4">
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                    <AlertCircle className="h-5 w-5 text-success mt-0.5 flex-shrink-0" />
                     <div className="text-sm">
-                      <p className="font-medium text-amber-800 dark:text-amber-200 mb-1">
-                        Importante: Taxa de Conversão
-                      </p>
-                      <p className="text-amber-700 dark:text-amber-300">
+                      <p className="font-medium text-success mb-1">
                         Uma taxa de <strong>1%</strong> é cobrada em todas as conversões. 
                         Para realizar análises na plataforma, é necessário ter saldo em RIOZ Coin.
                       </p>
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              )}
+            </CardContent>
+          </Card>
 
-          {/* Hot Markets Card */}
+          {/* Hot Markets Mini Cards */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -463,26 +483,36 @@ const Exchange = () => {
               <div className="space-y-3">
                 {topMarkets.length > 0 ? (
                   topMarkets.map((market, index) => (
-                    <div key={market.id} className="p-3 rounded-lg border border-border/50 hover:border-primary/30 transition-all">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge variant="destructive" className="text-xs animate-pulse">
-                              HOT
-                            </Badge>
-                            {index === 0 && (
-                              <TrendingUp className="h-4 w-4 text-success animate-bounce" />
-                            )}
+                    <Card key={market.id} className="cursor-pointer hover:border-primary/50 transition-all">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge variant="destructive" className="text-xs animate-pulse">
+                                HOT
+                              </Badge>
+                              {index === 0 && (
+                                <TrendingUp className="h-4 w-4 text-success animate-bounce" />
+                              )}
+                            </div>
+                            <h4 className="font-medium text-sm leading-tight mb-2">
+                              {market.titulo}
+                            </h4>
+                            <div className="flex gap-2 mb-3">
+                              <Button size="sm" className="bg-[#00ff90] hover:bg-[#00ff90]/90 text-black text-xs px-3 py-1 h-7">
+                                SIM {market.odds?.sim?.toFixed(2)}x
+                              </Button>
+                              <Button size="sm" className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white text-xs px-3 py-1 h-7">
+                                NÃO {(market.odds?.não || market.odds?.nao)?.toFixed(2)}x
+                              </Button>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              Volume 24h: {market.volume24h.toLocaleString()} RZ
+                            </p>
                           </div>
-                          <h4 className="font-medium text-sm leading-tight mb-1 truncate">
-                            {market.titulo}
-                          </h4>
-                          <p className="text-xs text-muted-foreground">
-                            Volume 24h: {market.volume24h.toLocaleString()} RZ
-                          </p>
                         </div>
-                      </div>
-                    </div>
+                      </CardContent>
+                    </Card>
                   ))
                 ) : (
                   <div className="text-center py-4 text-muted-foreground">

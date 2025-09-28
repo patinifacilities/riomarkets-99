@@ -106,10 +106,10 @@ const AdminRevenue = () => {
                 <div className="p-2 rounded-lg bg-destructive/10">
                   <Percent className="w-5 h-5 text-destructive" />
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Taxas de Cancelamento</p>
-                  <p className="text-2xl font-bold">{revenueData.cancellationFees.toLocaleString()} RZ</p>
-                </div>
+                 <div>
+                   <p className="text-sm text-muted-foreground">Taxas de Cancelamento</p>
+                   <p className="text-2xl font-bold">R$ {(revenueData.cancellationFees / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                 </div>
               </div>
             </CardContent>
           </Card>
@@ -120,10 +120,10 @@ const AdminRevenue = () => {
                 <div className="p-2 rounded-lg bg-primary/10">
                   <TrendingUp className="w-5 h-5 text-primary" />
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Taxas de Pool</p>
-                  <p className="text-2xl font-bold">{revenueData.poolFees.toLocaleString()} RZ</p>
-                </div>
+                 <div>
+                   <p className="text-sm text-muted-foreground">Taxas de Pool</p>
+                   <p className="text-2xl font-bold">R$ {(revenueData.poolFees / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                 </div>
               </div>
             </CardContent>
           </Card>
@@ -134,10 +134,10 @@ const AdminRevenue = () => {
                 <div className="p-2 rounded-lg bg-accent/10">
                   <RefreshCw className="w-5 h-5 text-accent" />
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Taxas de Conversão</p>
-                  <p className="text-2xl font-bold">{revenueData.conversionFees.toLocaleString()} RZ</p>
-                </div>
+                 <div>
+                   <p className="text-sm text-muted-foreground">Taxas de Conversão</p>
+                   <p className="text-2xl font-bold">R$ {(revenueData.conversionFees / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                 </div>
               </div>
             </CardContent>
           </Card>
@@ -148,10 +148,10 @@ const AdminRevenue = () => {
                 <div className="p-2 rounded-lg bg-success/10">
                   <DollarSign className="w-5 h-5 text-success" />
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Receita Total</p>
-                  <p className="text-2xl font-bold text-success">{revenueData.totalRevenue.toLocaleString()} RZ</p>
-                </div>
+                 <div>
+                   <p className="text-sm text-muted-foreground">Receita Total</p>
+                   <p className="text-2xl font-bold text-success">R$ {(revenueData.totalRevenue / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                 </div>
               </div>
             </CardContent>
           </Card>
@@ -175,10 +175,10 @@ const AdminRevenue = () => {
                     <p className="text-sm text-muted-foreground mb-2">
                       Taxa cobrada quando usuários cancelam suas opiniões
                     </p>
-                    <p className="text-xl font-bold">{revenueData.cancellationFees.toLocaleString()} RZ</p>
-                    <p className="text-sm text-muted-foreground">
-                      {((revenueData.cancellationFees / revenueData.totalRevenue) * 100 || 0).toFixed(1)}% do total
-                    </p>
+                     <p className="text-xl font-bold">R$ {(revenueData.cancellationFees / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                     <p className="text-sm text-muted-foreground">
+                       {((revenueData.cancellationFees / revenueData.totalRevenue) * 100 || 0).toFixed(1)}% do total
+                     </p>
                   </div>
 
                   <div className="p-4 rounded-lg border border-border bg-card/50">
@@ -186,10 +186,10 @@ const AdminRevenue = () => {
                     <p className="text-sm text-muted-foreground mb-2">
                       Taxa cobrada sobre o menor pool ao final de cada mercado
                     </p>
-                    <p className="text-xl font-bold">{revenueData.poolFees.toLocaleString()} RZ</p>
-                    <p className="text-sm text-muted-foreground">
-                      {((revenueData.poolFees / revenueData.totalRevenue) * 100 || 0).toFixed(1)}% do total
-                    </p>
+                     <p className="text-xl font-bold">R$ {(revenueData.poolFees / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                     <p className="text-sm text-muted-foreground">
+                       {((revenueData.poolFees / revenueData.totalRevenue) * 100 || 0).toFixed(1)}% do total
+                     </p>
                   </div>
 
                   <div className="p-4 rounded-lg border border-border bg-card/50">
@@ -197,19 +197,19 @@ const AdminRevenue = () => {
                     <p className="text-sm text-muted-foreground mb-2">
                       Taxa cobrada em todas as conversões RIOZ ⇄ BRL
                     </p>
-                    <p className="text-xl font-bold">{revenueData.conversionFees.toLocaleString()} RZ</p>
-                    <p className="text-sm text-muted-foreground">
-                      {((revenueData.conversionFees / revenueData.totalRevenue) * 100 || 0).toFixed(1)}% do total
-                    </p>
+                     <p className="text-xl font-bold">R$ {(revenueData.conversionFees / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                     <p className="text-sm text-muted-foreground">
+                       {((revenueData.conversionFees / revenueData.totalRevenue) * 100 || 0).toFixed(1)}% do total
+                     </p>
                   </div>
                 </div>
 
                 <div className="border-t pt-4">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold">Total Acumulado:</span>
-                    <span className="text-2xl font-bold text-success">
-                      {revenueData.totalRevenue.toLocaleString()} RZ
-                    </span>
+                     <span className="text-2xl font-bold text-success">
+                       R$ {(revenueData.totalRevenue / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                     </span>
                   </div>
                 </div>
               </div>

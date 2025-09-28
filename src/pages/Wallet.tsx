@@ -96,19 +96,23 @@ const WalletPage = () => {
 
         {/* Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-card border-primary/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Saldo RIOZ Coin</p>
-                  <p className="text-2xl font-bold text-white">
-                    {(profile?.saldo_moeda || 0).toLocaleString('pt-BR')} RZ
-                  </p>
-                </div>
-                <Wallet className="w-8 h-8 text-white" />
-              </div>
-            </CardContent>
-          </Card>
+           <Card className="bg-gradient-card border-primary/20">
+             <CardContent className="p-6">
+               <div className="flex items-center justify-between">
+                 <div>
+                   <p className="text-sm text-muted-foreground">Saldo RIOZ Coin</p>
+                   <div className="flex items-center gap-2">
+                     <p className="text-2xl font-bold text-white">
+                       {(profile?.saldo_moeda || 0).toLocaleString('pt-BR')} RZ
+                     </p>
+                     {/* Balance change arrows - you can implement logic to track changes */}
+                     <TrendingUp className="w-5 h-5" style={{ color: '#00ff90' }} />
+                   </div>
+                 </div>
+                 <Wallet className="w-8 h-8 text-white" />
+               </div>
+             </CardContent>
+           </Card>
 
           <Card className="bg-gradient-card border-accent/20">
             <CardContent className="p-6">
@@ -159,12 +163,12 @@ const WalletPage = () => {
                     <div key={i} className="h-16 bg-muted/20 rounded animate-pulse" />
                   ))}
                 </div>
-              ) : transactions && transactions.length > 0 ? (
-                <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                  {transactions.map((transaction) => (
-                    <TransactionItem key={transaction.id} transaction={transaction} />
-                  ))}
-                </div>
+               ) : transactions && transactions.length > 0 ? (
+                 <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                   {transactions.map((transaction) => (
+                     <TransactionItem key={transaction.id} transaction={transaction} />
+                   ))}
+                 </div>
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   <Wallet className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -190,37 +194,37 @@ const WalletPage = () => {
                     <div key={i} className="h-16 bg-muted/20 rounded animate-pulse" />
                   ))}
                 </div>
-              ) : allOrders && allOrders.length > 0 ? (
-                <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                  {allOrders.map((order) => {
-                    const market = markets?.find(m => m.id === order.market_id);
-                    return (
-                      <div key={order.id} className="p-4 rounded-lg border border-border/50 hover:border-primary/30 transition-all">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <OrderItem order={order} market={market} />
-                        </div>
-                        {order.status === 'ativa' && (
-                          <div className="flex flex-col gap-2 ml-4">
-                            <Button 
-                              onClick={() => {
-                                setSelectedOrder(order);
-                                setShowCancelBetModal(true);
-                              }}
-                              variant="outline"
-                              size="sm"
-                              className="border-danger/30 text-danger hover:bg-danger/10"
-                            >
-                              <X className="w-4 h-4 mr-1" />
-                              Cancelar
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                      </div>
-                    );
-                  })}
-                </div>
+               ) : allOrders && allOrders.length > 0 ? (
+                 <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                   {allOrders.map((order) => {
+                     const market = markets?.find(m => m.id === order.market_id);
+                     return (
+                       <div key={order.id} className="p-5 rounded-lg border border-border/50 hover:border-primary/30 transition-all">
+                       <div className="flex items-start justify-between">
+                         <div className="flex-1">
+                           <OrderItem order={order} market={market} />
+                         </div>
+                         {order.status === 'ativa' && (
+                           <div className="flex flex-col gap-2 ml-4">
+                             <Button 
+                               onClick={() => {
+                                 setSelectedOrder(order);
+                                 setShowCancelBetModal(true);
+                               }}
+                               variant="outline"
+                               size="sm"
+                               className="border-danger/30 text-danger hover:bg-danger/10"
+                             >
+                               <X className="w-4 h-4 mr-1" />
+                               Cancelar
+                             </Button>
+                           </div>
+                         )}
+                       </div>
+                       </div>
+                     );
+                   })}
+                 </div>
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-50" />
