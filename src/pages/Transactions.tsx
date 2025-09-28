@@ -276,8 +276,10 @@ const Transactions = () => {
         </div>
       </div>
 
-      {/* Sticky Toolbar */}
-      <TransactionsToolbar onExport={handleExport} />
+      {/* Toolbar - Export removed */}
+      <div className="container mx-auto px-4 max-w-6xl">
+        <div className="h-6"></div>
+      </div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 pb-[env(safe-area-inset-bottom)] max-w-6xl">

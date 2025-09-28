@@ -121,6 +121,9 @@ const Exchange = () => {
         setBrlBalance(newBrlBalance);
         setRiozBalance(newRiozBalance);
         
+        // Force refresh balances to ensure UI updates
+        await fetchBalances();
+        
         toast({
           title: "Compra realizada!",
           description: `Você comprou ${amountNum} RIOZ por R$ ${amountNum} (+ R$ ${fee.toFixed(2)} de taxa)`,
@@ -146,6 +149,9 @@ const Exchange = () => {
         
         setBrlBalance(newBrlBalance);
         setRiozBalance(newRiozBalance);
+        
+        // Force refresh balances to ensure UI updates
+        await fetchBalances();
         
         toast({
           title: "Venda realizada!",
@@ -276,7 +282,7 @@ const Exchange = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* Interface de Troca */}
-          <Card>
+          <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ArrowRightLeft className="h-5 w-5" />
@@ -345,7 +351,7 @@ const Exchange = () => {
                         </div>
                         <div className="flex justify-between text-sm border-t pt-2">
                           <span>Você recebe:</span>
-                          <span className="font-medium text-success">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
+                          <span className="font-medium text-success">{((parseFloat(amount) || 0) - (parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR')} RZ</span>
                         </div>
                       </div>
                     )}

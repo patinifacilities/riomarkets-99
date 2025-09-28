@@ -19,7 +19,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
   const startX = useRef(0);
   const startPosition = useRef(0);
 
-  const THRESHOLD = 0.85; // 85% threshold to complete
+  const THRESHOLD = 0.99; // 99% threshold to complete
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
