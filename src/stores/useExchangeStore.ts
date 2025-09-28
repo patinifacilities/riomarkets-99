@@ -143,6 +143,11 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         },
         balanceLoading: false 
       });
+      
+      // Dispatch balance update event for other components
+      window.dispatchEvent(new CustomEvent('balanceUpdated', { 
+        detail: newBalance 
+      }));
           return;
         }
         throw error;
@@ -156,6 +161,11 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         },
         balanceLoading: false 
       });
+      
+      // Dispatch balance update event for other components
+      window.dispatchEvent(new CustomEvent('balanceUpdated', { 
+        detail: data 
+      }));
     } catch (error) {
       console.error('Error fetching balance:', error);
       set({ 

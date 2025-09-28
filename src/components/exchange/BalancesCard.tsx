@@ -21,8 +21,21 @@ export const BalancesCard = () => {
       fetchBalance();
     }, 30000);
 
-    return () => clearInterval(interval);
-  }, [fetchBalance]);
+    // Listen for balance updates
+    const handleBalanceUpdate = () => {
+      fetchBalance();
+      refetchProfile();
+    };
+
+    window.addEventListener('balanceUpdated', handleBalanceUpdate);
+    window.addEventListener('forceProfileRefresh', handleBalanceUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('balanceUpdated', handleBalanceUpdate);
+      window.removeEventListener('forceProfileRefresh', handleBalanceUpdate);
+    };
+  }, [fetchBalance, refetchProfile]);
 
   const handleRefresh = () => {
     fetchBalance();

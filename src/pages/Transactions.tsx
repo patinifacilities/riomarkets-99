@@ -164,7 +164,7 @@ const Transactions = () => {
           {/* Header */}
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-3">
-              <Receipt className="w-7 h-7 text-primary" />
+              <Receipt className="w-7 h-7 text-white" />
               Minhas Transações
             </h1>
             <p className="text-muted-foreground mt-1">
@@ -183,7 +183,7 @@ const Transactions = () => {
                   </p>
                 </div>
                 <div className="p-2 rounded-full bg-primary/10">
-                  <Receipt className="w-5 h-5 text-primary" />
+                  <Receipt className="w-5 h-5 text-white" />
                 </div>
               </div>
             </Card>
@@ -197,7 +197,7 @@ const Transactions = () => {
                   </p>
                 </div>
                 <div className="p-2 rounded-full bg-success/10">
-                  <TrendingUp className="w-5 h-5 text-success" />
+                  <TrendingUp className="w-5 h-5 text-white" />
                 </div>
               </div>
             </Card>
@@ -211,7 +211,7 @@ const Transactions = () => {
                   </p>
                 </div>
                 <div className="p-2 rounded-full bg-danger/10">
-                  <TrendingDown className="w-5 h-5 text-danger" />
+                  <TrendingDown className="w-5 h-5 text-white" />
                 </div>
               </div>
             </Card>

@@ -41,12 +41,13 @@ export const CancelBetModal = ({ open, onOpenChange, onConfirm, orderId, orderAm
         window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
       }
 
-      await onConfirm();
       toast({
         title: "Opinião cancelada",
         description: "Sua opinião foi cancelada com sucesso. Taxa de 30% aplicada.",
         variant: "default",
       });
+      
+      await onConfirm();
       onOpenChange(false);
     } catch (error) {
       console.error('Cancel error:', error);

@@ -251,39 +251,87 @@ const Exchange = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-6">
-                  {/* Buy Orders */}
+                <div className="space-y-4">
+                  {/* Sell Orders (Ask) - Top */}
                   <div>
-                    <h3 className="text-sm font-medium text-[#00ff90] mb-3">Ordens de Compra</h3>
-                    <div className="space-y-1">
-                      {buyOrders.length === 0 ? (
-                        <div className="text-center text-muted-foreground py-4">
-                          Nenhuma ordem de compra
+                    <h3 className="text-sm font-medium text-[#ff2389] mb-3 flex items-center gap-2">
+                      🔴 Ordens de Venda (Ask)
+                    </h3>
+                    <div className="space-y-1 border border-[#ff2389]/20 rounded-lg p-3 bg-[#ff2389]/5">
+                      <div className="flex justify-between text-xs font-medium text-muted-foreground border-b border-border pb-1">
+                        <span>Preço (BRL)</span>
+                        <span>Quantidade (RIOZ)</span>
+                        <span>Total (BRL)</span>
+                      </div>
+                      {sellOrders.length === 0 ? (
+                        <div className="text-center text-muted-foreground py-4 text-xs">
+                          Nenhuma ordem de venda
                         </div>
                       ) : (
-                        buyOrders.map((order) => (
-                          <div key={order.id} className="flex justify-between text-xs py-1">
-                            <span>R$ {order.price_brl_per_rioz.toFixed(4)}</span>
-                            <span>{order.remaining_amount.toFixed(2)} RIOZ</span>
+                        sellOrders.reverse().map((order, index) => (
+                          <div 
+                            key={order.id} 
+                            className="flex justify-between text-xs py-1 hover:bg-[#ff2389]/10 rounded px-2 cursor-pointer transition-colors"
+                            style={{
+                              backgroundColor: `rgba(255, 35, 137, ${0.05 + (index * 0.02)})`,
+                            }}
+                          >
+                            <span className="text-[#ff2389] font-mono">
+                              {order.price_brl_per_rioz.toFixed(4)}
+                            </span>
+                            <span className="text-foreground font-mono">
+                              {order.remaining_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </span>
+                            <span className="text-muted-foreground font-mono">
+                              {(order.remaining_amount * order.price_brl_per_rioz).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </span>
                           </div>
                         ))
                       )}
                     </div>
                   </div>
 
-                  {/* Sell Orders */}
+                  {/* Current Price */}
+                  <div className="text-center py-2 border-y border-border bg-card/50">
+                    <div className="text-lg font-bold text-foreground">
+                      R$ {rate?.price?.toFixed(4) || '1.0000'}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Preço Atual</div>
+                  </div>
+
+                  {/* Buy Orders (Bid) - Bottom */}
                   <div>
-                    <h3 className="text-sm font-medium text-[#ff2389] mb-3">Ordens de Venda</h3>
-                    <div className="space-y-1">
-                      {sellOrders.length === 0 ? (
-                        <div className="text-center text-muted-foreground py-4">
-                          Nenhuma ordem de venda
+                    <h3 className="text-sm font-medium text-[#00ff90] mb-3 flex items-center gap-2">
+                      🟢 Ordens de Compra (Bid)
+                    </h3>
+                    <div className="space-y-1 border border-[#00ff90]/20 rounded-lg p-3 bg-[#00ff90]/5">
+                      <div className="flex justify-between text-xs font-medium text-muted-foreground border-b border-border pb-1">
+                        <span>Preço (BRL)</span>
+                        <span>Quantidade (RIOZ)</span>
+                        <span>Total (BRL)</span>
+                      </div>
+                      {buyOrders.length === 0 ? (
+                        <div className="text-center text-muted-foreground py-4 text-xs">
+                          Nenhuma ordem de compra
                         </div>
                       ) : (
-                        sellOrders.map((order) => (
-                          <div key={order.id} className="flex justify-between text-xs py-1">
-                            <span>R$ {order.price_brl_per_rioz.toFixed(4)}</span>
-                            <span>{order.remaining_amount.toFixed(2)} RIOZ</span>
+                        buyOrders.map((order, index) => (
+                          <div 
+                            key={order.id} 
+                            className="flex justify-between text-xs py-1 hover:bg-[#00ff90]/10 rounded px-2 cursor-pointer transition-colors"
+                            style={{
+                              backgroundColor: `rgba(0, 255, 144, ${0.05 + (index * 0.02)})`,
+                            }}
+                          >
+                            <span className="text-[#00ff90] font-mono">
+                              {order.price_brl_per_rioz.toFixed(4)}
+                            </span>
+                            <span className="text-foreground font-mono">
+                              {order.remaining_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </span>
+                            <span className="text-muted-foreground font-mono">
+                              {(order.remaining_amount * order.price_brl_per_rioz).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </span>
                           </div>
                         ))
                       )}

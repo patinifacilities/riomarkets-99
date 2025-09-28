@@ -1,5 +1,7 @@
 import { ONBOARDING_STEPS } from '@/lib/onboarding-content';
 import { Button } from '@/components/ui/button';
+import logoWhite from '@/assets/rio-white-logo-auth.png';
+import { useTheme } from 'next-themes';
 
 interface OnboardingStepProps {
   step: number;
@@ -8,6 +10,7 @@ interface OnboardingStepProps {
 
 export function OnboardingStep({ step, className = "" }: OnboardingStepProps) {
   const content = ONBOARDING_STEPS[step - 1];
+  const { resolvedTheme } = useTheme();
   
   if (!content) return null;
 
@@ -18,7 +21,11 @@ export function OnboardingStep({ step, className = "" }: OnboardingStepProps) {
       <div className="flex justify-center">
         {content.id === 1 ? (
           <div className="w-20 h-20 flex items-center justify-center">
-            <IconComponent />
+            {resolvedTheme === 'light' ? (
+              <img src={logoWhite} alt="Rio Markets" className="h-16" />
+            ) : (
+              <IconComponent />
+            )}
           </div>
         ) : (
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
