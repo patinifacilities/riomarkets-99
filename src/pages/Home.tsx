@@ -167,19 +167,20 @@ const Home = () => {
       {/* Hero Section - Trading Aligned */}
       <section className="relative min-h-[42vh] md:min-h-[52vh] flex flex-col items-center justify-center bg-[color:var(--bg-app)]">
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
-          {/* Reduced Animated background area */}
-          <div className="absolute -inset-16 -z-10 opacity-40">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-accent/20 animate-pulse"></div>
-            <div className="absolute top-0 left-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-bounce"></div>
-            <div className="absolute top-10 right-0 w-56 h-56 bg-accent/20 rounded-full blur-3xl animate-bounce" style={{ animationDelay: '1s' }}></div>
+          {/* Seamless animated background */}
+          <div className="absolute -inset-8 -z-10 opacity-30 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-transparent to-accent/15 animate-[pulse_4s_ease-in-out_infinite]"></div>
             
-            {/* Reduced floating elements */}
-            <div className="absolute top-1/4 left-1/2 w-48 h-48 bg-[#00FF91]/25 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-            <div className="absolute bottom-0 right-0 w-52 h-52 bg-primary/20 rounded-full blur-3xl animate-bounce" style={{ animationDelay: '3s' }}></div>
-            <div className="absolute bottom-10 left-0 w-40 h-40 bg-accent/25 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+            {/* Seamless floating particles */}
+            <div className="absolute w-32 h-32 bg-[#00FF91]/20 rounded-full blur-2xl animate-[float_6s_ease-in-out_infinite]" 
+                 style={{ top: '10%', left: '15%', animationDelay: '0s' }}></div>
+            <div className="absolute w-24 h-24 bg-primary/15 rounded-full blur-2xl animate-[float_5s_ease-in-out_infinite]" 
+                 style={{ top: '60%', right: '10%', animationDelay: '2s' }}></div>
+            <div className="absolute w-20 h-20 bg-accent/20 rounded-full blur-2xl animate-[float_7s_ease-in-out_infinite]" 
+                 style={{ bottom: '20%', left: '20%', animationDelay: '4s' }}></div>
             
-            {/* Gradient overlay animation */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/8 to-transparent animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+            {/* Seamless gradient waves */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-transparent animate-[wave_8s_ease-in-out_infinite]"></div>
           </div>
           
           <div className="text-center mb-6 md:mb-8">

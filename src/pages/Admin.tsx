@@ -103,6 +103,31 @@ const Admin = () => {
     }
   };
 
+  const handleReopenMarket = async (marketId: string) => {
+    try {
+      const { error } = await supabase
+        .from('markets')
+        .update({ status: 'aberto' })
+        .eq('id', marketId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Mercado reaberto!",
+        description: "O mercado foi reaberto para novas análises.",
+      });
+
+      refetch();
+    } catch (error) {
+      console.error('Error reopening market:', error);
+      toast({
+        title: "Erro",
+        description: "Falha ao reabrir mercado.",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Security check
   if (authLoading || profileLoading) {
     return (
@@ -358,18 +383,18 @@ const Admin = () => {
                         ))}
                       </div>
 
-                      {market.status === 'aberto' && (
-                        <div className="flex gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="gap-2 min-h-[44px]"
-                            onClick={() => setEditModal({ isOpen: true, market })}
-                            aria-label={`Editar mercado ${market.titulo}`}
-                          >
-                            <Edit className="w-4 h-4" />
-                            Editar
-                          </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="gap-2 min-h-[44px]"
+                          onClick={() => setEditModal({ isOpen: true, market })}
+                          aria-label={`Editar mercado ${market.titulo}`}
+                        >
+                          <Edit className="w-4 h-4" />
+                          Editar
+                        </Button>
+                        {market.status === 'aberto' ? (
                           <Button 
                             variant="outline" 
                             size="sm" 
@@ -380,16 +405,25 @@ const Admin = () => {
                             <XCircle className="w-4 h-4" />
                             Fechar
                           </Button>
-                        </div>
-                      )}
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="gap-2 min-h-[44px] hover:bg-success/10 text-success border-success"
+                            onClick={() => handleReopenMarket(market.id)}
+                            aria-label={`Reabrir mercado ${market.titulo}`}
+                          >
+                            <Play className="w-4 h-4" />
+                            Reabrir
+                          </Button>
+                        )}
+                      </div>
 
-                      {/* Odds Controller for open markets */}
-                      {market.status === 'aberto' && (
-                        <OddsController 
-                          market={market} 
-                          onOddsUpdate={refetch}
-                        />
-                      )}
+                      {/* Odds Controller for all markets (for editing) */}
+                      <OddsController 
+                        market={market} 
+                        onOddsUpdate={refetch}
+                      />
 
                       {market.status === 'fechado' && (
                         <div className="space-y-3">

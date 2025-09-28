@@ -60,8 +60,8 @@ export function Footer() {
             <button
               onClick={handleRianaToggle}
               className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold
-                         bg-[color:var(--brand-green)] text-black hover:opacity-90 
-                         focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-green)]
+                         bg-[#00ff90] text-black hover:opacity-90 
+                         focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00ff90]
                          transition-all duration-200 min-h-[44px]"
               aria-label="Falar com a Riana - Assistente virtual"
             >

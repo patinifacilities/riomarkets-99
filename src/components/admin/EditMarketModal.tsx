@@ -28,6 +28,7 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
     destaque: false,
     periodicidade: ''
   });
+  const [editingOptions, setEditingOptions] = useState<string[]>([]);
 
   useEffect(() => {
     if (market) {
@@ -39,6 +40,7 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
         destaque: market.destaque || false,
         periodicidade: market.periodicidade || ''
       });
+      setEditingOptions([...(market.opcoes || [])]);
     }
   }, [market]);
 
@@ -74,7 +76,8 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
           categoria: editMarket.category,
           end_date: new Date(editMarket.endDate).toISOString(),
           destaque: editMarket.destaque,
-          periodicidade: editMarket.periodicidade || null
+          periodicidade: editMarket.periodicidade || null,
+          opcoes: editingOptions
         })
         .eq('id', market.id)
         .select();
@@ -196,6 +199,47 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
             </label>
           </div>
 
+          {/* Editable market options */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium mb-2 block">Opções do Mercado</label>
+            <div className="space-y-2">
+              {editingOptions.map((opcao, index) => (
+                <div key={index} className="flex gap-2">
+                  <Input
+                    value={opcao}
+                    onChange={(e) => {
+                      const newOptions = [...editingOptions];
+                      newOptions[index] = e.target.value;
+                      setEditingOptions(newOptions);
+                    }}
+                    placeholder={`Opção ${index + 1}`}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const newOptions = editingOptions.filter((_, i) => i !== index);
+                      setEditingOptions(newOptions);
+                    }}
+                    disabled={editingOptions.length <= 2}
+                  >
+                    Remover
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setEditingOptions([...editingOptions, ''])}
+                disabled={editingOptions.length >= 4}
+              >
+                Adicionar Opção
+              </Button>
+            </div>
+          </div>
+
           <div className="p-3 rounded-lg bg-muted/50">
             <p className="text-sm text-muted-foreground">
               <strong>Tipo:</strong> {market.market_type === 'binary' ? 'Binário (2 opções)' :
@@ -204,10 +248,7 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
                                        `${market.opcoes.length} opções`}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              <strong>Opções:</strong> {market.opcoes.join(', ')}
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              Nota: O tipo e opções do mercado não podem ser alterados após a criação.
+              <strong>Status:</strong> {market.status}
             </p>
           </div>
         </div>

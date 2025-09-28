@@ -38,8 +38,9 @@ const MarketCard = ({ market }: MarketCardProps) => {
   };
 
   const daysLeft = getDaysUntilEnd(new Date(market.end_date));
+  // Get odds from database (odds field has priority, fallback to recompensas)
   const yesRecompensa = market.odds?.['sim'] || market.recompensas?.['sim'] || 1.5;
-  const noRecompensa = market.odds?.['não'] || market.recompensas?.['não'] || 1.5;
+  const noRecompensa = market.odds?.['nao'] || market.odds?.['não'] || market.recompensas?.['nao'] || market.recompensas?.['não'] || 1.5;
 
   const handleSimulateReward = (e: React.MouseEvent) => {
     e.stopPropagation();
