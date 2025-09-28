@@ -131,21 +131,16 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
       ref={containerRef}
       className={cn(
         "relative h-14 rounded-full overflow-hidden cursor-pointer select-none",
-        "border-2 transition-all duration-300",
+        "bg-gradient-to-r from-[#ff2389] to-[#00ff90] transition-all duration-300",
         disabled ? "opacity-50 cursor-not-allowed" : "",
         className
       )}
-      style={{
-        background: 'white',
-        borderColor: progress > 0.5 ? '#00ff90' : '#ff2389',
-      }}
     >
-      {/* Background gradient overlay */}
+      {/* Progress overlay */}
       <div 
-        className="absolute inset-0 rounded-full transition-all duration-300"
+        className="absolute inset-0 bg-white/20 transition-all duration-300"
         style={{
-          background: `linear-gradient(90deg, #00ff90 0%, #ff2389 100%)`,
-          opacity: progress * 0.8,
+          clipPath: `inset(0 ${100 - (progress * 100)}% 0 0)`,
         }}
       />
       
@@ -153,7 +148,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
       <div className="absolute inset-0 flex items-center justify-center z-10">
         <span className={cn(
           "text-sm font-medium transition-colors duration-300",
-          "text-gray-800"
+          "text-white"
         )}>
           {text}
         </span>
@@ -171,7 +166,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
         )}
         style={{
           transform: `translateX(${position}px)`,
-          background: progress > 0.5 ? '#ff2389' : '#00ff90',
+          background: 'white',
         }}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
@@ -179,7 +174,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
         <ChevronRight 
           className={cn(
             "w-6 h-6 transition-colors duration-300",
-            progress > 0.5 ? "text-white" : "text-gray-800"
+            "text-gray-800"
           )}
         />
       </div>
