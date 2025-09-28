@@ -56,19 +56,126 @@ const Exchange = () => {
 
     try {
       if (orderType === 'market') {
-        await performExchange(
-          side === 'buy' ? 'buy_rioz' : 'sell_rioz',
-          amount,
-          'RIOZ'
-        );
+        if (side === 'buy') {
+          // Find cheapest sell orders to match
+          const availableSellOrders = orderBookData
+            .filter(order => order.side === 'sell')
+            .sort((a, b) => a.price_brl_per_rioz - b.price_brl_per_rioz);
+          
+          let remainingAmount = amount;
+          let totalCost = 0;
+          
+          // Calculate if we can fulfill the order
+          for (const order of availableSellOrders) {
+            const amountToTake = Math.min(remainingAmount, order.remaining_amount);
+            totalCost += amountToTake * order.price_brl_per_rioz;
+            remainingAmount -= amountToTake;
+            if (remainingAmount <= 0) break;
+          }
+          
+          if (remainingAmount > 0) {
+            toast({
+              title: "Erro",
+              description: "Não há ordens de venda suficientes para completar sua compra",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          // Check if user has enough BRL balance
+          if ((balance?.brl_balance || 0) < totalCost) {
+            toast({
+              title: "Erro", 
+              description: "Saldo BRL insuficiente",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          // Execute the market buy order
+          await performExchange('buy_rioz', amount, 'RIOZ');
+        } else {
+          // Find highest buy orders to match
+          const availableBuyOrders = orderBookData
+            .filter(order => order.side === 'buy')
+            .sort((a, b) => b.price_brl_per_rioz - a.price_brl_per_rioz);
+          
+          let remainingAmount = amount;
+          
+          // Calculate if we can fulfill the order
+          for (const order of availableBuyOrders) {
+            const amountToTake = Math.min(remainingAmount, order.remaining_amount);
+            remainingAmount -= amountToTake;
+            if (remainingAmount <= 0) break;
+          }
+          
+          if (remainingAmount > 0) {
+            toast({
+              title: "Erro",
+              description: "Não há ordens de compra suficientes para completar sua venda",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          // Check if user has enough RIOZ balance
+          if ((balance?.rioz_balance || 0) < amount) {
+            toast({
+              title: "Erro",
+              description: "Saldo RIOZ insuficiente", 
+              variant: "destructive",
+            });
+            return;
+          }
+
+          // Execute the market sell order
+          await performExchange('sell_rioz', amount, 'RIOZ');
+        }
+        
+        // Refresh order book and balances
+        await Promise.all([fetchOrderBook(), fetchBalance()]);
         
         toast({
           title: "Trade executado!",
           description: `${side === 'buy' ? 'Compra' : 'Venda'} realizada com sucesso.`,
         });
       } else {
-        // Create limit order
+        // Create limit order and update balance immediately
         const price = parseFloat(limitPrice) || rate?.price || 1;
+        
+        // Check balance before placing limit order
+        if (side === 'buy') {
+          const totalCost = amount * price;
+          if ((balance?.brl_balance || 0) < totalCost) {
+            toast({
+              title: "Erro",
+              description: "Saldo BRL insuficiente para criar a ordem",
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          // Reserve BRL balance
+          await supabase
+            .from('balances')
+            .update({ brl_balance: (balance?.brl_balance || 0) - totalCost })
+            .eq('user_id', user.id);
+        } else {
+          if ((balance?.rioz_balance || 0) < amount) {
+            toast({
+              title: "Erro", 
+              description: "Saldo RIOZ insuficiente para criar a ordem",
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          // Reserve RIOZ balance
+          await supabase
+            .from('balances')
+            .update({ rioz_balance: (balance?.rioz_balance || 0) - amount })
+            .eq('user_id', user.id);
+        }
         
         const { error } = await supabase
           .from('exchange_order_book')
@@ -82,6 +189,9 @@ const Exchange = () => {
           });
 
         if (error) throw error;
+
+        // Refresh balances to show updated amounts
+        await fetchBalance();
 
         toast({
           title: "Ordem criada!",
@@ -102,8 +212,16 @@ const Exchange = () => {
     }
   };
 
-  const buyOrders = orderBookData.filter(order => order.side === 'buy').slice(0, 10);
-  const sellOrders = orderBookData.filter(order => order.side === 'sell').slice(0, 10);
+  // Sort buy orders by price (highest first) and sell orders by price (lowest first)
+  const buyOrders = orderBookData
+    .filter(order => order.side === 'buy')
+    .sort((a, b) => b.price_brl_per_rioz - a.price_brl_per_rioz)
+    .slice(0, 10);
+  
+  const sellOrders = orderBookData
+    .filter(order => order.side === 'sell') 
+    .sort((a, b) => a.price_brl_per_rioz - b.price_brl_per_rioz)
+    .slice(0, 10);
 
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
@@ -254,8 +372,8 @@ const Exchange = () => {
                 <div className="space-y-4">
                   {/* Sell Orders (Ask) - Top */}
                   <div>
-                    <h3 className="text-sm font-medium text-[#ff2389] mb-3 flex items-center gap-2">
-                      🔴 Ordens de Venda (Ask)
+                    <h3 className="text-sm font-medium text-[#ff2389] mb-3">
+                      Ordens de Venda (Ask)
                     </h3>
                     <div className="space-y-1 border border-[#ff2389]/20 rounded-lg p-3 bg-[#ff2389]/5">
                       <div className="flex justify-between text-xs font-medium text-muted-foreground border-b border-border pb-1">
@@ -268,7 +386,7 @@ const Exchange = () => {
                           Nenhuma ordem de venda
                         </div>
                       ) : (
-                        sellOrders.reverse().map((order, index) => (
+                        sellOrders.map((order, index) => (
                           <div 
                             key={order.id} 
                             className="flex justify-between text-xs py-1 hover:bg-[#ff2389]/10 rounded px-2 cursor-pointer transition-colors"
@@ -301,8 +419,8 @@ const Exchange = () => {
 
                   {/* Buy Orders (Bid) - Bottom */}
                   <div>
-                    <h3 className="text-sm font-medium text-[#00ff90] mb-3 flex items-center gap-2">
-                      🟢 Ordens de Compra (Bid)
+                    <h3 className="text-sm font-medium text-[#00ff90] mb-3">
+                      Ordens de Compra (Bid)
                     </h3>
                     <div className="space-y-1 border border-[#00ff90]/20 rounded-lg p-3 bg-[#00ff90]/5">
                       <div className="flex justify-between text-xs font-medium text-muted-foreground border-b border-border pb-1">

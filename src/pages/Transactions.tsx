@@ -110,7 +110,7 @@ const Transactions = () => {
       <div className="container mx-auto px-4 py-6 pb-[env(safe-area-inset-bottom)] max-w-6xl">
         <div className="text-center py-12">
           <div className="text-red-500 mb-4">
-            <Receipt className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <Receipt className="w-12 h-12 mx-auto mb-4 opacity-50 text-white" />
           </div>
           <h3 className="text-lg font-semibold text-foreground mb-2">Erro ao carregar transações</h3>
           <p className="text-muted-foreground mb-4">{error}</p>
