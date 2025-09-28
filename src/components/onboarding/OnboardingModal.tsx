@@ -94,7 +94,7 @@ export function OnboardingModal() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent 
-        className="no-motion bg-background border-primary/20 max-w-lg mx-4"
+        className="no-motion bg-background border-primary/20 max-w-lg mx-auto sm:mx-4"
         aria-describedby="onboarding-description"
       >
         <DialogHeader className="text-center">

@@ -131,13 +131,18 @@ export const UserEditModal = ({ user, open, onOpenChange, onSuccess }: UserEditM
   const handleDeleteUser = async () => {
     setIsLoading(true);
     try {
-      // First delete from profiles table
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', user.id);
+      // First soft delete the auth user (Supabase will handle cascade)
+      const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
       
-      if (profileError) throw profileError;
+      if (authError) {
+        // Fallback: delete from profiles table
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .delete()
+          .eq('id', user.id);
+        
+        if (profileError) throw profileError;
+      }
 
       // Log admin action
       await logAdminAction('user_deletion', {

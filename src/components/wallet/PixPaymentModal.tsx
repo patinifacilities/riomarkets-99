@@ -99,9 +99,9 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
 
         <div className="space-y-6">
           {/* Timer */}
-          <div className="flex items-center justify-center gap-2 p-3 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200 dark:border-orange-800">
-            <Clock className="w-4 h-4 text-orange-600" />
-            <span className="text-sm font-medium text-orange-800 dark:text-orange-200">
+          <div className="flex items-center justify-center gap-2 p-3 rounded-lg border border-[#ff2389]/30" style={{ backgroundColor: '#ff2389' }}>
+            <Clock className="w-4 h-4 text-white" />
+            <span className="text-sm font-medium text-white">
               Código expira em: {formatTime(timeLeft)}
             </span>
           </div>

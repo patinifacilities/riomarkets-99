@@ -50,13 +50,6 @@ const WalletPage = () => {
   // Sort all orders by date
   const allOrders = orders?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) || [];
 
-  // Calculate global pool data (mock data for now)
-  const globalPoolSim = 65000;
-  const globalPoolNao = 35000;
-  const totalPool = globalPoolSim + globalPoolNao;
-  const simPercent = totalPool > 0 ? (globalPoolSim / totalPool) * 100 : 50;
-  const naoPercent = totalPool > 0 ? (globalPoolNao / totalPool) * 100 : 50;
-
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
@@ -108,7 +101,7 @@ const WalletPage = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Saldo RIOZ Coin</p>
                   <p className="text-2xl font-bold text-white">
-                    {profile?.saldo_moeda?.toLocaleString('pt-BR') || 0} RIOZ
+                    {(currentBalance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RZ
                   </p>
                 </div>
                 <Wallet className="w-8 h-8 text-white" />
@@ -122,7 +115,7 @@ const WalletPage = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Em Ordens Ativas</p>
                   <p className="text-2xl font-bold text-white">
-                    {totalInOrders.toLocaleString('pt-BR')} RIOZ
+                    {(totalInOrders || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RZ
                   </p>
                 </div>
                 <TrendingUp className="w-8 h-8 text-white" />
@@ -136,7 +129,7 @@ const WalletPage = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Saldo em R$/BRL</p>
                   <p className="text-2xl font-bold text-white">
-                    R$ {brlBalance.toFixed(2)}
+                    R$ {(brlBalance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                 </div>
                 <DollarSign className="w-8 h-8 text-white" />
@@ -144,7 +137,6 @@ const WalletPage = () => {
             </CardContent>
           </Card>
         </div>
-
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Transaction History */}
@@ -195,15 +187,6 @@ const WalletPage = () => {
                     <ArrowRightLeft className="w-4 h-4 mr-2" />
                     Sacar Agora
                   </Button>
-                  <Button 
-                    onClick={() => setShowCancelBetModal(true)}
-                    variant="outline"
-                    size="sm"
-                    className="border-danger/30 text-danger hover:bg-danger/10"
-                  >
-                    <X className="w-4 h-4 mr-2" />
-                    Cancelar Opinião
-                  </Button>
                 </div>
               </div>
             </CardHeader>
@@ -214,30 +197,43 @@ const WalletPage = () => {
                     <div key={i} className="h-16 bg-muted/20 rounded animate-pulse" />
                   ))}
                 </div>
-              ) : allOrders.length > 0 ? (
-                  <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                    {allOrders.map((order) => {
-                      const market = markets?.find(m => m.id === order.market_id);
-                      return (
-                        <div key={order.id} className="flex items-center justify-between">
+              ) : allOrders && allOrders.length > 0 ? (
+                <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                  {allOrders.map((order) => {
+                    const market = markets?.find(m => m.id === order.market_id);
+                    return (
+                      <div key={order.id} className="p-4 rounded-lg border border-border/50 hover:border-primary/30 transition-all">
+                        <div className="flex items-center justify-between">
                           <div className="flex-1">
                             <OrderItem order={order} market={market} />
                           </div>
                           {order.status === 'ativa' && (
-                            <Button 
-                              onClick={() => setShowCancelBetModal(true)}
-                              variant="outline"
-                              size="sm"
-                              className="ml-2 border-danger/30 text-danger hover:bg-danger/10"
-                            >
-                              <X className="w-4 h-4 mr-1" />
-                              Cancelar
-                            </Button>
+                            <div className="flex gap-2 ml-4">
+                              <Button 
+                                onClick={() => setShowWithdrawModal(true)}
+                                variant="outline"
+                                size="sm"
+                                className="border-primary/30 text-primary hover:bg-primary/10"
+                              >
+                                <ArrowRightLeft className="w-4 h-4 mr-1" />
+                                Sacar agora
+                              </Button>
+                              <Button 
+                                onClick={() => setShowCancelBetModal(true)}
+                                variant="outline"
+                                size="sm"
+                                className="border-danger/30 text-danger hover:bg-danger/10"
+                              >
+                                <X className="w-4 h-4 mr-1" />
+                                Cancelar
+                              </Button>
+                            </div>
                           )}
                         </div>
-                      );
-                    })}
-                  </div>
+                      </div>
+                    );
+                  })}
+                </div>
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -249,30 +245,35 @@ const WalletPage = () => {
         </div>
 
         {/* Modals */}
-        <AddBrlModal 
-          open={showDepositModal} 
+        <AddBrlModal
+          open={showDepositModal}
           onOpenChange={setShowDepositModal}
           onSuccess={() => {
+            setShowDepositModal(false);
             refetchProfile();
             refetchTransactions();
             fetchBalance();
           }}
         />
-        <WithdrawModal 
-          open={showWithdrawModal} 
+
+        <WithdrawModal
+          open={showWithdrawModal}
           onOpenChange={setShowWithdrawModal}
           onSuccess={() => {
+            setShowWithdrawModal(false);
             refetchProfile();
             refetchTransactions();
             fetchBalance();
           }}
         />
-        <CancelBetModal 
+
+        <CancelBetModal
           open={showCancelBetModal}
           onOpenChange={setShowCancelBetModal}
           onConfirm={() => {
-            // Implementation for canceling bet would go here
-            console.log('Cancel bet logic');
+            setShowCancelBetModal(false);
+            refetchProfile();
+            refetchTransactions();
           }}
         />
       </div>

@@ -23,6 +23,7 @@ import { useState } from 'react';
 import { TickerBar } from '@/components/ui/ticker-bar';
 import { WalletHoverCard } from '@/components/wallet/WalletHoverCard';
 import { DarkModeToggle } from './DarkModeToggle';
+import { AddBrlModal } from '@/components/exchange/AddBrlModal';
 
 import logoImage from '@/assets/rio-markets-logo-white.png';
 
@@ -30,7 +31,8 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, session, signOut, loading } = useAuth();
-  const { data: profile } = useProfile(user?.id);
+  const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
+  const [showDepositModal, setShowDepositModal] = useState(false);
 
   // Authentication check - only require session and user, profile should be optional for initial render
   const isLoggedIn = !loading && !!session && !!user;
@@ -269,16 +271,15 @@ const Header = () => {
                 </Link>
                 
                   {/* Deposit Button */}
-                <Link to="/wallet">
-                  <Button 
-                    variant="default" 
-                    size="sm"
-                    className="gap-2 shadow-success rounded-xl"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Depositar
-                  </Button>
-                </Link>
+                <Button 
+                  variant="default" 
+                  size="sm"
+                  onClick={() => setShowDepositModal(true)}
+                  className="gap-2 shadow-success rounded-xl"
+                >
+                  <Plus className="w-4 h-4" />
+                  Depositar
+                </Button>
                 
                  {/* Dark Mode Toggle */}
                  <DarkModeToggle />
@@ -310,6 +311,18 @@ const Header = () => {
         />
         </div>
       </div>
+      
+      {/* Deposit Modal */}
+      {user && (
+        <AddBrlModal
+          open={showDepositModal}
+          onOpenChange={setShowDepositModal}
+          onSuccess={() => {
+            setShowDepositModal(false);
+            refetchProfile();
+          }}
+        />
+      )}
     </header>
     </>
   );
