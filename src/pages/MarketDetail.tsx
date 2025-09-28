@@ -358,59 +358,21 @@ const MarketDetail = () => {
                         try {
                           const recompensa = market.odds?.[selectedOption] || 1.5;
                           
-                          // Direct bet without modal - just like BetModal logic
-                          const { data: poolData } = await supabase.rpc('get_market_pools', { market_id: market.id });
+                          // Use the new market order book function
+                          const { data, error } = await supabase.rpc('execute_market_opinion_order', {
+                            p_market_id: market.id,
+                            p_user_id: authUser.id,
+                            p_side: selectedOption,
+                            p_quantity: betAmount,
+                            p_price: recompensa
+                          });
+
+                          if (error) throw error;
                           
-                          const currentPool = poolData?.[0];
-                          const currentPercent = selectedOption === 'sim' 
-                            ? currentPool?.percent_sim || 50 
-                            : currentPool?.percent_nao || 50;
-
-                          // Create order entry
-                          const { error: orderError } = await supabase
-                            .from('orders')
-                            .insert({
-                              id: crypto.randomUUID(),
-                              user_id: authUser.id,
-                              market_id: market.id,
-                              opcao_escolhida: selectedOption,
-                              quantidade_moeda: betAmount,
-                              preco: recompensa,
-                              status: 'ativa',
-                              entry_percent: currentPercent,
-                              entry_multiple: recompensa
-                            });
-
-                          if (orderError) throw orderError;
-
-                          // Create market order for order book
-                          const { error: marketOrderError } = await supabase
-                            .from('market_orders')
-                            .insert({
-                              market_id: market.id,
-                              user_id: authUser.id,
-                              side: selectedOption.toUpperCase(),
-                              amount_rioz: betAmount,
-                              probability_percent: currentPercent,
-                              odds: recompensa,
-                              status: 'active'
-                            });
-
-                          if (marketOrderError) throw marketOrderError;
-
-                          // Create debit transaction
-                          const { error: transactionError } = await supabase
-                            .from('wallet_transactions')
-                            .insert({
-                              id: crypto.randomUUID(),
-                              user_id: authUser.id,
-                              tipo: 'debito',
-                              valor: betAmount,
-                              descricao: `Análise em: ${market.titulo} (${selectedOption}) — entrada ${recompensa}x recompensa`,
-                              market_id: market.id
-                            });
-
-                          if (transactionError) throw transactionError;
+                          const result = data?.[0];
+                          if (!result?.success) {
+                            throw new Error(result?.message || 'Failed to execute opinion');
+                          }
 
                           // Update user balance
                           const { error: balanceError } = await supabase.rpc('increment_balance', {
@@ -418,36 +380,35 @@ const MarketDetail = () => {
                             amount: -betAmount
                           });
 
-                          if (balanceError) throw balanceError;
-
-                          toast({
-                            title: "Ordem enviada com sucesso!",
-                            description: `Você investiu ${betAmount.toLocaleString()} Rioz Coin em "${selectedOption}". Sua ordem foi adicionada ao order book!`,
-                          });
-
-                          // Dispatch balance update events
-                          if (typeof window !== 'undefined') {
-                            window.dispatchEvent(new CustomEvent('balanceUpdated'));
-                            window.dispatchEvent(new CustomEvent('exchangeBalanceUpdated'));
-                            window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
+                          if (balanceError) {
+                            console.error('Balance update error:', balanceError);
                           }
 
+                          // Dispatch balance update events
+                          window.dispatchEvent(new CustomEvent('balanceUpdated'));
+                          window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
+
+                          toast({
+                            title: "Opinião confirmada!",
+                            description: `Sua opinião de ${betAmount} Rioz foi confirmada com sucesso.`,
+                            variant: "default",
+                          });
+
+                          handleBetSuccess();
                           setSelectedOption('');
                           setBetAmount(0);
-                          refetchMarket();
-
-                        } catch (error: any) {
-                          console.error('Bet error:', error);
+                        } catch (error) {
+                          console.error('Opinion error:', error);
                           toast({
-                            title: "Erro ao processar análise",
-                            description: error.message || "Tente novamente em alguns instantes",
+                            title: "Erro",
+                            description: error instanceof Error ? error.message : "Falha ao confirmar opinião. Tente novamente.",
                             variant: "destructive",
                           });
                         }
                       }}
-                      disabled={market.status !== 'aberto'}
-                      text={`Deslize para confirmar ${selectedOption.toUpperCase()} ${betAmount.toLocaleString()} RIOZ`}
-                      className="w-full mt-4"
+                      disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
+                      text="Deslize para confirmar opinião"
+                      className="mt-4 w-full"
                     />
                   )}
 
