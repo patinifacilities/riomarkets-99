@@ -7,6 +7,7 @@ interface TypewriterTextProps {
   deletingSpeed?: number;
   pauseDuration?: number;
   className?: string;
+  mobileBreak?: boolean;
 }
 
 export const TypewriterText = ({ 
@@ -15,7 +16,8 @@ export const TypewriterText = ({
   typingSpeed = 100, 
   deletingSpeed = 50, 
   pauseDuration = 2000,
-  className = ""
+  className = "",
+  mobileBreak = false
 }: TypewriterTextProps) => {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [currentText, setCurrentText] = useState('');
@@ -58,8 +60,17 @@ export const TypewriterText = ({
 
   return (
     <span className={className}>
-      {baseText} {currentText}
-      <span className="animate-pulse">|</span>
+      {mobileBreak ? (
+        <>
+          <span className="block">{baseText}</span>
+          <span className="block">{currentText}<span className="animate-pulse">|</span></span>
+        </>
+      ) : (
+        <>
+          {baseText} {currentText}
+          <span className="animate-pulse">|</span>
+        </>
+      )}
     </span>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Shield, TrendingUp } from 'lucide-react';
-import RioMarketsLogo from '@/assets/rio-markets-logo.png';
+import RioWhiteLogo from '@/assets/rio-white-logo.png';
 
 export type OnboardingStepContent = {
   id: number;
@@ -13,7 +13,7 @@ export type OnboardingStepContent = {
 };
 
 const LogoIcon = () => React.createElement('img', { 
-  src: RioMarketsLogo, 
+  src: RioWhiteLogo, 
   alt: 'Rio Markets Logo', 
   className: 'w-8 h-8' 
 });

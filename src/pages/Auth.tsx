@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { Eye, EyeOff, Mail, Lock, UserPlus, LogIn, TrendingUp, KeyRound } from 'lucide-react';
+import { TypewriterText } from '@/components/ui/TypewriterText';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -217,9 +218,20 @@ const Auth = () => {
       <div className="w-full max-w-md">
         {/* Logo/Branding */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <TrendingUp className="w-8 h-8 text-primary" />
-            <h1 className="text-2xl font-bold">Rio Markets</h1>
+          <div className="mb-4">
+            <TypewriterText
+              baseText="Mercados Preditivos"
+              texts={[
+                "para Análise Estratégica",
+                "baseados em Dados",
+                "com Transparência Total",
+                "para o Futuro do Rio"
+              ]}
+              className="text-2xl font-bold text-primary"
+              typingSpeed={100}
+              deletingSpeed={50}
+              pauseDuration={2000}
+            />
           </div>
           <p className="text-muted-foreground max-w-[65ch] mx-auto">
             Entre ou cadastre-se para começar suas análises no maior mercado de previsões do Rio
@@ -407,7 +419,7 @@ const Auth = () => {
         </Card>
 
         <div className="text-center mt-6 text-sm text-muted-foreground">
-          <p>Após criar sua conta, você receberá 1000 Rioz Coin para começar suas análises!</p>
+          <p>Após criar sua conta, você receberá 10 Rioz Coin para começar suas análises!</p>
         </div>
       </div>
     </div>
