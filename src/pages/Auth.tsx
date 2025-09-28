@@ -10,10 +10,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from 'next-themes';
 
 const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { resolvedTheme } = useTheme();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLogin, setIsLogin] = useState(true);
@@ -220,7 +222,9 @@ const Auth = () => {
         <div className="text-center mb-8">
           <div className="mb-6">
             <img 
-              src={new URL('../assets/rio-white-logo-new.png', import.meta.url).href}
+              src={resolvedTheme === 'dark' 
+                ? new URL('../assets/rio-white-logo-new.png', import.meta.url).href
+                : "/assets/rio-black-logo.png"}
               alt="Rio Markets Logo" 
               className="h-20 w-auto mx-auto mb-4"
             />

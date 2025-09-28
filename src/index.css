@@ -137,8 +137,9 @@
   }
   
   
-  /* Dark theme adjustments - updated for light mode support */
-  .dark {
+  /* Set dark as default and add light theme overrides */
+  :root {
+    /* Dark theme is now default */
     --background: 210 13% 5%;
     --foreground: 210 20% 98%;
     --card: 210 13% 7%;
@@ -160,8 +161,8 @@
     --ring: 160 100% 50%;
   }
 
-  /* Light theme */
-  :root:not(.dark) {
+  /* Light theme overrides */
+  .light {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;

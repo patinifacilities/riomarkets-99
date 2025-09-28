@@ -21,6 +21,7 @@ import ProbabilityChart from '@/components/markets/ProbabilityChart';
 import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorModal';
 import SimpleOrderBook from '@/components/markets/SimpleOrderBook';
 import { BetSlider } from '@/components/markets/BetSlider';
+import { SliderConfirm } from '@/components/ui/slider-confirm';
 
 const MarketDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -286,6 +287,25 @@ const MarketDetail = () => {
                 </h3>
                 
                  <div className="space-y-4">
+                    {/* Editable RIOZ Input */}
+                    <div>
+                      <Label htmlFor="rioz-amount" className="text-sm font-medium">
+                        Quantidade RIOZ
+                      </Label>
+                      <Input
+                        id="rioz-amount"
+                        type="number"
+                        placeholder="Digite a quantidade..."
+                        value={betAmount || ''}
+                        onChange={(e) => setBetAmount(Number(e.target.value) || 0)}
+                        min="5"
+                        max={userProfile?.saldo_moeda || 0}
+                        className="mt-2"
+                      />
+                    </div>
+                    
+                    <div className="text-center text-sm text-muted-foreground">ou use o slider</div>
+                    
                     <BetSlider 
                       balance={userProfile?.saldo_moeda || 0}
                       onAmountChange={(amount) => setBetAmount(amount)}
@@ -324,8 +344,8 @@ const MarketDetail = () => {
                   </div>
                   
                   {selectedOption && betAmount && betAmount > 0 && (
-                    <Button 
-                      onClick={async () => {
+                    <SliderConfirm
+                      onConfirm={async () => {
                         if (!authUser?.id) {
                           toast({
                             title: "Erro",
@@ -426,12 +446,9 @@ const MarketDetail = () => {
                         }
                       }}
                       disabled={market.status !== 'aberto'}
-                      className="bg-white text-black hover:bg-white/90 w-full min-h-[44px] mt-4 font-semibold border-2"
-                      size="sm"
-                      aria-label={`Confirmar opinião ${selectedOption.toUpperCase()}`}
-                    >
-                      Confirmar Opinião {selectedOption.toUpperCase()}
-                    </Button>
+                      text={`Deslize para confirmar ${selectedOption.toUpperCase()} ${betAmount.toLocaleString()} RIOZ`}
+                      className="w-full mt-4"
+                    />
                   )}
 
                    {/* Calculator button */}

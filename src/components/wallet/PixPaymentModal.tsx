@@ -63,7 +63,8 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
       setCopied(true);
       toast({
         title: "Código copiado!",
-        description: "O código PIX foi copiado para a área de transferência.",
+        description: "Chave PIX copiada com sucesso.",
+        className: "bg-[#00ff90] text-gray-800 border-0",
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
@@ -79,6 +80,7 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
     toast({
       title: "Pagamento sendo processado",
       description: "Seu pagamento está sendo processado e em breve será creditado em sua conta.",
+      className: "bg-[#00ff90] text-gray-800 border-0",
     });
     onOpenChange(false);
     onSuccess?.();

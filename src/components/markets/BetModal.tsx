@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { MarketPool } from '@/hooks/useMarketPools';
 import { BetSlider } from './BetSlider';
+import { SliderConfirm } from '@/components/ui/slider-confirm';
 
 interface BetModalProps {
   open: boolean;
@@ -199,7 +200,7 @@ const BetModal = ({
           <div className="space-y-4">
             <div>
               <Label htmlFor="bet-amount" className="text-sm font-medium">
-                Valor da opinião (Rioz Coin)
+                Quantidade (Rioz Coin)
               </Label>
               <Input
                 id="bet-amount"
@@ -261,22 +262,19 @@ const BetModal = ({
           )}
 
           {/* Action Buttons */}
-          <div className="flex gap-3">
+          <div className="space-y-3">
+            <SliderConfirm
+              onConfirm={handleBet}
+              disabled={!!errorMessage || isLoading}
+              text={isLoading ? "Processando..." : `Deslize para opinar ${betValue || 0} Rioz Coin`}
+              className="w-full"
+            />
             <Button 
               variant="outline" 
               onClick={() => onOpenChange(false)}
-              className="flex-1"
+              className="w-full"
             >
               Cancelar
-            </Button>
-            <Button 
-              onClick={handleBet}
-              disabled={!!errorMessage || isLoading}
-              className="flex-1 min-h-[44px]"
-              size="default"
-              aria-label={`Confirmar opinião de ${betValue || 0} Rioz Coin em ${selectedOption.toUpperCase()}`}
-            >
-              {isLoading ? 'Processando...' : `Opinar ${betValue || 0} Rioz Coin`}
             </Button>
           </div>
         </div>
