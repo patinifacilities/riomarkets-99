@@ -300,7 +300,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         }
       });
       
-      // Dispatch events to update UI
+      // Dispatch events to update UI - force refresh both balance and profile
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('balanceUpdated', { 
           detail: { 
@@ -310,6 +310,12 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
           } 
         }));
         window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
+        // Also dispatch profile updated event to ensure UI refreshes
+        window.dispatchEvent(new CustomEvent('profileUpdated', {
+          detail: {
+            saldo_moeda: Math.round(newRiozBalance)
+          }
+        }));
       }
       
       set({ exchangeLoading: false });
