@@ -18,7 +18,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
   const startX = useRef(0);
   const startPosition = useRef(0);
 
-  const THRESHOLD = 0.97; // 97% threshold to complete
+  const THRESHOLD = 0.85; // 85% threshold to complete
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -107,6 +107,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (disabled) return;
+    e.preventDefault();
     
     setIsDragging(true);
     startX.current = e.clientX;
@@ -115,6 +116,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (disabled) return;
+    e.preventDefault();
     
     setIsDragging(true);
     startX.current = e.touches[0].clientX;
@@ -158,15 +160,13 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
       <div
         ref={thumbRef}
         className={cn(
-          "absolute top-1 left-1 w-12 h-12 rounded-full shadow-lg",
-          "flex items-center justify-center transition-all duration-200",
-          "cursor-grab active:cursor-grabbing",
-          isDragging ? "scale-110" : "scale-100",
-          disabled ? "cursor-not-allowed" : ""
+          "absolute top-1 left-1 w-12 h-12 rounded-full shadow-lg z-20",
+          "flex items-center justify-center",
+          isDragging ? "scale-110 transition-none" : "scale-100 transition-all duration-200",
+          disabled ? "cursor-not-allowed bg-gray-400" : "cursor-grab active:cursor-grabbing bg-white"
         )}
         style={{
           transform: `translateX(${position}px)`,
-          background: 'white',
         }}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}

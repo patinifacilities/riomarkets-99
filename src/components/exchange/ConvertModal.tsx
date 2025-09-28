@@ -147,21 +147,25 @@ export const ConvertModal = ({ open, onOpenChange, onSuccess }: ConvertModalProp
                   </div>
                 </div>
                 
-                <div className="flex gap-2 mt-2">
-                  {[25, 50, 75, 100].map((percentage) => {
-                    const maxAmount = Math.floor((balance?.brl_balance || 0) * (percentage / 100));
-                    return (
-                      <Button
-                        key={percentage}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setAmount(maxAmount.toString())}
-                        className="flex-1 text-xs"
-                      >
-                        {percentage}%
-                      </Button>
-                    );
-                  })}
+                <div className="space-y-2 mt-4">
+                  <div className="text-sm text-muted-foreground">Selecione o valor</div>
+                  <div className="px-4">
+                    <input
+                      type="range"
+                      min="0"
+                      max={Math.floor(balance?.brl_balance || 0)}
+                      value={amount || 0}
+                      onChange={(e) => setAmount(e.target.value)}
+                      className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer slider-thumb"
+                      style={{
+                        background: `linear-gradient(to right, hsl(var(--primary)) 0%, hsl(var(--primary)) ${((parseFloat(amount) || 0) / Math.floor(balance?.brl_balance || 0)) * 100}%, hsl(var(--muted)) ${((parseFloat(amount) || 0) / Math.floor(balance?.brl_balance || 0)) * 100}%, hsl(var(--muted)) 100%)`
+                      }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>0</span>
+                    <span>{Math.floor(balance?.brl_balance || 0)}</span>
+                  </div>
                 </div>
               </div>
               
@@ -200,21 +204,25 @@ export const ConvertModal = ({ open, onOpenChange, onSuccess }: ConvertModalProp
                   </div>
                 </div>
                 
-                <div className="flex gap-2 mt-2">
-                  {[25, 50, 75, 100].map((percentage) => {
-                    const maxAmount = Math.floor((profile?.saldo_moeda || 0) * (percentage / 100));
-                    return (
-                      <Button
-                        key={percentage}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setAmount(maxAmount.toString())}
-                        className="flex-1 text-xs"
-                      >
-                        {percentage}%
-                      </Button>
-                    );
-                  })}
+                <div className="space-y-2 mt-4">
+                  <div className="text-sm text-muted-foreground">Selecione a quantidade</div>
+                  <div className="px-4">
+                    <input
+                      type="range"
+                      min="0"
+                      max={profile?.saldo_moeda || 0}
+                      value={amount || 0}
+                      onChange={(e) => setAmount(e.target.value)}
+                      className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer slider-thumb"
+                      style={{
+                        background: `linear-gradient(to right, hsl(var(--primary)) 0%, hsl(var(--primary)) ${((parseFloat(amount) || 0) / (profile?.saldo_moeda || 0)) * 100}%, hsl(var(--muted)) ${((parseFloat(amount) || 0) / (profile?.saldo_moeda || 0)) * 100}%, hsl(var(--muted)) 100%)`
+                      }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>0</span>
+                    <span>{profile?.saldo_moeda || 0}</span>
+                  </div>
                 </div>
               </div>
               

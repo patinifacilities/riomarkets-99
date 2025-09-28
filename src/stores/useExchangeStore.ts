@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
+import { logExchangeTransaction } from '@/services/exchangeTransactions';
 
 export interface Rate {
   price: number;
@@ -255,36 +256,59 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         supabase
           .from('profiles')
           .update({ saldo_moeda: Math.round(newRiozBalance) })
-          .eq('id', user.id),
+          .eq('id', user.id)
+          .select('saldo_moeda')
+          .single(),
         supabase
           .from('balances')
           .update({ brl_balance: newBrlBalance })
           .eq('user_id', user.id)
+          .select('brl_balance')
+          .single()
       ]);
 
       if (profileUpdate.error) throw profileUpdate.error;
       if (balanceUpdate.error) throw balanceUpdate.error;
 
-      // Log the exchange transaction
-      await supabase
-        .from('exchange_orders')
-        .insert({
-          user_id: user.id,
-          side,
-          price_brl_per_rioz: 1.0,
-          amount_rioz: amountInput,
-          amount_brl: totalCost,
-          status: 'filled',
-          filled_at: new Date().toISOString()
-        });
+      // Log the exchange transaction in both tables
+      await Promise.all([
+        supabase
+          .from('exchange_orders')
+          .insert({
+            user_id: user.id,
+            side,
+            price_brl_per_rioz: 1.0,
+            amount_rioz: amountInput,
+            amount_brl: totalCost,
+            status: 'filled',
+            filled_at: new Date().toISOString()
+          }),
+        logExchangeTransaction(
+          user.id,
+          side === 'buy_rioz' ? 'compra_rioz' : 'venda_rioz',
+          side === 'buy_rioz' ? totalCost : amountInput,
+          side === 'buy_rioz' ? `Compra de ${amountInput} RIOZ por R$ ${totalCost.toFixed(2)}` : `Venda de ${amountInput} RIOZ por R$ ${totalCost.toFixed(2)}`
+        )
+      ]);
       
-      // Refresh balance and skip history to avoid errors
-      const store = get();
-      await store.fetchBalance();
+      // Update local balance state with actual data from database
+      set({ 
+        balance: {
+          rioz_balance: newRiozBalance,
+          brl_balance: newBrlBalance,
+          updated_at: new Date().toISOString()
+        }
+      });
       
       // Dispatch events to update UI
       if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('balanceUpdated'));
+        window.dispatchEvent(new CustomEvent('balanceUpdated', { 
+          detail: { 
+            rioz_balance: newRiozBalance, 
+            brl_balance: newBrlBalance,
+            saldo_moeda: Math.round(newRiozBalance)
+          } 
+        }));
         window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
       }
       
