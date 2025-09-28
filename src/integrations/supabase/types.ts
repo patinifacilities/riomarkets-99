@@ -1054,6 +1054,15 @@ export type Database = {
         Args: { target_symbol: string }
         Returns: undefined
       }
+      cancel_bet_with_fee: {
+        Args: { p_order_id: string; p_user_id: string }
+        Returns: {
+          fee_amount: number
+          message: string
+          refund_amount: number
+          success: boolean
+        }[]
+      }
       cleanup_expired_limit_orders: {
         Args: Record<PropertyKey, never>
         Returns: number
