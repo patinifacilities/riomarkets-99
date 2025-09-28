@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wallet, TrendingUp, TrendingDown, Users, Plus, ArrowRightLeft, DollarSign } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Users, Plus, ArrowRightLeft, DollarSign, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useWalletTransactions, useUserOrders } from '@/hooks/useWallet';
@@ -9,6 +9,7 @@ import { useMarkets } from '@/hooks/useMarkets';
 import { useExchangeStore } from '@/stores/useExchangeStore';
 import { AddBrlModal } from '@/components/exchange/AddBrlModal';
 import { WithdrawModal } from '@/components/wallet/WithdrawModal';
+import { CancelBetModal } from '@/components/wallet/CancelBetModal';
 import TransactionItem from '@/components/wallet/TransactionItem';
 import OrderItem from '@/components/wallet/OrderItem';
 import ExportCSVButton from '@/components/ui/export-csv-button';
@@ -22,6 +23,7 @@ const WalletPage = () => {
   const { balance, fetchBalance } = useExchangeStore();
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [showCancelBetModal, setShowCancelBetModal] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -95,6 +97,14 @@ const WalletPage = () => {
               <ArrowRightLeft className="w-4 h-4 mr-2" />
               Sacar
             </Button>
+            <Button 
+              onClick={() => setShowCancelBetModal(true)}
+              variant="outline"
+              className="border-danger/30 text-danger hover:bg-danger/10"
+            >
+              <X className="w-4 h-4 mr-2" />
+              Cancelar Opinião
+            </Button>
           </div>
         </div>
 
@@ -133,70 +143,16 @@ const WalletPage = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Saldo em R$/BRL</p>
-                  <p className="text-2xl font-bold text-success">
+                  <p className="text-2xl font-bold text-white">
                     R$ {brlBalance.toFixed(2)}
                   </p>
                 </div>
-                <DollarSign className="w-8 h-8 text-success" />
+                <DollarSign className="w-8 h-8 text-white" />
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Global Pool Status */}
-        <Card className="bg-gradient-card border-border/50 mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5" />
-              Status do Pool Global de Predições
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-[#00FF91]/10 rounded-lg">
-                  <div className="text-sm text-muted-foreground mb-1">Pool SIM</div>
-                  <div className="text-xl font-bold text-[#00FF91]">{simPercent.toFixed(1)}%</div>
-                  <div className="text-xs text-muted-foreground">{globalPoolSim.toLocaleString()} RIOZ</div>
-                </div>
-              
-              <div className="text-center p-4 bg-primary/10 rounded-lg">
-                <div className="text-sm text-muted-foreground mb-1">Pool Total</div>
-                <div className="text-xl font-bold text-primary">{totalPool.toLocaleString()}</div>
-                <div className="text-xs text-muted-foreground">Rioz Coin</div>
-              </div>
-              
-                <div className="text-center p-4 bg-[#FF1493]/10 rounded-lg">
-                  <div className="text-sm text-muted-foreground mb-1">Pool NÃO</div>
-                  <div className="text-xl font-bold text-[#FF1493]">{naoPercent.toFixed(1)}%</div>
-                  <div className="text-xs text-muted-foreground">{globalPoolNao.toLocaleString()} RIOZ</div>
-                </div>
-            </div>
-
-            <div className="bg-danger/10 border border-danger/20 rounded-lg p-4">
-              <p className="text-sm text-danger font-medium mb-2">⚠️ Aviso sobre Taxa de Liquidação</p>
-              <p className="text-xs text-muted-foreground">
-                20% do pool perdedor será destinado à manutenção da plataforma quando os mercados forem liquidados.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <Button 
-                className="bg-[#00FF91] hover:bg-[#00FF91]/90 text-black"
-                onClick={() => window.location.href = '/'}
-              >
-                <TrendingUp className="w-4 h-4 mr-2" />
-                Dar Opinião SIM
-              </Button>
-              <Button 
-                className="bg-[#FF1493] hover:bg-[#FF1493]/90 text-white"
-                onClick={() => window.location.href = '/'}
-              >
-                <TrendingDown className="w-4 h-4 mr-2" />
-                Dar Opinião NÃO
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Transaction History */}
@@ -236,7 +192,9 @@ const WalletPage = () => {
           {/* Order History */}
           <Card className="bg-gradient-card border-border/50">
             <CardHeader>
-              <CardTitle>Histórico de Ordens</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Histórico de Ordens</CardTitle>
+              </div>
             </CardHeader>
             <CardContent>
               {loadingOrders ? (
@@ -281,6 +239,14 @@ const WalletPage = () => {
             refetchProfile();
             refetchTransactions();
             fetchBalance();
+          }}
+        />
+        <CancelBetModal 
+          open={showCancelBetModal}
+          onOpenChange={setShowCancelBetModal}
+          onConfirm={() => {
+            // Implementation for canceling bet would go here
+            console.log('Cancel bet logic');
           }}
         />
       </div>

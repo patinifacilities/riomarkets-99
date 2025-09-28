@@ -195,30 +195,22 @@
     backdrop-filter: blur(10px);
   }
 
-  /* Liquid glass scroll effect */
+  /* Simple scroll styling */
   html::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
 
   html::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 10px;
+    background: transparent;
   }
 
   html::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, 
-      rgba(0, 255, 145, 0.6) 0%, 
-      rgba(255, 35, 137, 0.6) 100%);
-    border-radius: 10px;
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: hsl(var(--muted));
+    border-radius: 3px;
   }
 
   html::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, 
-      rgba(0, 255, 145, 0.8) 0%, 
-      rgba(255, 35, 137, 0.8) 100%);
+    background: hsl(var(--muted-foreground) / 0.5);
   }
 
 /* Hide scrollbar but keep functionality */

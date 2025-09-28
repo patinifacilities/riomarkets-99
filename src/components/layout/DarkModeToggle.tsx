@@ -20,10 +20,6 @@ export function DarkModeToggle() {
   const handleThemeToggle = () => {
     const newTheme = currentTheme === "dark" ? "light" : "dark";
     setTheme(newTheme);
-    // Force update DOM
-    setTimeout(() => {
-      document.documentElement.setAttribute('class', newTheme);
-    }, 0);
   };
 
   return (

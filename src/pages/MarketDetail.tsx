@@ -302,24 +302,17 @@ const MarketDetail = () => {
                   )}
                   
                   <div className="grid grid-cols-2 gap-2 mt-4">
-                    <Button 
-                      onClick={() => setSelectedOption('sim')}
-                      disabled={market.status !== 'aberto'}
-                      className="bg-[#00FF91] hover:bg-[#00FF91]/90 text-black shadow-[#00FF91]/20 min-h-[44px]"
-                      size="sm"
-                      aria-label="Opinar SIM"
-                    >
-                      Opinar SIM
-                    </Button>
-                    <Button 
-                      onClick={() => handleOpenBetModal('não')}
-                      disabled={market.status !== 'aberto'}
-                      className="bg-[#FF1493] hover:bg-[#FF1493]/90 text-white shadow-[#FF1493]/20 min-h-[44px]"
-                      size="sm"
-                      aria-label="Opinar NÃO"
-                    >
-                      Opinar NÃO
-                    </Button>
+                    {selectedOption && betAmount && betAmount > 0 && (
+                      <Button 
+                        onClick={() => handleOpenBetModal(selectedOption)}
+                        disabled={market.status !== 'aberto'}
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground w-full min-h-[44px]"
+                        size="sm"
+                        aria-label={`Confirmar opinião ${selectedOption.toUpperCase()}`}
+                      >
+                        Confirmar Opinião {selectedOption.toUpperCase()}
+                      </Button>
+                    )}
                   </div>
 
                    {/* Calculator button */}
