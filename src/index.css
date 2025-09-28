@@ -108,8 +108,26 @@
     }
   }
 
+  @keyframes scroll-left {
+    0% { transform: "translateX(100%)" },
+    100% { transform: "translateX(-100%)" }
+  }
+
+  @keyframes scroll-left-seamless {
+    0% { transform: "translateX(0%)" },
+    100% { transform: "translateX(-50%)" }
+  }
+
   .animate-scroll-right {
     animation: scroll-right 60s linear infinite;
+  }
+
+  .animate-scroll-left {
+    animation: scroll-left 30s linear infinite;
+  }
+
+  .animate-scroll-left-seamless {
+    animation: scroll-left-seamless 30s linear infinite;
   }
 
   /* Dark theme adjustments */

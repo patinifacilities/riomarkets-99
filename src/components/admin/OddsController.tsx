@@ -62,15 +62,13 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
         })
         .eq('id', market.id);
 
-      // Force a page reload to update all cached data
-      if (!error) {
-        window.location.reload();
-      }
-
       if (error) {
         console.error('Supabase error updating odds:', error);
         throw error;
       }
+
+      // Force immediate refresh to show changes
+      onOddsUpdate?.();
 
       // Log admin action
       const { data: user } = await supabase.auth.getUser();

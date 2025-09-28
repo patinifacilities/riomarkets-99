@@ -185,11 +185,17 @@ const Home = () => {
           
           <div className="text-center mb-6 md:mb-8">
             <h1 className="font-extrabold text-[34px] md:text-[44px] lg:text-[56px] leading-[1.05] mb-4 text-white [text-wrap:balance]">
-              <span className="text-white">Mercados Preditivos </span>
+              <TypewriterText 
+                baseText="Mercados Preditivos"
+                texts={["Inteligentes", "Lucrativos", "Rápidos"]}
+                className="text-white md:hidden"
+                mobileBreak={true}
+              />
+              <span className="hidden md:inline text-white">Mercados Preditivos </span>
               <TypewriterText 
                 baseText=""
                 texts={["Inteligentes", "Lucrativos", "Rápidos"]}
-                className="text-[#00FF91]"
+                className="text-[#00FF91] hidden md:inline"
               />
             </h1>
             <p className="text-base md:text-lg max-w-[60ch] mx-auto text-[color:var(--text-secondary)]">
