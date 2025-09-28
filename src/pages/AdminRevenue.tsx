@@ -40,11 +40,11 @@ const AdminRevenue = () => {
         .select('valor')
         .ilike('descricao', '%cancelamento%');
 
-      // Buscar taxas de conversão
+      // Buscar taxas de conversão (receitas da plataforma)
       const { data: conversionData } = await supabase
         .from('wallet_transactions')
         .select('valor')
-        .ilike('descricao', '%conversão%');
+        .ilike('descricao', '%Receita - Taxa de conversão%');
 
       // Calcular taxas de pool (estimativa baseada nos mercados liquidados)
       const { data: marketsData } = await supabase
@@ -53,7 +53,7 @@ const AdminRevenue = () => {
         .eq('status', 'liquidado');
 
       const cancellationFees = cancellationData?.reduce((sum, t) => sum + Math.abs(t.valor), 0) || 0;
-      const conversionFees = conversionData?.reduce((sum, t) => sum + Math.abs(t.valor), 0) || 0;
+      const conversionFees = conversionData?.reduce((sum, t) => sum + t.valor, 0) || 0; // No need for Math.abs as it's already positive revenue
       const poolFees = (marketsData?.length || 0) * 100; // Estimativa
 
       setRevenueData({

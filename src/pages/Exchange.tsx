@@ -74,23 +74,26 @@ const Exchange = () => {
     const feeRate = 0.01; // 1% de taxa
     const fee = amountNum * feeRate;
     
-    // Validar saldos incluindo taxa
-    if (activeTab === 'buy' && brlBalance < (amountNum + fee)) {
-      toast({
-        title: "Erro",
-        description: "Saldo BRL insuficiente (incluindo taxa de 1%)",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (activeTab === 'sell' && riozBalance < amountNum) {
-      toast({
-        title: "Erro", 
-        description: "Saldo RIOZ insuficiente",
-        variant: "destructive",
-      });
-      return;
+    // New validation logic - should always allow if using calculated max amount
+    if (activeTab === 'buy') {
+      const totalCost = amountNum + fee;
+      if (brlBalance < totalCost) {
+        toast({
+          title: "Erro",
+          description: "Saldo BRL insuficiente (incluindo taxa de 1%)",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else {
+      if (riozBalance < amountNum) {
+        toast({
+          title: "Erro", 
+          description: "Saldo RIOZ insuficiente",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setLoading(true);
@@ -106,13 +109,13 @@ const Exchange = () => {
         await supabase.from('balances').update({ brl_balance: newBrlBalance }).eq('user_id', user.id);
         await supabase.from('profiles').update({ saldo_moeda: newRiozBalance }).eq('id', user.id);
         
-        // Log da receita de taxa
+        // Log da receita de taxa em R$ (convertendo de RZ para R$)
         await supabase.from('wallet_transactions').insert({
-          id: 'fee_' + Date.now(),
+          id: 'fee_conversion_' + Date.now(),
           user_id: user.id,
-          tipo: 'debito',
-          valor: Math.round(fee),
-          descricao: 'Taxa de conversão (1%)'
+          tipo: 'credito',
+          valor: Math.round(fee * 100), // Converter para centavos e armazenar como R$
+          descricao: 'Receita - Taxa de conversão (1%) - Compra RIOZ'
         });
         
         setBrlBalance(newBrlBalance);
@@ -132,13 +135,13 @@ const Exchange = () => {
         await supabase.from('balances').update({ brl_balance: newBrlBalance }).eq('user_id', user.id);
         await supabase.from('profiles').update({ saldo_moeda: newRiozBalance }).eq('id', user.id);
         
-        // Log da receita de taxa
+        // Log da receita de taxa em R$ (convertendo de RZ para R$)
         await supabase.from('wallet_transactions').insert({
-          id: 'fee_' + Date.now(),
+          id: 'fee_conversion_' + Date.now(),
           user_id: user.id,
-          tipo: 'debito',
-          valor: Math.round(fee),
-          descricao: 'Taxa de conversão (1%)'
+          tipo: 'credito',
+          valor: Math.round(fee * 100), // Converter para centavos e armazenar como R$
+          descricao: 'Receita - Taxa de conversão (1%) - Venda RIOZ'
         });
         
         setBrlBalance(newBrlBalance);
@@ -187,7 +190,15 @@ const Exchange = () => {
   };
 
   const getMaxAmount = () => {
-    return activeTab === 'buy' ? brlBalance : riozBalance;
+    // Calculate max amount after deducting fee
+    const feeRate = 0.01; // 1% fee
+    if (activeTab === 'buy') {
+      // For buying: max amount is BRL balance divided by (1 + fee rate)
+      return brlBalance / (1 + feeRate);
+    } else {
+      // For selling: max amount is RIOZ balance (fee is deducted from received BRL)
+      return riozBalance;
+    }
   };
 
   const handleSliderChange = (value: number[]) => {
@@ -204,21 +215,16 @@ const Exchange = () => {
     setAmount(selectedAmount.toString());
   };
 
-  // Get top volume markets for hot markets card
-  const getTopVolumeMarkets = () => {
-    if (!markets) return [];
-    
-    return markets
-      .filter(m => m.status === 'aberto')
-      .map(market => ({
-        ...market,
-        volume24h: Math.floor(Math.random() * 10000) // Mock volume for now
-      }))
-      .sort((a, b) => b.volume24h - a.volume24h)
-      .slice(0, 3);
-  };
-
-  const topMarkets = getTopVolumeMarkets();
+  // Get top volume markets for hot markets card - use static data to avoid changing when slider moves
+  const topMarkets = markets 
+    ? markets
+        .filter(m => m.status === 'aberto')
+        .map((market, index) => ({
+          ...market,
+          volume24h: [8500, 7200, 6300][index] || 5000 // Static values to prevent changes
+        }))
+        .slice(0, 3)
+    : [];
 
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
@@ -291,13 +297,13 @@ const Exchange = () => {
                 <TabsContent value="buy" className="space-y-4">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label>Valor a converter (máximo: R$ {brlBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })})</Label>
+                      <Label>Valor a converter (máximo: R$ {getMaxAmount().toLocaleString('pt-BR', { minimumFractionDigits: 2 })})</Label>
                       <Input
                         type="number"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         placeholder="0"
-                        max={brlBalance}
+                        max={getMaxAmount()}
                         step="1"
                         min="0"
                       />
@@ -346,7 +352,7 @@ const Exchange = () => {
                     
                     <Button 
                       onClick={handleExchange}
-                      disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > brlBalance}
+                      disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > getMaxAmount()}
                       className="w-full"
                     >
                       {loading ? (
@@ -362,13 +368,13 @@ const Exchange = () => {
                 <TabsContent value="sell" className="space-y-4">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label>Quantidade RIOZ a vender (máximo: {riozBalance.toLocaleString('pt-BR')} RZ)</Label>
+                      <Label>Quantidade RIOZ a vender (máximo: {getMaxAmount().toLocaleString('pt-BR')} RZ)</Label>
                       <Input
                         type="number"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         placeholder="0"
-                        max={riozBalance}
+                        max={getMaxAmount()}
                         step="1"
                         min="0"
                       />
@@ -417,7 +423,7 @@ const Exchange = () => {
                     
                     <Button 
                       onClick={handleExchange}
-                      disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > riozBalance}
+                      disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > getMaxAmount()}
                       variant="destructive"
                       className="w-full"
                     >
