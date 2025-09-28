@@ -141,7 +141,7 @@ const MarketDetail = () => {
                   <div className="text-right space-y-2">
                     <div className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Clock className="w-4 h-4" />
-                      <span>{daysLeft > 0 ? `${daysLeft} dias` : 'Encerrando'}</span>
+                      <span className="flex items-center gap-1">{daysLeft > 0 ? `${daysLeft} dias` : 'Encerrando'}</span>
                     </div>
                     <Badge className={getStatusColor(market.status)}>
                       {market.status}
@@ -164,7 +164,7 @@ const MarketDetail = () => {
                    </div>
                    <div className="flex items-center gap-1">
                      <TrendingUp className="w-4 h-4" />
-                     {Math.max(100, (pool?.total_pool || 0) * 2).toLocaleString('pt-BR')} análises
+                     {Math.min((pool?.total_pool || 0), Math.max(100, (pool?.total_pool || 0) * 2)).toLocaleString('pt-BR')} análises
                    </div>
                 </div>
               </CardContent>
@@ -330,26 +330,33 @@ const MarketDetail = () => {
                     </div>
                   )}
                   
-                  <div className="grid grid-cols-2 gap-2 mt-4">
-                    <Button 
-                      onClick={() => setSelectedOption('sim')}
-                      disabled={market.status !== 'aberto'}
-                      className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-[#00ff90] hover:bg-[#00ff90]/90 text-black font-semibold' : 'bg-[#00ff90] text-black border-2 hover:bg-[#00ff90]/90 font-semibold'}`}
-                      size="sm"
-                      aria-label="Opinar Sim"
-                    >
-                      Opinar Sim
-                    </Button>
-                    <Button 
-                      onClick={() => setSelectedOption('nao')}
-                      disabled={market.status !== 'aberto'}
-                      className={`min-h-[44px] ${selectedOption === 'nao' ? 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-semibold' : 'bg-[#ff2389] text-white border-2 hover:bg-[#ff2389]/90 font-semibold'}`}
-                      size="sm"
-                      aria-label="Opinar Não"
-                    >
-                      Opinar Não
-                    </Button>
-                  </div>
+                   {(userProfile?.saldo_moeda || 0) === 0 ? (
+                     <div className="p-4 bg-warning/10 border border-warning rounded-lg text-center">
+                       <p className="text-sm text-warning mb-2">Saldo insuficiente para opinar</p>
+                       <p className="text-xs text-muted-foreground">Deposite R$ ou troque R$ por RIOZ para começar a opinar</p>
+                     </div>
+                   ) : (
+                     <div className="grid grid-cols-2 gap-2 mt-4">
+                       <Button 
+                         onClick={() => setSelectedOption('sim')}
+                         disabled={market.status !== 'aberto'}
+                         className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-[#00ff90] hover:bg-[#00ff90]/90 text-black font-semibold' : 'bg-[#00ff90] text-black border-2 hover:bg-[#00ff90]/90 font-semibold'}`}
+                         size="sm"
+                         aria-label="Opinar Sim"
+                       >
+                         Opinar Sim
+                       </Button>
+                       <Button 
+                         onClick={() => setSelectedOption('nao')}
+                         disabled={market.status !== 'aberto'}
+                         className={`min-h-[44px] ${selectedOption === 'nao' ? 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-semibold' : 'bg-[#ff2389] text-white border-2 hover:bg-[#ff2389]/90 font-semibold'}`}
+                         size="sm"
+                         aria-label="Opinar Não"
+                       >
+                         Opinar Não
+                       </Button>
+                     </div>
+                   )}
                   
                    {selectedOption && betAmount && betAmount > 0 && (
                      <SliderConfirm

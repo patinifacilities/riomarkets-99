@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, TrendingUp, Percent, RefreshCw } from 'lucide-react';
+import { DollarSign, TrendingUp, Percent, RefreshCw, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 
 interface RevenueData {
   cancellationFees: number;
@@ -88,6 +88,10 @@ const AdminRevenue = () => {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
+            <Link to="/admin" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-2">
+              <ArrowLeft className="w-4 h-4" />
+              Voltar
+            </Link>
             <h1 className="text-3xl font-bold mb-2">Receita da Plataforma</h1>
             <p className="text-muted-foreground">
               Acompanhe as taxas coletadas pela plataforma

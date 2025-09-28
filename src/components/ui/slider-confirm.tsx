@@ -129,7 +129,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
   const maxPosition = containerWidth - thumbWidth;
   const progress = maxPosition > 0 ? position / maxPosition : 0;
   
-  // Determine colors based on selected option
+  // Determine colors based on selected option - change when sim is selected (green)
   const isSimOption = selectedOption === 'sim';
   const fillColor = isSimOption ? '#00ff90' : '#ff2389';
 
@@ -148,7 +148,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
         className="absolute inset-0 transition-none"
         style={{
           background: fillColor,
-          clipPath: `inset(0 ${100 - (progress * 100)}% 0 0)`,
+          width: `${Math.min(progress * 100, 85)}%`, // Stop at 85% to avoid overlapping thumb
         }}
       />
       
@@ -157,7 +157,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
         <span 
           className="text-sm font-medium transition-none"
           style={{
-            color: progress > 0 && selectedOption === 'nao' ? '#374151' : 'white'
+            color: progress > 0 && selectedOption === 'sim' ? '#000' : 'white'
           }}
         >
           {text}

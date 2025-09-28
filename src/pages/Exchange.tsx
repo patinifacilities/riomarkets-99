@@ -156,6 +156,9 @@ const Exchange = () => {
         await fetchBalances();
         setRefreshKey(prev => prev + 1);
         
+        // Force profile refetch for RIOZ balance update
+        await refetchProfile();
+        
         toast({
           title: "Venda realizada!",
           description: `Você vendeu ${amountNum} RIOZ e recebeu R$ ${totalReceived.toFixed(2)} (- R$ ${fee.toFixed(2)} de taxa)`,
