@@ -266,6 +266,53 @@ export type Database = {
         }
         Relationships: []
       }
+      market_order_book: {
+        Row: {
+          cancelled_at: string | null
+          created_at: string | null
+          filled_at: string | null
+          id: string
+          market_id: string
+          price: number
+          quantity: number
+          side: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          created_at?: string | null
+          filled_at?: string | null
+          id?: string
+          market_id: string
+          price: number
+          quantity: number
+          side: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          created_at?: string | null
+          filled_at?: string | null
+          id?: string
+          market_id?: string
+          price?: number
+          quantity?: number
+          side?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_order_book_market_id_fkey"
+            columns: ["market_id"]
+            isOneToOne: false
+            referencedRelation: "markets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_orders: {
         Row: {
           amount_rioz: number
@@ -1132,6 +1179,22 @@ export type Database = {
           error_message: string
           new_brl_balance: number
           new_rioz_balance: number
+          success: boolean
+        }[]
+      }
+      execute_market_opinion_order: {
+        Args: {
+          p_market_id: string
+          p_price: number
+          p_quantity: number
+          p_side: string
+          p_user_id: string
+        }
+        Returns: {
+          matched_quantity: number
+          message: string
+          new_order_id: string
+          remaining_quantity: number
           success: boolean
         }[]
       }
