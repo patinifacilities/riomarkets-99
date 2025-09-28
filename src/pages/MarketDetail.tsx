@@ -140,10 +140,13 @@ const MarketDetail = () => {
                     <h1 className="text-[clamp(2rem,4vw,3rem)] font-bold leading-tight [text-wrap:balance]">{market.titulo}</h1>
                   </div>
                   <div className="text-right space-y-2">
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Clock className="w-4 h-4" />
-                      <span className="flex items-center gap-1">{daysLeft > 0 ? `${daysLeft} dias` : 'Encerrando'}</span>
-                    </div>
+                     <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                       <Clock className="w-4 h-4" />
+                       <span className="flex items-center gap-1">
+                         <span className="mr-1">{daysLeft > 0 ? daysLeft : 0}</span>
+                         <span>dias</span>
+                       </span>
+                     </div>
                     <Badge className={getStatusColor(market.status)}>
                       {market.status}
                     </Badge>

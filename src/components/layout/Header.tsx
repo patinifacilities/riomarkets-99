@@ -291,16 +291,34 @@ const Header = () => {
                  {/* Dark Mode Toggle */}
                  <DarkModeToggle />
                 
-                 {/* Profile Icon */}
-                 <Link to="/profile">
-                   <Button 
-                     variant="ghost" 
-                     size="sm"
-                     className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-full p-2"
-                   >
-                     <UserCircle className="w-6 h-6" />
-                   </Button>
-                 </Link>
+                 {/* Profile Dropdown */}
+                 <DropdownMenu>
+                   <DropdownMenuTrigger asChild>
+                     <Button 
+                       variant="ghost" 
+                       size="sm"
+                       className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-full p-2"
+                     >
+                       <UserCircle className="w-6 h-6" />
+                     </Button>
+                   </DropdownMenuTrigger>
+                   <DropdownMenuContent align="end" className="w-48">
+                     <DropdownMenuItem asChild>
+                       <Link to="/profile" className="flex items-center gap-2">
+                         <User className="w-4 h-4" />
+                         Meu Perfil
+                       </Link>
+                     </DropdownMenuItem>
+                     <DropdownMenuSeparator />
+                     <DropdownMenuItem 
+                       onClick={signOut}
+                       className="flex items-center gap-2 text-red-600 focus:text-red-600"
+                     >
+                       <LogOut className="w-4 h-4" />
+                       Sair
+                     </DropdownMenuItem>
+                   </DropdownMenuContent>
+                 </DropdownMenu>
               </>
             ) : !loading ? (
               <Link to="/auth">

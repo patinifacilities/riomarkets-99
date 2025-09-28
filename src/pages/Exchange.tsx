@@ -106,28 +106,32 @@ const Exchange = () => {
         const newBrlBalance = brlBalance - totalCost;
         const newRiozBalance = riozBalance + amountNum;
         
-        // Atualizar saldos
-        await supabase.from('balances').update({ 
-          brl_balance: newBrlBalance,
-          rioz_balance: newRiozBalance 
-        }).eq('user_id', user.id);
-        await supabase.from('profiles').update({ saldo_moeda: newRiozBalance }).eq('id', user.id);
+        // Atualizar saldos no banco de dados
+        const updatePromises = [
+          supabase.from('balances').update({ 
+            brl_balance: newBrlBalance,
+            rioz_balance: newRiozBalance 
+          }).eq('user_id', user.id),
+          
+          supabase.from('profiles').update({ 
+            saldo_moeda: newRiozBalance 
+          }).eq('id', user.id),
+
+          // Log da receita de taxa
+          supabase.from('wallet_transactions').insert({
+            id: 'fee_conversion_' + Date.now(),
+            user_id: user.id,
+            tipo: 'credito',
+            valor: Math.round(fee * 100),
+            descricao: 'Receita - Taxa de conversão (1%) - Compra RIOZ'
+          })
+        ];
+
+        await Promise.all(updatePromises);
         
-        // Log da receita de taxa em R$ (convertendo de RZ para R$)
-        await supabase.from('wallet_transactions').insert({
-          id: 'fee_conversion_' + Date.now(),
-          user_id: user.id,
-          tipo: 'credito',
-          valor: Math.round(fee * 100), // Converter para centavos e armazenar como R$
-          descricao: 'Receita - Taxa de conversão (1%) - Compra RIOZ'
-        });
-        
+        // Atualizar estados locais
         setBrlBalance(newBrlBalance);
         setRiozBalance(newRiozBalance);
-        
-        // Force refresh balances to ensure UI updates
-        await fetchBalances();
-        setRefreshKey(prev => prev + 1);
         
         toast({
           title: "Compra realizada!",
@@ -139,31 +143,32 @@ const Exchange = () => {
         const newBrlBalance = brlBalance + totalReceived;
         const newRiozBalance = riozBalance - amountNum;
         
-        // Atualizar saldos
-        await supabase.from('balances').update({ 
-          brl_balance: newBrlBalance,
-          rioz_balance: newRiozBalance 
-        }).eq('user_id', user.id);
-        await supabase.from('profiles').update({ saldo_moeda: newRiozBalance }).eq('id', user.id);
+        // Atualizar saldos no banco de dados
+        const updatePromises = [
+          supabase.from('balances').update({ 
+            brl_balance: newBrlBalance,
+            rioz_balance: newRiozBalance 
+          }).eq('user_id', user.id),
+          
+          supabase.from('profiles').update({ 
+            saldo_moeda: newRiozBalance 
+          }).eq('id', user.id),
+
+          // Log da receita de taxa
+          supabase.from('wallet_transactions').insert({
+            id: 'fee_conversion_' + Date.now(),
+            user_id: user.id,
+            tipo: 'credito',
+            valor: Math.round(fee * 100),
+            descricao: 'Receita - Taxa de conversão (1%) - Venda RIOZ'
+          })
+        ];
+
+        await Promise.all(updatePromises);
         
-        // Log da receita de taxa em R$ (convertendo de RZ para R$)
-        await supabase.from('wallet_transactions').insert({
-          id: 'fee_conversion_' + Date.now(),
-          user_id: user.id,
-          tipo: 'credito',
-          valor: Math.round(fee * 100), // Converter para centavos e armazenar como R$
-          descricao: 'Receita - Taxa de conversão (1%) - Venda RIOZ'
-        });
-        
+        // Atualizar estados locais
         setBrlBalance(newBrlBalance);
         setRiozBalance(newRiozBalance);
-        
-        // Force refresh balances to ensure UI updates
-        await fetchBalances();
-        setRefreshKey(prev => prev + 1);
-        
-        // Force profile refetch for RIOZ balance update
-        await refetchProfile();
         
         toast({
           title: "Venda realizada!",
@@ -192,8 +197,15 @@ const Exchange = () => {
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 3000);
       
-      // Atualizar profile para outros componentes
-      await refetchProfile();
+      // Force refresh all balances to ensure UI updates
+      await Promise.all([
+        fetchBalances(),
+        refetchProfile()
+      ]);
+      
+      // Trigger refresh in other components that might be using balance
+      setRefreshKey(prev => prev + 1);
+      window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
       
     } catch (error) {
       console.error('Erro na troca:', error);
