@@ -6,7 +6,7 @@ const corsHeaders = createCorsHeaders();
 
 const FEE_RATE = 0.01; // 1%
 const MIN_BRL = 5.00;
-const MAX_BRL = 5000.00;
+const MAX_BRL = 1000000.00; // 1 milhão máximo
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -105,30 +105,34 @@ Deno.serve(async (req) => {
 
     // Calculate amounts based on conversion side with 1% fee
     if (side === 'buy_rioz') {
+      // Comprando RIOZ com BRL
       if (inputCurrency === 'BRL') {
         amountBrl = amount;
-        const grossRioz = amountBrl / price;
-        feeRioz = grossRioz * FEE_RATE;
-        amountRioz = grossRioz - feeRioz; // Net Rioz after fee
-        feeBrl = 0;
+        feeBrl = amountBrl * FEE_RATE; // Taxa sobre o BRL
+        const netBrl = amountBrl - feeBrl; // BRL líquido após taxa
+        amountRioz = netBrl / price; // RIOZ que o usuário recebe
+        feeRioz = 0;
       } else {
+        // Input é RIOZ desejado
         amountRioz = amount;
         amountBrl = amountRioz * price;
-        feeRioz = amountRioz * FEE_RATE;
-        feeBrl = 0;
-      }
-    } else { // sell_rioz
-      if (inputCurrency === 'RIOZ') {
-        amountRioz = amount;
-        const grossBrl = amountRioz * price;
-        feeBrl = grossBrl * FEE_RATE;
-        amountBrl = grossBrl - feeBrl; // Net BRL after fee
-        feeRioz = 0;
-      } else {
-        amountBrl = amount;
-        amountRioz = amountBrl / price;
         feeBrl = amountBrl * FEE_RATE;
         feeRioz = 0;
+      }
+    } else { // sell_rioz
+      // Vendendo RIOZ por BRL
+      if (inputCurrency === 'RIOZ') {
+        amountRioz = amount;
+        feeRioz = amountRioz * FEE_RATE; // Taxa sobre o RIOZ
+        const netRioz = amountRioz - feeRioz; // RIOZ líquido após taxa
+        amountBrl = netRioz * price; // BRL que o usuário recebe
+        feeBrl = 0;
+      } else {
+        // Input é BRL desejado
+        amountBrl = amount;
+        amountRioz = amountBrl / price;
+        feeRioz = amountRioz * FEE_RATE;
+        feeBrl = 0;
       }
     }
 
@@ -176,12 +180,12 @@ Deno.serve(async (req) => {
     }
     
     // Check sufficient balance
-    if (side === 'buy_rioz' && currentBrlBalance < amountBrl) {
+    if (side === 'buy_rioz' && currentBrlBalance < (amountBrl + feeBrl)) {
       statusCode = 400;
       throw new Error('Insufficient BRL balance');
     }
 
-    if (side === 'sell_rioz' && currentRiozBalance < amountRioz) {
+    if (side === 'sell_rioz' && currentRiozBalance < (amountRioz + feeRioz)) {
       statusCode = 400;
       throw new Error('Insufficient Rioz balance');
     }
@@ -212,10 +216,12 @@ Deno.serve(async (req) => {
     let newRiozBalance: number, newBrlBalance: number;
     
     if (side === 'buy_rioz') {
-      newBrlBalance = currentBrlBalance - amountBrl;
+      // Compra: Gasta BRL (+ taxa), Ganha RIOZ
+      newBrlBalance = currentBrlBalance - amountBrl - feeBrl;
       newRiozBalance = currentRiozBalance + amountRioz;
     } else {
-      newRiozBalance = currentRiozBalance - amountRioz;
+      // Venda: Gasta RIOZ (+ taxa), Ganha BRL
+      newRiozBalance = currentRiozBalance - amountRioz - feeRioz;
       newBrlBalance = currentBrlBalance + amountBrl;
     }
 
