@@ -87,7 +87,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
     set({ rateLoading: true, rateError: null });
     
     try {
-      // Set fixed rate for RIOZ as stable coin at R$1
+      // Set fixed rate for RIOZ conversion at 1:1
       const stableRate = {
         price: 1.0,
         change24h: 0,
