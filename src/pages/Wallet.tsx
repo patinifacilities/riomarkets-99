@@ -97,14 +97,6 @@ const WalletPage = () => {
               <ArrowRightLeft className="w-4 h-4 mr-2" />
               Sacar
             </Button>
-            <Button 
-              onClick={() => setShowCancelBetModal(true)}
-              variant="outline"
-              className="border-danger/30 text-danger hover:bg-danger/10"
-            >
-              <X className="w-4 h-4 mr-2" />
-              Cancelar Opinião
-            </Button>
           </div>
         </div>
 
@@ -115,11 +107,11 @@ const WalletPage = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Saldo RIOZ Coin</p>
-                  <p className="text-2xl font-bold text-primary">
+                  <p className="text-2xl font-bold text-white">
                     {profile?.saldo_moeda?.toLocaleString() || 0} RIOZ
                   </p>
                 </div>
-                <Wallet className="w-8 h-8 text-primary" />
+                <Wallet className="w-8 h-8 text-white" />
               </div>
             </CardContent>
           </Card>
@@ -129,11 +121,11 @@ const WalletPage = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Em Ordens Ativas</p>
-                  <p className="text-2xl font-bold text-accent">
+                  <p className="text-2xl font-bold text-white">
                     {totalInOrders.toLocaleString()} RIOZ
                   </p>
                 </div>
-                <TrendingUp className="w-8 h-8 text-accent" />
+                <TrendingUp className="w-8 h-8 text-white" />
               </div>
             </CardContent>
           </Card>
@@ -194,6 +186,15 @@ const WalletPage = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Histórico de Ordens</CardTitle>
+                <Button 
+                  onClick={() => setShowCancelBetModal(true)}
+                  variant="outline"
+                  size="sm"
+                  className="border-danger/30 text-danger hover:bg-danger/10"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Cancelar Opinião
+                </Button>
               </div>
             </CardHeader>
             <CardContent>

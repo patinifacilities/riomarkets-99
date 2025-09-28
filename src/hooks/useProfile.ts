@@ -34,11 +34,20 @@ export const useProfile = (userId?: string) => {
       }
     };
 
+    const handleForceRefresh = () => {
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: ['profile', userId] });
+        queryClient.refetchQueries({ queryKey: ['profile', userId] });
+      }
+    };
+
     window.addEventListener('balanceUpdated', handleBalanceUpdate);
     window.addEventListener('exchangeBalanceUpdated', handleExchangeBalanceUpdate);
+    window.addEventListener('forceProfileRefresh', handleForceRefresh);
     return () => {
       window.removeEventListener('balanceUpdated', handleBalanceUpdate);
       window.removeEventListener('exchangeBalanceUpdated', handleExchangeBalanceUpdate);
+      window.removeEventListener('forceProfileRefresh', handleForceRefresh);
     };
   }, [userId, queryClient]);
 

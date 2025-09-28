@@ -302,18 +302,37 @@ const MarketDetail = () => {
                   )}
                   
                   <div className="grid grid-cols-2 gap-2 mt-4">
-                    {selectedOption && betAmount && betAmount > 0 && (
-                      <Button 
-                        onClick={() => handleOpenBetModal(selectedOption)}
-                        disabled={market.status !== 'aberto'}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground w-full min-h-[44px]"
-                        size="sm"
-                        aria-label={`Confirmar opinião ${selectedOption.toUpperCase()}`}
-                      >
-                        Confirmar Opinião {selectedOption.toUpperCase()}
-                      </Button>
-                    )}
+                    <Button 
+                      onClick={() => setSelectedOption('sim')}
+                      disabled={market.status !== 'aberto'}
+                      className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-success hover:bg-success/90 text-success-foreground' : 'bg-secondary hover:bg-secondary/80'}`}
+                      size="sm"
+                      aria-label="Opinar Sim"
+                    >
+                      Opinar Sim
+                    </Button>
+                    <Button 
+                      onClick={() => setSelectedOption('nao')}
+                      disabled={market.status !== 'aberto'}
+                      className={`min-h-[44px] ${selectedOption === 'nao' ? 'bg-danger hover:bg-danger/90 text-danger-foreground' : 'bg-secondary hover:bg-secondary/80'}`}
+                      size="sm"
+                      aria-label="Opinar Não"
+                    >
+                      Opinar Não
+                    </Button>
                   </div>
+                  
+                  {selectedOption && betAmount && betAmount > 0 && (
+                    <Button 
+                      onClick={() => handleOpenBetModal(selectedOption)}
+                      disabled={market.status !== 'aberto'}
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground w-full min-h-[44px] mt-4"
+                      size="sm"
+                      aria-label={`Confirmar opinião ${selectedOption.toUpperCase()}`}
+                    >
+                      Confirmar Opinião {selectedOption.toUpperCase()}
+                    </Button>
+                  )}
 
                    {/* Calculator button */}
                    <Button

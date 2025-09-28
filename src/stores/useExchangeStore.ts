@@ -225,6 +225,8 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('balanceUpdated'));
         window.dispatchEvent(new CustomEvent('exchangeBalanceUpdated'));
+        // Force an immediate profile refresh
+        window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
       }
       
       set({ exchangeLoading: false });

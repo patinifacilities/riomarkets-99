@@ -19,7 +19,12 @@ export function DarkModeToggle() {
 
   const handleThemeToggle = () => {
     const newTheme = currentTheme === "dark" ? "light" : "dark";
+    console.log('Switching theme from', currentTheme, 'to', newTheme);
     setTheme(newTheme);
+    // Force a re-render by dispatching a custom event
+    setTimeout(() => {
+      document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    }, 0);
   };
 
   return (
