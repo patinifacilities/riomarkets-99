@@ -107,7 +107,10 @@ const Exchange = () => {
         const newRiozBalance = riozBalance + amountNum;
         
         // Atualizar saldos
-        await supabase.from('balances').update({ brl_balance: newBrlBalance }).eq('user_id', user.id);
+        await supabase.from('balances').update({ 
+          brl_balance: newBrlBalance,
+          rioz_balance: newRiozBalance 
+        }).eq('user_id', user.id);
         await supabase.from('profiles').update({ saldo_moeda: newRiozBalance }).eq('id', user.id);
         
         // Log da receita de taxa em R$ (convertendo de RZ para R$)
@@ -137,7 +140,10 @@ const Exchange = () => {
         const newRiozBalance = riozBalance - amountNum;
         
         // Atualizar saldos
-        await supabase.from('balances').update({ brl_balance: newBrlBalance }).eq('user_id', user.id);
+        await supabase.from('balances').update({ 
+          brl_balance: newBrlBalance,
+          rioz_balance: newRiozBalance 
+        }).eq('user_id', user.id);
         await supabase.from('profiles').update({ saldo_moeda: newRiozBalance }).eq('id', user.id);
         
         // Log da receita de taxa em R$ (convertendo de RZ para R$)

@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Users, TrendingUp, Clock, Wallet, Calculator } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,7 @@ const MarketDetail = () => {
   const { openCalculator } = useRewardCalculator();
   
   // Get real authenticated user
+  const navigate = useNavigate();
   const { user: authUser } = useAuth();
   const { data: userProfile } = useProfile(authUser?.id);
   
@@ -296,21 +297,41 @@ const MarketDetail = () => {
                 </h3>
                 
                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="bet-amount" className="text-sm font-medium">
-                        Quantidade
-                      </Label>
-                      <Input
-                        id="bet-amount"
-                        type="number"
-                        placeholder="Digite a quantidade..."
-                        value={betAmount || ''}
-                        onChange={(e) => setBetAmount(Number(e.target.value) || 0)}
-                        min="5"
-                        max={userProfile?.saldo_moeda || 0}
-                        className="mt-2"
-                      />
-                    </div>
+                    {(userProfile?.saldo_moeda || 0) > 0 ? (
+                      <>
+                        <div>
+                          <Label htmlFor="bet-amount" className="text-sm font-medium">
+                            Quantidade
+                          </Label>
+                          <Input
+                            id="bet-amount"
+                            type="number"
+                            placeholder="Digite a quantidade..."
+                            value={betAmount || ''}
+                            onChange={(e) => setBetAmount(Number(e.target.value) || 0)}
+                            min="5"
+                            max={userProfile?.saldo_moeda || 0}
+                            className="mt-2"
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <div className="p-4 bg-muted/50 rounded-lg text-center">
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Você precisa de Rioz Coin para opinar neste mercado
+                        </p>
+                        <div className="flex flex-col gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => navigate('/exchange')}
+                            className="w-full"
+                          >
+                            Depositar R$ ou Trocar por RZ
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                     
                     <div className="text-center text-sm text-muted-foreground">ou use o slider</div>
                     
@@ -433,11 +454,20 @@ const MarketDetail = () => {
                            window.dispatchEvent(new CustomEvent('balanceUpdated'));
                           window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
 
-                          toast({
-                            title: "Opinião confirmada!",
-                            description: `Sua opinião de ${betAmount} Rioz foi confirmada com sucesso.`,
-                            variant: "default",
-                          });
+                           // Success notification with opinion color
+                           const backgroundColor = selectedOption === 'sim' ? '#00ff90' : '#ff2389';
+                           
+                           // Custom toast with background color
+                           const toastElement = document.createElement('div');
+                           toastElement.className = 'fixed top-4 right-4 z-50 p-4 rounded-lg text-white font-medium shadow-lg animate-in fade-in slide-in-from-top-2';
+                           toastElement.style.backgroundColor = backgroundColor;
+                           toastElement.textContent = `Opinião ${selectedOption.toUpperCase()} confirmada! ${betAmount} Rioz apostado.`;
+                           
+                           document.body.appendChild(toastElement);
+                           
+                           setTimeout(() => {
+                             document.body.removeChild(toastElement);
+                           }, 3000);
 
                           handleBetSuccess();
                           setSelectedOption('');

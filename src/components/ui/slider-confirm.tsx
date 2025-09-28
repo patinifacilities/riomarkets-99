@@ -145,10 +145,11 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
     >
       {/* Progress fill with dynamic color */}
       <div 
-        className="absolute inset-0 transition-none"
+        className="absolute inset-0 transition-none rounded-full"
         style={{
           background: fillColor,
-          width: `${Math.min(progress * 100, 85)}%`, // Stop at 85% to avoid overlapping thumb
+          width: `${Math.min(progress * 100, 88)}%`,
+          maxWidth: 'calc(100% - 56px)', // Prevent overlapping thumb (56px = thumb width)
         }}
       />
       
@@ -157,7 +158,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
         <span 
           className="text-sm font-medium transition-none"
           style={{
-            color: progress > 0 && selectedOption === 'sim' ? '#000' : 'white'
+            color: progress > 0 && selectedOption === 'nao' ? '#000' : 'white'
           }}
         >
           {text}

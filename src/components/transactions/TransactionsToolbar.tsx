@@ -82,7 +82,7 @@ const TransactionsToolbar = ({ onExport, className }: TransactionsToolbarProps) 
       aria-controls="transactions-table"
     >
       <div className="container mx-auto px-4 py-4">
-        <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-center">
+        <div className="flex flex-col lg:flex-row gap-4 items-center justify-center">
           {/* Search and Filters */}
           <div className="flex flex-col sm:flex-row gap-3 flex-1 w-full lg:w-auto">
             {/* Search */}
