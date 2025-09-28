@@ -24,29 +24,35 @@ export const useProfile = (userId?: string) => {
   useEffect(() => {
     const handleBalanceUpdate = () => {
       if (userId) {
+        console.log('Profile invalidating on balanceUpdated');
         queryClient.invalidateQueries({ queryKey: ['profile', userId] });
+        queryClient.refetchQueries({ queryKey: ['profile', userId] });
       }
     };
 
-    const handleExchangeBalanceUpdate = () => {
+    const handleProfileUpdate = () => {
       if (userId) {
+        console.log('Profile invalidating on profileUpdated');
         queryClient.invalidateQueries({ queryKey: ['profile', userId] });
+        queryClient.refetchQueries({ queryKey: ['profile', userId] });
       }
     };
 
     const handleForceRefresh = () => {
       if (userId) {
+        console.log('Profile force refresh');
         queryClient.invalidateQueries({ queryKey: ['profile', userId] });
         queryClient.refetchQueries({ queryKey: ['profile', userId] });
       }
     };
 
     window.addEventListener('balanceUpdated', handleBalanceUpdate);
-    window.addEventListener('exchangeBalanceUpdated', handleExchangeBalanceUpdate);
+    window.addEventListener('profileUpdated', handleProfileUpdate);
     window.addEventListener('forceProfileRefresh', handleForceRefresh);
+    
     return () => {
       window.removeEventListener('balanceUpdated', handleBalanceUpdate);
-      window.removeEventListener('exchangeBalanceUpdated', handleExchangeBalanceUpdate);
+      window.removeEventListener('profileUpdated', handleProfileUpdate);
       window.removeEventListener('forceProfileRefresh', handleForceRefresh);
     };
   }, [userId, queryClient]);

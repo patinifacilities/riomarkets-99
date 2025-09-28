@@ -302,6 +302,13 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
       
       // Force immediate UI refresh
       if (typeof window !== 'undefined') {
+        console.log('Exchange completed - dispatching events', {
+          rioz_balance: Math.round(newRiozBalance),
+          brl_balance: updatedBalance.brl_balance,
+          saldo_moeda: updatedProfile.saldo_moeda,
+          side
+        });
+        
         // Dispatch multiple events to ensure all components update
         window.dispatchEvent(new CustomEvent('balanceUpdated', { 
           detail: { 
