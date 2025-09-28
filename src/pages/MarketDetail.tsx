@@ -182,24 +182,60 @@ const MarketDetail = () => {
 
             {/* Options */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {market.opcoes.map((opcao: string) => {
+              {market.opcoes.map((opcao: string, index: number) => {
                 const recompensa = market.odds?.[opcao] || market.recompensas?.[opcao] || 1.5;
-                const isYes = opcao === 'sim';
+                const allRecompensas = market.opcoes.map(opt => market.odds?.[opt] || market.recompensas?.[opt] || 1.5);
+                const maxRecompensa = Math.max(...allRecompensas);
+                const minRecompensa = Math.min(...allRecompensas);
+                
+                // Use colors based on odds values
+                const isHighOdds = recompensa === maxRecompensa;
+                const isLowOdds = recompensa === minRecompensa;
+                
+                const getColorClass = () => {
+                  if (market.opcoes.length === 2) {
+                    // Binary - use SIM/NÃO colors
+                    const isYes = opcao === 'sim';
+                    return isYes ? 'text-[#00FF91]' : 'text-[#FF1493]';
+                  } else {
+                    // Multiple options - use odds-based colors
+                    if (isHighOdds) return 'text-[#ff2389]'; // Higher odds = red
+                    if (isLowOdds) return 'text-[#00ff90]'; // Lower odds = green
+                    return 'text-foreground'; // Neutral
+                  }
+                };
+                
+                const getButtonClass = () => {
+                  if (market.opcoes.length === 2) {
+                    // Binary - use SIM/NÃO colors
+                    const isYes = opcao === 'sim';
+                    return isYes 
+                      ? 'bg-[#00FF91] hover:bg-[#00FF91]/90 text-black' 
+                      : 'bg-[#FF1493] hover:bg-[#FF1493]/90 text-white';
+                  } else {
+                    // Multiple options - use odds-based colors
+                    if (isHighOdds) return 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white';
+                    if (isLowOdds) return 'bg-[#00ff90] hover:bg-[#00ff90]/90 text-black';
+                    return 'bg-primary hover:bg-primary/90 text-primary-foreground';
+                  }
+                };
                 
                 return (
                   <Card 
                     key={opcao}
                     className={`cursor-pointer transition-all duration-200 hover:shadow-lg hover:ring-1 ${
-                      isYes 
-                        ? 'hover:ring-primary hover:shadow-success' 
-                        : 'hover:ring-[#ff2389] hover:shadow-danger hover:border-[#ff2389]'
+                      market.opcoes.length === 2 
+                        ? (opcao === 'sim' 
+                           ? 'hover:ring-primary hover:shadow-success' 
+                           : 'hover:ring-[#ff2389] hover:shadow-danger hover:border-[#ff2389]')
+                        : (isHighOdds 
+                           ? 'hover:ring-[#ff2389] hover:shadow-danger hover:border-[#ff2389]'
+                           : 'hover:ring-[#00ff90] hover:shadow-success hover:border-[#00ff90]')
                     }`}
                     onClick={() => handleOpenBetModal(opcao)}
                   >
                     <CardContent className="p-6 text-center">
-                      <div className={`text-2xl font-bold mb-2 ${
-                        isYes ? 'text-[#00FF91]' : 'text-[#FF1493]'
-                      }`}>
+                      <div className={`text-2xl font-bold mb-2 ${getColorClass()}`}>
                         {opcao.toUpperCase()}
                       </div>
                       <div className="text-3xl font-extrabold mb-2">
@@ -209,11 +245,7 @@ const MarketDetail = () => {
                         Recompensa para cada Rioz Coin
                       </div>
                       <Button 
-                        className={`mt-4 w-full min-h-[44px] ${
-                          isYes 
-                            ? 'bg-[#00FF91] hover:bg-[#00FF91]/90 text-black' 
-                            : 'bg-[#FF1493] hover:bg-[#FF1493]/90 text-white'
-                        }`}
+                        className={`mt-4 w-full min-h-[44px] ${getButtonClass()}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleOpenBetModal(opcao);

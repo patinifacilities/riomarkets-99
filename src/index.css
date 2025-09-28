@@ -129,6 +129,11 @@
   .animate-scroll-left-seamless {
     animation: scroll-left-seamless 30s linear infinite;
   }
+  
+  @keyframes scroll-left-seamless {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
 
   /* Dark theme adjustments */
   .dark {

@@ -16,13 +16,13 @@ export function OnboardingStep({ step, className = "" }: OnboardingStepProps) {
   return (
     <div className={`text-center space-y-4 ${className}`}>
       <div className="flex justify-center">
-        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-          {content.id === 1 ? (
-            <IconComponent />
-          ) : (
+        {content.id === 1 ? (
+          <IconComponent />
+        ) : (
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
             <IconComponent className="w-8 h-8 text-primary" />
-          )}
-        </div>
+          </div>
+        )}
       </div>
       
       <div className="space-y-3">

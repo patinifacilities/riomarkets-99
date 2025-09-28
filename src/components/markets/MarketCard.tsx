@@ -98,47 +98,82 @@ const MarketCard = ({ market }: MarketCardProps) => {
 
         {/* Options */}
         <div className="p-4 space-y-3">
-          <Link 
-            to={`/market/${market.id}`}
-            className="block"
-          >
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50">
-              <div className="flex items-center gap-3">
-                <div className="text-sm font-medium text-foreground">
-                  SIM
+          {market.opcoes && market.opcoes.length > 2 ? (
+            // Multiple options - show list
+            market.opcoes.map((opcao: string, index: number) => {
+              const opcaoRecompensa = market.odds?.[opcao] || market.recompensas?.[opcao] || 1.5;
+              const opcaoPercent = opcao === 'sim' ? pool?.percent_sim : pool?.percent_nao;
+              
+              return (
+                <Link 
+                  key={opcao}
+                  to={`/market/${market.id}`}
+                  className="block"
+                >
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50">
+                    <div className="flex items-center gap-3">
+                      <div className="text-sm font-medium text-foreground">
+                        {opcao.toUpperCase()}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-semibold text-foreground mb-1">
+                        {opcaoRecompensa ? `${opcaoRecompensa.toFixed(2)}x` : '--'}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {opcaoPercent ? `${opcaoPercent.toFixed(0)}%` : '--'}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })
+          ) : (
+            // Binary options - show SIM/NÃO
+            <>
+              <Link 
+                to={`/market/${market.id}`}
+                className="block"
+              >
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50">
+                  <div className="flex items-center gap-3">
+                    <div className="text-sm font-medium text-foreground">
+                      SIM
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-foreground mb-1">
+                      {yesRecompensa ? `${yesRecompensa.toFixed(2)}x` : '--'}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {pool?.percent_sim ? `${pool.percent_sim.toFixed(0)}%` : '--'}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="text-sm font-semibold text-foreground mb-1">
-                  {yesRecompensa ? `${yesRecompensa.toFixed(2)}x` : '--'}
+              </Link>
+              
+              <Link 
+                to={`/market/${market.id}`}
+                className="block"
+              >
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50">
+                  <div className="flex items-center gap-3">
+                    <div className="text-sm font-medium text-foreground">
+                      NÃO
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-foreground mb-1">
+                      {noRecompensa ? `${noRecompensa.toFixed(2)}x` : '--'}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {pool?.percent_nao ? `${pool.percent_nao.toFixed(0)}%` : '--'}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  {pool?.percent_sim ? `${pool.percent_sim.toFixed(0)}%` : '--'}
-                </div>
-              </div>
-            </div>
-          </Link>
-          
-          <Link 
-            to={`/market/${market.id}`}
-            className="block"
-          >
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer border border-transparent hover:border-border/50">
-              <div className="flex items-center gap-3">
-                <div className="text-sm font-medium text-foreground">
-                  NÃO
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-sm font-semibold text-foreground mb-1">
-                  {noRecompensa ? `${noRecompensa.toFixed(2)}x` : '--'}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {pool?.percent_nao ? `${pool.percent_nao.toFixed(0)}%` : '--'}
-                </div>
-              </div>
-            </div>
-          </Link>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Footer */}

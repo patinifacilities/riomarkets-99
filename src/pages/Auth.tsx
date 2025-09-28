@@ -214,7 +214,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 py-8">
       <div className="w-full max-w-md">
         {/* Logo/Branding */}
         <div className="text-center mb-8">
@@ -227,7 +227,7 @@ const Auth = () => {
                 "com Transparência Total",
                 "para o Futuro do Rio"
               ]}
-              className="text-2xl font-bold text-primary"
+              className="text-2xl font-bold text-white"
               typingSpeed={100}
               deletingSpeed={50}
               pauseDuration={2000}

@@ -167,21 +167,6 @@ const Home = () => {
       {/* Hero Section - Trading Aligned */}
       <section className="relative min-h-[42vh] md:min-h-[52vh] flex flex-col items-center justify-center bg-[color:var(--bg-app)]">
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
-          {/* Seamless animated background */}
-          <div className="absolute -inset-8 -z-10 opacity-30 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-transparent to-accent/15 animate-[pulse_4s_ease-in-out_infinite]"></div>
-            
-            {/* Seamless floating particles */}
-            <div className="absolute w-32 h-32 bg-[#00FF91]/20 rounded-full blur-2xl animate-[float_6s_ease-in-out_infinite]" 
-                 style={{ top: '10%', left: '15%', animationDelay: '0s' }}></div>
-            <div className="absolute w-24 h-24 bg-primary/15 rounded-full blur-2xl animate-[float_5s_ease-in-out_infinite]" 
-                 style={{ top: '60%', right: '10%', animationDelay: '2s' }}></div>
-            <div className="absolute w-20 h-20 bg-accent/20 rounded-full blur-2xl animate-[float_7s_ease-in-out_infinite]" 
-                 style={{ bottom: '20%', left: '20%', animationDelay: '4s' }}></div>
-            
-            {/* Seamless gradient waves */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-transparent animate-[wave_8s_ease-in-out_infinite]"></div>
-          </div>
           
           <div className="text-center mb-6 md:mb-8">
             <h1 className="font-extrabold text-[34px] md:text-[44px] lg:text-[56px] leading-[1.05] mb-4 text-white [text-wrap:balance]">
