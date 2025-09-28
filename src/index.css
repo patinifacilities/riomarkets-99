@@ -136,8 +136,8 @@
     animation: scroll-left 30s linear infinite;
   }
   
-
-  /* Dark theme adjustments */
+  
+  /* Dark theme adjustments - updated for light mode support */
   .dark {
     --background: 210 13% 5%;
     --foreground: 210 20% 98%;
@@ -158,6 +158,29 @@
     --border: 210 13% 15%;
     --input: 210 13% 9%;
     --ring: 160 100% 50%;
+  }
+
+  /* Light theme */
+  :root[class~="light"] {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 155 100% 35%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 160 100% 40%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 160 100% 40%;
   }
 
   /* Background styles */

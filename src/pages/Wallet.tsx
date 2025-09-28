@@ -24,6 +24,7 @@ const WalletPage = () => {
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showCancelBetModal, setShowCancelBetModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
@@ -219,7 +220,10 @@ const WalletPage = () => {
                                 Sacar agora
                               </Button>
                               <Button 
-                                onClick={() => setShowCancelBetModal(true)}
+                                onClick={() => {
+                                  setSelectedOrder(order);
+                                  setShowCancelBetModal(true);
+                                }}
                                 variant="outline"
                                 size="sm"
                                 className="border-danger/30 text-danger hover:bg-danger/10"
@@ -270,8 +274,11 @@ const WalletPage = () => {
         <CancelBetModal
           open={showCancelBetModal}
           onOpenChange={setShowCancelBetModal}
+          orderId={selectedOrder?.id}
+          orderAmount={selectedOrder?.quantidade_moeda}
           onConfirm={() => {
             setShowCancelBetModal(false);
+            setSelectedOrder(null);
             refetchProfile();
             refetchTransactions();
           }}

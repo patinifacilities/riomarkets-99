@@ -21,43 +21,24 @@ export const CancelBetModal = ({ open, onOpenChange, onConfirm, orderId, orderAm
     setIsLoading(true);
     try {
       if (orderId && orderAmount) {
-        // Calculate 30% fee
-        const cancelFee = orderAmount * 0.30;
-        const refundAmount = orderAmount - cancelFee;
+        const { data: user } = await supabase.auth.getUser();
+        if (!user.user) throw new Error('User not authenticated');
 
-        // Update order status to cancelled
-        const { error: orderError } = await supabase
-          .from('orders')
-          .update({ 
-            status: 'cancelada',
-            cashed_out_at: new Date().toISOString(),
-            cashout_amount: refundAmount
-          })
-          .eq('id', orderId);
-
-        if (orderError) throw orderError;
-
-        // Create refund transaction
-        const { error: transactionError } = await supabase
-          .from('wallet_transactions')
-          .insert({
-            id: `cancel_${orderId}_${Date.now()}`,
-            user_id: (await supabase.auth.getUser()).data.user?.id,
-            tipo: 'credito',
-            valor: refundAmount,
-            descricao: `Reembolso de cancelamento - Taxa de 30% aplicada`,
-            market_id: null
-          });
-
-        if (transactionError) throw transactionError;
-
-        // Update user balance
-        const { error: balanceError } = await supabase.rpc('increment_balance', {
-          user_id: (await supabase.auth.getUser()).data.user?.id,
-          amount: Math.floor(refundAmount)
+        const { data, error } = await supabase.rpc('cancel_bet_with_fee', {
+          p_order_id: orderId,
+          p_user_id: user.user.id
         });
 
-        if (balanceError) throw balanceError;
+        if (error) throw error;
+        
+        const result = data?.[0];
+        if (!result?.success) {
+          throw new Error(result?.message || 'Failed to cancel bet');
+        }
+
+        // Dispatch balance update events
+        window.dispatchEvent(new CustomEvent('balanceUpdated'));
+        window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
       }
 
       await onConfirm();
@@ -71,7 +52,7 @@ export const CancelBetModal = ({ open, onOpenChange, onConfirm, orderId, orderAm
       console.error('Cancel error:', error);
       toast({
         title: "Erro",
-        description: "Falha ao cancelar opinião. Tente novamente.",
+        description: error instanceof Error ? error.message : "Falha ao cancelar opinião. Tente novamente.",
         variant: "destructive",
       });
     } finally {
