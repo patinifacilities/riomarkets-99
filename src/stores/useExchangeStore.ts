@@ -204,98 +204,36 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
     set({ exchangeLoading: true, exchangeError: null });
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
-
-      // Taxas simples: 1 R$ = 1 RZ
-      const EXCHANGE_RATE = 1.0;
-      
-      // Get current balances
-      const [profileResponse, balanceResponse] = await Promise.all([
-        supabase.from('profiles').select('saldo_moeda').eq('id', user.id).single(),
-        supabase.from('balances').select('brl_balance').eq('user_id', user.id).single()
-      ]);
-
-      if (profileResponse.error || balanceResponse.error) {
-        throw new Error('Erro ao buscar dados do usuário');
-      }
-
-      const currentRiozBalance = profileResponse.data.saldo_moeda;
-      const currentBrlBalance = balanceResponse.data.brl_balance;
-
-      let newRiozBalance = currentRiozBalance;
-      let newBrlBalance = currentBrlBalance;
-
-      if (side === 'buy_rioz') {
-        // Comprar RIOZ com BRL: precisa de BRL suficiente
-        const brlNeeded = amountInput * EXCHANGE_RATE;
-        
-        if (currentBrlBalance < brlNeeded) {
-          throw new Error('Saldo BRL insuficiente');
+      const { data, error } = await supabase.functions.invoke('exchange-convert', {
+        body: {
+          side,
+          amountInput,
+          inputCurrency
         }
-        
-        newRiozBalance = currentRiozBalance + amountInput;
-        newBrlBalance = currentBrlBalance - brlNeeded;
-      } else {
-        // Vender RIOZ por BRL: precisa de RIOZ suficiente
-        if (currentRiozBalance < amountInput) {
-          throw new Error('Saldo RIOZ insuficiente');
-        }
-        
-        newRiozBalance = currentRiozBalance - amountInput;
-        newBrlBalance = currentBrlBalance + (amountInput * EXCHANGE_RATE);
-      }
-
-      // Atualizar ambos os saldos
-      const [profileUpdate, balanceUpdate] = await Promise.all([
-        supabase
-          .from('profiles')
-          .update({ saldo_moeda: newRiozBalance })
-          .eq('id', user.id)
-          .select('saldo_moeda')
-          .single(),
-        supabase
-          .from('balances')
-          .update({ brl_balance: newBrlBalance })
-          .eq('user_id', user.id)
-          .select('brl_balance')
-          .single()
-      ]);
-
-      if (profileUpdate.error || balanceUpdate.error) {
-        throw new Error('Erro ao atualizar saldos');
-      }
-
-      // Log da transação
-      await supabase.from('exchange_orders').insert({
-        user_id: user.id,
-        side,
-        price_brl_per_rioz: EXCHANGE_RATE,
-        amount_rioz: amountInput,
-        amount_brl: amountInput * EXCHANGE_RATE,
-        status: 'filled',
-        filled_at: new Date().toISOString()
       });
       
-      // Atualizar estado local
+      if (error) {
+        throw new Error(error.message || 'Exchange failed');
+      }
+      
+      // Update local state with new balances
       set({ 
         balance: {
-          rioz_balance: newRiozBalance,
-          brl_balance: newBrlBalance,
+          rioz_balance: data.newBalances.rioz_balance,
+          brl_balance: data.newBalances.brl_balance,
           updated_at: new Date().toISOString()
         },
         exchangeLoading: false
       });
       
-      // Forçar atualização da UI
-      window.dispatchEvent(new CustomEvent('balanceUpdated'));
-      window.dispatchEvent(new CustomEvent('profileUpdated'));
+      // Refresh the balance to ensure sync
+      get().fetchBalance();
       
-      return { success: true, new_rioz_balance: newRiozBalance, new_brl_balance: newBrlBalance };
+      return data;
     } catch (error) {
-      console.error('Erro na troca:', error);
+      console.error('Exchange error:', error);
       set({ 
-        exchangeError: error instanceof Error ? error.message : 'Erro na troca',
+        exchangeError: error instanceof Error ? error.message : 'Exchange failed',
         exchangeLoading: false 
       });
       throw error;

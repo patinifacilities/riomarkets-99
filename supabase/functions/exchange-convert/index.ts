@@ -4,7 +4,7 @@ import { RateLimiter, RATE_LIMITS } from '../_shared/rateLimit.ts';
 
 const corsHeaders = createCorsHeaders();
 
-const FEE_RATE = 0.02; // 2%
+const FEE_RATE = 0.01; // 1%
 const MIN_BRL = 5.00;
 const MAX_BRL = 5000.00;
 
