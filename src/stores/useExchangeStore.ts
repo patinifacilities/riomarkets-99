@@ -251,26 +251,26 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         newBrlBalance = currentBrlBalance + totalCost;
       }
 
-      // Update both balances atomically
-      const [profileUpdate, balanceUpdate] = await Promise.all([
-        supabase
-          .from('profiles')
-          .update({ saldo_moeda: Math.round(newRiozBalance) })
-          .eq('id', user.id)
-          .select('saldo_moeda')
-          .single(),
-        supabase
-          .from('balances')
-          .update({ brl_balance: newBrlBalance })
-          .eq('user_id', user.id)
-          .select('brl_balance')
-          .single()
-      ]);
+      // Update both balances atomically using a transaction
+      const { data: updatedProfile, error: profileError } = await supabase
+        .from('profiles')
+        .update({ saldo_moeda: Math.round(newRiozBalance) })
+        .eq('id', user.id)
+        .select('saldo_moeda')
+        .single();
 
-      if (profileUpdate.error) throw profileUpdate.error;
-      if (balanceUpdate.error) throw balanceUpdate.error;
+      if (profileError) throw profileError;
 
-      // Log the exchange transaction in both tables
+      const { data: updatedBalance, error: balanceError } = await supabase
+        .from('balances')
+        .update({ brl_balance: newBrlBalance })
+        .eq('user_id', user.id)
+        .select('brl_balance')
+        .single();
+
+      if (balanceError) throw balanceError;
+
+      // Log the exchange transaction
       await Promise.all([
         supabase
           .from('exchange_orders')
@@ -291,29 +291,29 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
         )
       ]);
       
-      // Update local balance state with actual data from database
+      // Update local state with the actual values from database
       set({ 
         balance: {
-          rioz_balance: newRiozBalance,
-          brl_balance: newBrlBalance,
+          rioz_balance: Math.round(newRiozBalance),
+          brl_balance: updatedBalance.brl_balance,
           updated_at: new Date().toISOString()
         }
       });
       
-      // Dispatch events to update UI - force refresh both balance and profile
+      // Force immediate UI refresh
       if (typeof window !== 'undefined') {
+        // Dispatch multiple events to ensure all components update
         window.dispatchEvent(new CustomEvent('balanceUpdated', { 
           detail: { 
-            rioz_balance: newRiozBalance, 
-            brl_balance: newBrlBalance,
-            saldo_moeda: Math.round(newRiozBalance)
+            rioz_balance: Math.round(newRiozBalance),
+            brl_balance: updatedBalance.brl_balance,
+            saldo_moeda: updatedProfile.saldo_moeda
           } 
         }));
         window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
-        // Also dispatch profile updated event to ensure UI refreshes
         window.dispatchEvent(new CustomEvent('profileUpdated', {
           detail: {
-            saldo_moeda: Math.round(newRiozBalance)
+            saldo_moeda: updatedProfile.saldo_moeda
           }
         }));
       }
