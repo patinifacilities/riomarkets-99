@@ -15,18 +15,18 @@ interface OddsControllerProps {
 }
 
 export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) => {
-  const [odds, setOdds] = useState<Record<string, number>>(market.recompensas || {});
-  const [originalOdds, setOriginalOdds] = useState<Record<string, number>>(market.recompensas || {});
+  const [odds, setOdds] = useState<Record<string, number>>(market.odds || {});
+  const [originalOdds, setOriginalOdds] = useState<Record<string, number>>(market.odds || {});
   const [hasChanges, setHasChanges] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    const marketOdds = market.recompensas || {};
+    const marketOdds = market.odds || {};
     setOdds(marketOdds);
     setOriginalOdds(marketOdds);
     setHasChanges(false);
-  }, [market.recompensas]);
+  }, [market.odds]);
 
   // Check for changes whenever odds change
   useEffect(() => {
@@ -57,8 +57,7 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
       const { error } = await supabase
         .from('markets')
         .update({ 
-          odds: odds,
-          recompensas: odds // Update both odds and recompensas for backward compatibility
+          odds: odds
         })
         .eq('id', market.id);
 

@@ -52,8 +52,8 @@ const MarketCard = ({ market }: MarketCardProps) => {
   };
 
   // Calculate percentages and rewards
-  const yesRecompensa = market.odds?.sim || market.recompensas?.sim || 1.5;
-  const noRecompensa = market.odds?.não || market.odds?.nao || market.recompensas?.não || market.recompensas?.nao || 1.5;
+  const yesRecompensa = market.odds?.sim || 1.5;
+  const noRecompensa = market.odds?.não || market.odds?.nao || 1.5;
 
   return (
     <Card className={`market-card transition-all duration-300 hover:shadow-lg border-border/50 ${
@@ -101,7 +101,7 @@ const MarketCard = ({ market }: MarketCardProps) => {
         {market.opcoes.length > 2 ? (
           // Multiple options - show first 3
           market.opcoes.slice(0, 3).map((opcao: string, index: number) => {
-            const opcaoRecompensa = market.odds?.[opcao] || market.recompensas?.[opcao] || 1.5;
+            const opcaoRecompensa = market.odds?.[opcao] || 1.5;
             const opcaoPercent = pool?.percent_sim || 0; // This would need to be calculated per option
             
             return (

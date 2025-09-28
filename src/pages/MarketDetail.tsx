@@ -187,8 +187,8 @@ const MarketDetail = () => {
             {/* Options */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {market.opcoes.map((opcao: string, index: number) => {
-                const recompensa = market.odds?.[opcao] || market.recompensas?.[opcao] || 1.5;
-                const allRecompensas = market.opcoes.map(opt => market.odds?.[opt] || market.recompensas?.[opt] || 1.5);
+                const recompensa = market.odds?.[opcao] || 1.5;
+                const allRecompensas = market.opcoes.map(opt => market.odds?.[opt] || 1.5);
                 const maxRecompensa = Math.max(...allRecompensas);
                 const minRecompensa = Math.min(...allRecompensas);
                 

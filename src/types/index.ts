@@ -16,8 +16,7 @@ export interface Market {
   descricao: string;
   categoria: string;
   opcoes: string[];
-  recompensas?: Record<string, number>; // preferido no app
-  odds?: Record<string, number>;        // compatibilidade DB
+  odds?: Record<string, number>; // Real odds from database
   status: 'aberto' | 'fechado' | 'liquidado';
   end_date: string;
   created_at: string;

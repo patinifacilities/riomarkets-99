@@ -40,7 +40,7 @@ export function adaptMarketToDB(market: MarketWithRecompensas): any {
  * Extrai recompensas de um market (com fallback seguro)
  */
 export function getMarketRecompensas(market: Market): RecompensasMap {
-  return market.recompensas ?? (market as any).odds ?? {};
+  return market.odds ?? {};
 }
 
 /**

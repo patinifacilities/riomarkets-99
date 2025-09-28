@@ -376,7 +376,7 @@ const Admin = () => {
                             <div className="flex items-center justify-between">
                               <span className="font-medium">{opcao}</span>
                               <span className="text-sm text-muted-foreground">
-                                {market.recompensas[opcao] || 1.5}x recompensa
+                                {market.odds?.[opcao] || 1.5}x recompensa
                               </span>
                             </div>
                           </div>
