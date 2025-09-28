@@ -64,8 +64,15 @@ const ExchangeOld = () => {
     try {
       await performExchange(side, amount, 'RIOZ');
       
-      // Force immediate balance refresh
+      // Force immediate balance refresh and profile refresh
       await fetchBalance();
+      
+      // Dispatch events to update all components
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('balanceUpdated'));
+        window.dispatchEvent(new CustomEvent('exchangeBalanceUpdated'));
+        window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
+      }
       
       setAmount(0);
       setLimitPrice('');
@@ -77,7 +84,7 @@ const ExchangeOld = () => {
       
       track('exchange_completed', { 
         side, 
-        amount: amount, 
+        amount: amount,
         order_type: orderType 
       });
     } catch (error) {

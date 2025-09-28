@@ -112,6 +112,13 @@ export const WithdrawModal = ({ open, onOpenChange, onSuccess }: WithdrawModalPr
       // Simular processamento
       await new Promise(resolve => setTimeout(resolve, 2000));
       
+      // Dispatch balance update events
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('balanceUpdated'));
+        window.dispatchEvent(new CustomEvent('exchangeBalanceUpdated'));
+        window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
+      }
+      
       toast({
         title: "Solicitação enviada",
         description: `Saque de R$ ${amount} via ${paymentMethods.find(m => m.id === paymentMethod)?.label} solicitado com sucesso.`,

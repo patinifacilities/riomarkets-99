@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
 export function DarkModeToggle() {
-  const { theme, setTheme, systemTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -15,15 +15,19 @@ export function DarkModeToggle() {
     return null;
   }
 
-  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDark = theme === 'dark';
 
   const handleThemeToggle = () => {
-    const newTheme = currentTheme === "dark" ? "light" : "dark";
-    console.log('Switching theme from', currentTheme, 'to', newTheme);
+    const newTheme = isDark ? "light" : "dark";
     setTheme(newTheme);
-    // Force a re-render by dispatching a custom event
+    
+    // Force immediate DOM update
     setTimeout(() => {
-      document.documentElement.classList.toggle('dark', newTheme === 'dark');
+      if (newTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }, 0);
   };
 
@@ -34,8 +38,8 @@ export function DarkModeToggle() {
       onClick={handleThemeToggle}
       className="w-9 h-9 p-0"
     >
-      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <Sun className={`h-[1.2rem] w-[1.2rem] transition-all ${isDark ? 'rotate-90 scale-0' : 'rotate-0 scale-100'}`} />
+      <Moon className={`absolute h-[1.2rem] w-[1.2rem] transition-all ${isDark ? 'rotate-0 scale-100' : 'rotate-90 scale-0'}`} />
       <span className="sr-only">Toggle theme</span>
     </Button>
   );
