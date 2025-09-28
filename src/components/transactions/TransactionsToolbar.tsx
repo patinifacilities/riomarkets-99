@@ -174,7 +174,7 @@ const TransactionsToolbar = ({ onExport, className }: TransactionsToolbarProps) 
             </Select>
           </div>
 
-          {/* Action Buttons */}
+          {/* Active Filters Badge Only */}
           <div className="flex items-center gap-2">
             {activeFiltersCount > 0 && (
               <Badge variant="secondary" className="text-xs">
@@ -182,28 +182,6 @@ const TransactionsToolbar = ({ onExport, className }: TransactionsToolbarProps) 
                 {activeFiltersCount} filtro{activeFiltersCount > 1 ? 's' : ''}
               </Badge>
             )}
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleExport('csv')}
-              disabled={isExporting}
-              aria-label="Exportar dados como CSV"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              CSV
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleExport('json')}
-              disabled={isExporting}
-              aria-label="Exportar dados como JSON"
-            >
-              <FileDown className="w-4 h-4 mr-2" />
-              JSON
-            </Button>
           </div>
         </div>
 

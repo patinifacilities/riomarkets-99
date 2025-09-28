@@ -22,18 +22,19 @@ const Exchange = () => {
   
   const [brlBalance, setBrlBalance] = useState(0);
   const [riozBalance, setRiozBalance] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [amount, setAmount] = useState('');
   const [sliderPercent, setSliderPercent] = useState([0]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'buy' | 'sell'>('buy');
   const [showNotification, setShowNotification] = useState(false);
 
-  // Buscar saldos ao carregar
+  // Buscar saldos ao carregar e quando refreshKey muda
   useEffect(() => {
     if (user?.id) {
       fetchBalances();
     }
-  }, [user?.id]);
+  }, [user?.id, refreshKey]);
 
   const fetchBalances = async () => {
     if (!user?.id) return;
@@ -123,6 +124,7 @@ const Exchange = () => {
         
         // Force refresh balances to ensure UI updates
         await fetchBalances();
+        setRefreshKey(prev => prev + 1);
         
         toast({
           title: "Compra realizada!",
@@ -152,6 +154,7 @@ const Exchange = () => {
         
         // Force refresh balances to ensure UI updates
         await fetchBalances();
+        setRefreshKey(prev => prev + 1);
         
         toast({
           title: "Venda realizada!",
@@ -473,7 +476,11 @@ const Exchange = () => {
               <div className="space-y-3">
                 {topMarkets.length > 0 ? (
                   topMarkets.map((market, index) => (
-                    <Card key={market.id} className="cursor-pointer hover:border-primary/50 transition-all">
+                    <Card 
+                      key={market.id} 
+                      className="cursor-pointer hover:border-primary/50 transition-all"
+                      onClick={() => window.location.href = `/market/${market.id}`}
+                    >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1 min-w-0">
@@ -489,10 +496,24 @@ const Exchange = () => {
                               {market.titulo}
                             </h4>
                             <div className="flex gap-2 mb-3">
-                              <Button size="sm" className="bg-[#00ff90] hover:bg-[#00ff90]/90 text-black text-xs px-3 py-1 h-7">
+                              <Button 
+                                size="sm" 
+                                className="bg-[#00ff90] hover:bg-[#00ff90]/90 text-black text-xs px-3 py-1 h-7"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  window.location.href = `/market/${market.id}`;
+                                }}
+                              >
                                 SIM {market.odds?.sim?.toFixed(2)}x
                               </Button>
-                              <Button size="sm" className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white text-xs px-3 py-1 h-7">
+                              <Button 
+                                size="sm" 
+                                className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white text-xs px-3 py-1 h-7"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  window.location.href = `/market/${market.id}`;
+                                }}
+                              >
                                 NÃO {(market.odds?.não || market.odds?.nao)?.toFixed(2)}x
                               </Button>
                             </div>

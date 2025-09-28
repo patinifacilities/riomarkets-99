@@ -37,5 +37,6 @@ export const useUserOrders = (userId?: string) => {
       return (data || []) as Order[];
     },
     enabled: !!userId,
+    refetchInterval: 2000, // Refetch every 2 seconds to catch status changes
   });
 };
