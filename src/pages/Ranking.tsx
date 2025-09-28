@@ -2,9 +2,14 @@ import { Trophy, TrendingUp, Users, Award, Target, BarChart3 } from 'lucide-reac
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
 import { fakeUsers } from '@/data/fake-users';
+import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 
 const Ranking = () => {
+  const { user } = useAuth();
+  const { data: profile } = useProfile(user?.id);
   const sortedUsers = [...fakeUsers].sort((a, b) => b.saldo_moeda - a.saldo_moeda);
   
   const stats = {
@@ -24,6 +29,34 @@ const Ranking = () => {
         return <Badge className="bg-muted text-muted-foreground">Iniciante</Badge>;
       default:
         return <Badge variant="outline">Usuário</Badge>;
+    }
+  };
+
+  const getUserLevelProgress = (balance: number) => {
+    if (balance <= 1500) {
+      return {
+        current: 'iniciante',
+        progress: (balance / 1500) * 100,
+        nextLevel: 'analista',
+        nextLevelRequirement: 1500,
+        currentBalance: balance
+      };
+    } else if (balance <= 5000) {
+      return {
+        current: 'analista',
+        progress: ((balance - 1500) / (5000 - 1500)) * 100,
+        nextLevel: 'guru',
+        nextLevelRequirement: 5000,
+        currentBalance: balance
+      };
+    } else {
+      return {
+        current: 'guru',
+        progress: 100,
+        nextLevel: null,
+        nextLevelRequirement: null,
+        currentBalance: balance
+      };
     }
   };
 
@@ -99,6 +132,58 @@ const Ranking = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* User Progress Section */}
+        {profile && (
+          <Card className="mb-8 bg-gradient-primary/10 border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="w-5 h-5" />
+                Meu Progresso
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-6">
+                <Avatar className="w-16 h-16">
+                  <AvatarImage src={profile.profile_pic_url} alt={profile.nome} />
+                  <AvatarFallback className="bg-primary/20 text-primary text-lg">
+                    {profile.nome.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+                
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-lg font-semibold">{profile.nome}</h3>
+                    {profile.username && (
+                      <span className="text-sm text-muted-foreground">@{profile.username}</span>
+                    )}
+                    {getLevelBadge(profile.nivel)}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span>Saldo atual: <span className="font-semibold text-primary">{profile.saldo_moeda.toLocaleString()} RZ</span></span>
+                      {getUserLevelProgress(profile.saldo_moeda).nextLevel && (
+                        <span>Próximo nível: <span className="font-semibold">{getUserLevelProgress(profile.saldo_moeda).nextLevelRequirement?.toLocaleString()} RZ</span></span>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>Progresso para {getUserLevelProgress(profile.saldo_moeda).nextLevel || 'Guru'}</span>
+                        <span>{Math.round(getUserLevelProgress(profile.saldo_moeda).progress)}%</span>
+                      </div>
+                      <Progress 
+                        value={getUserLevelProgress(profile.saldo_moeda).progress} 
+                        className="h-3"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Level Badges */}
         <Card className="mb-8">

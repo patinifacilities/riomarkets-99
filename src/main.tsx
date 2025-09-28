@@ -18,13 +18,14 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider 
-        attribute="class" 
-        defaultTheme="dark" 
-        enableSystem={false}
-        storageKey="rio-markets-theme"
-        disableTransitionOnChange={false}
-      >
+        <ThemeProvider 
+          attribute="class" 
+          defaultTheme="dark" 
+          enableSystem={true}
+          storageKey="rio-markets-theme"
+          disableTransitionOnChange={false}
+          themes={['light', 'dark']}
+        >
         <HelmetProvider>
           <App />
         </HelmetProvider>

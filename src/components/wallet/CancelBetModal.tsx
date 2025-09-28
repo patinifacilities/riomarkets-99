@@ -3,20 +3,63 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CancelBetModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
+  orderId?: string;
+  orderAmount?: number;
 }
 
-export const CancelBetModal = ({ open, onOpenChange, onConfirm }: CancelBetModalProps) => {
+export const CancelBetModal = ({ open, onOpenChange, onConfirm, orderId, orderAmount }: CancelBetModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const handleCancel = async () => {
     setIsLoading(true);
     try {
+      if (orderId && orderAmount) {
+        // Calculate 30% fee
+        const cancelFee = orderAmount * 0.30;
+        const refundAmount = orderAmount - cancelFee;
+
+        // Update order status to cancelled
+        const { error: orderError } = await supabase
+          .from('orders')
+          .update({ 
+            status: 'cancelada',
+            cashed_out_at: new Date().toISOString(),
+            cashout_amount: refundAmount
+          })
+          .eq('id', orderId);
+
+        if (orderError) throw orderError;
+
+        // Create refund transaction
+        const { error: transactionError } = await supabase
+          .from('wallet_transactions')
+          .insert({
+            id: `cancel_${orderId}_${Date.now()}`,
+            user_id: (await supabase.auth.getUser()).data.user?.id,
+            tipo: 'credito',
+            valor: refundAmount,
+            descricao: `Reembolso de cancelamento - Taxa de 30% aplicada`,
+            market_id: null
+          });
+
+        if (transactionError) throw transactionError;
+
+        // Update user balance
+        const { error: balanceError } = await supabase.rpc('increment_balance', {
+          user_id: (await supabase.auth.getUser()).data.user?.id,
+          amount: Math.floor(refundAmount)
+        });
+
+        if (balanceError) throw balanceError;
+      }
+
       await onConfirm();
       toast({
         title: "Opinião cancelada",
@@ -25,6 +68,7 @@ export const CancelBetModal = ({ open, onOpenChange, onConfirm }: CancelBetModal
       });
       onOpenChange(false);
     } catch (error) {
+      console.error('Cancel error:', error);
       toast({
         title: "Erro",
         description: "Falha ao cancelar opinião. Tente novamente.",
