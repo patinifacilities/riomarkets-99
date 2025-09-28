@@ -318,7 +318,7 @@ const Admin = () => {
 
         {/* Admin Tabs */}
         <Tabs defaultValue="markets" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="markets" aria-label="Gerenciar mercados de análise">
               <Settings className="w-4 h-4 mr-2" />
               Mercados
@@ -334,6 +334,10 @@ const Admin = () => {
             <TabsTrigger value="news" aria-label="Gerenciar notícias">
               <Newspaper className="w-4 h-4 mr-2" />
               Notícias
+            </TabsTrigger>
+            <TabsTrigger value="revenue" aria-label="Ver receita da plataforma">
+              <DollarSign className="w-4 h-4 mr-2" />
+              Receita
             </TabsTrigger>
             <TabsTrigger value="logs" aria-label="Ver logs e auditoria">
               <Activity className="w-4 h-4 mr-2" />
@@ -480,6 +484,22 @@ const Admin = () => {
 
           <TabsContent value="news">
             <NewsManagement />
+          </TabsContent>
+
+          <TabsContent value="revenue">
+            <Card>
+              <CardHeader>
+                <CardTitle>Receita da Plataforma</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Button asChild className="w-full min-h-[44px]" aria-label="Acessar página de receita detalhada">
+                  <Link to="/admin/revenue">
+                    <DollarSign className="w-5 h-5 mr-2" />
+                    Ver Receita Detalhada
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="logs">

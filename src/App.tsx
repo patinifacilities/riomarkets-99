@@ -16,6 +16,7 @@ import Admin from '@/pages/Admin';
 import AdminCategories from '@/pages/AdminCategories';
 import AdminUsers from '@/pages/AdminUsers';
 import AdminReconciliation from '@/pages/AdminReconciliation';
+import AdminRevenue from '@/pages/AdminRevenue';
 import FiatRequests from '@/pages/FiatRequests';
 import NotFound from '@/pages/NotFound';
 import { Toaster } from '@/components/ui/sonner';
@@ -47,6 +48,7 @@ function App() {
           <Route path="/admin/categories" element={<AdminCategories />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/reconciliation" element={<AdminReconciliation />} />
+          <Route path="/admin/revenue" element={<AdminRevenue />} />
           <Route path="/admin/fiat-requests" element={<FiatRequests />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
