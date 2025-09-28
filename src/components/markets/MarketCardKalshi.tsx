@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Bookmark, Share2, Clock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Market } from '@/types';
 import BetModal from './BetModal';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,6 +24,7 @@ interface MarketCardKalshiProps {
 const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, className }: MarketCardKalshiProps) {
   const [betModalOpen, setBetModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string>('sim');
+  const navigate = useNavigate();
   
   const { user } = useAuth();
   const { data: profile } = useProfile();
@@ -180,40 +181,42 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
 
             {/* Prediction Buttons - Kalshi Style */}
             <div className="grid grid-cols-2 gap-2 mb-3">
-              <Link to={`/market/${market.id}`} className="block">
-                <Button
-                  onClick={(e) => e.stopPropagation()}
-                  disabled={market.status !== 'aberto'}
-                  style={{ backgroundColor: '#00ff9020', borderColor: '#00ff90', color: '#00ff90' }}
-                  className="h-12 rounded-xl border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80 w-full"
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <span className="font-semibold">SIM</span>
-                    <span className="text-xs opacity-80">{(market.odds?.sim || 1.5).toFixed(1)}X</span>
-                  </div>
-                </Button>
-              </Link>
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/market/${market.id}`);
+                }}
+                disabled={market.status !== 'aberto'}
+                style={{ backgroundColor: '#00ff9020', borderColor: '#00ff90', color: '#00ff90' }}
+                className="h-12 rounded-xl border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80 w-full"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="font-semibold">SIM</span>
+                  <span className="text-xs opacity-80">{(market.odds?.sim || 1.5).toFixed(1)}X</span>
+                </div>
+              </Button>
               
-              <Link to={`/market/${market.id}`} className="block">
-                <Button
-                  onClick={(e) => e.stopPropagation()}
-                  disabled={market.status !== 'aberto'}
-                  style={{ backgroundColor: '#ff238920', borderColor: '#ff2389', color: '#ff2389' }}
-                  className="h-12 rounded-xl border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80 w-full"
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <span className="font-semibold">NÃO</span>
-                    <span className="text-xs opacity-80">{(market.odds?.não || market.odds?.nao || 1.5).toFixed(1)}X</span>
-                  </div>
-                </Button>
-              </Link>
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/market/${market.id}`);
+                }}
+                disabled={market.status !== 'aberto'}
+                style={{ backgroundColor: '#ff238920', borderColor: '#ff2389', color: '#ff2389' }}
+                className="h-12 rounded-xl border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80 w-full"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="font-semibold">NÃO</span>
+                  <span className="text-xs opacity-80">{(market.odds?.não || market.odds?.nao || 1.5).toFixed(1)}X</span>
+                </div>
+              </Button>
             </div>
 
             {/* Odds Progress Bar - Below buttons */}
             <div className="mb-3">
               <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                <span>SIM {yesPercentage}%</span>
-                <span>NÃO {noPercentage}%</span>
+                <span>SIM {Math.round(yesPercentage)}%</span>
+                <span>NÃO {Math.round(noPercentage)}%</span>
               </div>
               <div className="h-1 bg-muted rounded-full overflow-hidden flex">
                 <div 

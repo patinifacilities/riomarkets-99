@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
 export function DarkModeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -15,11 +15,20 @@ export function DarkModeToggle() {
     return null;
   }
 
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+
+  const handleThemeToggle = () => {
+    console.log('Current theme:', currentTheme);
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+    console.log('Setting theme to:', newTheme);
+    setTheme(newTheme);
+  };
+
   return (
     <Button
       variant="ghost"
       size="sm"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={handleThemeToggle}
       className="w-9 h-9 p-0"
     >
       <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />

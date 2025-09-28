@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface Profile {
@@ -17,6 +18,20 @@ export interface Profile {
 }
 
 export const useProfile = (userId?: string) => {
+  const queryClient = useQueryClient();
+  
+  // Listen for balance updates
+  useEffect(() => {
+    const handleBalanceUpdate = () => {
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: ['profile', userId] });
+      }
+    };
+
+    window.addEventListener('balanceUpdated', handleBalanceUpdate);
+    return () => window.removeEventListener('balanceUpdated', handleBalanceUpdate);
+  }, [userId, queryClient]);
+
   return useQuery({
     queryKey: ['profile', userId],
     queryFn: async (): Promise<Profile | null> => {

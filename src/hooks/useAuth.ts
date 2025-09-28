@@ -10,23 +10,12 @@ export const useAuth = () => {
   useEffect(() => {
     let mounted = true;
 
-    // Listen for auth changes FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (mounted) {
-          console.log('Auth state changed:', event, session ? 'User logged in' : 'User logged out');
-          setSession(session);
-          setUser(session?.user ?? null);
-          setLoading(false);
-        }
-      }
-    );
-
-    // THEN get initial session
+    // Get initial session FIRST
     const getSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (mounted) {
+          console.log('Initial session:', session ? 'User logged in' : 'No session');
           setSession(session);
           setUser(session?.user ?? null);
           setLoading(false);
@@ -40,6 +29,18 @@ export const useAuth = () => {
     };
 
     getSession();
+
+    // THEN Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (mounted) {
+          console.log('Auth state changed:', event, session ? 'User logged in' : 'User logged out');
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+        }
+      }
+    );
 
     return () => {
       mounted = false;

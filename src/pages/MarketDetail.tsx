@@ -284,9 +284,17 @@ const MarketDetail = () => {
                 </h3>
                 
                  <div className="space-y-4">
-                   <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                     <span className="text-sm">Saldo disponível:</span>
-                     <span className="font-semibold">{userProfile?.saldo_moeda || 0} RZ</span>
+                   <div className="space-y-2">
+                     <div className="flex items-center justify-between text-sm">
+                       <span>Saldo disponível:</span>
+                       <span className="font-semibold">{userProfile?.saldo_moeda || 0} RZ</span>
+                     </div>
+                     <div className="w-full bg-muted rounded-full h-2">
+                       <div 
+                         className="bg-primary h-2 rounded-full transition-all duration-300"
+                         style={{ width: `${Math.min(100, ((userProfile?.saldo_moeda || 0) / 10000) * 100)}%` }}
+                       />
+                     </div>
                    </div>
                   
                   <div className="grid grid-cols-2 gap-2">

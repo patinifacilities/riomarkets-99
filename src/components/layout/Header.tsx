@@ -268,16 +268,17 @@ const Header = () => {
                   </Button>
                 </Link>
                 
-                 {/* Deposit Button */}
-                <Button 
-                  variant="default" 
-                  size="sm"
-                  onClick={() => setWalletHoverOpen(true)}
-                  className="gap-2 shadow-success rounded-xl"
-                >
-                  <Plus className="w-4 h-4" />
-                  Depositar
-                </Button>
+                  {/* Deposit Button */}
+                <Link to="/wallet">
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    className="gap-2 shadow-success rounded-xl"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Depositar
+                  </Button>
+                </Link>
                 
                  {/* Dark Mode Toggle */}
                  <DarkModeToggle />
