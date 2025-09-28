@@ -23,7 +23,7 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState('recentes');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const [selectedStatus, setSelectedStatus] = useState<string[]>(['active']);
   const location = useLocation();
   const navigate = useNavigate();
 

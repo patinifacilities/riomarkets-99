@@ -111,7 +111,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
     }
   };
 
-  // Get yes/no percentages
+  // Get yes/no percentages from actual pool data
   const yesOption = detailedPool?.options.find(opt => 
     opt.label.toLowerCase().includes('sim') || opt.label.toLowerCase().includes('yes')
   );
@@ -119,9 +119,9 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
     opt.label.toLowerCase().includes('não') || opt.label.toLowerCase().includes('no')
   );
 
-  // Always set to 50/50 as requested by user
-  const yesPercentage = 50;
-  const noPercentage = 50;
+  // Use real pool percentages or default to 50/50
+  const yesPercentage = yesOption?.chance || 50;
+  const noPercentage = noOption?.chance || 50;
 
   return (
     <>
@@ -180,29 +180,33 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
 
             {/* Prediction Buttons - Kalshi Style */}
             <div className="grid grid-cols-2 gap-2 mb-3">
-              <Button
-                onClick={(e) => handleBetClick(e, yesOption?.label || 'sim')}
-                disabled={market.status !== 'aberto'}
-                style={{ backgroundColor: '#00ff9020', borderColor: '#00ff90', color: '#00ff90' }}
-                className="h-12 rounded-xl border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-semibold">SIM</span>
-                  <span className="text-xs opacity-80">2.0X</span>
-                </div>
-              </Button>
+              <Link to={`/market/${market.id}`} className="block">
+                <Button
+                  onClick={(e) => e.stopPropagation()}
+                  disabled={market.status !== 'aberto'}
+                  style={{ backgroundColor: '#00ff9020', borderColor: '#00ff90', color: '#00ff90' }}
+                  className="h-12 rounded-xl border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80 w-full"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="font-semibold">SIM</span>
+                    <span className="text-xs opacity-80">{(market.odds?.sim || 1.5).toFixed(1)}X</span>
+                  </div>
+                </Button>
+              </Link>
               
-              <Button
-                onClick={(e) => handleBetClick(e, noOption?.label || 'não')}
-                disabled={market.status !== 'aberto'}
-                style={{ backgroundColor: '#ff238920', borderColor: '#ff2389', color: '#ff2389' }}
-                className="h-12 rounded-xl border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-semibold">NÃO</span>
-                  <span className="text-xs opacity-80">2.0X</span>
-                </div>
-              </Button>
+              <Link to={`/market/${market.id}`} className="block">
+                <Button
+                  onClick={(e) => e.stopPropagation()}
+                  disabled={market.status !== 'aberto'}
+                  style={{ backgroundColor: '#ff238920', borderColor: '#ff2389', color: '#ff2389' }}
+                  className="h-12 rounded-xl border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80 w-full"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="font-semibold">NÃO</span>
+                    <span className="text-xs opacity-80">{(market.odds?.não || market.odds?.nao || 1.5).toFixed(1)}X</span>
+                  </div>
+                </Button>
+              </Link>
             </div>
 
             {/* Odds Progress Bar - Below buttons */}

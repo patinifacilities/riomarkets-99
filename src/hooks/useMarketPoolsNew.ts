@@ -63,9 +63,9 @@ export const useMarketPool = (marketId: string) => {
       };
     },
     enabled: !!marketId,
-    refetchInterval: 30000, // Atualiza a cada 30 segundos
+    refetchInterval: 5000, // Atualiza a cada 5 segundos
     retry: 2, // Limit retries to prevent infinite loops
     retryDelay: 1000, // Wait 1 second between retries
-    staleTime: 10000, // Consider data fresh for 10 seconds
+    staleTime: 1000, // Consider data fresh for 1 second
   });
 };

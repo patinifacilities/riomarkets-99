@@ -23,6 +23,7 @@ import { useState } from 'react';
 import { TickerBar } from '@/components/ui/ticker-bar';
 import { WalletHoverCard } from '@/components/wallet/WalletHoverCard';
 import { DarkModeToggle } from './DarkModeToggle';
+
 import logoImage from '@/assets/rio-markets-logo-white.png';
 
 const Header = () => {

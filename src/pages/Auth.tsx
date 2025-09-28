@@ -218,7 +218,12 @@ const Auth = () => {
       <div className="w-full max-w-md">
         {/* Logo/Branding */}
         <div className="text-center mb-8">
-          <div className="mb-4">
+          <div className="mb-6">
+            <img 
+              src={new URL('../assets/rio-white-logo-auth.png', import.meta.url).href}
+              alt="Rio Markets Logo" 
+              className="h-16 w-auto mx-auto mb-4"
+            />
             <TypewriterText
               baseText="Mercados Preditivos"
               texts={[

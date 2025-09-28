@@ -33,7 +33,7 @@ export const WalletHoverCard = ({ isOpen, onClose }: WalletHoverCardProps) => {
             <div className="flex gap-2">
               <Button 
                 size="sm" 
-                className="flex-1"
+                className="w-full"
                 style={{ backgroundColor: '#00ff90', color: 'white' }}
                 onClick={() => {
                   setDepositModalOpen(true);
@@ -42,15 +42,6 @@ export const WalletHoverCard = ({ isOpen, onClose }: WalletHoverCardProps) => {
               >
                 <Plus className="w-4 h-4 mr-1" />
                 Depositar
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex-1"
-                style={{ color: '#ff2389', borderColor: '#ff2389' }}
-              >
-                <Minus className="w-4 h-4 mr-1" />
-                Sacar
               </Button>
             </div>
           </CardContent>
