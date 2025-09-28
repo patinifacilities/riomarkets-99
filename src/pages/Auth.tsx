@@ -214,7 +214,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 overflow-hidden">
+    <div className="h-screen bg-background flex items-center justify-center p-4 overflow-hidden">
       <div className="w-full max-w-md">
         {/* Logo/Branding */}
         <div className="text-center mb-8">
@@ -224,14 +224,16 @@ const Auth = () => {
               alt="Rio Markets Logo" 
               className="h-20 w-auto mx-auto mb-4"
             />
+            <div className="text-2xl font-bold text-white">
+              Mercados Preditivos
+            </div>
             <div style={{ color: '#00ff90' }}>
               <TypewriterText
-                baseText="Mercados Preditivos"
+                baseText=""
                 texts={[
                   "para Análise Estratégica",
                   "baseados em Dados",
-                  "com Transparência Total",
-                  "para o Futuro do Rio"
+                  "com Transparência Total"
                 ]}
                 className="text-2xl font-bold"
                 typingSpeed={100}

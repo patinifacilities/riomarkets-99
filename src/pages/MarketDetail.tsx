@@ -237,7 +237,7 @@ const MarketDetail = () => {
                            ? 'hover:ring-[#ff2389] hover:shadow-danger hover:border-[#ff2389]'
                            : 'hover:ring-[#00ff90] hover:shadow-success hover:border-[#00ff90]')
                     }`}
-                    onClick={() => handleOpenBetModal(opcao)}
+                    onClick={() => setSelectedOption(opcao)}
                   >
                     <CardContent className="p-6 text-center">
                       <div className={`text-2xl font-bold mb-2 ${getColorClass()}`}>
@@ -253,7 +253,7 @@ const MarketDetail = () => {
                         className={`mt-4 w-full min-h-[44px] ${getButtonClass()}`}
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleOpenBetModal(opcao);
+                          setSelectedOption(opcao);
                         }}
                         aria-label={`Opinar em ${opcao.toUpperCase()}`}
                       >
@@ -291,9 +291,19 @@ const MarketDetail = () => {
                       estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
                     />
                   
-                  <div className="grid grid-cols-2 gap-2">
+                  {selectedOption && (
+                    <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">
+                      <div className="text-sm text-muted-foreground mb-2">Opção selecionada:</div>
+                      <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
+                      <div className="text-sm text-muted-foreground mb-1">Valor apostado: {betAmount} Rioz</div>
+                      <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toFixed(2)} Rioz</div>
+                      <div className="text-sm text-success">Lucro estimado: {(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toFixed(2)} Rioz</div>
+                    </div>
+                  )}
+                  
+                  <div className="grid grid-cols-2 gap-2 mt-4">
                     <Button 
-                      onClick={() => handleOpenBetModal('sim')}
+                      onClick={() => setSelectedOption('sim')}
                       disabled={market.status !== 'aberto'}
                       className="bg-[#00FF91] hover:bg-[#00FF91]/90 text-black shadow-[#00FF91]/20 min-h-[44px]"
                       size="sm"

@@ -18,10 +18,12 @@ export function DarkModeToggle() {
   const currentTheme = theme === 'system' ? systemTheme : theme;
 
   const handleThemeToggle = () => {
-    console.log('Current theme:', currentTheme);
     const newTheme = currentTheme === "dark" ? "light" : "dark";
-    console.log('Setting theme to:', newTheme);
     setTheme(newTheme);
+    // Force update DOM
+    setTimeout(() => {
+      document.documentElement.setAttribute('class', newTheme);
+    }, 0);
   };
 
   return (
