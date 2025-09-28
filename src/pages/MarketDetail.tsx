@@ -295,9 +295,9 @@ const MarketDetail = () => {
                     <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">
                       <div className="text-sm text-muted-foreground mb-2">Opção selecionada:</div>
                       <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
-                      <div className="text-sm text-muted-foreground mb-1">Valor apostado: {betAmount} Rioz</div>
+                      <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount} Rioz</div>
                       <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toFixed(2)} Rioz</div>
-                      <div className="text-sm text-success">Lucro estimado: {(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toFixed(2)} Rioz</div>
+                      <div className="text-lg font-bold text-success bg-success/10 px-2 py-1 rounded">Lucro estimado: +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toFixed(2)} Rioz</div>
                     </div>
                   )}
                   
@@ -305,7 +305,7 @@ const MarketDetail = () => {
                     <Button 
                       onClick={() => setSelectedOption('sim')}
                       disabled={market.status !== 'aberto'}
-                      className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-success hover:bg-success/90 text-success-foreground' : 'bg-secondary hover:bg-secondary/80'}`}
+                      className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-[#00FF91] hover:bg-[#00FF91]/90 text-black font-semibold' : 'bg-white text-black border-2 hover:bg-gray-100 font-semibold'}`}
                       size="sm"
                       aria-label="Opinar Sim"
                     >
@@ -314,7 +314,7 @@ const MarketDetail = () => {
                     <Button 
                       onClick={() => setSelectedOption('nao')}
                       disabled={market.status !== 'aberto'}
-                      className={`min-h-[44px] ${selectedOption === 'nao' ? 'bg-danger hover:bg-danger/90 text-danger-foreground' : 'bg-secondary hover:bg-secondary/80'}`}
+                      className={`min-h-[44px] ${selectedOption === 'nao' ? 'bg-[#FF1493] hover:bg-[#FF1493]/90 text-white font-semibold' : 'bg-white text-black border-2 hover:bg-gray-100 font-semibold'}`}
                       size="sm"
                       aria-label="Opinar Não"
                     >
@@ -326,7 +326,7 @@ const MarketDetail = () => {
                     <Button 
                       onClick={() => handleOpenBetModal(selectedOption)}
                       disabled={market.status !== 'aberto'}
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground w-full min-h-[44px] mt-4"
+                      className="bg-white text-black hover:bg-white/90 w-full min-h-[44px] mt-4 font-semibold border-2"
                       size="sm"
                       aria-label={`Confirmar opinião ${selectedOption.toUpperCase()}`}
                     >

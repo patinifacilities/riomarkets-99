@@ -133,6 +133,13 @@ const BetModal = ({
         description: `Você investiu ${betValue} Rioz Coin em "${selectedOption}". Sua ordem foi adicionada ao order book!`,
       });
 
+      // Dispatch balance update events to refresh RIOZ balance
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('balanceUpdated'));
+        window.dispatchEvent(new CustomEvent('exchangeBalanceUpdated'));
+        window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
+      }
+
       setBetAmount('');
       onOpenChange(false);
       onBetSuccess?.();

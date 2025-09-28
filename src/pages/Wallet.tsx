@@ -97,14 +97,6 @@ const WalletPage = () => {
               <ArrowRightLeft className="w-4 h-4 mr-2" />
               Sacar
             </Button>
-            <Button 
-              onClick={() => setShowCancelBetModal(true)}
-              variant="outline"
-              className="border-danger/30 text-danger hover:bg-danger/10"
-            >
-              <X className="w-4 h-4 mr-2" />
-              Cancelar Opinião
-            </Button>
           </div>
         </div>
 
@@ -194,6 +186,25 @@ const WalletPage = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Histórico de Ordens</CardTitle>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => setShowWithdrawModal(true)}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <ArrowRightLeft className="w-4 h-4 mr-2" />
+                    Sacar Agora
+                  </Button>
+                  <Button 
+                    onClick={() => setShowCancelBetModal(true)}
+                    variant="outline"
+                    size="sm"
+                    className="border-danger/30 text-danger hover:bg-danger/10"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Cancelar Opinião
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>

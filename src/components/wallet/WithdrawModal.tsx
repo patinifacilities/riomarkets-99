@@ -112,11 +112,16 @@ export const WithdrawModal = ({ open, onOpenChange, onSuccess }: WithdrawModalPr
       // Simular processamento
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Dispatch balance update events
+      // Dispatch balance update events to refresh RIOZ balance
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('balanceUpdated'));
         window.dispatchEvent(new CustomEvent('exchangeBalanceUpdated'));
         window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
+        // Force immediate query invalidation
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('balanceUpdated'));
+          window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
+        }, 100);
       }
       
       toast({
