@@ -97,7 +97,7 @@ const BetModal = ({
         .insert({
           market_id: market.id,
           user_id: userId,
-          side: selectedOption,
+          side: selectedOption.toUpperCase(),
           amount_rioz: betValue,
           probability_percent: currentPercent,
           odds: recompensa,

@@ -13,7 +13,7 @@ interface SimpleOrderBookProps {
 
 interface MarketOrder {
   id: string;
-  side: 'sim' | 'nao';
+  side: 'SIM' | 'NAO';
   amount_rioz: number;
   probability_percent: number;
   odds: number;
@@ -61,8 +61,8 @@ const SimpleOrderBook = ({ marketId, simPercent, naoPercent, simOdds, naoOdds }:
     };
   }, [marketId]);
 
-  const simOrders = orders.filter(order => order.side === 'sim');
-  const naoOrders = orders.filter(order => order.side === 'nao');
+  const simOrders = orders.filter(order => order.side === 'SIM');
+  const naoOrders = orders.filter(order => order.side === 'NAO');
 
   return (
     <Card className="bg-gradient-card border-border/50">

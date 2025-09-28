@@ -228,51 +228,80 @@ const Home = () => {
         </section>
 
 
-      {/* Combined Filters Section */}
-      <div className="container mx-auto px-4 pb-4 bg-gradient-to-b from-background/80 to-background/40 border-t border-border/20">
-        <div className="flex items-center gap-3 mb-4 pt-4">
-          <Filter className="w-5 h-5 text-muted-foreground" />
-          <span className="text-lg font-semibold text-foreground">Filtros:</span>
+      {/* Enhanced Filters Section */}
+      <div className="container mx-auto px-4 pb-6 bg-gradient-to-b from-background/95 to-background/60 border-t border-border/30 backdrop-blur-sm">
+        <div className="flex items-center gap-3 mb-6 pt-6">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <Filter className="w-5 h-5 text-primary" />
+          </div>
+          <span className="text-xl font-bold text-foreground">Filtrar Mercados</span>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Topic Filters - 50% larger */}
-          <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-3">Por tópico:</h4>
+        {/* Search Bar - Moved to top */}
+        <div className="mb-6">
+          <div className="relative max-w-lg">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+            <Input
+              placeholder="Buscar por título ou descrição..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-12 h-12 bg-background/80 border-border/50 text-foreground placeholder:text-muted-foreground rounded-xl shadow-sm focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Topic Filters - Enhanced */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-5 bg-gradient-to-b from-primary to-primary/50 rounded-full"></div>
+              <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">Tópicos</h4>
+            </div>
             <FilterChips
               chips={topicFilters}
               selectedChips={selectedTopics}
               onChipSelect={handleTopicSelect}
               onRemoveChip={handleRemoveTopic}
-              chipClassName="px-9 py-4 text-lg"
+              chipClassName="px-6 py-3 text-sm font-medium rounded-full transition-all duration-200"
+              className="flex flex-wrap gap-3"
             />
           </div>
 
-          {/* Status Filters - 50% larger */}
-          <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-3">Por status:</h4>
+          {/* Status Filters - Enhanced */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-5 bg-gradient-to-b from-[#00FF91] to-[#00FF91]/50 rounded-full"></div>
+              <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">Status</h4>
+            </div>
             <FilterChips
               chips={statusFilters}
               selectedChips={selectedStatus}
               onChipSelect={handleStatusSelect}
               onRemoveChip={handleRemoveStatus}
-              chipClassName="px-9 py-4 text-lg"
+              chipClassName="px-6 py-3 text-sm font-medium rounded-full transition-all duration-200"
+              className="flex flex-wrap gap-3"
             />
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="mt-6">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Buscar mercados..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60"
-            />
+        {/* Active Filters Summary */}
+        {(selectedTopics.length > 0 || selectedStatus.length > 0) && (
+          <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-xl">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-2 h-2 bg-primary rounded-full"></div>
+              <span className="text-sm font-medium text-primary">Filtros ativos</span>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {selectedTopics.length > 0 && (
+                <span>{selectedTopics.length} tópico{selectedTopics.length > 1 ? 's' : ''}</span>
+              )}
+              {selectedTopics.length > 0 && selectedStatus.length > 0 && <span> • </span>}
+              {selectedStatus.length > 0 && (
+                <span>{selectedStatus.length} status</span>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Markets Grid */}
