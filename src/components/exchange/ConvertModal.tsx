@@ -46,10 +46,9 @@ export const ConvertModal = ({ open, onOpenChange, onSuccess }: ConvertModalProp
 
     const amountNum = parseFloat(amount);
     
-    // Validate balances
+    // Validar saldos (taxa fixa 1:1)
     if (activeTab === 'buy') {
-      const totalCost = amountNum * (rate?.price || 1);
-      if ((balance?.brl_balance || 0) < totalCost) {
+      if ((balance?.brl_balance || 0) < amountNum) {
         toast({
           title: "Erro",
           description: "Saldo BRL insuficiente",
@@ -70,26 +69,27 @@ export const ConvertModal = ({ open, onOpenChange, onSuccess }: ConvertModalProp
 
     setLoading(true);
     try {
-      if (activeTab === 'buy') {
-        await performExchange('buy_rioz', amountNum, 'RIOZ');
-      } else {
-        await performExchange('sell_rioz', amountNum, 'RIOZ');
-      }
+      await performExchange(
+        activeTab === 'buy' ? 'buy_rioz' : 'sell_rioz', 
+        amountNum, 
+        'RIOZ'
+      );
       
-      // Refresh balances
+      // Atualizar dados
       await Promise.all([fetchBalance(), refetchProfile()]);
       
       toast({
         title: "Conversão realizada!",
-        description: `${activeTab === 'buy' ? 'Compra' : 'Venda'} de ${amountNum} RIOZ executada com sucesso.`,
+        description: `${activeTab === 'buy' ? 'Compra' : 'Venda'} de ${amountNum} RIOZ executada.`,
       });
       
       onSuccess?.();
       onOpenChange(false);
+      setAmount('');
     } catch (error) {
       toast({
         title: "Erro na conversão",
-        description: error instanceof Error ? error.message : 'Erro desconhecido',
+        description: error instanceof Error ? error.message : 'Erro na conversão',
         variant: "destructive",
       });
     } finally {

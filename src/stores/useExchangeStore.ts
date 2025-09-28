@@ -207,131 +207,95 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
+      // Taxas simples: 1 R$ = 1 RZ
+      const EXCHANGE_RATE = 1.0;
+      
       // Get current balances
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('saldo_moeda')
-        .eq('id', user.id)
-        .single();
+      const [profileResponse, balanceResponse] = await Promise.all([
+        supabase.from('profiles').select('saldo_moeda').eq('id', user.id).single(),
+        supabase.from('balances').select('brl_balance').eq('user_id', user.id).single()
+      ]);
 
-      const { data: balance } = await supabase
-        .from('balances')
-        .select('brl_balance')
-        .eq('user_id', user.id)
-        .single();
+      if (profileResponse.error || balanceResponse.error) {
+        throw new Error('Erro ao buscar dados do usuário');
+      }
 
-      if (!profile || !balance) throw new Error('User data not found');
+      const currentRiozBalance = profileResponse.data.saldo_moeda;
+      const currentBrlBalance = balanceResponse.data.brl_balance;
 
-      const currentRiozBalance = profile.saldo_moeda;
-      const currentBrlBalance = balance.brl_balance;
-
-      // Calculate new balances based on operation
       let newRiozBalance = currentRiozBalance;
       let newBrlBalance = currentBrlBalance;
-      let totalCost = 0;
 
       if (side === 'buy_rioz') {
-        // Buying RIOZ with BRL
-        totalCost = amountInput * 1.0; // 1 RIOZ = 1 BRL
+        // Comprar RIOZ com BRL: precisa de BRL suficiente
+        const brlNeeded = amountInput * EXCHANGE_RATE;
         
-        if (currentBrlBalance < totalCost) {
+        if (currentBrlBalance < brlNeeded) {
           throw new Error('Saldo BRL insuficiente');
         }
         
         newRiozBalance = currentRiozBalance + amountInput;
-        newBrlBalance = currentBrlBalance - totalCost;
+        newBrlBalance = currentBrlBalance - brlNeeded;
       } else {
-        // Selling RIOZ for BRL
+        // Vender RIOZ por BRL: precisa de RIOZ suficiente
         if (currentRiozBalance < amountInput) {
           throw new Error('Saldo RIOZ insuficiente');
         }
         
-        totalCost = amountInput * 1.0; // 1 RIOZ = 1 BRL
         newRiozBalance = currentRiozBalance - amountInput;
-        newBrlBalance = currentBrlBalance + totalCost;
+        newBrlBalance = currentBrlBalance + (amountInput * EXCHANGE_RATE);
       }
 
-      // Update both balances atomically using a transaction
-      const { data: updatedProfile, error: profileError } = await supabase
-        .from('profiles')
-        .update({ saldo_moeda: Math.round(newRiozBalance) })
-        .eq('id', user.id)
-        .select('saldo_moeda')
-        .single();
-
-      if (profileError) throw profileError;
-
-      const { data: updatedBalance, error: balanceError } = await supabase
-        .from('balances')
-        .update({ brl_balance: newBrlBalance })
-        .eq('user_id', user.id)
-        .select('brl_balance')
-        .single();
-
-      if (balanceError) throw balanceError;
-
-      // Log the exchange transaction
-      await Promise.all([
+      // Atualizar ambos os saldos
+      const [profileUpdate, balanceUpdate] = await Promise.all([
         supabase
-          .from('exchange_orders')
-          .insert({
-            user_id: user.id,
-            side,
-            price_brl_per_rioz: 1.0,
-            amount_rioz: amountInput,
-            amount_brl: totalCost,
-            status: 'filled',
-            filled_at: new Date().toISOString()
-          }),
-        logExchangeTransaction(
-          user.id,
-          side === 'buy_rioz' ? 'compra_rioz' : 'venda_rioz',
-          side === 'buy_rioz' ? totalCost : amountInput,
-          side === 'buy_rioz' ? `Compra de ${amountInput} RIOZ por R$ ${totalCost.toFixed(2)}` : `Venda de ${amountInput} RIOZ por R$ ${totalCost.toFixed(2)}`
-        )
+          .from('profiles')
+          .update({ saldo_moeda: newRiozBalance })
+          .eq('id', user.id)
+          .select('saldo_moeda')
+          .single(),
+        supabase
+          .from('balances')
+          .update({ brl_balance: newBrlBalance })
+          .eq('user_id', user.id)
+          .select('brl_balance')
+          .single()
       ]);
-      
-      // Update local state with the actual values from database
-      set({ 
-        balance: {
-          rioz_balance: Math.round(newRiozBalance),
-          brl_balance: updatedBalance.brl_balance,
-          updated_at: new Date().toISOString()
-        }
+
+      if (profileUpdate.error || balanceUpdate.error) {
+        throw new Error('Erro ao atualizar saldos');
+      }
+
+      // Log da transação
+      await supabase.from('exchange_orders').insert({
+        user_id: user.id,
+        side,
+        price_brl_per_rioz: EXCHANGE_RATE,
+        amount_rioz: amountInput,
+        amount_brl: amountInput * EXCHANGE_RATE,
+        status: 'filled',
+        filled_at: new Date().toISOString()
       });
       
-      // Force immediate UI refresh
-      if (typeof window !== 'undefined') {
-        console.log('Exchange completed - dispatching events', {
-          rioz_balance: Math.round(newRiozBalance),
-          brl_balance: updatedBalance.brl_balance,
-          saldo_moeda: updatedProfile.saldo_moeda,
-          side
-        });
-        
-        // Dispatch multiple events to ensure all components update
-        window.dispatchEvent(new CustomEvent('balanceUpdated', { 
-          detail: { 
-            rioz_balance: Math.round(newRiozBalance),
-            brl_balance: updatedBalance.brl_balance,
-            saldo_moeda: updatedProfile.saldo_moeda
-          } 
-        }));
-        window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
-        window.dispatchEvent(new CustomEvent('profileUpdated', {
-          detail: {
-            saldo_moeda: updatedProfile.saldo_moeda
-          }
-        }));
-      }
+      // Atualizar estado local
+      set({ 
+        balance: {
+          rioz_balance: newRiozBalance,
+          brl_balance: newBrlBalance,
+          updated_at: new Date().toISOString()
+        },
+        exchangeLoading: false
+      });
       
-      set({ exchangeLoading: false });
+      // Forçar atualização da UI
+      window.dispatchEvent(new CustomEvent('balanceUpdated'));
+      window.dispatchEvent(new CustomEvent('profileUpdated'));
+      
       return { success: true, new_rioz_balance: newRiozBalance, new_brl_balance: newBrlBalance };
     } catch (error) {
-      console.error('Error performing exchange:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Exchange failed';
+      console.error('Erro na troca:', error);
       set({ 
-        exchangeError: errorMessage,
+        exchangeError: error instanceof Error ? error.message : 'Erro na troca',
         exchangeLoading: false 
       });
       throw error;

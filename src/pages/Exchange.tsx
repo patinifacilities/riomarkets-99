@@ -68,164 +68,50 @@ const Exchange = () => {
     }
 
     try {
-      if (orderType === 'market') {
-        if (side === 'buy') {
-          // Find cheapest sell orders to match
-          const availableSellOrders = orderBookData
-            .filter(order => order.side === 'sell')
-            .sort((a, b) => a.price_brl_per_rioz - b.price_brl_per_rioz);
-          
-          let remainingAmount = amount;
-          let totalCost = 0;
-          
-          // Calculate if we can fulfill the order
-          for (const order of availableSellOrders) {
-            const amountToTake = Math.min(remainingAmount, order.remaining_amount);
-            totalCost += amountToTake * order.price_brl_per_rioz;
-            remainingAmount -= amountToTake;
-            if (remainingAmount <= 0) break;
-          }
-          
-          if (remainingAmount > 0) {
-            toast({
-              title: "Erro",
-              description: "Não há ordens de venda suficientes para completar sua compra",
-              variant: "destructive",
-            });
-            return;
-          }
-
-          // Check if user has enough BRL balance
-          if ((balance?.brl_balance || 0) < totalCost) {
-            toast({
-              title: "Erro", 
-              description: "Saldo BRL insuficiente",
-              variant: "destructive",
-            });
-            return;
-          }
-
-          // Execute the market buy order
-          await performExchange('buy_rioz', amount, 'RIOZ');
-          
-          // Refresh profile to update RIOZ balance
-          await refetchProfile();
-        } else {
-          // Find highest buy orders to match
-          const availableBuyOrders = orderBookData
-            .filter(order => order.side === 'buy')
-            .sort((a, b) => b.price_brl_per_rioz - a.price_brl_per_rioz);
-          
-          let remainingAmount = amount;
-          
-          // Calculate if we can fulfill the order
-          for (const order of availableBuyOrders) {
-            const amountToTake = Math.min(remainingAmount, order.remaining_amount);
-            remainingAmount -= amountToTake;
-            if (remainingAmount <= 0) break;
-          }
-          
-          if (remainingAmount > 0) {
-            toast({
-              title: "Erro",
-              description: "Não há ordens de compra suficientes para completar sua venda",
-              variant: "destructive",
-            });
-            return;
-          }
-
-          // Check if user has enough RIOZ balance
-          if ((balance?.rioz_balance || 0) < amount) {
-            toast({
-              title: "Erro",
-              description: "Saldo RIOZ insuficiente", 
-              variant: "destructive",
-            });
-            return;
-          }
-
-          // Execute the market sell order
-          await performExchange('sell_rioz', amount, 'RIOZ');
-          
-          // Refresh profile to update RIOZ balance
-          await refetchProfile();
-        }
-        
-        // Refresh order book and balances
-        await Promise.all([fetchOrderBook(), fetchBalance(), refetchProfile()]);
-        
-        toast({
-          title: "Trade executado!",
-          description: `${side === 'buy' ? 'Compra' : 'Venda'} realizada com sucesso.`,
-        });
-      } else {
-        // Create limit order and update balance immediately
-        const price = parseFloat(limitPrice) || rate?.price || 1;
-        
-        // Check balance before placing limit order
-        if (side === 'buy') {
-          const totalCost = amount * price;
-          if ((balance?.brl_balance || 0) < totalCost) {
-            toast({
-              title: "Erro",
-              description: "Saldo BRL insuficiente para criar a ordem",
-              variant: "destructive",
-            });
-            return;
-          }
-          
-          // Reserve BRL balance
-          await supabase
-            .from('balances')
-            .update({ brl_balance: (balance?.brl_balance || 0) - totalCost })
-            .eq('user_id', user.id);
-        } else {
-          if ((balance?.rioz_balance || 0) < amount) {
-            toast({
-              title: "Erro", 
-              description: "Saldo RIOZ insuficiente para criar a ordem",
-              variant: "destructive",
-            });
-            return;
-          }
-          
-          // Reserve RIOZ balance
-          await supabase
-            .from('balances')
-            .update({ rioz_balance: (balance?.rioz_balance || 0) - amount })
-            .eq('user_id', user.id);
-        }
-        
-        const { error } = await supabase
-          .from('exchange_order_book')
-          .insert({
-            user_id: user.id,
-            side,
-            amount_rioz: amount,
-            price_brl_per_rioz: price,
-            remaining_amount: amount,
-            order_type: 'limit'
+      // Lógica simples: 1 R$ = 1 RZ
+      if (side === 'buy') {
+        // Verificar saldo BRL
+        if ((balance?.brl_balance || 0) < amount) {
+          toast({
+            title: "Erro", 
+            description: "Saldo BRL insuficiente",
+            variant: "destructive",
           });
-
-        if (error) throw error;
-
-        // Refresh balances to show updated amounts
-        await Promise.all([fetchBalance(), refetchProfile()]);
-
-        toast({
-          title: "Ordem criada!",
-          description: `Ordem de ${side === 'buy' ? 'compra' : 'venda'} adicionada ao order book.`,
-        });
-        
-        fetchOrderBook();
+          return;
+        }
+      } else {
+        // Verificar saldo RIOZ
+        if ((profile?.saldo_moeda || 0) < amount) {
+          toast({
+            title: "Erro",
+            description: "Saldo RIOZ insuficiente", 
+            variant: "destructive",
+          });
+          return;
+        }
       }
+
+      // Executar troca
+      await performExchange(
+        side === 'buy' ? 'buy_rioz' : 'sell_rioz', 
+        amount, 
+        'RIOZ'
+      );
+      
+      // Atualizar dados
+      await Promise.all([fetchBalance(), refetchProfile()]);
+      
+      toast({
+        title: "Trade executado!",
+        description: `${side === 'buy' ? 'Compra' : 'Venda'} de ${amount} RIOZ realizada.`,
+      });
       
       setAmount(0);
       setLimitPrice('');
     } catch (error) {
       toast({
         title: "Erro no trade",
-        description: error instanceof Error ? error.message : 'Erro desconhecido',
+        description: error instanceof Error ? error.message : 'Erro na operação',
         variant: "destructive",
       });
     }
@@ -262,7 +148,7 @@ const Exchange = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ArrowUpDown className="h-5 w-5" />
-                  Trading Interface
+                  Trade
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
