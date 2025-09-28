@@ -11,11 +11,12 @@ import { ArrowUpDown, Wallet, TrendingUp, TrendingDown } from 'lucide-react';
 import { track } from '@/lib/analytics';
 import { BalancesCard } from '@/components/exchange/BalancesCard';
 import { TradeSlider } from '@/components/exchange/TradeSlider';
+import { ConvertModal } from '@/components/exchange/ConvertModal';
 import { supabase } from '@/integrations/supabase/client';
 
 const Exchange = () => {
   const { user } = useAuth();
-  const { data: profile } = useProfile(user?.id);
+  const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
   const { rate, balance, fetchRate, fetchBalance, performExchange } = useExchangeStore();
   
@@ -23,11 +24,23 @@ const Exchange = () => {
   const [amount, setAmount] = useState(0);
   const [limitPrice, setLimitPrice] = useState('');
   const [orderBookData, setOrderBookData] = useState<any[]>([]);
+  const [convertModalOpen, setConvertModalOpen] = useState(false);
 
   useEffect(() => {
     fetchRate();
     fetchBalance();
     fetchOrderBook();
+    
+    // Listen for convert modal trigger
+    const handleOpenConvertModal = () => {
+      setConvertModalOpen(true);
+    };
+    
+    window.addEventListener('openConvertModal', handleOpenConvertModal);
+    
+    return () => {
+      window.removeEventListener('openConvertModal', handleOpenConvertModal);
+    };
   }, []);
 
   const fetchOrderBook = async () => {
@@ -94,6 +107,9 @@ const Exchange = () => {
 
           // Execute the market buy order
           await performExchange('buy_rioz', amount, 'RIOZ');
+          
+          // Refresh profile to update RIOZ balance
+          await refetchProfile();
         } else {
           // Find highest buy orders to match
           const availableBuyOrders = orderBookData
@@ -130,10 +146,13 @@ const Exchange = () => {
 
           // Execute the market sell order
           await performExchange('sell_rioz', amount, 'RIOZ');
+          
+          // Refresh profile to update RIOZ balance
+          await refetchProfile();
         }
         
         // Refresh order book and balances
-        await Promise.all([fetchOrderBook(), fetchBalance()]);
+        await Promise.all([fetchOrderBook(), fetchBalance(), refetchProfile()]);
         
         toast({
           title: "Trade executado!",
@@ -191,7 +210,7 @@ const Exchange = () => {
         if (error) throw error;
 
         // Refresh balances to show updated amounts
-        await fetchBalance();
+        await Promise.all([fetchBalance(), refetchProfile()]);
 
         toast({
           title: "Ordem criada!",
@@ -272,14 +291,14 @@ const Exchange = () => {
                   </TabsList>
                   
                   <TabsContent value="buy" className="space-y-4 mt-6">
-                    <div className="space-y-4">
-                      <TradeSlider
-                        balance={profile?.saldo_moeda || 0}
-                        currency="RIOZ"
-                        price={rate?.price || 1}
-                        onAmountChange={setAmount}
-                        side="buy"
-                      />
+                     <div className="space-y-4">
+                       <TradeSlider
+                         balance={balance?.brl_balance || 0}
+                         currency="BRL"
+                         price={rate?.price || 1}
+                         onAmountChange={setAmount}
+                         side="buy"
+                       />
                       
                       {orderType === 'limit' && (
                         <div>
@@ -314,14 +333,14 @@ const Exchange = () => {
                   </TabsContent>
                   
                   <TabsContent value="sell" className="space-y-4 mt-6">
-                    <div className="space-y-4">
-                      <TradeSlider
-                        balance={profile?.saldo_moeda || 0}
-                        currency="RIOZ"
-                        price={rate?.price || 1}
-                        onAmountChange={setAmount}
-                        side="sell"
-                      />
+                     <div className="space-y-4">
+                       <TradeSlider
+                         balance={profile?.saldo_moeda || 0}
+                         currency="RIOZ"
+                         price={rate?.price || 1}
+                         onAmountChange={setAmount}
+                         side="sell"
+                       />
                       
                       {orderType === 'limit' && (
                         <div>
@@ -460,6 +479,16 @@ const Exchange = () => {
             </Card>
           </div>
         </div>
+        
+        {/* Convert Modal */}
+        <ConvertModal 
+          open={convertModalOpen}
+          onOpenChange={setConvertModalOpen}
+          onSuccess={() => {
+            fetchBalance();
+            refetchProfile();
+          }}
+        />
       </div>
     </div>
   );

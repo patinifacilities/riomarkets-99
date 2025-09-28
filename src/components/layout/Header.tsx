@@ -292,14 +292,15 @@ const Header = () => {
                  <DarkModeToggle />
                 
                  {/* Profile Icon */}
-                 <Button 
-                   variant="ghost" 
-                   size="sm"
-                   onClick={() => navigate('/profile')}
-                   className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-full p-2"
-                 >
-                   <UserCircle className="w-6 h-6" />
-                 </Button>
+                 <Link to="/profile">
+                   <Button 
+                     variant="ghost" 
+                     size="sm"
+                     className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-full p-2"
+                   >
+                     <UserCircle className="w-6 h-6" />
+                   </Button>
+                 </Link>
               </>
             ) : !loading ? (
               <Link to="/auth">

@@ -140,8 +140,7 @@ const MarketDetail = () => {
                   <div className="text-right space-y-2">
                     <div className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Clock className="w-4 h-4" />
-                      <span>{daysLeft > 0 ? `${daysLeft} ` : 'Encerrando'}</span>
-                      {daysLeft > 0 && <span>dias</span>}
+                      <span>{daysLeft > 0 ? `${daysLeft} dias` : 'Encerrando'}</span>
                     </div>
                     <Badge className={getStatusColor(market.status)}>
                       {market.status}

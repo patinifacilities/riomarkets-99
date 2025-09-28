@@ -99,16 +99,6 @@ export const BalancesCard = () => {
               </div>
             </div>
 
-            <Separator />
-
-            {/* Total Value */}
-            <div className="space-y-2">
-              <span className="text-sm text-muted-foreground">Valor Total</span>
-              <div className="text-base font-semibold tabular-nums text-[#00FF91] break-words">
-                {ExchangeService.formatCurrency(getTotalValueInBRL(), 'BRL')}
-              </div>
-            </div>
-
             {/* Action Buttons */}
             <div className="space-y-2">
               <Button 
@@ -124,10 +114,8 @@ export const BalancesCard = () => {
                 variant="default" 
                 className="w-full"
                 onClick={() => {
-                  // Scroll to exchange widget or focus on it
-                  document.querySelector('[data-exchange-widget]')?.scrollIntoView({ 
-                    behavior: 'smooth' 
-                  });
+                  // Trigger convert modal
+                  window.dispatchEvent(new CustomEvent('openConvertModal'));
                 }}
               >
                 <ArrowRightLeft className="h-4 w-4 mr-2" />

@@ -20,21 +20,22 @@ export const CancelBetModal = ({ open, onOpenChange, onConfirm, orderId, orderAm
   const handleCancel = async () => {
     setIsLoading(true);
     try {
-      if (orderId && orderAmount) {
+      if (orderId) {
         const { data: user } = await supabase.auth.getUser();
         if (!user.user) throw new Error('User not authenticated');
 
-        const { data, error } = await supabase.rpc('cancel_bet_with_fee', {
-          p_order_id: orderId,
-          p_user_id: user.user.id
-        });
+        // Simply update the order status to cancelled
+        const { error } = await supabase
+          .from('orders')
+          .update({ 
+            status: 'cancelada',
+            cashed_out_at: new Date().toISOString(),
+            cashout_amount: 0
+          })
+          .eq('id', orderId)
+          .eq('user_id', user.user.id);
 
         if (error) throw error;
-        
-        const result = data?.[0];
-        if (!result?.success) {
-          throw new Error(result?.message || 'Failed to cancel bet');
-        }
 
         // Dispatch balance update events
         window.dispatchEvent(new CustomEvent('balanceUpdated'));
@@ -43,7 +44,7 @@ export const CancelBetModal = ({ open, onOpenChange, onConfirm, orderId, orderAm
 
       toast({
         title: "Opinião cancelada",
-        description: "Sua opinião foi cancelada com sucesso. Taxa de 30% aplicada.",
+        description: "Sua opinião foi cancelada com sucesso.",
         variant: "default",
       });
       
