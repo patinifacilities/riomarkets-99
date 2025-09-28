@@ -7,9 +7,10 @@ interface SliderConfirmProps {
   disabled?: boolean;
   className?: string;
   text?: string;
+  selectedOption?: string; // Added to determine color
 }
 
-export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "Deslize para confirmar" }: SliderConfirmProps) => {
+export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "Deslize para confirmar", selectedOption }: SliderConfirmProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -127,31 +128,33 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
   const thumbWidth = 56;
   const maxPosition = containerWidth - thumbWidth;
   const progress = maxPosition > 0 ? position / maxPosition : 0;
+  
+  // Determine colors based on selected option
+  const isSimOption = selectedOption === 'sim';
+  const fillColor = isSimOption ? '#00ff90' : '#ff2389';
 
   return (
     <div
       ref={containerRef}
       className={cn(
         "relative h-14 rounded-full overflow-hidden cursor-pointer select-none",
-        "bg-gradient-to-r from-[#ff2389] to-[#00ff90] transition-all duration-300",
+        "bg-secondary/20 border border-border transition-all duration-300",
         disabled ? "opacity-50 cursor-not-allowed" : "",
         className
       )}
     >
-      {/* Progress overlay */}
+      {/* Progress fill with dynamic color */}
       <div 
-        className="absolute inset-0 bg-white/20 transition-all duration-300"
+        className="absolute inset-0 transition-all duration-300"
         style={{
+          background: fillColor,
           clipPath: `inset(0 ${100 - (progress * 100)}% 0 0)`,
         }}
       />
       
       {/* Background text */}
       <div className="absolute inset-0 flex items-center justify-center z-10">
-        <span className={cn(
-          "text-sm font-medium transition-colors duration-300",
-          "text-white"
-        )}>
+        <span className="text-sm font-medium text-white">
           {text}
         </span>
       </div>
@@ -161,9 +164,9 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
         ref={thumbRef}
         className={cn(
           "absolute top-1 left-1 w-12 h-12 rounded-full shadow-lg z-20",
-          "flex items-center justify-center",
+          "flex items-center justify-center bg-white",
           isDragging ? "scale-110 transition-none" : "scale-100 transition-all duration-200",
-          disabled ? "cursor-not-allowed bg-gray-400" : "cursor-grab active:cursor-grabbing bg-white"
+          disabled ? "cursor-not-allowed bg-gray-400" : "cursor-grab active:cursor-grabbing"
         )}
         style={{
           transform: `translateX(${position}px)`,
@@ -172,17 +175,17 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
         onTouchStart={handleTouchStart}
       >
         <ChevronRight 
-          className={cn(
-            "w-6 h-6 transition-colors duration-300",
-            "text-gray-800"
-          )}
+          className="w-6 h-6 text-gray-800"
         />
       </div>
       
       {/* Completion animation */}
       {isCompleted && (
-        <div className="absolute inset-0 bg-[#00ff90] flex items-center justify-center animate-pulse">
-          <span className="text-gray-800 font-bold">Confirmado!</span>
+        <div 
+          className="absolute inset-0 flex items-center justify-center animate-pulse"
+          style={{ backgroundColor: fillColor }}
+        >
+          <span className="text-white font-bold">Confirmado!</span>
         </div>
       )}
     </div>

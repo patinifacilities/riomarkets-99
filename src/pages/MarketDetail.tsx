@@ -342,9 +342,10 @@ const MarketDetail = () => {
                     </Button>
                   </div>
                   
-                  {selectedOption && betAmount && betAmount > 0 && (
-                    <SliderConfirm
-                      disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
+                   {selectedOption && betAmount && betAmount > 0 && (
+                     <SliderConfirm
+                       selectedOption={selectedOption}
+                       disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
                       onConfirm={async () => {
                         if (!authUser?.id) {
                           toast({

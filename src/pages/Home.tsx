@@ -228,58 +228,49 @@ const Home = () => {
         </section>
 
 
-      {/* Enhanced Filters Section */}
-      <div className="container mx-auto px-4 pb-6 bg-gradient-to-b from-background/95 to-background/60 border-t border-border/30 backdrop-blur-sm">
-        <div className="flex items-center gap-3 mb-6 pt-6">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <Filter className="w-5 h-5 text-primary" />
-          </div>
-          <span className="text-xl font-bold text-foreground">Filtrar Mercados</span>
-        </div>
-        
-        {/* Search Bar - Moved to top */}
-        <div className="mb-6">
-          <div className="relative max-w-lg">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+      {/* Compact Filters Section */}
+      <div className="container mx-auto px-4 py-4 bg-gradient-to-b from-background/95 to-background/60 border-t border-border/30 backdrop-blur-sm">
+        {/* Search Bar - Compact */}
+        <div className="mb-4">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
-              placeholder="Buscar por título ou descrição..."
+              placeholder="Buscar mercados..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 h-12 bg-background/80 border-border/50 text-foreground placeholder:text-muted-foreground rounded-xl shadow-sm focus:ring-2 focus:ring-primary/20"
+              className="pl-10 h-10 bg-background/80 border-border/50 text-foreground placeholder:text-muted-foreground rounded-lg shadow-sm focus:ring-2 focus:ring-primary/20"
             />
           </div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Topic Filters - Enhanced */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-1 h-5 bg-gradient-to-b from-primary to-primary/50 rounded-full"></div>
-              <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">Tópicos</h4>
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* Topic Filters - Compact */}
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <h4 className="text-xs font-semibold text-foreground uppercase tracking-wide">Tópicos</h4>
             </div>
             <FilterChips
               chips={topicFilters}
               selectedChips={selectedTopics}
               onChipSelect={handleTopicSelect}
               onRemoveChip={handleRemoveTopic}
-              chipClassName="px-6 py-3 text-sm font-medium rounded-full transition-all duration-200"
-              className="flex flex-wrap gap-3"
+              chipClassName="px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200"
+              className="flex flex-wrap gap-2"
             />
           </div>
 
-          {/* Status Filters - Enhanced */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-1 h-5 bg-gradient-to-b from-[#00FF91] to-[#00FF91]/50 rounded-full"></div>
-              <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">Status</h4>
+          {/* Status Filters - Compact */}
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <h4 className="text-xs font-semibold text-foreground uppercase tracking-wide">Status</h4>
             </div>
             <FilterChips
               chips={statusFilters}
               selectedChips={selectedStatus}
               onChipSelect={handleStatusSelect}
               onRemoveChip={handleRemoveStatus}
-              chipClassName="px-6 py-3 text-sm font-medium rounded-full transition-all duration-200"
-              className="flex flex-wrap gap-3"
+              chipClassName="px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200"
+              className="flex flex-wrap gap-2"
             />
           </div>
         </div>
