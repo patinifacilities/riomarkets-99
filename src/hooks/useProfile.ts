@@ -21,38 +21,19 @@ export const useProfile = (userId?: string) => {
   const queryClient = useQueryClient();
   
   // Listen for balance updates
+  // Remover event listeners que causam loop infinito
   useEffect(() => {
-    const handleBalanceUpdate = () => {
-      if (userId) {
-        console.log('Profile invalidating on balanceUpdated');
-        queryClient.invalidateQueries({ queryKey: ['profile', userId] });
-        queryClient.refetchQueries({ queryKey: ['profile', userId] });
-      }
-    };
-
-    const handleProfileUpdate = () => {
-      if (userId) {
-        console.log('Profile invalidating on profileUpdated');
-        queryClient.invalidateQueries({ queryKey: ['profile', userId] });
-        queryClient.refetchQueries({ queryKey: ['profile', userId] });
-      }
-    };
-
+    // Apenas invalidar quando necessário, sem loops
     const handleForceRefresh = () => {
       if (userId) {
-        console.log('Profile force refresh');
         queryClient.invalidateQueries({ queryKey: ['profile', userId] });
         queryClient.refetchQueries({ queryKey: ['profile', userId] });
       }
     };
 
-    window.addEventListener('balanceUpdated', handleBalanceUpdate);
-    window.addEventListener('profileUpdated', handleProfileUpdate);
     window.addEventListener('forceProfileRefresh', handleForceRefresh);
     
     return () => {
-      window.removeEventListener('balanceUpdated', handleBalanceUpdate);
-      window.removeEventListener('profileUpdated', handleProfileUpdate);
       window.removeEventListener('forceProfileRefresh', handleForceRefresh);
     };
   }, [userId, queryClient]);
