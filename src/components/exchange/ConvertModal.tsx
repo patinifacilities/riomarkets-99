@@ -120,38 +120,62 @@ export const ConvertModal = ({ open, onOpenChange, onSuccess }: ConvertModalProp
         <div className="space-y-6">
           <Tabs value={activeTab} onValueChange={(value: any) => setActiveTab(value)}>
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="buy" className="data-[state=active]:bg-[#00ff90] data-[state=active]:text-black">
+              <TabsTrigger value="buy" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 Comprar RIOZ
               </TabsTrigger>
-              <TabsTrigger value="sell" className="data-[state=active]:bg-[#ff2389] data-[state=active]:text-white">
+              <TabsTrigger value="sell" className="data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground">
                 Vender RIOZ
               </TabsTrigger>
             </TabsList>
             
             <TabsContent value="buy" className="space-y-4 mt-6">
               <div className="space-y-2">
-                <Label>Quantidade RIOZ</Label>
-                <Input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0.00"
-                  step="0.01"
-                  min="0"
-                />
+                <Label htmlFor="buy-amount">Quantidade RIOZ</Label>
+                <div className="relative">
+                  <Input
+                    id="buy-amount"
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="0"
+                    step="1"
+                    min="0"
+                    className="pr-16"
+                  />
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-muted-foreground">
+                    RZ
+                  </div>
+                </div>
+                
+                <div className="flex gap-2 mt-2">
+                  {[25, 50, 75, 100].map((percentage) => {
+                    const maxAmount = Math.floor((balance?.brl_balance || 0) * (percentage / 100));
+                    return (
+                      <Button
+                        key={percentage}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setAmount(maxAmount.toString())}
+                        className="flex-1 text-xs"
+                      >
+                        {percentage}%
+                      </Button>
+                    );
+                  })}
+                </div>
               </div>
               
-              <div className="text-sm text-muted-foreground">
-                <div className="flex justify-between">
-                  <span>Preço atual:</span>
-                  <span>R$ {rate?.price?.toFixed(4) || '1.0000'} por RIOZ</span>
+              <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Preço:</span>
+                  <span>R$ 1,00 por RIOZ</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-sm">
                   <span>Valor total:</span>
                   <span className="font-medium">{getPreviewValue()}</span>
                 </div>
-                <div className="flex justify-between text-xs mt-2">
-                  <span>Saldo BRL disponível:</span>
+                <div className="flex justify-between text-xs text-muted-foreground pt-2 border-t">
+                  <span>Saldo BRL:</span>
                   <span>{ExchangeService.formatCurrency(balance?.brl_balance || 0, 'BRL')}</span>
                 </div>
               </div>
@@ -159,28 +183,52 @@ export const ConvertModal = ({ open, onOpenChange, onSuccess }: ConvertModalProp
             
             <TabsContent value="sell" className="space-y-4 mt-6">
               <div className="space-y-2">
-                <Label>Quantidade RIOZ</Label>
-                <Input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0.00"
-                  step="0.01"
-                  min="0"
-                />
+                <Label htmlFor="sell-amount">Quantidade RIOZ</Label>
+                <div className="relative">
+                  <Input
+                    id="sell-amount"
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="0"
+                    step="1"
+                    min="0"
+                    className="pr-16"
+                  />
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-muted-foreground">
+                    RZ
+                  </div>
+                </div>
+                
+                <div className="flex gap-2 mt-2">
+                  {[25, 50, 75, 100].map((percentage) => {
+                    const maxAmount = Math.floor((profile?.saldo_moeda || 0) * (percentage / 100));
+                    return (
+                      <Button
+                        key={percentage}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setAmount(maxAmount.toString())}
+                        className="flex-1 text-xs"
+                      >
+                        {percentage}%
+                      </Button>
+                    );
+                  })}
+                </div>
               </div>
               
-              <div className="text-sm text-muted-foreground">
-                <div className="flex justify-between">
-                  <span>Preço atual:</span>
-                  <span>R$ {rate?.price?.toFixed(4) || '1.0000'} por RIOZ</span>
+              <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Preço:</span>
+                  <span>R$ 1,00 por RIOZ</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-sm">
                   <span>Valor a receber:</span>
                   <span className="font-medium">{getPreviewValue()}</span>
                 </div>
-                <div className="flex justify-between text-xs mt-2">
-                  <span>Saldo RIOZ disponível:</span>
+                <div className="flex justify-between text-xs text-muted-foreground pt-2 border-t">
+                  <span>Saldo RIOZ:</span>
                   <span>{(profile?.saldo_moeda || 0).toLocaleString('pt-BR')} RZ</span>
                 </div>
               </div>
@@ -198,12 +246,9 @@ export const ConvertModal = ({ open, onOpenChange, onSuccess }: ConvertModalProp
             </Button>
             <Button 
               onClick={handleConvert}
-              disabled={loading || !amount || parseFloat(amount) <= 0}
-              className={`flex-1 ${
-                activeTab === 'buy' 
-                  ? 'bg-[#00ff90] hover:bg-[#00ff90]/90 text-black' 
-                  : 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white'
-              }`}
+              disabled={loading || !amount || parseInt(amount) <= 0}
+              variant={activeTab === 'buy' ? 'default' : 'destructive'}
+              className="flex-1"
             >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />

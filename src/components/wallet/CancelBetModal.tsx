@@ -24,31 +24,36 @@ export const CancelBetModal = ({ open, onOpenChange, onConfirm, orderId, orderAm
         const { data: user } = await supabase.auth.getUser();
         if (!user.user) throw new Error('User not authenticated');
 
-        // Simply update the order status to cancelled
-        const { error } = await supabase
-          .from('orders')
-          .update({ 
-            status: 'cancelada',
-            cashed_out_at: new Date().toISOString(),
-            cashout_amount: 0
-          })
-          .eq('id', orderId)
-          .eq('user_id', user.user.id);
+        // Use the cancel_bet_with_fee function
+        const { data, error } = await supabase.rpc('cancel_bet_with_fee', {
+          p_order_id: orderId,
+          p_user_id: user.user.id
+        });
 
         if (error) throw error;
+
+        if (!data || data.length === 0 || !data[0].success) {
+          throw new Error(data?.[0]?.message || 'Cancellation failed');
+        }
 
         // Dispatch balance update events
         window.dispatchEvent(new CustomEvent('balanceUpdated'));
         window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
-      }
 
-      toast({
-        title: "Opinião cancelada",
-        description: "Sua opinião foi cancelada com sucesso.",
-        variant: "default",
-      });
+        toast({
+          title: "Opinião cancelada",
+          description: `Opinião cancelada. Reembolso: ${data[0].refund_amount} moedas (taxa de 30% aplicada).`,
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: "Opinião cancelada",
+          description: "Sua opinião foi cancelada com sucesso.",
+          variant: "default",
+        });
+      }
       
-      await onConfirm();
+      onConfirm();
       onOpenChange(false);
     } catch (error) {
       console.error('Cancel error:', error);
