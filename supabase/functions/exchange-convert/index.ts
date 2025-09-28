@@ -139,37 +139,49 @@ Deno.serve(async (req) => {
       throw new Error(`Amount must be between R$ ${MIN_BRL.toFixed(2)} and R$ ${MAX_BRL.toFixed(2)}`);
     }
 
-    // Get user balance from both tables
+    // Get user balance from balances table only
     const { data: balanceData, error: balanceError } = await supabaseAdmin
       .from('balances')
       .select('rioz_balance, brl_balance')
       .eq('user_id', user.id)
       .single();
 
-    const { data: profileData, error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .select('saldo_moeda')
-      .eq('id', user.id)
-      .single();
+    let currentRiozBalance = 0;
+    let currentBrlBalance = 0;
 
-    if (balanceError || profileError) {
-      statusCode = 500;
-      throw new Error('Failed to get user balance');
+    if (balanceError) {
+      // If balance doesn't exist, create it
+      if (balanceError.code === 'PGRST116') {
+        const { data: newBalance, error: createError } = await supabaseAdmin
+          .from('balances')
+          .insert({
+            user_id: user.id,
+            rioz_balance: 0,
+            brl_balance: 0
+          })
+          .select()
+          .single();
+          
+        if (createError) {
+          statusCode = 500;
+          throw new Error('Failed to create balance');
+        }
+      } else {
+        statusCode = 500;
+        throw new Error('Failed to get user balance');
+      }
+    } else {
+      currentRiozBalance = parseFloat(balanceData?.rioz_balance || '0');
+      currentBrlBalance = parseFloat(balanceData?.brl_balance || '0');
     }
-
-    const currentRiozBalance = parseFloat(balanceData?.rioz_balance || '0');
-    const currentBrlBalance = parseFloat(balanceData?.brl_balance || '0');
-    const currentProfileRioz = profileData?.saldo_moeda || 0;
-
-    // Check sufficient balance (use the higher value between the two tables)
-    const actualRiozBalance = Math.max(currentRiozBalance, currentProfileRioz);
     
+    // Check sufficient balance
     if (side === 'buy_rioz' && currentBrlBalance < amountBrl) {
       statusCode = 400;
       throw new Error('Insufficient BRL balance');
     }
 
-    if (side === 'sell_rioz' && actualRiozBalance < amountRioz) {
+    if (side === 'sell_rioz' && currentRiozBalance < amountRioz) {
       statusCode = 400;
       throw new Error('Insufficient Rioz balance');
     }
@@ -196,39 +208,28 @@ Deno.serve(async (req) => {
       throw new Error('Failed to create order');
     }
 
-    // Update balances in BOTH tables
-    let newRiozBalance: number, newBrlBalance: number, newProfileRioz: number;
+    // Update balances - ONLY balances table
+    let newRiozBalance: number, newBrlBalance: number;
     
     if (side === 'buy_rioz') {
       newBrlBalance = currentBrlBalance - amountBrl;
       newRiozBalance = currentRiozBalance + amountRioz;
-      newProfileRioz = currentProfileRioz + amountRioz;
     } else {
       newRiozBalance = currentRiozBalance - amountRioz;
       newBrlBalance = currentBrlBalance + amountBrl;
-      newProfileRioz = currentProfileRioz - amountRioz;
     }
 
-    // Update both balances and profiles tables simultaneously
-    const [balanceUpdate, profileUpdate] = await Promise.all([
-      supabaseAdmin
-        .from('balances')
-        .upsert({
-          user_id: user.id,
-          rioz_balance: newRiozBalance,
-          brl_balance: newBrlBalance,
-          updated_at: new Date().toISOString()
-        }),
-      supabaseAdmin
-        .from('profiles')
-        .update({
-          saldo_moeda: Math.round(newProfileRioz)
-        })
-        .eq('id', user.id)
-    ]);
+    const { error: updateError } = await supabaseAdmin
+      .from('balances')
+      .upsert({
+        user_id: user.id,
+        rioz_balance: newRiozBalance,
+        brl_balance: newBrlBalance,
+        updated_at: new Date().toISOString()
+      });
 
-    if (balanceUpdate.error || profileUpdate.error) {
-      console.error('Error updating balances:', balanceUpdate.error || profileUpdate.error);
+    if (updateError) {
+      console.error('Error updating balance:', updateError);
       statusCode = 500;
       throw new Error('Failed to update balance');
     }
@@ -240,7 +241,7 @@ Deno.serve(async (req) => {
       feeBrl,
       price,
       newRiozBalance,
-      newProfileRioz
+      newBrlBalance
     });
 
     // Log audit event
