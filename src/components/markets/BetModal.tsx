@@ -64,7 +64,15 @@ const BetModal = ({
     setIsLoading(true);
 
     try {
-      // Start transaction
+      // Get current market pool data to calculate probability
+      const { data: poolData } = await supabase.rpc('get_market_pools', { market_id: market.id });
+      
+      const currentPool = poolData?.[0];
+      const currentPercent = selectedOption === 'sim' 
+        ? currentPool?.percent_sim || 50 
+        : currentPool?.percent_nao || 50;
+
+      // Start transaction - Create order entry
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -75,13 +83,28 @@ const BetModal = ({
           quantidade_moeda: betValue,
           preco: recompensa,
           status: 'ativa',
-          entry_percent: 0, // Will be updated by trigger or app logic
+          entry_percent: currentPercent,
           entry_multiple: recompensa
         })
         .select()
         .single();
 
       if (orderError) throw orderError;
+
+      // Create market order for order book
+      const { error: marketOrderError } = await supabase
+        .from('market_orders')
+        .insert({
+          market_id: market.id,
+          user_id: userId,
+          side: selectedOption,
+          amount_rioz: betValue,
+          probability_percent: currentPercent,
+          odds: recompensa,
+          status: 'active'
+        });
+
+      if (marketOrderError) throw marketOrderError;
 
       // Create debit transaction
       const { error: transactionError } = await supabase
@@ -107,7 +130,7 @@ const BetModal = ({
 
       toast({
         title: "Opinião enviada com sucesso!",
-        description: `Você investiu ${betValue} Rioz Coin em "${selectedOption}". Boa sorte!`,
+        description: `Você investiu ${betValue} Rioz Coin em "${selectedOption}". Sua ordem foi adicionada ao order book!`,
       });
 
       setBetAmount('');

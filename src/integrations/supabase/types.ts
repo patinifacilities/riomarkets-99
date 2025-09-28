@@ -224,6 +224,53 @@ export type Database = {
         }
         Relationships: []
       }
+      market_orders: {
+        Row: {
+          amount_rioz: number
+          created_at: string | null
+          filled_at: string | null
+          id: string
+          market_id: string
+          odds: number
+          probability_percent: number
+          side: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount_rioz: number
+          created_at?: string | null
+          filled_at?: string | null
+          id?: string
+          market_id: string
+          odds: number
+          probability_percent: number
+          side: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount_rioz?: number
+          created_at?: string | null
+          filled_at?: string | null
+          id?: string
+          market_id?: string
+          odds?: number
+          probability_percent?: number
+          side?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_orders_market_id_fkey"
+            columns: ["market_id"]
+            isOneToOne: false
+            referencedRelation: "markets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_stats: {
         Row: {
           id: string
