@@ -313,6 +313,45 @@ export type Database = {
           },
         ]
       }
+      market_order_book_pools: {
+        Row: {
+          cancelled_at: string | null
+          created_at: string | null
+          filled_at: string | null
+          id: string
+          market_id: string
+          price: number
+          quantity: number
+          side: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          created_at?: string | null
+          filled_at?: string | null
+          id?: string
+          market_id: string
+          price: number
+          quantity: number
+          side: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          created_at?: string | null
+          filled_at?: string | null
+          id?: string
+          market_id?: string
+          price?: number
+          quantity?: number
+          side?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       market_orders: {
         Row: {
           amount_rioz: number

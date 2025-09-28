@@ -356,37 +356,65 @@ const MarketDetail = () => {
                           return;
                         }
 
-                        try {
-                          const recompensa = market.odds?.[selectedOption] || 1.5;
-                          
-                          // Use the new market order book function
-                          const { data, error } = await supabase.rpc('execute_market_opinion_order', {
-                            p_market_id: market.id,
-                            p_user_id: authUser.id,
-                            p_side: selectedOption,
-                            p_quantity: betAmount,
-                            p_price: recompensa
-                          });
+                         try {
+                           const recompensa = market.odds?.[selectedOption] || 1.5;
+                           
+                           // Insert into market_order_book_pools for pool-specific orderbook
+                           const { error: orderBookError } = await supabase
+                             .from('market_order_book_pools')
+                             .insert({
+                               market_id: market.id,
+                               user_id: authUser.id,
+                               side: selectedOption,
+                               quantity: betAmount,
+                               price: recompensa,
+                               status: 'filled',
+                               filled_at: new Date().toISOString()
+                             });
 
-                          if (error) throw error;
-                          
-                          const result = data?.[0];
-                          if (!result?.success) {
-                            throw new Error(result?.message || 'Failed to execute opinion');
-                          }
+                           if (orderBookError) {
+                             console.error('OrderBook error:', orderBookError);
+                           }
 
-                          // Update user balance
-                          const { error: balanceError } = await supabase.rpc('increment_balance', {
-                            user_id: authUser.id,
-                            amount: -betAmount
-                          });
+                           // Insert into orders table for user tracking
+                           const { error: orderError } = await supabase
+                             .from('orders')
+                             .insert({
+                               id: `order_${Date.now()}_${authUser.id}`,
+                               user_id: authUser.id,
+                               market_id: market.id,
+                               opcao_escolhida: selectedOption,
+                               quantidade_moeda: betAmount,
+                               preco: recompensa,
+                               status: 'ativa',
+                               entry_percent: 50,
+                               entry_multiple: recompensa
+                             });
 
-                          if (balanceError) {
-                            console.error('Balance update error:', balanceError);
-                          }
+                           if (orderError) throw orderError;
 
-                          // Dispatch balance update events
-                          window.dispatchEvent(new CustomEvent('balanceUpdated'));
+                           // Update user balance
+                           const { error: balanceError } = await supabase.rpc('increment_balance', {
+                             user_id: authUser.id,
+                             amount: -betAmount
+                           });
+
+                           if (balanceError) {
+                             console.error('Balance update error:', balanceError);
+                           }
+
+                           // Create transaction record
+                           await supabase.from('wallet_transactions').insert({
+                             id: `opinion_${Date.now()}_${authUser.id}`,
+                             user_id: authUser.id,
+                             tipo: 'debito',
+                             valor: betAmount,
+                             descricao: `Opinião ${selectedOption.toUpperCase()} - ${market.titulo}`,
+                             market_id: market.id
+                           });
+
+                           // Dispatch balance update events
+                           window.dispatchEvent(new CustomEvent('balanceUpdated'));
                           window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
 
                           toast({
