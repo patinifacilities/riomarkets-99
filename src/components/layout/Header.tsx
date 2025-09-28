@@ -25,7 +25,9 @@ import { WalletHoverCard } from '@/components/wallet/WalletHoverCard';
 import { DarkModeToggle } from './DarkModeToggle';
 import { AddBrlModal } from '@/components/exchange/AddBrlModal';
 
-import logoImage from '@/assets/rio-markets-logo-white.png';
+import logoImageWhite from '@/assets/rio-markets-logo-white.png';
+import logoImageBlack from '@/assets/rio-markets-logo-black.png';
+import { useTheme } from 'next-themes';
 
 const Header = () => {
   const location = useLocation();
@@ -33,6 +35,7 @@ const Header = () => {
   const { user, session, signOut, loading } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const [showDepositModal, setShowDepositModal] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   // Authentication check - only require session and user, profile should be optional for initial render
   const isLoggedIn = !loading && !!session && !!user;
@@ -199,7 +202,11 @@ const Header = () => {
           )}
 
           <Link to="/" className="flex items-center space-x-3">
-            <img src={logoImage} alt="Rio Markets" className="h-8 w-auto" />
+            <img 
+              src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
+              alt="Rio Markets" 
+              className="h-8 w-auto" 
+            />
           </Link>
 
           {/* Desktop Navigation */}

@@ -224,7 +224,7 @@ const Auth = () => {
               alt="Rio Markets Logo" 
               className="h-20 w-auto mx-auto mb-4"
             />
-            <div className="text-2xl font-bold text-white">
+            <div className="text-2xl font-bold text-foreground">
               Mercados Preditivos
             </div>
             <div style={{ color: '#00ff90' }}>

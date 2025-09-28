@@ -169,18 +169,18 @@ const Home = () => {
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
           
           <div className="text-center mb-6 md:mb-8">
-            <h1 className="font-extrabold text-[34px] md:text-[44px] lg:text-[56px] leading-[1.05] mb-4 text-white [text-wrap:balance]">
+            <h1 className="font-extrabold text-[34px] md:text-[44px] lg:text-[56px] leading-[1.05] mb-4 text-foreground [text-wrap:balance]">
               <TypewriterText 
                 baseText="Mercados Preditivos"
                 texts={["Inteligentes", "Lucrativos", "Rápidos"]}
-                className="text-white md:hidden"
+                className="text-foreground md:hidden"
                 mobileBreak={true}
               />
-              <span className="hidden md:inline text-white">Mercados Preditivos </span>
+              <span className="hidden md:inline text-foreground">Mercados Preditivos </span>
               <TypewriterText 
                 baseText=""
                 texts={["Inteligentes", "Lucrativos", "Rápidos"]}
-                className="text-[#00FF91] hidden md:inline"
+                className="text-primary hidden md:inline"
               />
             </h1>
             <p className="text-base md:text-lg max-w-[60ch] mx-auto text-[color:var(--text-secondary)]">

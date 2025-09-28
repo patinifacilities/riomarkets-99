@@ -1,45 +1,31 @@
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 export function DarkModeToggle() {
-  const [isDark, setIsDark] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    // Check for stored theme preference
-    const storedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    // Apply stored theme or system preference
-    const shouldBeDark = storedTheme === 'dark' || (!storedTheme && systemPrefersDark);
-    
-    if (shouldBeDark) {
-      document.documentElement.classList.add('dark');
-      setIsDark(true);
-    } else {
-      document.documentElement.classList.remove('dark');
-      setIsDark(false);
-    }
   }, []);
 
   if (!mounted) {
-    return null;
+    return (
+      <Button
+        variant="ghost"
+        size="sm"
+        className="w-9 h-9 p-0"
+        disabled
+      >
+        <Sun className="h-[1.2rem] w-[1.2rem]" />
+      </Button>
+    );
   }
 
   const handleThemeToggle = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    
-    // Immediately update DOM
-    if (newTheme) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (
@@ -49,8 +35,8 @@ export function DarkModeToggle() {
       onClick={handleThemeToggle}
       className="w-9 h-9 p-0"
     >
-      <Sun className={`h-[1.2rem] w-[1.2rem] transition-all ${isDark ? 'rotate-90 scale-0' : 'rotate-0 scale-100'}`} />
-      <Moon className={`absolute h-[1.2rem] w-[1.2rem] transition-all ${isDark ? 'rotate-0 scale-100' : 'rotate-90 scale-0'}`} />
+      <Sun className={`h-[1.2rem] w-[1.2rem] transition-all ${resolvedTheme === 'dark' ? 'rotate-90 scale-0' : 'rotate-0 scale-100'}`} />
+      <Moon className={`absolute h-[1.2rem] w-[1.2rem] transition-all ${resolvedTheme === 'dark' ? 'rotate-0 scale-100' : 'rotate-90 scale-0'}`} />
       <span className="sr-only">Toggle theme</span>
     </Button>
   );
