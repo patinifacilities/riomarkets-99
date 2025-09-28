@@ -1,34 +1,34 @@
-import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
 export function DarkModeToggle() {
-  const { theme, setTheme } = useTheme();
+  const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    // Check initial theme
+    const currentTheme = document.documentElement.classList.contains('dark');
+    setIsDark(currentTheme);
   }, []);
 
   if (!mounted) {
     return null;
   }
 
-  const isDark = theme === 'dark';
-
   const handleThemeToggle = () => {
-    const newTheme = isDark ? "light" : "dark";
-    setTheme(newTheme);
+    const newTheme = !isDark;
+    setIsDark(newTheme);
     
-    // Force immediate DOM update
-    setTimeout(() => {
-      if (newTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    }, 0);
+    // Immediately update DOM
+    if (newTheme) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
   };
 
   return (

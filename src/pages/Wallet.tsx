@@ -108,7 +108,7 @@ const WalletPage = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Saldo RIOZ Coin</p>
                   <p className="text-2xl font-bold text-white">
-                    {profile?.saldo_moeda?.toLocaleString() || 0} RIOZ
+                    {profile?.saldo_moeda?.toLocaleString('pt-BR') || 0} RIOZ
                   </p>
                 </div>
                 <Wallet className="w-8 h-8 text-white" />
@@ -122,7 +122,7 @@ const WalletPage = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Em Ordens Ativas</p>
                   <p className="text-2xl font-bold text-white">
-                    {totalInOrders.toLocaleString()} RIOZ
+                    {totalInOrders.toLocaleString('pt-BR')} RIOZ
                   </p>
                 </div>
                 <TrendingUp className="w-8 h-8 text-white" />
@@ -215,14 +215,29 @@ const WalletPage = () => {
                   ))}
                 </div>
               ) : allOrders.length > 0 ? (
-                <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                  {allOrders.map((order) => {
-                    const market = markets?.find(m => m.id === order.market_id);
-                    return (
-                      <OrderItem key={order.id} order={order} market={market} />
-                    );
-                  })}
-                </div>
+                  <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                    {allOrders.map((order) => {
+                      const market = markets?.find(m => m.id === order.market_id);
+                      return (
+                        <div key={order.id} className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <OrderItem order={order} market={market} />
+                          </div>
+                          {order.status === 'ativa' && (
+                            <Button 
+                              onClick={() => setShowCancelBetModal(true)}
+                              variant="outline"
+                              size="sm"
+                              className="ml-2 border-danger/30 text-danger hover:bg-danger/10"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Cancelar
+                            </Button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-50" />

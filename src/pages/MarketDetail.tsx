@@ -15,6 +15,7 @@ import { useRewardCalculator } from '@/store/useRewardCalculator';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import BetModal from '@/components/markets/BetModal';
+import { supabase } from '@/integrations/supabase/client';
 import PoolProgressBar from '@/components/markets/PoolProgressBar';
 import ProbabilityChart from '@/components/markets/ProbabilityChart';
 import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorModal';
@@ -157,11 +158,11 @@ const MarketDetail = () => {
                   </div>
                    <div className="flex items-center gap-1">
                      <Users className="w-4 h-4" />
-                     {(pool?.total_pool || 0).toLocaleString()} Rioz Coin total
+                     {(pool?.total_pool || 0).toLocaleString('pt-BR')} Rioz Coin total
                    </div>
                    <div className="flex items-center gap-1">
                      <TrendingUp className="w-4 h-4" />
-                     {Math.max(100, (pool?.total_pool || 0) * 2).toLocaleString()} análises
+                     {Math.max(100, (pool?.total_pool || 0) * 2).toLocaleString('pt-BR')} análises
                    </div>
                 </div>
               </CardContent>
@@ -295,9 +296,9 @@ const MarketDetail = () => {
                     <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">
                       <div className="text-sm text-muted-foreground mb-2">Opção selecionada:</div>
                       <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
-                      <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount} Rioz</div>
-                      <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toFixed(2)} Rioz</div>
-                      <div className="text-lg font-bold text-success bg-success/10 px-2 py-1 rounded">Lucro estimado: +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toFixed(2)} Rioz</div>
+                      <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
+                      <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
+                      <div className="text-lg font-bold text-success bg-success/10 px-2 py-1 rounded">Lucro estimado: +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz</div>
                     </div>
                   )}
                   
@@ -305,7 +306,7 @@ const MarketDetail = () => {
                     <Button 
                       onClick={() => setSelectedOption('sim')}
                       disabled={market.status !== 'aberto'}
-                      className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-[#00FF91] hover:bg-[#00FF91]/90 text-black font-semibold' : 'bg-white text-black border-2 hover:bg-gray-100 font-semibold'}`}
+                      className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-[#00ff90] hover:bg-[#00ff90]/90 text-black font-semibold' : 'bg-[#00ff90] text-black border-2 hover:bg-[#00ff90]/90 font-semibold'}`}
                       size="sm"
                       aria-label="Opinar Sim"
                     >
@@ -314,7 +315,7 @@ const MarketDetail = () => {
                     <Button 
                       onClick={() => setSelectedOption('nao')}
                       disabled={market.status !== 'aberto'}
-                      className={`min-h-[44px] ${selectedOption === 'nao' ? 'bg-[#FF1493] hover:bg-[#FF1493]/90 text-white font-semibold' : 'bg-white text-black border-2 hover:bg-gray-100 font-semibold'}`}
+                      className={`min-h-[44px] ${selectedOption === 'nao' ? 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-semibold' : 'bg-[#ff2389] text-white border-2 hover:bg-[#ff2389]/90 font-semibold'}`}
                       size="sm"
                       aria-label="Opinar Não"
                     >
@@ -324,7 +325,106 @@ const MarketDetail = () => {
                   
                   {selectedOption && betAmount && betAmount > 0 && (
                     <Button 
-                      onClick={() => handleOpenBetModal(selectedOption)}
+                      onClick={async () => {
+                        if (!authUser?.id) {
+                          toast({
+                            title: "Erro",
+                            description: "Você precisa estar logado para opinar",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+
+                        try {
+                          const recompensa = market.odds?.[selectedOption] || 1.5;
+                          
+                          // Direct bet without modal - just like BetModal logic
+                          const { data: poolData } = await supabase.rpc('get_market_pools', { market_id: market.id });
+                          
+                          const currentPool = poolData?.[0];
+                          const currentPercent = selectedOption === 'sim' 
+                            ? currentPool?.percent_sim || 50 
+                            : currentPool?.percent_nao || 50;
+
+                          // Create order entry
+                          const { error: orderError } = await supabase
+                            .from('orders')
+                            .insert({
+                              id: crypto.randomUUID(),
+                              user_id: authUser.id,
+                              market_id: market.id,
+                              opcao_escolhida: selectedOption,
+                              quantidade_moeda: betAmount,
+                              preco: recompensa,
+                              status: 'ativa',
+                              entry_percent: currentPercent,
+                              entry_multiple: recompensa
+                            });
+
+                          if (orderError) throw orderError;
+
+                          // Create market order for order book
+                          const { error: marketOrderError } = await supabase
+                            .from('market_orders')
+                            .insert({
+                              market_id: market.id,
+                              user_id: authUser.id,
+                              side: selectedOption.toUpperCase(),
+                              amount_rioz: betAmount,
+                              probability_percent: currentPercent,
+                              odds: recompensa,
+                              status: 'active'
+                            });
+
+                          if (marketOrderError) throw marketOrderError;
+
+                          // Create debit transaction
+                          const { error: transactionError } = await supabase
+                            .from('wallet_transactions')
+                            .insert({
+                              id: crypto.randomUUID(),
+                              user_id: authUser.id,
+                              tipo: 'debito',
+                              valor: betAmount,
+                              descricao: `Análise em: ${market.titulo} (${selectedOption}) — entrada ${recompensa}x recompensa`,
+                              market_id: market.id
+                            });
+
+                          if (transactionError) throw transactionError;
+
+                          // Update user balance
+                          const { error: balanceError } = await supabase.rpc('increment_balance', {
+                            user_id: authUser.id,
+                            amount: -betAmount
+                          });
+
+                          if (balanceError) throw balanceError;
+
+                          toast({
+                            title: "Ordem enviada com sucesso!",
+                            description: `Você investiu ${betAmount.toLocaleString()} Rioz Coin em "${selectedOption}". Sua ordem foi adicionada ao order book!`,
+                          });
+
+                          // Dispatch balance update events
+                          if (typeof window !== 'undefined') {
+                            window.dispatchEvent(new CustomEvent('balanceUpdated'));
+                            window.dispatchEvent(new CustomEvent('exchangeBalanceUpdated'));
+                            window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
+                          }
+
+                          setSelectedOption('');
+                          setBetAmount(0);
+                          refetchMarket();
+
+                        } catch (error: any) {
+                          console.error('Bet error:', error);
+                          toast({
+                            title: "Erro ao processar análise",
+                            description: error.message || "Tente novamente em alguns instantes",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
                       disabled={market.status !== 'aberto'}
                       className="bg-white text-black hover:bg-white/90 w-full min-h-[44px] mt-4 font-semibold border-2"
                       size="sm"

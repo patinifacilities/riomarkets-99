@@ -107,7 +107,7 @@ const Header = () => {
                     <Link to="/wallet" onClick={handleMobileNavClick}>
                       <div className="px-2 py-2 mt-2 rounded-lg bg-gradient-primary text-primary-foreground font-semibold text-center cursor-pointer hover:opacity-90 transition-opacity">
                         <Wallet className="w-4 h-4 inline mr-2" />
-                        {profile?.saldo_moeda?.toLocaleString() || 0} RZ
+                        {(profile?.saldo_moeda || 0).toLocaleString('pt-BR')} RZ
                       </div>
                     </Link>
                     </div>
@@ -264,7 +264,7 @@ const Header = () => {
                     className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-xl"
                   >
                     <Wallet className="w-4 h-4" />
-                    {profile?.saldo_moeda || 0} RZ
+                    {(profile?.saldo_moeda || 0).toLocaleString('pt-BR')} RZ
                   </Button>
                 </Link>
                 
@@ -284,14 +284,15 @@ const Header = () => {
                  <DarkModeToggle />
                 
                  {/* Profile Icon */}
-                 <Button 
-                   onClick={() => navigate('/profile')}
-                   variant="ghost" 
-                   size="sm"
-                   className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-full p-2"
-                 >
-                   <UserCircle className="w-6 h-6" />
-                 </Button>
+                 <Link to="/profile">
+                   <Button 
+                     variant="ghost" 
+                     size="sm"
+                     className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-full p-2"
+                   >
+                     <UserCircle className="w-6 h-6" />
+                   </Button>
+                 </Link>
               </>
             ) : !loading ? (
               <Link to="/auth">
