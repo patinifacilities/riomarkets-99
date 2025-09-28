@@ -48,8 +48,15 @@ const WalletPage = () => {
   const brlBalance = balance?.brl_balance || 0;
   const totalInOrders = orders?.filter(o => o.status === 'ativa').reduce((sum, o) => sum + o.quantidade_moeda, 0) || 0;
 
-  // Sort all orders by date
-  const allOrders = orders?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) || [];
+  // Sort orders: active first, then by date
+  const allOrders = orders?.sort((a, b) => {
+    // Active orders first
+    if (a.status === 'ativa' && b.status !== 'ativa') return -1;
+    if (b.status === 'ativa' && a.status !== 'ativa') return 1;
+    
+    // Then by date (newest first)
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  }) || [];
 
   if (!user) {
     return (
@@ -199,29 +206,34 @@ const WalletPage = () => {
                    {allOrders.map((order) => {
                      const market = markets?.find(m => m.id === order.market_id);
                      return (
-                       <div key={order.id} className="p-5 rounded-lg border border-border/50 hover:border-primary/30 transition-all">
-                       <div className="flex items-start justify-between">
-                         <div className="flex-1">
-                           <OrderItem order={order} market={market} />
-                         </div>
-                         {order.status === 'ativa' && (
-                           <div className="flex flex-col gap-2 ml-4">
-                             <Button 
-                               onClick={() => {
-                                 setSelectedOrder(order);
-                                 setShowCancelBetModal(true);
-                               }}
-                               variant="outline"
-                               size="sm"
-                               className="border-danger/30 text-danger hover:bg-danger/10"
-                             >
-                               <X className="w-4 h-4 mr-1" />
-                               Cancelar
-                             </Button>
-                           </div>
-                         )}
-                       </div>
-                       </div>
+                        <div 
+                          key={order.id} 
+                          className="p-5 rounded-lg border border-border/50 hover:border-primary/30 transition-all cursor-pointer"
+                          onClick={() => market && (window.location.href = `/market/${market.id}`)}
+                        >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <OrderItem order={order} market={market} />
+                          </div>
+                          {order.status === 'ativa' && (
+                            <div className="flex flex-col gap-2 ml-4">
+                              <Button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedOrder(order);
+                                  setShowCancelBetModal(true);
+                                }}
+                                variant="outline"
+                                size="sm"
+                                className="border-danger/30 text-danger hover:bg-danger/10"
+                              >
+                                <X className="w-4 h-4 mr-1" />
+                                Cancelar
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                        </div>
                      );
                    })}
                  </div>

@@ -145,7 +145,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
     >
       {/* Progress fill with dynamic color */}
       <div 
-        className="absolute inset-0 transition-all duration-75"
+        className="absolute inset-0 transition-none"
         style={{
           background: fillColor,
           clipPath: `inset(0 ${100 - (progress * 100)}% 0 0)`,
@@ -155,7 +155,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
       {/* Background text */}
       <div className="absolute inset-0 flex items-center justify-center z-10">
         <span 
-          className="text-sm font-medium transition-colors duration-75"
+          className="text-sm font-medium transition-none"
           style={{
             color: progress > 0 && selectedOption === 'nao' ? '#374151' : 'white'
           }}

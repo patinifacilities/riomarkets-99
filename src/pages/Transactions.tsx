@@ -9,9 +9,10 @@ import TransactionsList from '@/components/transactions/TransactionsList';
 import TransactionsSkeleton from '@/components/transactions/TransactionsSkeleton';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { toast } from 'sonner';
-import { Receipt, TrendingUp, TrendingDown } from 'lucide-react';
+import { Receipt, TrendingUp, TrendingDown, ArrowRightLeft, Target, X } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { track } from '@/lib/analytics';
+import { supabase } from '@/integrations/supabase/client';
 
 const Transactions = () => {
   const { user } = useAuth();
@@ -41,8 +42,64 @@ const Transactions = () => {
         setLoading(true);
         track('view_transactions', { filters });
         
-        const response = await fetchTransactions(user.id, filters);
-        setTransactions(response.data, response.total, response.totalPages);
+        // Fetch wallet transactions
+        const { data: walletTransactions } = await supabase
+          .from('wallet_transactions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        // Fetch exchange orders
+        const { data: exchangeOrders } = await supabase
+          .from('exchange_orders')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('status', 'filled')
+          .order('created_at', { ascending: false });
+
+        // Fetch market orders/opinions
+        const { data: marketOrders } = await supabase
+          .from('orders')
+          .select('*, markets(titulo)')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        // Combine and format all transactions
+        const allTransactions = [
+          ...(walletTransactions || []).map(tx => ({
+            ...tx,
+            tipo: tx.tipo as 'credito' | 'debito',
+            valor: tx.valor,
+            descricao: tx.descricao,
+            user_id: tx.user_id,
+            market_id: tx.market_id,
+            transaction_type: 'wallet'
+          })),
+          ...(exchangeOrders || []).map(order => ({
+            id: order.id,
+            created_at: order.created_at,
+            tipo: (order.side === 'buy_rioz' ? 'debito' : 'credito') as 'credito' | 'debito',
+            valor: Math.round(order.side === 'buy_rioz' ? order.amount_brl + order.fee_brl : order.amount_brl - order.fee_brl),
+            descricao: order.side === 'buy_rioz' ? `Compra de ${order.amount_rioz} RIOZ` : `Venda de ${order.amount_rioz} RIOZ`,
+            user_id: order.user_id,
+            market_id: null,
+            transaction_type: 'exchange'
+          })),
+          ...(marketOrders || []).map(order => ({
+            id: order.id,
+            created_at: order.created_at,
+            tipo: (order.status === 'cancelada' ? 'credito' : 'debito') as 'credito' | 'debito',
+            valor: order.status === 'cancelada' ? Math.round(order.cashout_amount || 0) : order.quantidade_moeda,
+            descricao: order.status === 'cancelada' 
+              ? `Cancelamento de opinião - ${order.markets?.titulo || 'Mercado'}`
+              : `Opinião ${order.opcao_escolhida} - ${order.markets?.titulo || 'Mercado'}`,
+            user_id: order.user_id,
+            market_id: order.market_id,
+            transaction_type: 'opinion'
+          }))
+        ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+        setTransactions(allTransactions, allTransactions.length, Math.ceil(allTransactions.length / 20));
       } catch (error) {
         console.error('Error loading transactions:', error);
         setError(error instanceof Error ? error.message : 'Erro ao carregar transações');

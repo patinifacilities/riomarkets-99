@@ -224,7 +224,7 @@ const Exchange = () => {
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
       {/* Success Notification */}
       {showNotification && (
-        <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
+        <div className="fixed bottom-4 right-4 z-50 animate-slide-in-right">
           <div className="bg-success text-success-foreground p-4 rounded-lg shadow-lg flex items-center gap-3">
             <CheckCircle2 className="h-5 w-5" />
             <span>Conversão realizada com sucesso!</span>
@@ -268,32 +268,6 @@ const Exchange = () => {
         </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Trades Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-success" />
-                Trocas Recentes
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 max-h-40 overflow-hidden">
-                {Array.from({ length: 8 }, (_, i) => {
-                  const amount = Math.floor(Math.random() * 995000) + 5;
-                  const isBuy = Math.random() > 0.5;
-                  return (
-                    <div key={i} className="flex justify-between items-center text-xs py-1 animate-slide-up" style={{ animationDelay: `${i * 100}ms` }}>
-                      <span className={isBuy ? 'text-success' : 'text-destructive'}>
-                        {isBuy ? 'COMPRA' : 'VENDA'}
-                      </span>
-                      <span className="font-medium">R$ {amount.toLocaleString('pt-BR')}</span>
-                      <span className="text-muted-foreground">agora</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
 
           {/* Interface de Troca */}
           <Card>
@@ -352,21 +326,23 @@ const Exchange = () => {
                       </div>
                     </div>
 
-                    {/* Calculation Display */}
-                    <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Valor:</span>
-                        <span className="font-medium">R$ {(parseFloat(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    {/* Calculation Display - only show when amount > 0 */}
+                    {(parseFloat(amount) > 0) && (
+                      <div className="bg-success/10 border border-success/20 rounded-lg p-4 space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Valor:</span>
+                          <span className="font-medium">R$ {(parseFloat(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Taxa (1%):</span>
+                          <span className="font-medium text-success">- R$ {((parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex justify-between text-sm border-t pt-2">
+                          <span>Você recebe:</span>
+                          <span className="font-medium text-success">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
+                        </div>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Taxa (1%):</span>
-                        <span className="font-medium text-destructive">- R$ {((parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      </div>
-                      <div className="flex justify-between text-sm border-t pt-2">
-                        <span>Você recebe:</span>
-                        <span className="font-medium text-primary">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
-                      </div>
-                    </div>
+                    )}
                     
                     <Button 
                       onClick={handleExchange}
@@ -421,21 +397,23 @@ const Exchange = () => {
                       </div>
                     </div>
 
-                    {/* Calculation Display */}
-                    <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Você vende:</span>
-                        <span className="font-medium">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
+                    {/* Calculation Display - only show when amount > 0 */}
+                    {(parseFloat(amount) > 0) && (
+                      <div className="bg-success/10 border border-success/20 rounded-lg p-4 space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Você vende:</span>
+                          <span className="font-medium">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Taxa (1%):</span>
+                          <span className="font-medium text-success">- R$ {((parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex justify-between text-sm border-t pt-2">
+                          <span>Você recebe:</span>
+                          <span className="font-medium text-success">R$ {((parseFloat(amount) || 0) - (parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        </div>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Taxa (1%):</span>
-                        <span className="font-medium text-destructive">- R$ {((parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      </div>
-                      <div className="flex justify-between text-sm border-t pt-2">
-                        <span>Você recebe:</span>
-                        <span className="font-medium text-primary">R$ {((parseFloat(amount) || 0) - (parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      </div>
-                    </div>
+                    )}
                     
                     <Button 
                       onClick={handleExchange}

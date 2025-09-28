@@ -36,11 +36,7 @@ export const CancelBetModal = ({ open, onOpenChange, onConfirm, orderId, orderAm
           throw new Error(data?.[0]?.message || 'Cancellation failed');
         }
 
-        // Atualizar o status da ordem para cancelada
-        await supabase
-          .from('orders')
-          .update({ status: 'cancelada' })
-          .eq('id', orderId);
+        // The order status is already updated by the cancel_bet_with_fee function
 
         // Dispatch balance update events
         window.dispatchEvent(new CustomEvent('balanceUpdated'));
