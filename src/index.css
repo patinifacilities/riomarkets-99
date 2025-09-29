@@ -98,6 +98,22 @@
     --animation-curve: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* Scale-in animation for winner announcements */
+  @keyframes scale-in {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out;
+  }
+
   /* Ticker animation */
   @keyframes scroll-right {
     0% {

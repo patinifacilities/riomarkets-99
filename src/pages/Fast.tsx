@@ -12,6 +12,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useTheme } from 'next-themes';
+import { FastMarketTermsModal } from '@/components/fast/FastMarketTermsModal';
 
 const Fast = () => {
   const [countdown, setCountdown] = useState(60);
@@ -19,10 +20,19 @@ const Fast = () => {
   const [betAmount, setBetAmount] = useState(100);
   const [clickedPool, setClickedPool] = useState<{id: number, side: string} | null>(null);
   const [winnerAnimation, setWinnerAnimation] = useState<{poolId: number, winner: string} | null>(null);
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
   const { resolvedTheme } = useTheme();
+  
+  // Check if user has already accepted terms
+  useEffect(() => {
+    const hasAcceptedTerms = localStorage.getItem('fastMarketsTermsAccepted');
+    if (!hasAcceptedTerms) {
+      setShowTermsModal(true);
+    }
+  }, []);
   
   // Calculate dynamic odds based on countdown
   const getOdds = (baseOdds: number) => {
@@ -192,8 +202,8 @@ const Fast = () => {
       
       if (currentRoundBets.length === 0) return;
 
-      // MVP Logic: Alternate between "sim" and "não" results
-      const winningOption = currentRound % 2 === 0 ? 'sim' : 'nao';
+      // MVP Logic: Random results for testing
+      const winningOption = Math.random() > 0.5 ? 'sim' : 'nao';
       
       const winningBets = currentRoundBets.filter((bet: any) => bet.side === winningOption);
       const currentUserWins = winningBets.filter((bet: any) => bet.userId === user?.id);
@@ -270,8 +280,8 @@ const Fast = () => {
   // Winner animation effect for last second
   useEffect(() => {
     if (countdown === 1) {
-      // Show winner animation in the last second
-      const winningOption = (currentRound + 1) % 2 === 0 ? 'sim' : 'nao';
+      // Show winner animation in the last second with random result
+      const winningOption = Math.random() > 0.5 ? 'sim' : 'nao';
       setWinnerAnimation({ poolId: 0, winner: winningOption }); // poolId 0 means all pools
       
       setTimeout(() => {
@@ -467,10 +477,18 @@ const Fast = () => {
             >
               {/* Winner Animation Overlay */}
               {winnerAnimation && countdown === 1 && (
-                <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center z-10">
-                  <div className="text-center animate-bounce">
-                    <div className="text-3xl font-bold text-white mb-2">
-                      {winnerAnimation.winner === 'sim' ? '🟢 SIM VENCEU!' : '🔴 NÃO VENCEU!'}
+                <div 
+                  className={`absolute inset-0 rounded-lg flex items-center justify-center z-10 transition-all duration-300 ${
+                    winnerAnimation.winner === 'sim' 
+                      ? 'bg-[#00ff90]/90 backdrop-blur-sm' 
+                      : 'bg-[#ff2389]/90 backdrop-blur-sm'
+                  }`}
+                >
+                  <div className="text-center animate-scale-in">
+                    <div className={`text-2xl font-bold mb-2 ${
+                      winnerAnimation.winner === 'sim' ? 'text-black' : 'text-white'
+                    }`}>
+                      {winnerAnimation.winner === 'sim' ? '✅ SIM VENCEU!' : '❌ NÃO VENCEU!'}
                     </div>
                   </div>
                 </div>
@@ -634,6 +652,15 @@ const Fast = () => {
           </Card>
         </div>
       </div>
+      
+      {/* Fast Markets Terms Modal */}
+      <FastMarketTermsModal
+        open={showTermsModal}
+        onOpenChange={setShowTermsModal}
+        onAccept={() => {
+          setShowTermsModal(false);
+        }}
+      />
     </div>
   );
 };

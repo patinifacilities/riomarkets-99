@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, TrendingUp, Percent, RefreshCw, ArrowLeft, PieChart } from 'lucide-react';
+import { DollarSign, TrendingUp, Percent, RefreshCw, ArrowLeft, PieChart, Zap } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,6 +14,7 @@ interface RevenueData {
   cancellationFees: number;
   poolFees: number;
   conversionFees: number;
+  fastFees: number;
   totalRevenue: number;
 }
 
@@ -32,6 +33,7 @@ const AdminRevenue = () => {
     cancellationFees: 0,
     poolFees: 0,
     conversionFees: 0,
+    fastFees: 0,
     totalRevenue: 0
   });
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethodData[]>([]);
@@ -66,15 +68,23 @@ const AdminRevenue = () => {
         .select('id')
         .eq('status', 'liquidado');
 
+      // Calcular taxas do FAST (baseado em transações fast)
+      const { data: fastData } = await supabase
+        .from('wallet_transactions')
+        .select('valor')
+        .ilike('descricao', '%Fast Market%');
+
       const cancellationFees = cancellationData?.reduce((sum, t) => sum + Math.abs(t.valor), 0) || 0;
       const conversionFees = conversionData?.reduce((sum, t) => sum + t.valor, 0) || 0;
       const poolFees = (marketsData?.length || 0) * 100;
+      const fastFees = Math.floor((fastData?.length || 0) * 0.05 * 100); // 5% das transações como taxa
 
       setRevenueData({
         cancellationFees,
         poolFees,
         conversionFees,
-        totalRevenue: cancellationFees + poolFees + conversionFees
+        fastFees,
+        totalRevenue: cancellationFees + poolFees + conversionFees + fastFees
       });
 
       // Mock data for payment methods (PIX, Credit Card, etc.) with specific colors
@@ -84,14 +94,14 @@ const AdminRevenue = () => {
         { method: 'Boleto', value: 19200, percentage: 10, fill: '#ff6100' }
       ]);
 
-      // Fee revenue data with specific colors - highest gets #00ff90, second #ff2389, third white
+      // Fee revenue data with specific colors - highest gets #00ff90, second #ff2389, third #FFD800, fourth white
       const feeData = [
-        { month: 'Jan', cancellationFees: 1800, poolFees: 2000, conversionFees: 200 },
-        { month: 'Fev', cancellationFees: 2300, poolFees: 1900, conversionFees: 250 },
-        { month: 'Mar', cancellationFees: 1700, poolFees: 2100, conversionFees: 180 },
-        { month: 'Abr', cancellationFees: 2800, poolFees: 2000, conversionFees: 300 },
-        { month: 'Mai', cancellationFees: 2500, poolFees: 1800, conversionFees: 280 },
-        { month: 'Jun', cancellationFees: 3100, poolFees: 2200, conversionFees: 350 }
+        { month: 'Jan', cancellationFees: 1800, poolFees: 2000, conversionFees: 200, fastFees: 1200 },
+        { month: 'Fev', cancellationFees: 2300, poolFees: 1900, conversionFees: 250, fastFees: 1500 },
+        { month: 'Mar', cancellationFees: 1700, poolFees: 2100, conversionFees: 180, fastFees: 1800 },
+        { month: 'Abr', cancellationFees: 2800, poolFees: 2000, conversionFees: 300, fastFees: 2200 },
+        { month: 'Mai', cancellationFees: 2500, poolFees: 1800, conversionFees: 280, fastFees: 1900 },
+        { month: 'Jun', cancellationFees: 3100, poolFees: 2200, conversionFees: 350, fastFees: 2500 }
       ];
 
       // Add colors based on highest revenue per month
@@ -99,20 +109,23 @@ const AdminRevenue = () => {
         const values = [
           { name: 'cancellationFees', value: data.cancellationFees },
           { name: 'poolFees', value: data.poolFees },
-          { name: 'conversionFees', value: data.conversionFees }
+          { name: 'conversionFees', value: data.conversionFees },
+          { name: 'fastFees', value: data.fastFees }
         ].sort((a, b) => b.value - a.value);
 
         const colors = {
           [values[0].name]: '#00ff90', // Highest
           [values[1].name]: '#ff2389', // Second
-          [values[2].name]: 'white'    // Third
+          [values[2].name]: '#FFD800', // Third
+          [values[3].name]: 'white'    // Fourth
         };
 
         return {
           ...data,
           cancellationFeesColor: colors.cancellationFees,
           poolFeesColor: colors.poolFees,
-          conversionFeesColor: colors.conversionFees
+          conversionFeesColor: colors.conversionFees,
+          fastFeesColor: colors.fastFees
         };
       }));
 
@@ -160,7 +173,7 @@ const AdminRevenue = () => {
         </div>
 
         {/* Revenue Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
@@ -198,6 +211,20 @@ const AdminRevenue = () => {
                  <div>
                    <p className="text-sm text-muted-foreground">Taxas de Conversão</p>
                    <p className="text-2xl font-bold">R$ {(revenueData.conversionFees / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg" style={{ backgroundColor: '#FFD800' + '20' }}>
+                  <Zap className="w-5 h-5" style={{ color: '#FFD800' }} />
+                </div>
+                 <div>
+                   <p className="text-sm text-muted-foreground">Taxas FAST</p>
+                   <p className="text-2xl font-bold" style={{ color: '#FFD800' }}>R$ {(revenueData.fastFees / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                  </div>
               </div>
             </CardContent>
@@ -275,7 +302,8 @@ const AdminRevenue = () => {
               <ChartContainer config={{
                 cancellationFees: { label: "Cancelamento", color: "hsl(var(--chart-1))" },
                 poolFees: { label: "Pool", color: "hsl(var(--chart-2))" },
-                conversionFees: { label: "Conversão", color: "hsl(var(--chart-3))" }
+                conversionFees: { label: "Conversão", color: "hsl(var(--chart-3))" },
+                fastFees: { label: "FAST", color: "hsl(var(--chart-4))" }
               }}>
                 <ResponsiveContainer width="100%" height={300}>
                    <BarChart data={monthlyRevenue}>
@@ -296,12 +324,17 @@ const AdminRevenue = () => {
                          <Cell key={`cell-pool-${index}`} fill={entry.poolFeesColor} />
                        ))}
                      </Bar>
-                     <Bar dataKey="conversionFees" name="Taxas de Conversão">
-                       {monthlyRevenue.map((entry, index) => (
-                         <Cell key={`cell-conversion-${index}`} fill={entry.conversionFeesColor} />
-                       ))}
-                     </Bar>
-                   </BarChart>
+                      <Bar dataKey="conversionFees" name="Taxas de Conversão">
+                        {monthlyRevenue.map((entry, index) => (
+                          <Cell key={`cell-conversion-${index}`} fill={entry.conversionFeesColor} />
+                        ))}
+                      </Bar>
+                      <Bar dataKey="fastFees" name="Taxas FAST">
+                        {monthlyRevenue.map((entry, index) => (
+                          <Cell key={`cell-fast-${index}`} fill={entry.fastFeesColor} />
+                        ))}
+                      </Bar>
+                    </BarChart>
                 </ResponsiveContainer>
               </ChartContainer>
             </CardContent>
@@ -320,7 +353,7 @@ const AdminRevenue = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="p-4 rounded-lg border border-border bg-card/50">
                     <h3 className="font-semibold mb-2 text-destructive">Taxas de Cancelamento (30%)</h3>
                     <p className="text-sm text-muted-foreground mb-2">
@@ -351,6 +384,17 @@ const AdminRevenue = () => {
                      <p className="text-xl font-bold">R$ {(revenueData.conversionFees / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                      <p className="text-sm text-muted-foreground">
                        {((revenueData.conversionFees / revenueData.totalRevenue) * 100 || 0).toFixed(1)}% do total
+                     </p>
+                  </div>
+
+                  <div className="p-4 rounded-lg border border-border bg-card/50">
+                    <h3 className="font-semibold mb-2" style={{ color: '#FFD800' }}>Taxas FAST (5%)</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Taxa cobrada nos Fast Markets ultrarrápidos de 60 segundos
+                    </p>
+                     <p className="text-xl font-bold">R$ {(revenueData.fastFees / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                     <p className="text-sm text-muted-foreground">
+                       {((revenueData.fastFees / revenueData.totalRevenue) * 100 || 0).toFixed(1)}% do total
                      </p>
                   </div>
                 </div>

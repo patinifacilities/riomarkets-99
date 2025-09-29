@@ -161,7 +161,9 @@ const Header = () => {
                           size="sm" 
                            className={`w-full justify-start gap-3 h-12 ${
                              isActive 
-                               ? 'bg-[#00ff90] text-black hover:bg-[#00ff90]/90' 
+                               ? (item.href === '/fast' && resolvedTheme === 'light' 
+                                   ? 'bg-[#FFDFEC] text-gray-800 hover:bg-[#FFDFEC]/90' 
+                                   : 'bg-[#00ff90] text-black hover:bg-[#00ff90]/90')
                                : 'text-white hover:text-foreground hover:bg-muted/10'
                            } ${item.special === 'pulse' ? 'animate-[pulse_1s_ease-in-out_infinite]' : ''}`}
                          >
@@ -250,7 +252,9 @@ const Header = () => {
                     size="sm" 
                      className={`gap-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00FF91] ${
                       isActive 
-                        ? (item.href === '/fast' ? 'bg-[#32162C] text-white hover:bg-[#32162C]/90' : 'bg-primary text-primary-foreground hover:bg-primary/90')
+                        ? (item.href === '/fast' 
+                            ? (resolvedTheme === 'light' ? 'bg-[#FFDFEC] text-gray-800 hover:bg-[#FFDFEC]/90' : 'bg-[#32162C] text-white hover:bg-[#32162C]/90')
+                            : 'bg-primary text-primary-foreground hover:bg-primary/90')
                         : 'text-foreground/80 hover:text-foreground'
                     } ${item.special === 'pulse' ? 'animate-[pulse_1s_ease-in-out_infinite]' : ''}`}
                   >
