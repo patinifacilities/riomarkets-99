@@ -27,8 +27,11 @@ import AdminGatewayConfig from '@/pages/AdminGatewayConfig';
 import AdminGatewayConfigPix from '@/pages/AdminGatewayConfigPix';
 import AdminGatewayConfigStripe from '@/pages/AdminGatewayConfigStripe';
 import AdminGatewayConfigCrypto from '@/pages/AdminGatewayConfigCrypto';
+import AdminGatewaysSaque from '@/pages/AdminGatewaysSaque';
 import Opinioes from '@/pages/Opinioes';
 import FiatRequests from '@/pages/FiatRequests';
+import Terms from '@/pages/Terms';
+import Privacy from '@/pages/Privacy';
 import NotFound from '@/pages/NotFound';
 import { Toaster } from '@/components/ui/sonner';
 import { track } from '@/lib/analytics';
@@ -70,8 +73,11 @@ function App() {
             <Route path="/admin/gateway-config/stripe" element={<AdminGatewayConfigStripe />} />
             <Route path="/admin/gateway-config/crypto" element={<AdminGatewayConfigCrypto />} />
             <Route path="/admin/gateway-config/:gatewayId" element={<AdminGatewayConfig />} />
+            <Route path="/admin/gateways-saque" element={<AdminGatewaysSaque />} />
           <Route path="/opinioes" element={<Opinioes />} />
           <Route path="/fiat-requests" element={<FiatRequests />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>

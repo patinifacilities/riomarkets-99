@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import MarketCardKalshi from '@/components/markets/MarketCardKalshi';
+import hotFire from '@/assets/hot-fire.png';
 import { FilterChips } from '@/components/ui/filter-chips';
 import { MarketGridSkeleton } from '@/components/ui/MarketCardSkeleton';
 import FAQ from '@/components/ui/FAQ';
@@ -340,11 +341,25 @@ const Home = () => {
             {sortedAndFilteredMarkets.map((market, index) => {
               const isHighVolume = index < 3; // Top 3 markets get hot icon
               return (
-                <MarketCardKalshi 
-                  key={market.id} 
-                  market={market} 
-                  showHotIcon={isHighVolume}
-                />
+                <div key={market.id} className="relative">
+                  <MarketCardKalshi
+                    market={market} 
+                    showHotIcon={isHighVolume}
+                  />
+                  {isHighVolume && (
+                    <div className="absolute top-2 right-2 z-10">
+                      <img 
+                        src={hotFire} 
+                        alt="Hot" 
+                        className="w-6 h-6 animate-pulse"
+                        style={{
+                          filter: 'drop-shadow(0 0 8px rgba(255, 100, 0, 0.8))',
+                          animation: 'pulse 2s infinite'
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>

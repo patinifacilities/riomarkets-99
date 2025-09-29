@@ -240,8 +240,8 @@ export const WithdrawModal = ({ open, onOpenChange, onSuccess }: WithdrawModalPr
                 />
               </div>
               
-              <div className="p-3 bg-amber-50 dark:bg-amber-950 rounded-lg border border-amber-200 dark:border-amber-800">
-                <p className="text-xs text-amber-800 dark:text-amber-200">
+              <div className="p-3 bg-success/10 rounded-lg border border-success/30">
+                <p className="text-xs text-success">
                   ⚠️ <strong>Importante:</strong> Só será possível sacar para conta bancária cadastrada com o mesmo CPF. 
                   Se o CPF for diferente, o valor será estornado para seu saldo.
                 </p>

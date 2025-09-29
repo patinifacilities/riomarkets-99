@@ -78,9 +78,9 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
 
   const handleConfirmPayment = () => {
     toast({
-      title: "Pagamento sendo processado",
-      description: "Seu pagamento está sendo processado e em breve será creditado em sua conta.",
-      className: "bg-[#00ff90] text-gray-800 border-0",
+      title: "Depósito sendo processado",
+      description: "Seu depósito está sendo processado e será creditado em breve.",
+      className: "bg-success text-success-foreground border-0 rounded-lg",
     });
     onOpenChange(false);
     onSuccess?.();

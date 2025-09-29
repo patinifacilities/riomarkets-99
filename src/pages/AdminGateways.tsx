@@ -1,4 +1,4 @@
-import { ArrowLeft, CreditCard, Globe, Shield, Settings, BarChart3, TrendingUp } from 'lucide-react';
+import { ArrowLeft, CreditCard, Globe, Shield, Settings, BarChart3, TrendingUp, Plus, ArrowRightLeft } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -93,21 +93,39 @@ const AdminGateways = () => {
       
       <div className="flex-1 lg:ml-0">
         <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <Link to="/admin" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-2">
-                <ArrowLeft className="w-4 h-4" />
-                Voltar
-              </Link>
-              <h1 className="text-3xl font-bold mb-2">Gateways de Pagamento</h1>
-              <p className="text-muted-foreground">
-                Configurar e gerenciar meios de pagamento da plataforma
-              </p>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <Link to="/admin" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-2">
+                  <ArrowLeft className="w-4 h-4" />
+                  Voltar
+                </Link>
+                <h1 className="text-3xl font-bold mb-2">Gateways de Pagamento</h1>
+                <p className="text-muted-foreground">
+                  Configurar e gerenciar meios de pagamento da plataforma
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline"
+                  className="gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Adicionar Gateway
+                </Button>
+                <Link to="/admin/gateways-saque">
+                  <Button 
+                    variant="outline"
+                    className="gap-2"
+                  >
+                    <ArrowRightLeft className="w-4 h-4" />
+                    Gateways de Saque
+                  </Button>
+                </Link>
+                <Badge variant="destructive" className="text-xs">
+                  ADMIN
+                </Badge>
+              </div>
             </div>
-            <Badge variant="destructive" className="text-xs">
-              ADMIN
-            </Badge>
-          </div>
 
           <div className="grid gap-6">
             {gateways.map((gateway) => (

@@ -22,6 +22,7 @@ const Auth = () => {
   const { openOnFirstVisit } = useOnboarding();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,6 +43,10 @@ const Auth = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
+        setUser(session?.user || null);
+        setSession(session);
+        setIsLoading(false);
+        
         // If user is already logged in and accessing auth page, redirect to home
         if (session?.user) {
           console.log('User already logged in, redirecting to home...');
@@ -50,6 +55,7 @@ const Auth = () => {
         }
       } catch (error) {
         console.error('Error checking initial auth:', error);
+        setIsLoading(false);
       }
     };
     

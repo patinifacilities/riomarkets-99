@@ -79,15 +79,13 @@ const MarketCard = ({ market }: MarketCardProps) => {
         </div>
 
         {/* Market Image */}
-        {market.thumbnail_url && (
-          <div className="aspect-[16/7] rounded-lg overflow-hidden bg-muted">
-            <img 
-              src={market.thumbnail_url} 
-              alt={market.titulo}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
+        <div className="aspect-[16/7] rounded-lg overflow-hidden bg-muted">
+          <img 
+            src={market.thumbnail_url || `https://picsum.photos/400/175?random=${market.id}`} 
+            alt={market.titulo}
+            className="w-full h-full object-cover"
+          />
+        </div>
 
         {/* Title */}
         <Link to={`/market/${market.id}`} className="block">
