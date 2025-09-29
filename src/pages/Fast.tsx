@@ -4,10 +4,21 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Zap, Clock, BarChart3 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 
 const Fast = () => {
   const [countdown, setCountdown] = useState(60);
   const [currentRound, setCurrentRound] = useState(1);
+  
+  // Calculate dynamic odds based on countdown
+  const getOdds = (baseOdds: number) => {
+    const timeElapsed = 60 - countdown;
+    if (timeElapsed >= 35) { // 25 seconds remaining
+      return 1.0;
+    }
+    const reduction = (timeElapsed / 35) * (baseOdds - 1.0);
+    return Math.max(1.0, baseOdds - reduction);
+  };
 
   // Categories/themes for the fast pools
   const categories = [
@@ -27,24 +38,24 @@ const Fast = () => {
         question: 'O Petróleo vai subir nos próximos 60 segundos?', 
         asset: 'Petróleo WTI',
         currentPrice: '$73.45',
-        upOdds: 1.85,
-        downOdds: 1.92
+        upOdds: 2.15,
+        downOdds: 2.22
       },
       { 
         id: 2, 
         question: 'O Ouro vai descer nos próximos 60 segundos?', 
         asset: 'Ouro',
         currentPrice: '$2,018.30',
-        upOdds: 1.78,
-        downOdds: 2.05
+        upOdds: 2.08,
+        downOdds: 2.35
       },
       { 
         id: 3, 
         question: 'A Prata vai subir nos próximos 60 segundos?', 
         asset: 'Prata',
         currentPrice: '$24.12',
-        upOdds: 1.90,
-        downOdds: 1.88
+        upOdds: 2.20,
+        downOdds: 2.18
       }
     ],
     crypto: [
@@ -53,16 +64,16 @@ const Fast = () => {
         question: 'O Bitcoin vai subir nos próximos 60 segundos?', 
         asset: 'Bitcoin',
         currentPrice: '$42,350.00',
-        upOdds: 1.82,
-        downOdds: 1.95
+        upOdds: 2.12,
+        downOdds: 2.25
       },
       { 
         id: 5, 
         question: 'O Ethereum vai descer nos próximos 60 segundos?', 
         asset: 'Ethereum',
         currentPrice: '$2,545.80',
-        upOdds: 1.75,
-        downOdds: 2.08
+        upOdds: 2.05,
+        downOdds: 2.38
       }
     ],
     forex: [
@@ -71,8 +82,8 @@ const Fast = () => {
         question: 'O USD/BRL vai subir nos próximos 60 segundos?', 
         asset: 'USD/BRL',
         currentPrice: 'R$ 5.12',
-        upOdds: 1.88,
-        downOdds: 1.90
+        upOdds: 2.18,
+        downOdds: 2.20
       }
     ],
     stocks: [
@@ -81,8 +92,8 @@ const Fast = () => {
         question: 'A Apple vai subir nos próximos 60 segundos?', 
         asset: 'AAPL',
         currentPrice: '$185.40',
-        upOdds: 1.85,
-        downOdds: 1.92
+        upOdds: 2.15,
+        downOdds: 2.22
       }
     ]
   };
@@ -145,16 +156,29 @@ const Fast = () => {
           <h2 className="text-xl font-semibold mb-4 text-center">Selecione o Tema</h2>
           <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
             <TabsList className="grid w-full grid-cols-4 mb-6">
-              {categories.map((category) => (
-                <TabsTrigger 
-                  key={category.id} 
-                  value={category.id}
-                  className="data-[state=active]:bg-[#ff2389] data-[state=active]:text-white"
-                >
-                  <span className="mr-2">{category.icon}</span>
-                  {category.name}
-                </TabsTrigger>
-              ))}
+              {categories.map((category) => {
+                let activeClasses = "data-[state=active]:text-white";
+                if (category.id === 'commodities') {
+                  activeClasses = "data-[state=active]:bg-[#ffd800] data-[state=active]:text-gray-800";
+                } else if (category.id === 'crypto') {
+                  activeClasses = "data-[state=active]:bg-[#FF6101] data-[state=active]:text-white";
+                } else if (category.id === 'stocks') {
+                  activeClasses = "data-[state=active]:bg-[#00ff90] data-[state=active]:text-black";
+                } else {
+                  activeClasses = "data-[state=active]:bg-[#ff2389] data-[state=active]:text-white";
+                }
+                
+                return (
+                  <TabsTrigger 
+                    key={category.id} 
+                    value={category.id}
+                    className={activeClasses}
+                  >
+                    <span className="mr-2">{category.icon}</span>
+                    {category.name}
+                  </TabsTrigger>
+                );
+              })}
             </TabsList>
           </Tabs>
         </div>
@@ -201,41 +225,51 @@ const Fast = () => {
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-4">
                   <Button 
-                    className="bg-success hover:bg-success/90 text-black font-medium h-12 flex flex-col gap-1"
+                    className="bg-success hover:bg-success/90 text-black font-medium h-16 flex flex-col gap-1 text-sm"
                     onClick={() => {
                       // Handle bet logic here
                       console.log('Bet UP on', pool.asset);
                     }}
                   >
-                    <TrendingUp className="h-4 w-4" />
+                    <TrendingUp className="h-5 w-5" />
                     <div className="flex items-center gap-1">
-                      <span className="text-xs">⬆️ SIM</span>
-                      <span className="text-xs font-bold">{pool.upOdds}x</span>
+                      <span className="text-sm">⬆️ SIM</span>
+                      <span className="text-sm font-bold transition-all duration-300">
+                        {getOdds(pool.upOdds).toFixed(2)}x
+                      </span>
                     </div>
                   </Button>
                   <Button 
-                    className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-medium h-12 flex flex-col gap-1"
+                    className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-medium h-16 flex flex-col gap-1 text-sm"
                     onClick={() => {
                       // Handle bet logic here
                       console.log('Bet DOWN on', pool.asset);
                     }}
                   >
-                    <TrendingDown className="h-4 w-4" />
+                    <TrendingDown className="h-5 w-5" />
                     <div className="flex items-center gap-1">
-                      <span className="text-xs">⬇️ NÃO</span>
-                      <span className="text-xs font-bold">{pool.downOdds}x</span>
+                      <span className="text-sm">⬇️ NÃO</span>
+                      <span className="text-sm font-bold transition-all duration-300">
+                        {getOdds(pool.downOdds).toFixed(2)}x
+                      </span>
                     </div>
                   </Button>
                 </div>
                 
                 {/* Progress bar for time remaining */}
-                <div className="mt-3">
-                  <div className="w-full bg-muted rounded-full h-1">
+                <div className="mt-4">
+                  <div className="w-full bg-muted rounded-full h-2">
                     <div 
-                      className="bg-[#ff2389] h-1 rounded-full transition-all duration-1000"
-                      style={{ width: `${(countdown / 60) * 100}%` }}
+                      className={cn(
+                        "bg-[#ff2389] h-2 rounded-full transition-all duration-1000",
+                        countdown <= 8 && "animate-pulse"
+                      )}
+                      style={{ 
+                        width: `${(countdown / 60) * 100}%`,
+                        animationDuration: countdown <= 8 ? `${Math.max(0.1, countdown * 0.1)}s` : '2s'
+                      }}
                     ></div>
                   </div>
                 </div>
