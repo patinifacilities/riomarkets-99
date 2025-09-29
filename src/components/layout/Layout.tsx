@@ -66,9 +66,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         {children}
       </main>
       {!shouldHideHeaderFooter && <Footer />}
-      <ComplianceBanner variant="sticky" />
-      <OnboardingModal />
-      <RianaChat />
+      {!shouldHideHeaderFooter && <ComplianceBanner variant="sticky" />}
+      {!shouldHideHeaderFooter && <OnboardingModal />}
+      {!shouldHideHeaderFooter && <RianaChat />}
     </div>
   );
 };

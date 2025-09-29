@@ -186,6 +186,14 @@ const WalletPage = () => {
               <div className="flex items-center justify-between">
                 <CardTitle>Histórico de Ordens</CardTitle>
                 <div className="flex gap-2">
+                  <Button 
+                    size="sm"
+                    variant="outline"
+                    style={{ backgroundColor: '#ff2389', color: 'white', borderColor: '#ff2389' }}
+                    className="hover:bg-[#ff2389]/90 text-xs px-2 py-1"
+                  >
+                    Cancelar
+                  </Button>
                 </div>
               </div>
             </CardHeader>
