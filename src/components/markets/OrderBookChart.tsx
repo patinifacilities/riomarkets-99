@@ -105,7 +105,7 @@ export const OrderBookChart = ({ market }: OrderBookChartProps) => {
               RIOZ investidos
             </div>
             <div className="text-xs text-[#00FF91] mt-1">
-              {simData?.bettors || 0} apostadores
+              {simData?.bettors || 0} opiniões
             </div>
           </div>
 
@@ -121,7 +121,7 @@ export const OrderBookChart = ({ market }: OrderBookChartProps) => {
               RIOZ investidos
             </div>
             <div className="text-xs text-[#FF1493] mt-1">
-              {naoData?.bettors || 0} apostadores
+              {naoData?.bettors || 0} opiniões
             </div>
           </div>
         </div>

@@ -79,9 +79,9 @@ const Header = () => {
   return (
     <>
       <TickerBar />
-      <header className="border-b border-border backdrop-blur-sm sticky top-0 z-50 bg-background/95">
-        <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
+      <header className="border-b border-border backdrop-blur-sm sticky top-0 z-50 bg-background/95 overflow-x-hidden">
+        <div className="container mx-auto px-4 py-3 min-w-0">
+        <div className="flex items-center justify-between min-w-0">
           {/* Mobile Menu Button */}
           {isMobile && (
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -94,7 +94,7 @@ const Header = () => {
                 <SheetHeader className="border-b border-border pb-4">
                   <div className="text-left">
                     <img 
-                      src={menuLogoWhite} 
+                      src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
                       alt="Rio Markets" 
                       className="h-8 w-auto" 
                     />

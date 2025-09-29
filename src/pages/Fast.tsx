@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useTheme } from 'next-themes';
 import { FastMarketTermsModal } from '@/components/fast/FastMarketTermsModal';
+import { FastPoolHistoryModal } from '@/components/fast/FastPoolHistoryModal';
 import { Link } from 'react-router-dom';
 
 const Fast = () => {
@@ -23,18 +24,29 @@ const Fast = () => {
   const [winnerResults, setWinnerResults] = useState<{[poolId: number]: string}>({});
   const [showWinnerBalance, setShowWinnerBalance] = useState<{amount: number, show: boolean}>({amount: 0, show: false});
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const [selectedPool, setSelectedPool] = useState<string | null>(null);
+  const [poolHistoryOpen, setPoolHistoryOpen] = useState(false);
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
   const { resolvedTheme } = useTheme();
   
-  // Check if user has already accepted terms
+  // Check if user has already accepted terms and is logged in
   useEffect(() => {
+    if (!user) {
+      toast({
+        title: "Login necessário",
+        description: "Você precisa estar logado para acessar os Fast Markets.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const hasAcceptedTerms = localStorage.getItem('fastMarketsTermsAccepted');
     if (!hasAcceptedTerms) {
       setShowTermsModal(true);
     }
-  }, []);
+  }, [user, toast]);
   
   // Calculate dynamic odds based on countdown
   const getOdds = (baseOdds: number) => {
@@ -49,7 +61,7 @@ const Fast = () => {
   // Categories/themes for the fast pools
   const categories = [
     { id: 'crypto', name: 'Cripto', icon: '₿' },
-    { id: 'commodities', name: 'Commodities', icon: '🛢️' },
+    { id: 'commodities', name: 'Commodity', icon: '🛢️' },
     { id: 'forex', name: 'Forex', icon: '💱' },
     { id: 'stocks', name: 'Ações', icon: '📈' }
   ];
@@ -525,6 +537,10 @@ const Fast = () => {
                   : ''
                 }
               `}
+              onClick={() => {
+                setSelectedPool(pool.id.toString());
+                setPoolHistoryOpen(true);
+              }}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
@@ -552,7 +568,12 @@ const Fast = () => {
               <CardContent className="pt-0">
                 <div className="grid grid-cols-2 gap-3">
                   <Button
-                    onClick={() => placeBet(pool.id, 'sim', getOdds(pool.upOdds))}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setClickedPool({ id: pool.id, side: 'sim' });
+                      setTimeout(() => setClickedPool(null), 200);
+                      placeBet(pool.id, 'sim', getOdds(pool.upOdds));
+                    }}
                     disabled={!user || countdown <= 10}
                     data-pool-id={pool.id}
                     data-side="sim"
@@ -561,7 +582,7 @@ const Fast = () => {
                       border-2 border-[#00ff90] hover:border-[#00ff90]/70
                       transition-all duration-300 
                       ${countdown <= 10 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
-                      ${clickedPool?.id === pool.id && clickedPool?.side === 'sim' ? 'animate-pulse scale-95' : ''}
+                      ${clickedPool?.id === pool.id && clickedPool?.side === 'sim' ? 'animate-pulse scale-105' : ''}
                     `}
                   >
                     <div className="font-bold text-lg">SIM</div>
@@ -569,7 +590,12 @@ const Fast = () => {
                   </Button>
                   
                   <Button
-                    onClick={() => placeBet(pool.id, 'nao', getOdds(pool.downOdds))}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setClickedPool({ id: pool.id, side: 'nao' });
+                      setTimeout(() => setClickedPool(null), 200);
+                      placeBet(pool.id, 'nao', getOdds(pool.downOdds));
+                    }}
                     disabled={!user || countdown <= 10}
                     data-pool-id={pool.id}
                     data-side="nao"
@@ -578,7 +604,7 @@ const Fast = () => {
                       border-2 border-[#ff2389] hover:border-[#ff2389]/70
                       transition-all duration-300 
                       ${countdown <= 10 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
-                      ${clickedPool?.id === pool.id && clickedPool?.side === 'nao' ? 'animate-pulse scale-95' : ''}
+                      ${clickedPool?.id === pool.id && clickedPool?.side === 'nao' ? 'animate-pulse scale-105' : ''}
                     `}
                   >
                     <div className="font-bold text-lg">NÃO</div>
@@ -697,6 +723,14 @@ const Fast = () => {
         onAccept={() => {
           setShowTermsModal(false);
         }}
+      />
+
+      {/* Pool History Modal */}
+      <FastPoolHistoryModal
+        open={poolHistoryOpen}
+        onOpenChange={setPoolHistoryOpen}
+        poolId={selectedPool || ''}
+        timeLeft={countdown}
       />
     </div>
   );

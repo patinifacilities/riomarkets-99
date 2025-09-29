@@ -40,16 +40,16 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
               className="h-12 w-auto" 
             />
           </div>
-          <DialogTitle className="flex items-center justify-center gap-2 text-[#ff2389] text-center">
+          <DialogTitle className="flex items-center justify-center gap-2 text-[#ff2389] text-center mb-6">
             <Zap className="w-6 h-6" />
-            Fast Markets - Aviso Importante
+            Fast Markets
           </DialogTitle>
           <DialogDescription asChild>
             <div className="space-y-4 text-foreground">
               <div className="flex items-start gap-3 p-4 bg-[#ff2389]/10 rounded-lg border border-[#ff2389]/20">
                 <AlertTriangle className="w-5 h-5 text-[#ff2389] mt-0.5 flex-shrink-0" />
                 <div className="text-sm">
-                  <p className="font-semibold text-[#ff2389] mb-2">Mercados Ultra-rápidos</p>
+                  <p className="font-semibold text-[#ff2389] mb-2">Mercados Rápidos</p>
                   <p className="mb-2">
                     Os Fast Markets são pools de opinião com duração de apenas 60 segundos, 
                     projetados para traders experientes.
@@ -71,7 +71,7 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
                 <div>
                   <h4 className="font-semibold mb-1">Riscos importantes:</h4>
                   <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-2">
-                    <li>Alta volatilidade e risco de perda total</li>
+                    <li>Alta volatilidade e risco de perda</li>
                     <li>Resultados aleatórios durante fase de testes</li>
                     <li>Não é adequado para investidores conservadores</li>
                     <li>Pode causar dependência - jogue com responsabilidade</li>
@@ -115,7 +115,7 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
           <Button
             onClick={handleAccept}
             disabled={!hasAcceptedTerms}
-            className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white"
+            className="bg-[#00ff90] hover:bg-[#00ff90]/90 text-black"
           >
             Aceitar e Continuar
           </Button>
