@@ -17,6 +17,9 @@ import AdminCategories from '@/pages/AdminCategories';
 import AdminUsers from '@/pages/AdminUsers';
 import AdminReconciliation from '@/pages/AdminReconciliation';
 import AdminRevenue from '@/pages/AdminRevenue';
+import AdminPayouts from '@/pages/AdminPayouts';
+import AdminDeposits from '@/pages/AdminDeposits';
+import AdminGateways from '@/pages/AdminGateways';
 import FiatRequests from '@/pages/FiatRequests';
 import NotFound from '@/pages/NotFound';
 import { Toaster } from '@/components/ui/sonner';
@@ -44,11 +47,14 @@ function App() {
           <Route path="/support" element={<Support />} />
           <Route path="/market/:id" element={<MarketDetail />} />
           <Route path="/market/:id/audit" element={<MarketAudit />} />
-          <Route path="/admin/*" element={<Admin />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/admin/categories" element={<AdminCategories />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/reconciliation" element={<AdminReconciliation />} />
           <Route path="/admin/revenue" element={<AdminRevenue />} />
+          <Route path="/admin/payouts" element={<AdminPayouts />} />
+          <Route path="/admin/deposits" element={<AdminDeposits />} />
+          <Route path="/admin/gateways" element={<AdminGateways />} />
           <Route path="/admin/fiat-requests" element={<FiatRequests />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

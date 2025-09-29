@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, CheckCircle, XCircle, Settings, DollarSign, TrendingUp, Users, FileText, Play, Download, Shield, Activity, Newspaper } from 'lucide-react';
+import { Plus, Edit, CheckCircle, XCircle, Settings, DollarSign, TrendingUp, Users, FileText, Play, Download, Shield, Activity, Newspaper, Menu } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ import MarketTestModal from '@/components/admin/MarketTestModal';
 import { AdminLogin } from '@/components/admin/AdminLogin';
 import { NewsManagement } from '@/components/admin/NewsManagement';
 import { OddsController } from '@/components/admin/OddsController';
+import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
 const Admin = () => {
   const { user, loading: authLoading } = useAuth();
@@ -41,6 +42,7 @@ const Admin = () => {
     isOpen: boolean;
   }>({ isOpen: false });
   const [adminLoggedIn, setAdminLoggedIn] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (user?.id && profile?.is_admin) {
@@ -195,8 +197,23 @@ const Admin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
-      <div className="max-w-[1400px] mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background flex">
+      <AdminSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      
+      <div className="flex-1 lg:ml-0">
+        {/* Mobile header */}
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-border">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            <Menu className="h-4 w-4" />
+          </Button>
+          <h1 className="font-bold">Admin Panel</h1>
+        </div>
+        
+        <div className="max-w-[1400px] mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <Shield className="w-8 h-8 text-primary" />
@@ -571,6 +588,7 @@ const Admin = () => {
           isOpen={testModal.isOpen}
           onClose={() => setTestModal({ isOpen: false })}
         />
+        </div>
       </div>
     </div>
   );
