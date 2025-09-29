@@ -24,6 +24,9 @@ import AdminLogs from '@/pages/AdminLogs';
 import AdminNews from '@/pages/AdminNews';
 import AdminMarkets from '@/pages/AdminMarkets';
 import AdminGatewayConfig from '@/pages/AdminGatewayConfig';
+import AdminGatewayConfigPix from '@/pages/AdminGatewayConfigPix';
+import AdminGatewayConfigStripe from '@/pages/AdminGatewayConfigStripe';
+import AdminGatewayConfigCrypto from '@/pages/AdminGatewayConfigCrypto';
 import Opinioes from '@/pages/Opinioes';
 import FiatRequests from '@/pages/FiatRequests';
 import NotFound from '@/pages/NotFound';
@@ -63,6 +66,9 @@ function App() {
             <Route path="/admin/logs" element={<AdminLogs />} />
             <Route path="/admin/news" element={<AdminNews />} />
             <Route path="/admin/markets" element={<AdminMarkets />} />
+            <Route path="/admin/gateway-config/pix" element={<AdminGatewayConfigPix />} />
+            <Route path="/admin/gateway-config/stripe" element={<AdminGatewayConfigStripe />} />
+            <Route path="/admin/gateway-config/crypto" element={<AdminGatewayConfigCrypto />} />
             <Route path="/admin/gateway-config/:gatewayId" element={<AdminGatewayConfig />} />
           <Route path="/opinioes" element={<Opinioes />} />
           <Route path="/fiat-requests" element={<FiatRequests />} />

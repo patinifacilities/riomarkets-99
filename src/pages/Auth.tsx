@@ -226,8 +226,11 @@ const Auth = () => {
                 ? new URL('../assets/rio-white-logo-new.png', import.meta.url).href
                 : "/assets/rio-black-logo.png"}
               alt="Rio Markets Logo" 
-              className="h-20 md:h-20 h-10 w-auto mx-auto mb-4 cursor-pointer"
-              style={{ height: window.innerWidth < 768 ? '40px' : '80px' }}
+              className="h-20 md:h-20 mobile:h-10 w-auto mx-auto mb-4 cursor-pointer"
+              style={{ 
+                height: window.innerWidth < 768 ? '40px' : '80px',
+                maxHeight: window.innerWidth < 768 ? '40px' : '80px'
+              }}
               onClick={() => navigate('/')}
             />
             <div className="text-2xl font-bold text-foreground">
