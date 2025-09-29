@@ -273,7 +273,7 @@ const MarketDetail = () => {
             </div>
 
             {/* Order Book */}
-            <Card>
+            <Card className="bg-card-secondary border-border-secondary">
               <OrderBookChart market={market} />
             </Card>
 

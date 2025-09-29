@@ -41,8 +41,8 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
   const [option1, option2] = market.opcoes;
 
   const handleBinaryOddsChange = (value: number[]) => {
-    const leftValue = Math.min(4, Math.max(1, value[0] / 100)); // Limit to 4x max
-    const rightValue = Math.min(4, Math.max(1, (400 - value[0]) / 100)); // Inverse scale with 4x limit
+    const leftValue = Math.min(4, Math.max(1.1, value[0] / 100)); // Limit to 4x max, 1.1x min
+    const rightValue = Math.min(4, Math.max(1.1, (400 - value[0]) / 100)); // Inverse scale with 4x limit, 1.1x min
     
     const newOdds = {
       [option1]: leftValue,
@@ -108,7 +108,7 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
   };
 
   const handleOddsChange = (option: string, value: number[]) => {
-    const newValue = Math.min(4, Math.max(1, value[0] / 100)); // Limit to 4x max
+    const newValue = Math.min(4, Math.max(1.1, value[0] / 100)); // Limit to 4x max, 1.1x min
     const newOdds = {
       ...odds,
       [option]: newValue
@@ -146,9 +146,9 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
             
             <div className="relative">
               <Slider
-                value={[(odds[option1] || 1) * 100]} // Convert to 100-400 scale (4x max)
+                value={[(odds[option1] || 1.1) * 100]} // Convert to 110-400 scale (4x max, 1.1x min)
                 onValueChange={handleBinaryOddsChange}
-                min={100}
+                min={110}
                 max={400}
                 step={1}
                 className="w-full [&_[data-orientation='horizontal']>.slider-track]:bg-[#ff2389] [&_[data-orientation='horizontal']>.slider-range]:bg-gradient-to-r [&_[data-orientation='horizontal']>.slider-range]:from-[#00ff90] [&_[data-orientation='horizontal']>.slider-range]:to-[#ff2389] [&_[role=slider]]:border-2 [&_[role=slider]]:border-white"
@@ -173,9 +173,9 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
               </div>
               
               <Slider
-                value={[(odds[option] || 1) * 100]} // Convert to 100-400 scale (4x max)
+                value={[(odds[option] || 1.1) * 100]} // Convert to 110-400 scale (4x max, 1.1x min)
                 onValueChange={(value) => handleOddsChange(option, value)}
-                min={100}
+                min={110}
                 max={400}
                 step={1}
                 className="w-full [&_[data-orientation='horizontal']>.slider-track]:bg-[#ff2389] [&_[data-orientation='horizontal']>.slider-range]:bg-gradient-to-r [&_[data-orientation='horizontal']>.slider-range]:from-[#00ff90] [&_[data-orientation='horizontal']>.slider-range]:to-[#ff2389] [&_[role=slider]]:border-2 [&_[role=slider]]:border-white"
@@ -183,7 +183,7 @@ export const OddsController = ({ market, onOddsUpdate }: OddsControllerProps) =>
               />
               
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>1.00x</span>
+                <span>1.10x</span>
                 <span>4.00x</span>
               </div>
             </div>

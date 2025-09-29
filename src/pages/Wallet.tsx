@@ -215,33 +215,35 @@ const WalletPage = () => {
                           <div className="flex-1">
                             <OrderItem order={order} market={market} />
                           </div>
-                          {order.status === 'ativa' && (
-                            <div className="flex flex-col gap-2 ml-4">
-                               <div className="flex gap-2">
-                                 <Button 
-                                   onClick={() => setShowWithdrawModal(true)}
-                                   variant="outline"
-                                   size="sm"
-                                   className="border-primary/30 text-primary hover:bg-primary/10"
-                                 >
-                                   Sacar agora
-                                 </Button>
-                                 <Button 
-                                   onClick={(e) => {
-                                     e.stopPropagation();
-                                     setSelectedOrder(order);
-                                     setShowCancelBetModal(true);
-                                   }}
-                                   variant="outline"
-                                   size="sm"
-                                   className="border-danger/30 text-danger hover:bg-danger/10"
-                                 >
-                                   <X className="w-4 h-4 mr-1" />
-                                   Cancelar
-                                 </Button>
-                               </div>
-                            </div>
-                          )}
+                           {order.status === 'ativa' && (
+                             <div className="flex gap-2 ml-4 mt-2">
+                               <Button 
+                                 onClick={(e) => {
+                                   e.stopPropagation();
+                                   setShowWithdrawModal(true);
+                                 }}
+                                 variant="outline"
+                                 size="sm"
+                                 className="border-primary/30 text-primary hover:bg-primary/10 flex items-center gap-1"
+                               >
+                                 <DollarSign className="w-4 h-4" />
+                                 Sacar agora
+                               </Button>
+                               <Button 
+                                 onClick={(e) => {
+                                   e.stopPropagation();
+                                   setSelectedOrder(order);
+                                   setShowCancelBetModal(true);
+                                 }}
+                                 variant="outline"
+                                 size="sm"
+                                 className="border-danger/30 text-danger hover:bg-danger/10"
+                               >
+                                 <X className="w-4 h-4 mr-1" />
+                                 Cancelar
+                               </Button>
+                             </div>
+                           )}
                         </div>
                         </div>
                      );
