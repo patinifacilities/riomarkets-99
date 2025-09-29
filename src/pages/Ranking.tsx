@@ -136,30 +136,54 @@ const Ranking = () => {
         )}
 
         {/* Level Badges */}
-        <Card className="mb-8">
+        <Card className="mb-8 bg-secondary-glass border-border/50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Award className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-2xl">
+              <Award className="w-6 h-6 text-primary" />
               Níveis de Analista
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="p-4 rounded-lg bg-gray-500/10 border border-gray-500/20">
-                <Badge className="mb-2 bg-gray-500/20 text-gray-300">Iniciante</Badge>
-                <p className="text-sm text-muted-foreground">0 - 1.500 Rioz Coin</p>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="p-6 rounded-xl bg-gradient-to-br from-gray-500/10 to-gray-600/5 border border-gray-500/20 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-gray-500/20 flex items-center justify-center">
+                    <Target className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <Badge className="bg-gray-500/20 text-gray-300 px-3 py-1 text-sm font-semibold">Iniciante</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground font-medium">0 - 1.500 Rioz Coin</p>
+                <p className="text-xs text-muted-foreground/70 mt-2">Primeiros passos no mercado</p>
               </div>
-              <div className="p-4 rounded-lg bg-accent-muted border border-accent/20">
-                <Badge className="mb-2 bg-accent-muted text-accent">Analista</Badge>
-                <p className="text-sm text-muted-foreground">1.5K - 100K Rioz Coin</p>
+              <div className="p-6 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/20 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+                    <BarChart3 className="w-5 h-5 text-accent" />
+                  </div>
+                  <Badge className="bg-accent/20 text-accent px-3 py-1 text-sm font-semibold">Analista</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground font-medium">1.5K - 100K Rioz Coin</p>
+                <p className="text-xs text-muted-foreground/70 mt-2">Análises consistentes</p>
               </div>
-              <div className="p-4 rounded-lg bg-primary-glow/20 border border-primary/20">
-                <Badge className="mb-2 bg-primary-glow/20 text-primary">Guru</Badge>
-                <p className="text-sm text-muted-foreground">100K+ Rioz Coin</p>
+              <div className="p-6 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-primary" />
+                  </div>
+                  <Badge className="bg-primary/20 text-primary px-3 py-1 text-sm font-semibold">Guru</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground font-medium">100K+ Rioz Coin</p>
+                <p className="text-xs text-muted-foreground/70 mt-2">Expert em predições</p>
               </div>
-              <div className="p-4 rounded-lg bg-danger-muted border border-danger/20">
-                <Badge className="mb-2 bg-danger-muted text-danger">Mestre</Badge>
-                <p className="text-sm text-muted-foreground">500K+ Rioz Coin</p>
+              <div className="p-6 rounded-xl bg-gradient-to-br from-danger/10 to-danger/5 border border-danger/20 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-danger/20 flex items-center justify-center">
+                    <Trophy className="w-5 h-5 text-danger" />
+                  </div>
+                  <Badge className="bg-danger/20 text-danger px-3 py-1 text-sm font-semibold">Mestre</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground font-medium">500K+ Rioz Coin</p>
+                <p className="text-xs text-muted-foreground/70 mt-2">Elite dos analistas</p>
               </div>
             </div>
           </CardContent>

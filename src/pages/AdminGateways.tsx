@@ -9,7 +9,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { useState } from 'react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar, Cell, Legend, Tooltip } from 'recharts';
 
 const AdminGateways = () => {
   const { user, loading: authLoading } = useAuth();
@@ -58,6 +58,17 @@ const AdminGateways = () => {
       status: true,
       description: 'Gateway brasileiro multiplataforma',
       icon: <Shield className="w-5 h-5" />,
+      fees: '4.99%',
+      limits: 'R$ 1,00 - R$ 25.000,00',
+      conversionRate: 95.8,
+      usage: 10
+    },
+    {
+      id: 'crypto',
+      name: 'Crypto',
+      status: true,
+      description: 'Gateway para pagamentos em criptomoedas',
+      icon: <BarChart3 className="w-5 h-5" />,
       fees: '4.99%',
       limits: 'R$ 1,00 - R$ 25.000,00',
       conversionRate: 96.8,
@@ -152,7 +163,7 @@ const AdminGateways = () => {
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
             {/* Conversion Rate Line Chart */}
-            <Card className="bg-card-secondary border-border-secondary">
+            <Card className="bg-secondary-glass border-border/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" />
@@ -179,10 +190,10 @@ const AdminGateways = () => {
                       <XAxis dataKey="month" />
                       <YAxis domain={[90, 100]} />
                       <ChartTooltip content={<ChartTooltipContent />} />
-                      <Line type="monotone" dataKey="pix" stroke="hsl(var(--chart-1))" strokeWidth={2} />
-                      <Line type="monotone" dataKey="stripe" stroke="hsl(var(--chart-2))" strokeWidth={2} />
-                      <Line type="monotone" dataKey="mercadopago" stroke="hsl(var(--chart-3))" strokeWidth={2} />
-                      <Line type="monotone" dataKey="crypto" stroke="hsl(var(--chart-4))" strokeWidth={2} />
+                      <Line type="monotone" dataKey="pix" stroke="#00ff90" strokeWidth={2} />
+                      <Line type="monotone" dataKey="stripe" stroke="#ff6100" strokeWidth={2} />
+                      <Line type="monotone" dataKey="mercadopago" stroke="#ff2389" strokeWidth={2} />
+                      <Line type="monotone" dataKey="crypto" stroke="#8884d8" strokeWidth={2} />
                     </LineChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -190,7 +201,7 @@ const AdminGateways = () => {
             </Card>
 
             {/* Usage Bar Chart */}
-            <Card className="bg-card-secondary border-border-secondary">
+            <Card className="bg-secondary-glass border-border/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="w-5 h-5" />
@@ -214,7 +225,11 @@ const AdminGateways = () => {
                         content={<ChartTooltipContent />}
                         formatter={(value) => [`${value}%`, 'Uso']}
                       />
-                      <Bar dataKey="usage" />
+                      <Bar dataKey="usage">
+                        {gateways.sort((a, b) => b.usage - a.usage).map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={index === 0 ? '#00ff90' : index === 1 ? '#ff2389' : '#ff6100'} />
+                        ))}
+                      </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 </ChartContainer>

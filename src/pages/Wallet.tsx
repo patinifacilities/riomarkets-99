@@ -103,7 +103,7 @@ const WalletPage = () => {
 
         {/* Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-           <Card className="bg-gradient-card border-primary/20">
+           <Card className="bg-secondary-glass border-primary/20">
              <CardContent className="p-6">
                <div className="flex items-center justify-between">
                  <div>
@@ -121,7 +121,7 @@ const WalletPage = () => {
              </CardContent>
            </Card>
 
-          <Card className="bg-gradient-card border-accent/20">
+          <Card className="bg-secondary-glass border-accent/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -135,7 +135,7 @@ const WalletPage = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-card border-success/20">
+          <Card className="bg-secondary-glass border-success/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -152,7 +152,7 @@ const WalletPage = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Transaction History */}
-          <Card className="bg-gradient-card border-border/50">
+          <Card className="bg-secondary-glass border-border/50">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Histórico de Transações</CardTitle>
@@ -186,7 +186,7 @@ const WalletPage = () => {
           </Card>
 
           {/* Order History */}
-          <Card className="bg-gradient-card border-border/50">
+          <Card className="bg-secondary-glass border-border/50">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Histórico de Ordens</CardTitle>
@@ -217,19 +217,29 @@ const WalletPage = () => {
                           </div>
                           {order.status === 'ativa' && (
                             <div className="flex flex-col gap-2 ml-4">
-                              <Button 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedOrder(order);
-                                  setShowCancelBetModal(true);
-                                }}
-                                variant="outline"
-                                size="sm"
-                                className="border-danger/30 text-danger hover:bg-danger/10"
-                              >
-                                <X className="w-4 h-4 mr-1" />
-                                Cancelar
-                              </Button>
+                               <div className="flex gap-2">
+                                 <Button 
+                                   onClick={() => setShowWithdrawModal(true)}
+                                   variant="outline"
+                                   size="sm"
+                                   className="border-primary/30 text-primary hover:bg-primary/10"
+                                 >
+                                   Sacar agora
+                                 </Button>
+                                 <Button 
+                                   onClick={(e) => {
+                                     e.stopPropagation();
+                                     setSelectedOrder(order);
+                                     setShowCancelBetModal(true);
+                                   }}
+                                   variant="outline"
+                                   size="sm"
+                                   className="border-danger/30 text-danger hover:bg-danger/10"
+                                 >
+                                   <X className="w-4 h-4 mr-1" />
+                                   Cancelar
+                                 </Button>
+                               </div>
                             </div>
                           )}
                         </div>

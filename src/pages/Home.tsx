@@ -202,7 +202,7 @@ const Home = () => {
             <OnboardingTrigger 
               variant="outline" 
               size="lg"
-              className="border-[#00FF91]/40 text-[#00FF91] hover:bg-[#00FF91]/10 h-12 px-8 text-base"
+              className="border-[#00FF91]/40 text-[#00FF91] hover:bg-[#00FF91]/10 h-12 px-8 text-base bg-secondary-glass"
             >
               Como funciona
             </OnboardingTrigger>

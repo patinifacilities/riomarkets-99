@@ -222,14 +222,14 @@ const Exchange = () => {
           <CardContent>
             {/* Saldos Compactos */}
             <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gradient-to-r from-muted/30 to-muted/10 rounded-xl border border-border/50">
-              <div className="text-center p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border border-primary/20 shadow-sm">
-                <div className="text-xl font-bold text-primary mb-1">
+              <div className="text-center p-4 bg-gradient-to-br from-muted/20 to-muted/5 rounded-lg border border-border/20 shadow-sm">
+                <div className="text-xl font-bold text-foreground mb-1">
                   R$ {brlBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </div>
                 <div className="text-xs text-muted-foreground font-medium">Reais Brasileiros</div>
               </div>
-              <div className="text-center p-4 bg-gradient-to-br from-secondary/10 to-secondary/5 rounded-lg border border-secondary/20 shadow-sm">
-                <div className="text-xl font-bold text-foreground mb-1">
+              <div className="text-center p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border border-primary/20 shadow-sm">
+                <div className="text-xl font-bold text-primary mb-1">
                   {riozBalance.toLocaleString('pt-BR')} RZ
                 </div>
                 <div className="text-xs text-muted-foreground font-medium">RIOZ Coin</div>

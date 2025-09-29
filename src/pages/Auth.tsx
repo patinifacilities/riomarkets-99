@@ -226,7 +226,7 @@ const Auth = () => {
                 ? new URL('../assets/rio-white-logo-new.png', import.meta.url).href
                 : "/assets/rio-black-logo.png"}
               alt="Rio Markets Logo" 
-              className="h-20 md:h-20 h-12 w-auto mx-auto mb-4 cursor-pointer"
+              className="h-20 md:h-20 h-10 w-auto mx-auto mb-4 cursor-pointer"
               onClick={() => navigate('/')}
             />
             <div className="text-2xl font-bold text-foreground">
@@ -248,7 +248,7 @@ const Auth = () => {
             </div>
           </div>
           <p className="text-muted-foreground max-w-[65ch] mx-auto">
-            Entre ou cadastre-se para começar suas análises no maior mercado de previsões do Rio
+            Entre ou cadastre-se para começar suas análises no maior mercado de previsões do Brasil
           </p>
         </div>
 

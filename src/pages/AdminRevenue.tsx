@@ -267,7 +267,7 @@ const AdminRevenue = () => {
                      <Bar 
                        dataKey="fees" 
                        name="Taxas"
-                       fill="hsl(var(--chart-2))"
+                       fill="#00ff90"
                      />
                   </BarChart>
                 </ResponsiveContainer>

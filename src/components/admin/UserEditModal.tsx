@@ -205,14 +205,16 @@ export const UserEditModal = ({ user, open, onOpenChange, onSuccess }: UserEditM
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg bg-secondary-glass border-border/50">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Edit className="w-5 h-5" />
+          <DialogTitle className="flex items-center gap-3 text-xl">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <Edit className="w-5 h-5 text-primary" />
+            </div>
             Editar Usuário
           </DialogTitle>
-          <DialogDescription>
-            Gerencie informações e permissões do usuário {user.nome}
+          <DialogDescription className="text-base">
+            Gerencie informações e permissões do usuário <span className="font-semibold text-foreground">{user.nome}</span>
           </DialogDescription>
         </DialogHeader>
 
@@ -257,11 +259,14 @@ export const UserEditModal = ({ user, open, onOpenChange, onSuccess }: UserEditM
                 <Minus className="w-4 h-4" />
               </Button>
               <Input
-                type="number"
-                value={adjustAmount}
-                onChange={(e) => setAdjustAmount(parseInt(e.target.value) || 0)}
+                type="text"
+                value={adjustAmount.toLocaleString('pt-BR')}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '');
+                  setAdjustAmount(parseInt(value) || 0);
+                }}
                 placeholder="0"
-                className="text-center"
+                className="text-center font-mono"
                 disabled={isLoading}
               />
               <Button
