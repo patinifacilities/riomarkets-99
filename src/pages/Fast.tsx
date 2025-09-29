@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, Zap, Clock, BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Zap, Clock, BarChart3, Wallet, Plus } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { FastBetSelector, useFastBetting } from '@/components/markets/FastBetSelector';
@@ -13,13 +13,15 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useTheme } from 'next-themes';
 import { FastMarketTermsModal } from '@/components/fast/FastMarketTermsModal';
+import { Link } from 'react-router-dom';
 
 const Fast = () => {
   const [countdown, setCountdown] = useState(60);
   const [currentRound, setCurrentRound] = useState(1);
   const [betAmount, setBetAmount] = useState(100);
   const [clickedPool, setClickedPool] = useState<{id: number, side: string} | null>(null);
-  const [winnerAnimation, setWinnerAnimation] = useState<{poolId: number, winner: string} | null>(null);
+  const [winnerResults, setWinnerResults] = useState<{[poolId: number]: string}>({});
+  const [showWinnerBalance, setShowWinnerBalance] = useState<{amount: number, show: boolean}>({amount: 0, show: false});
   const [showTermsModal, setShowTermsModal] = useState(false);
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
@@ -194,6 +196,8 @@ const Fast = () => {
     ]
   };
 
+  const currentPools = pools[selectedCategory as keyof typeof pools] || pools.commodities;
+
   // Process results when countdown ends
   const processResults = async () => {
     try {
@@ -202,14 +206,19 @@ const Fast = () => {
       
       if (currentRoundBets.length === 0) return;
 
-      // MVP Logic: Random results for testing
-      const winningOption = Math.random() > 0.5 ? 'sim' : 'nao';
+      // MVP Logic: Random results for each pool individually
+      const poolResults: {[poolId: number]: string} = {};
+      const uniquePools = [...new Set(currentRoundBets.map((bet: any) => bet.poolId))];
       
-      const winningBets = currentRoundBets.filter((bet: any) => bet.side === winningOption);
-      const currentUserWins = winningBets.filter((bet: any) => bet.userId === user?.id);
+      uniquePools.forEach((poolId: number) => {
+        poolResults[poolId] = Math.random() > 0.5 ? 'sim' : 'nao';
+      });
+      
+      let totalUserWinnings = 0;
       
       for (const bet of currentRoundBets) {
-        if (bet.side === winningOption) {
+        const poolWinner = poolResults[bet.poolId];
+        if (bet.side === poolWinner) {
           // Winner! Pay out the winnings
           const winAmount = Math.floor(bet.amount * bet.odds);
           
@@ -236,14 +245,22 @@ const Fast = () => {
               user_id: bet.userId,
               tipo: 'credito',
               valor: winAmount,
-              descricao: `Vitória Fast Market - Pool ${bet.poolId} (${bet.side.toUpperCase()})`
+              descricao: `Vitória Fast Market - Pool ${bet.poolId} (${poolWinner.toUpperCase()})`
             });
+            
+          // Track user winnings for animation
+          if (bet.userId === user?.id) {
+            totalUserWinnings += winAmount;
+          }
         }
       }
       
-      // Show notification for current user wins if they're on another page
-      if (currentUserWins.length > 0 && window.location.pathname !== '/fast') {
-        showFastWinNotification(currentUserWins);
+      // Show winner balance animation for current user
+      if (totalUserWinnings > 0) {
+        setShowWinnerBalance({ amount: totalUserWinnings, show: true });
+        setTimeout(() => {
+          setShowWinnerBalance({ amount: 0, show: false });
+        }, 3000);
       }
       
       // Remove processed bets
@@ -254,7 +271,7 @@ const Fast = () => {
       
       toast({
         title: `Resultado Round #${currentRound - 1}`,
-        description: `Vencedor: ${winningOption.toUpperCase()}! ${currentRoundBets.filter((b: any) => b.side === winningOption).length} opinião(ões) premiada(s).`,
+        description: `Resultados individuais por pool! ${Object.values(poolResults).length} pool(s) processado(s).`,
       });
     } catch (error) {
       console.error('Error processing results:', error);
@@ -277,18 +294,21 @@ const Fast = () => {
     return () => clearInterval(timer);
   }, [currentRound]);
 
-  // Winner animation effect for last second
+  // Winner results for last second
   useEffect(() => {
     if (countdown === 1) {
-      // Show winner animation in the last second with random result
-      const winningOption = Math.random() > 0.5 ? 'sim' : 'nao';
-      setWinnerAnimation({ poolId: 0, winner: winningOption }); // poolId 0 means all pools
+      // Generate individual random results for each pool
+      const results: {[poolId: number]: string} = {};
+      currentPools.forEach(pool => {
+        results[pool.id] = Math.random() > 0.5 ? 'sim' : 'nao';
+      });
+      setWinnerResults(results);
       
       setTimeout(() => {
-        setWinnerAnimation(null);
+        setWinnerResults({});
       }, 1000);
     }
-  }, [countdown, currentRound]);
+  }, [countdown, currentRound, currentPools]);
 
   const placeBet = async (poolId: number, side: 'sim' | 'nao', odds: number) => {
     if (!user || !profile || betAmount <= 0) return;
@@ -307,6 +327,10 @@ const Fast = () => {
     setTimeout(() => setClickedPool(null), 200);
 
     try {
+      // Calculate 5% fee
+      const fee = Math.floor(betAmount * 0.05);
+      const netAmount = betAmount - fee;
+      
       // Deduct amount from user balance immediately
       const { error: balanceError } = await supabase
         .from('profiles')
@@ -315,7 +339,7 @@ const Fast = () => {
 
       if (balanceError) throw balanceError;
 
-      // Create transaction record
+      // Create transaction record for the bet
       const transactionId = `fast_${poolId}_${user.id}_${Date.now()}`;
       const { error: transactionError } = await supabase
         .from('wallet_transactions')
@@ -328,12 +352,26 @@ const Fast = () => {
         });
 
       if (transactionError) throw transactionError;
+      
+      // Create fee transaction record
+      const feeTransactionId = `fast_fee_${poolId}_${user.id}_${Date.now()}`;
+      const { error: feeTransactionError } = await supabase
+        .from('wallet_transactions')
+        .insert({
+          id: feeTransactionId,
+          user_id: user.id,
+          tipo: 'taxa_fast',
+          valor: fee,
+          descricao: `Taxa Fast Market 5% - Pool ${poolId}`
+        });
 
-      // Store the bet
+      if (feeTransactionError) throw feeTransactionError;
+
+      // Store the bet (with net amount for winnings calculation)
       const betData = {
         poolId,
         side,
-        amount: betAmount,
+        amount: netAmount, // Use net amount for winnings calculation
         odds,
         userId: user.id,
         timestamp: Date.now(),
@@ -346,7 +384,7 @@ const Fast = () => {
 
       toast({
         title: "Opinião registrada!",
-        description: `Você opinou ${side.toUpperCase()} com ${betAmount} RZ.`,
+        description: `Você opinou ${side.toUpperCase()} com ${betAmount} RZ (taxa 5%: ${fee} RZ).`,
       });
 
       refetchProfile();
@@ -363,8 +401,6 @@ const Fast = () => {
   const formatTime = (seconds: number) => {
     return `${seconds.toString().padStart(2, '0')}s`;
   };
-
-  const currentPools = pools[selectedCategory as keyof typeof pools] || pools.commodities;
 
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
@@ -396,6 +432,29 @@ const Fast = () => {
               <span className="text-white">{formatTime(countdown)}</span>
             </div>
           </div>
+          
+          {/* Winner Balance Animation in Header */}
+          {user && showWinnerBalance.show && (
+            <div className="flex justify-center items-center gap-4 mt-4">
+              <div className="relative">
+                <Link to="/wallet">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-xl"
+                  >
+                    <Wallet className="w-4 h-4" />
+                    {(profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RZ
+                  </Button>
+                </Link>
+                
+                {/* Winner Balance Animation */}
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-[#00ff90] text-black px-3 py-1 rounded-full text-sm font-bold animate-bounce z-50 shadow-lg">
+                  +{showWinnerBalance.amount} RZ
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Category Selection */}
@@ -467,33 +526,18 @@ const Fast = () => {
             <Card 
               key={pool.id} 
               className={`
-                group transition-all duration-300 hover:scale-[1.02] cursor-pointer relative
+                group transition-all duration-500 hover:scale-[1.02] cursor-pointer relative
                 bg-gradient-to-br from-card/95 to-card/80 
                 border border-border/50 hover:border-primary/30
                 backdrop-blur-sm
                 ${countdown <= 8 ? 'animate-pulse border-[#ff2389]/50' : ''}
                 ${resolvedTheme === 'light' ? 'border-2' : ''}
+                ${countdown === 1 && winnerResults[pool.id] ? 
+                  (winnerResults[pool.id] === 'sim' ? 'bg-[#00ff90]/90' : 'bg-[#ff2389]/90')
+                  : ''
+                }
               `}
             >
-              {/* Winner Animation Overlay */}
-              {winnerAnimation && countdown === 1 && (
-                <div 
-                  className={`absolute inset-0 rounded-lg flex items-center justify-center z-10 transition-all duration-300 ${
-                    winnerAnimation.winner === 'sim' 
-                      ? 'bg-[#00ff90]/90 backdrop-blur-sm' 
-                      : 'bg-[#ff2389]/90 backdrop-blur-sm'
-                  }`}
-                >
-                  <div className="text-center animate-scale-in">
-                    <div className={`text-2xl font-bold mb-2 ${
-                      winnerAnimation.winner === 'sim' ? 'text-black' : 'text-white'
-                    }`}>
-                      {winnerAnimation.winner === 'sim' ? '✅ SIM VENCEU!' : '❌ NÃO VENCEU!'}
-                    </div>
-                  </div>
-                </div>
-              )}
-
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -644,9 +688,10 @@ const Fast = () => {
               <div className="text-sm text-muted-foreground space-y-2">
                 <p>• Cada pool dura exatamente 60 segundos</p>
                 <p>• Opine se o preço vai subir (⬆️) ou descer (⬇️)</p>
-                <p>• Resultados alternam entre SIM e NÃO a cada round</p>
+                <p>• Resultados individuais aleatórios para cada pool (MVP)</p>
                 <p>• Novos pools começam automaticamente a cada minuto</p>
                 <p>• Os odds diminuem conforme o tempo passa</p>
+                <p>• Taxa de 5% cobrada por cada opinião</p>
               </div>
             </CardContent>
           </Card>

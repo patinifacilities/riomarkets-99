@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { AddGatewayModal } from '@/components/admin/AddGatewayModal';
 import { useState } from 'react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar, Cell, Legend, Tooltip } from 'recharts';
@@ -15,6 +16,7 @@ const AdminGateways = () => {
   const { user, loading: authLoading } = useAuth();
   const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showAddGatewayModal, setShowAddGatewayModal] = useState(false);
 
   // Security check
   if (authLoading || profileLoading) {
@@ -108,6 +110,7 @@ const AdminGateways = () => {
                 <Button 
                   variant="outline"
                   className="gap-2"
+                  onClick={() => setShowAddGatewayModal(true)}
                 >
                   <Plus className="w-4 h-4" />
                   Adicionar Gateway
@@ -281,6 +284,15 @@ const AdminGateways = () => {
           </Card>
         </div>
       </div>
+      
+      {/* Add Gateway Modal */}
+      <AddGatewayModal
+        open={showAddGatewayModal}
+        onOpenChange={setShowAddGatewayModal}
+        onSuccess={() => {
+          setShowAddGatewayModal(false);
+        }}
+      />
     </div>
   );
 };

@@ -158,6 +158,11 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
             >
               {paymentMethods.map((method) => (
                 <div key={method.id} className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors relative">
+                  {method.id === 'pix' && (
+                    <span className="absolute top-2 right-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white bg-[#ff2389]">
+                      Mais usado
+                    </span>
+                  )}
                   <RadioGroupItem value={method.id} id={method.id} />
                   <div className="flex items-center gap-3 flex-1">
                     <div className="text-primary">
@@ -166,11 +171,6 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
                     <div>
                       <Label htmlFor={method.id} className="font-medium cursor-pointer">
                         {method.label}
-                        {method.id === 'pix' && (
-                          <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white bg-[#ff2389]">
-                            Mais usado
-                          </span>
-                        )}
                       </Label>
                       <p className="text-sm text-muted-foreground">
                         {method.description}

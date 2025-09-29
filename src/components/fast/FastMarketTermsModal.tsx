@@ -32,7 +32,14 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-[#ff2389]">
+          <div className="flex justify-center mb-4">
+            <img 
+              src="/assets/rio-markets-logo.png" 
+              alt="Rio Markets" 
+              className="h-12 w-auto" 
+            />
+          </div>
+          <DialogTitle className="flex items-center justify-center gap-2 text-[#ff2389] text-center">
             <Zap className="w-6 h-6" />
             Fast Markets - Aviso Importante
           </DialogTitle>
