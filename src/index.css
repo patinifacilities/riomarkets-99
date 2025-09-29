@@ -140,7 +140,7 @@
   /* Set dark as default and add light theme overrides */
   :root {
     /* Dark theme is now default */
-    --background: 210 13% 5%;
+    --background: 211 45% 7%;
     --foreground: 210 20% 98%;
     --card: 210 13% 7%;
     --card-foreground: 210 20% 98%;

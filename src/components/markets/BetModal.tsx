@@ -130,8 +130,9 @@ const BetModal = ({
       if (balanceError) throw balanceError;
 
       toast({
-        title: "Opinião enviada com sucesso!",
-        description: `Você investiu ${betValue} Rioz Coin em "${selectedOption}". Sua ordem foi adicionada ao order book!`,
+        title: "Opinião confirmada.",
+        description: `Você investiu ${betValue} Rioz Coin. Sua ordem foi adicionada ao order book!`,
+        className: selectedOption === 'sim' ? 'bg-[#00ff90] text-gray-800' : '',
       });
 
       // Dispatch balance update events to refresh RIOZ balance

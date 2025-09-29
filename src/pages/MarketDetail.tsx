@@ -19,7 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import PoolProgressBar from '@/components/markets/PoolProgressBar';
 import ProbabilityChart from '@/components/markets/ProbabilityChart';
 import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorModal';
-import SimpleOrderBook from '@/components/markets/SimpleOrderBook';
+import { OrderBookChart } from '@/components/markets/OrderBookChart';
 import { BetSlider } from '@/components/markets/BetSlider';
 import { SliderConfirm } from '@/components/ui/slider-confirm';
 import { OpenOpinionsCard } from '@/components/markets/OpenOpinionsCard';
@@ -273,13 +273,7 @@ const MarketDetail = () => {
             </div>
 
             {/* Order Book */}
-            <SimpleOrderBook 
-              marketId={market.id}
-              simPercent={pool?.percent_sim || 0}
-              naoPercent={pool?.percent_nao || 0}
-              simOdds={market.odds?.sim || 1.5}
-              naoOdds={market.odds?.não || market.odds?.nao || 1.5}
-            />
+            <OrderBookChart market={market} />
 
             {/* Open Opinions Card */}
             <OpenOpinionsCard 

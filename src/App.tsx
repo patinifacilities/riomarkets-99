@@ -20,6 +20,7 @@ import AdminRevenue from '@/pages/AdminRevenue';
 import AdminPayouts from '@/pages/AdminPayouts';
 import AdminDeposits from '@/pages/AdminDeposits';
 import AdminGateways from '@/pages/AdminGateways';
+import Opinioes from '@/pages/Opinioes';
 import FiatRequests from '@/pages/FiatRequests';
 import NotFound from '@/pages/NotFound';
 import { Toaster } from '@/components/ui/sonner';
@@ -55,7 +56,8 @@ function App() {
           <Route path="/admin/payouts" element={<AdminPayouts />} />
           <Route path="/admin/deposits" element={<AdminDeposits />} />
           <Route path="/admin/gateways" element={<AdminGateways />} />
-          <Route path="/admin/fiat-requests" element={<FiatRequests />} />
+          <Route path="/opinioes" element={<Opinioes />} />
+          <Route path="/fiat-requests" element={<FiatRequests />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>

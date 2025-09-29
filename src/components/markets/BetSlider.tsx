@@ -53,7 +53,7 @@ export const BetSlider = ({ balance, onAmountChange, estimatedReward }: BetSlide
               variant={percentage[0] === percent ? "default" : "outline"}
               className={`cursor-pointer text-xs px-2 py-1 ${
                 percentage[0] === percent 
-                  ? "bg-[#00ff90] text-black hover:bg-[#00ff90]/90" 
+                  ? "bg-[#00ff90] text-gray-800 hover:bg-[#00ff90]/90" 
                   : "hover:bg-muted"
               }`}
               onClick={() => handlePercentageClick(percent)}

@@ -78,6 +78,17 @@ const MarketCard = ({ market }: MarketCardProps) => {
           </div>
         </div>
 
+        {/* Market Image */}
+        {market.thumbnail_url && (
+          <div className="aspect-[16/7] rounded-lg overflow-hidden bg-muted">
+            <img 
+              src={market.thumbnail_url} 
+              alt={market.titulo}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+
         {/* Title */}
         <Link to={`/market/${market.id}`} className="block">
           <h3 className="text-sm font-semibold leading-tight hover:text-primary transition-colors line-clamp-2 min-h-[2.5rem]">
