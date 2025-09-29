@@ -129,7 +129,7 @@ const TransactionsTable = ({ transactions, className }: TransactionsTableProps) 
   }
 
   return (
-    <div className={cn("border border-border rounded-lg overflow-hidden bg-card", className)}>
+    <div className={cn("border border-border rounded-lg overflow-hidden", className)}>
       <Table id="transactions-table">
         <TableHeader>
           <TableRow>

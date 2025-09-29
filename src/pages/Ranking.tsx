@@ -41,17 +41,25 @@ const Ranking = () => {
         nextLevelRequirement: 1500,
         currentBalance: balance
       };
-    } else if (balance <= 5000) {
+    } else if (balance <= 100000) {
       return {
         current: 'analista',
-        progress: ((balance - 1500) / (5000 - 1500)) * 100,
+        progress: ((balance - 1500) / (100000 - 1500)) * 100,
         nextLevel: 'guru',
-        nextLevelRequirement: 5000,
+        nextLevelRequirement: 100000,
+        currentBalance: balance
+      };
+    } else if (balance <= 500000) {
+      return {
+        current: 'guru',
+        progress: ((balance - 100000) / (500000 - 100000)) * 100,
+        nextLevel: 'mestre',
+        nextLevelRequirement: 500000,
         currentBalance: balance
       };
     } else {
       return {
-        current: 'guru',
+        current: 'mestre',
         progress: 100,
         nextLevel: null,
         nextLevelRequirement: null,
@@ -143,15 +151,15 @@ const Ranking = () => {
               </div>
               <div className="p-4 rounded-lg bg-accent-muted border border-accent/20">
                 <Badge className="mb-2 bg-accent-muted text-accent">Analista</Badge>
-                <p className="text-sm text-muted-foreground">1.501 - 5.000 Rioz Coin</p>
+                <p className="text-sm text-muted-foreground">1.5K - 100K Rioz Coin</p>
               </div>
               <div className="p-4 rounded-lg bg-primary-glow/20 border border-primary/20">
                 <Badge className="mb-2 bg-primary-glow/20 text-primary">Guru</Badge>
-                <p className="text-sm text-muted-foreground">5.001+ Rioz Coin</p>
+                <p className="text-sm text-muted-foreground">100K+ Rioz Coin</p>
               </div>
               <div className="p-4 rounded-lg bg-danger-muted border border-danger/20">
-                <Badge className="mb-2 bg-danger-muted text-danger">Root</Badge>
-                <p className="text-sm text-muted-foreground">Admin</p>
+                <Badge className="mb-2 bg-danger-muted text-danger">Mestre</Badge>
+                <p className="text-sm text-muted-foreground">500K+ Rioz Coin</p>
               </div>
             </div>
           </CardContent>

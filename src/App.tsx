@@ -20,6 +20,7 @@ import AdminRevenue from '@/pages/AdminRevenue';
 import AdminPayouts from '@/pages/AdminPayouts';
 import AdminDeposits from '@/pages/AdminDeposits';
 import AdminGateways from '@/pages/AdminGateways';
+import AdminLogs from '@/pages/AdminLogs';
 import Opinioes from '@/pages/Opinioes';
 import FiatRequests from '@/pages/FiatRequests';
 import NotFound from '@/pages/NotFound';
@@ -50,15 +51,15 @@ function App() {
           <Route path="/market/:id/audit" element={<MarketAudit />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/categories" element={<AdminCategories />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/admin/reconciliation" element={<AdminReconciliation />} />
-          <Route path="/admin/revenue" element={<AdminRevenue />} />
-          <Route path="/admin/payouts" element={<AdminPayouts />} />
-          <Route path="/admin/deposits" element={<AdminDeposits />} />
-          <Route path="/admin/gateways" element={<AdminGateways />} />
-          <Route path="/admin/logs" element={<Admin />} />
-          <Route path="/admin/news" element={<Admin />} />
-          <Route path="/admin/markets" element={<Admin />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/reconciliation" element={<AdminReconciliation />} />
+            <Route path="/admin/revenue" element={<AdminRevenue />} />
+            <Route path="/admin/payouts" element={<AdminPayouts />} />
+            <Route path="/admin/deposits" element={<AdminDeposits />} />
+            <Route path="/admin/gateways" element={<AdminGateways />} />
+            <Route path="/admin/logs" element={<AdminLogs />} />
+            <Route path="/admin/news" element={<Admin />} />
+            <Route path="/admin/markets" element={<Admin />} />
           <Route path="/opinioes" element={<Opinioes />} />
           <Route path="/fiat-requests" element={<FiatRequests />} />
           <Route path="*" element={<NotFound />} />

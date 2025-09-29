@@ -66,7 +66,7 @@ const TransactionsList = ({ transactions, className }: TransactionsListProps) =>
       {transactions.map((transaction) => (
         <div
           key={transaction.id}
-          className="p-4 rounded-lg bg-card border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-150 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-background"
+          className="p-4 rounded-lg border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-150 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-background"
         >
           {/* Line 1: Market Title */}
           <div className="flex items-start justify-between mb-2">

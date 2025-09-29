@@ -204,31 +204,30 @@ const Exchange = () => {
           </p>
         </div>
 
-        {/* Saldos Compactos */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="text-center p-3 bg-primary/20 rounded-lg border border-primary/30">
-            <div className="text-lg font-bold text-primary">
-              R$ {brlBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-            </div>
-            <div className="text-xs text-muted-foreground">BRL</div>
-          </div>
-          <div className="text-center p-3 bg-secondary/20 rounded-lg border border-secondary/30">
-            <div className="text-lg font-bold text-secondary-foreground">
-              {riozBalance.toLocaleString('pt-BR')} RZ
-            </div>
-            <div className="text-xs text-muted-foreground">RIOZ</div>
-          </div>
-        </div>
-
-        {/* Interface de Troca */}
-        <Card className="max-w-4xl mx-auto mb-8 bg-gradient-card border-primary/20">
+        {/* Interface de Troca Unificada */}
+        <Card className="max-w-4xl mx-auto mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ArrowRightLeft className="h-5 w-5" />
-              Trade
+              Exchange RIOZ/BRL
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {/* Saldos Compactos */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="text-center p-3 bg-primary/10 rounded-lg border border-primary/20">
+                <div className="text-lg font-bold text-primary">
+                  R$ {brlBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </div>
+                <div className="text-xs text-muted-foreground">Reais</div>
+              </div>
+              <div className="text-center p-3 bg-secondary/10 rounded-lg border border-secondary/20">
+                <div className="text-lg font-bold text-foreground">
+                  {riozBalance.toLocaleString('pt-BR')} RZ
+                </div>
+                <div className="text-xs text-muted-foreground">RIOZ</div>
+              </div>
+            </div>
             <Tabs value={activeTab} onValueChange={(value: any) => setActiveTab(value)}>
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="buy" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">

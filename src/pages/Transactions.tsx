@@ -231,7 +231,7 @@ const Transactions = () => {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="p-4 border-border bg-card">
+            <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Total de Transações</p>
@@ -245,7 +245,7 @@ const Transactions = () => {
               </div>
             </Card>
 
-            <Card className="p-4 border-border bg-card">
+            <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Total Recebido</p>
@@ -259,7 +259,7 @@ const Transactions = () => {
               </div>
             </Card>
 
-            <Card className="p-4 border-border bg-card">
+            <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Total Enviado</p>

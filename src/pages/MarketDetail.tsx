@@ -273,7 +273,7 @@ const MarketDetail = () => {
             </div>
 
             {/* Order Book */}
-            <Card className="bg-gradient-card border-primary/20">
+            <Card>
               <OrderBookChart market={market} />
             </Card>
 
@@ -286,9 +286,9 @@ const MarketDetail = () => {
             />
           </div>
 
-          {/* User Info Panel */}
+            {/* User Info Panel */}
           <div className="sticky top-24">
-            <Card className="bg-gradient-card border-primary/20">
+            <Card>
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <Wallet className="w-5 h-5" />
