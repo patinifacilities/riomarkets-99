@@ -103,7 +103,7 @@ const TransactionsToolbar = ({ onExport, className }: TransactionsToolbarProps) 
                 variant={filters.from ? "secondary" : "outline"}
                 size="sm"
                 onClick={() => handleQuickDateFilter(7)}
-                className="whitespace-nowrap"
+                className="whitespace-nowrap bg-card-secondary"
               >
                 Últimos 7 dias
               </Button>
@@ -111,7 +111,7 @@ const TransactionsToolbar = ({ onExport, className }: TransactionsToolbarProps) 
                 variant={filters.from && !dateRange.from ? "secondary" : "outline"}
                 size="sm"
                 onClick={() => handleQuickDateFilter(30)}
-                className="whitespace-nowrap"
+                className="whitespace-nowrap bg-card-secondary"
               >
                 Últimos 30 dias
               </Button>
@@ -122,7 +122,7 @@ const TransactionsToolbar = ({ onExport, className }: TransactionsToolbarProps) 
                     variant="outline"
                     size="sm"
                     className={cn(
-                      "whitespace-nowrap",
+                      "whitespace-nowrap bg-card-secondary",
                       (dateRange.from || dateRange.to) && "border-primary"
                     )}
                   >
@@ -163,7 +163,7 @@ const TransactionsToolbar = ({ onExport, className }: TransactionsToolbarProps) 
 
             {/* Type Filter */}
             <Select value={filters.type || 'todos'} onValueChange={handleTypeFilter}>
-              <SelectTrigger className="w-[140px]" aria-label="Filtrar por tipo">
+              <SelectTrigger className="w-[140px] bg-card-secondary" aria-label="Filtrar por tipo">
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>

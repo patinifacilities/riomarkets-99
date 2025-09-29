@@ -45,7 +45,7 @@ export function ComplianceBanner({ variant = 'sticky' }: ComplianceBannerProps) 
 
   const Wrapper = variant === 'sticky'
     ? ({ children }: { children: React.ReactNode }) => (
-        <div className="fixed bottom-0 inset-x-0 z-40">
+        <div className="fixed bottom-0 inset-x-0 z-50">
           {children}
         </div>
       )

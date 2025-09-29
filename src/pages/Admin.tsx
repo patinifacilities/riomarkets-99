@@ -191,7 +191,7 @@ const Admin = () => {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Receita Estimada</p>
-                    <p className="text-2xl font-bold">{Math.round(estimatedRevenue).toLocaleString()} Rioz Coin</p>
+                    <p className="text-2xl font-bold">R$ {(Math.round(estimatedRevenue) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                 </div>
               </CardContent>

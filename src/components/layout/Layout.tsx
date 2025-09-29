@@ -19,15 +19,15 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     setMounted(true);
     
-    // Trigger onboarding on first visit to home page
-    if (location.pathname === '/' && !loading) {
+    // Only trigger onboarding if user is authenticated and on home page
+    if (location.pathname === '/' && !loading && user) {
       const timer = setTimeout(() => {
         openOnFirstVisit();
       }, 1000); // Small delay to let the page settle
       
       return () => clearTimeout(timer);
     }
-  }, [location.pathname, loading, openOnFirstVisit, setMounted]);
+  }, [location.pathname, loading, user, openOnFirstVisit, setMounted]);
 
   // Show loading while checking auth status
   if (loading) {

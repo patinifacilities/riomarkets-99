@@ -84,15 +84,37 @@ const AdminRevenue = () => {
         { method: 'Boleto', value: 19200, percentage: 10, fill: '#ff6100' }
       ]);
 
-      // Mock monthly revenue data with specific colors based on fee values
-      setMonthlyRevenue([
-        { month: 'Jan', revenue: 45000, fees: 2000, feeColor: 'white' },
-        { month: 'Fev', revenue: 52000, fees: 2300, feeColor: '#ff2389' },
-        { month: 'Mar', revenue: 48000, fees: 2100, feeColor: 'white' },
-        { month: 'Abr', revenue: 61000, fees: 2800, feeColor: '#ff2389' },
-        { month: 'Mai', revenue: 55000, fees: 2500, feeColor: '#ff2389' },
-        { month: 'Jun', revenue: 67000, fees: 3100, feeColor: '#00ff90' }
-      ]);
+      // Fee revenue data with specific colors - highest gets #00ff90, second #ff2389, third white
+      const feeData = [
+        { month: 'Jan', cancellationFees: 1800, poolFees: 2000, conversionFees: 200 },
+        { month: 'Fev', cancellationFees: 2300, poolFees: 1900, conversionFees: 250 },
+        { month: 'Mar', cancellationFees: 1700, poolFees: 2100, conversionFees: 180 },
+        { month: 'Abr', cancellationFees: 2800, poolFees: 2000, conversionFees: 300 },
+        { month: 'Mai', cancellationFees: 2500, poolFees: 1800, conversionFees: 280 },
+        { month: 'Jun', cancellationFees: 3100, poolFees: 2200, conversionFees: 350 }
+      ];
+
+      // Add colors based on highest revenue per month
+      setMonthlyRevenue(feeData.map(data => {
+        const values = [
+          { name: 'cancellationFees', value: data.cancellationFees },
+          { name: 'poolFees', value: data.poolFees },
+          { name: 'conversionFees', value: data.conversionFees }
+        ].sort((a, b) => b.value - a.value);
+
+        const colors = {
+          [values[0].name]: '#00ff90', // Highest
+          [values[1].name]: '#ff2389', // Second
+          [values[2].name]: 'white'    // Third
+        };
+
+        return {
+          ...data,
+          cancellationFeesColor: colors.cancellationFees,
+          poolFeesColor: colors.poolFees,
+          conversionFeesColor: colors.conversionFees
+        };
+      }));
 
     } catch (error) {
       console.error('Erro ao buscar dados de receita:', error);
@@ -229,7 +251,11 @@ const AdminRevenue = () => {
                     </Pie>
                     <ChartTooltip 
                       content={<ChartTooltipContent />}
-                      formatter={(value: any) => [`R$ ${(value / 100).toLocaleString('pt-BR')}`, 'Valor']}
+                      formatter={(value: any, name: any) => [`R$ ${(value / 100).toLocaleString('pt-BR')}`, name]}
+                    />
+                    <ChartLegend 
+                      content={<ChartLegendContent />}
+                      wrapperStyle={{ paddingTop: '20px' }}
                     />
                   </RechartsPieChart>
                 </ResponsiveContainer>
@@ -237,18 +263,19 @@ const AdminRevenue = () => {
             </CardContent>
           </Card>
 
-          {/* Monthly Revenue */}
+          {/* Fee Revenue Distribution */}
           <Card className="bg-card-secondary border-border-secondary">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5" />
-                Receita Mensal
+                Distribuição de Taxas por Tipo
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ChartContainer config={{
-                revenue: { label: "Receita", color: "hsl(var(--chart-1))" },
-                fees: { label: "Taxas", color: "hsl(var(--chart-2))" }
+                cancellationFees: { label: "Cancelamento", color: "hsl(var(--chart-1))" },
+                poolFees: { label: "Pool", color: "hsl(var(--chart-2))" },
+                conversionFees: { label: "Conversão", color: "hsl(var(--chart-3))" }
               }}>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={monthlyRevenue}>
@@ -260,14 +287,19 @@ const AdminRevenue = () => {
                       formatter={(value: any) => [`R$ ${(value / 100).toLocaleString('pt-BR')}`, '']}
                     />
                      <Bar 
-                       dataKey="revenue" 
-                       fill="hsl(var(--chart-1))" 
-                       name="Receita" 
+                       dataKey="cancellationFees" 
+                       fill="#ff2389"
+                       name="Taxas de Cancelamento" 
                      />
                      <Bar 
-                       dataKey="fees" 
-                       name="Taxas"
+                       dataKey="poolFees" 
+                       fill="white"
+                       name="Taxas de Pool" 
+                     />
+                     <Bar 
+                       dataKey="conversionFees" 
                        fill="#00ff90"
+                       name="Taxas de Conversão" 
                      />
                   </BarChart>
                 </ResponsiveContainer>

@@ -46,6 +46,7 @@ export const useOnboarding = create<OnboardingState>((set, get) => ({
   },
 
   openOnFirstVisit: () => {
+    // This function is now only called after successful login
     const { mounted } = get();
     if (mounted && shouldShowOnboarding()) {
       set({ open: true, step: 1 });
