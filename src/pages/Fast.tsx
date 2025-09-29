@@ -346,10 +346,6 @@ const Fast = () => {
     setTimeout(() => setClickedPool(null), 200);
 
     try {
-      // Calculate 5% fee
-      const fee = Math.floor(betAmount * 0.05);
-      const netAmount = betAmount - fee;
-      
       // Deduct amount from user balance immediately
       const { error: balanceError } = await supabase
         .from('profiles')
@@ -371,26 +367,12 @@ const Fast = () => {
         });
 
       if (transactionError) throw transactionError;
-      
-      // Create fee transaction record
-      const feeTransactionId = `fast_fee_${poolId}_${user.id}_${Date.now()}`;
-      const { error: feeTransactionError } = await supabase
-        .from('wallet_transactions')
-        .insert({
-          id: feeTransactionId,
-          user_id: user.id,
-          tipo: 'taxa_fast',
-          valor: fee,
-          descricao: `Taxa Fast Market 5% - Pool ${poolId}`
-        });
 
-      if (feeTransactionError) throw feeTransactionError;
-
-      // Store the bet (with net amount for winnings calculation)
+      // Store the bet
       const betData = {
         poolId,
         side,
-        amount: netAmount, // Use net amount for winnings calculation
+        amount: betAmount,
         odds,
         userId: user.id,
         timestamp: Date.now(),
@@ -403,7 +385,7 @@ const Fast = () => {
 
       toast({
         title: "Opinião registrada!",
-        description: `Você opinou ${side.toUpperCase()} com ${betAmount} RZ (taxa 5%: ${fee} RZ).`,
+        description: `Você opinou ${side.toUpperCase()} com ${betAmount} RZ.`,
       });
 
       refetchProfile();
