@@ -94,9 +94,9 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, poolId, timeLeft }: F
       return;
     }
 
-    // Add animation
+    // Add premium animation
     setClickedSide(side);
-    setTimeout(() => setClickedSide(null), 200);
+    setTimeout(() => setClickedSide(null), 400);
 
     // Simulate bet placement
     toast({
@@ -147,13 +147,18 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, poolId, timeLeft }: F
           </DialogDescription>
         </DialogHeader>
 
-        {/* Countdown */}
+        {/* Countdown - continuous animation */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium">Tempo restante</span>
             <span className="text-lg font-bold text-[#ff2389]">{countdown}s</span>
           </div>
-          <Progress value={(countdown / 60) * 100} className="h-2" />
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 transition-all duration-1000 ease-linear"
+              style={{ width: `${(countdown / 60) * 100}%` }}
+            />
+          </div>
         </div>
 
         {/* History */}
@@ -200,7 +205,7 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, poolId, timeLeft }: F
             disabled={countdown <= 10}
             className={`h-12 ${
               clickedSide === 'sim' 
-                ? 'animate-[bounce_0.3s_ease-in-out] scale-110 shadow-lg shadow-[#00ff90]/50' 
+                ? 'scale-[1.02] shadow-lg shadow-[#00ff90]/30 ring-2 ring-[#00ff90]/50' 
                 : ''
             } bg-[#00ff90] hover:bg-[#00ff90]/90 text-black font-semibold transition-all duration-300`}
           >
@@ -211,7 +216,7 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, poolId, timeLeft }: F
             disabled={countdown <= 10}
             className={`h-12 ${
               clickedSide === 'nao' 
-                ? 'animate-[bounce_0.3s_ease-in-out] scale-110 shadow-lg shadow-[#ff2389]/50' 
+                ? 'scale-[1.02] shadow-lg shadow-[#ff2389]/30 ring-2 ring-[#ff2389]/50' 
                 : ''
             } bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-semibold transition-all duration-300`}
           >

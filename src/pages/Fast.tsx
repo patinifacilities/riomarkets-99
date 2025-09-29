@@ -223,7 +223,14 @@ const Fast = () => {
       const uniquePools = [...new Set(currentRoundBets.map((bet: any) => bet.poolId))];
       
       uniquePools.forEach((poolId: number) => {
-        poolResults[poolId] = Math.random() > 0.5 ? 'sim' : 'nao';
+        const random = Math.random();
+        if (random > 0.66) {
+          poolResults[poolId] = 'sim';
+        } else if (random > 0.33) {
+          poolResults[poolId] = 'nao';
+        } else {
+          poolResults[poolId] = 'manteve';
+        }
       });
       
       let totalUserWinnings = 0;
@@ -335,7 +342,14 @@ const Fast = () => {
       // Generate individual random results for each pool
       const results: {[poolId: number]: string} = {};
       currentPools.forEach(pool => {
-        results[pool.id] = Math.random() > 0.5 ? 'sim' : 'nao';
+        const random = Math.random();
+        if (random > 0.66) {
+          results[pool.id] = 'sim';
+        } else if (random > 0.33) {
+          results[pool.id] = 'nao';
+        } else {
+          results[pool.id] = 'manteve';
+        }
       });
       setWinnerResults(results);
       
@@ -545,7 +559,8 @@ const Fast = () => {
                 ${countdown <= 8 ? 'animate-pulse border-[#ff2389]/50' : ''}
                 ${resolvedTheme === 'light' ? 'border-2' : ''}
                 ${countdown === 1 && winnerResults[pool.id] ? 
-                  (winnerResults[pool.id] === 'sim' ? 'bg-[#00ff90]/90' : 'bg-[#ff2389]/90')
+                  (winnerResults[pool.id] === 'sim' ? 'bg-[#00ff90]/90' : 
+                   winnerResults[pool.id] === 'nao' ? 'bg-[#ff2389]/90' : 'bg-[#ffd800]/90')
                   : ''
                 }
               `}
@@ -590,8 +605,8 @@ const Fast = () => {
                         window.location.href = '/auth';
                         return;
                       }
-                      setClickedPool({ id: pool.id, side: 'sim' });
-                      setTimeout(() => setClickedPool(null), 300);
+                       setClickedPool({ id: pool.id, side: 'sim' });
+                      setTimeout(() => setClickedPool(null), 400);
                       placeBet(pool.id, 'sim', getOdds(pool.upOdds));
                     }}
                     disabled={countdown <= 10}
@@ -599,12 +614,12 @@ const Fast = () => {
                     data-side="sim"
                     className={`
                       h-14 flex flex-col gap-1 
-                      ${winnerResults[pool.id] === 'nao' ? 'bg-[#ff2389] text-white' : 'bg-[#00ff90] text-black'} 
+                      ${winnerResults[pool.id] === 'nao' ? 'bg-[#ffd800] text-gray-800' : 'bg-[#00ff90] text-black'} 
                       hover:bg-[#00ff90]/90 
                       border-2 border-[#00ff90] hover:border-[#00ff90]/70
-                      transition-all duration-300 
+                      transition-all duration-500 
                       ${countdown <= 10 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
-                      ${clickedPool?.id === pool.id && clickedPool?.side === 'sim' ? 'animate-[bounce_0.3s_ease-in-out] scale-110 shadow-lg shadow-[#00ff90]/50' : ''}
+                      ${clickedPool?.id === pool.id && clickedPool?.side === 'sim' ? 'scale-[1.02] shadow-lg shadow-[#00ff90]/30 ring-2 ring-[#00ff90]/50' : ''}
                     `}
                   >
                     <div className="font-bold text-lg">SIM</div>
@@ -618,8 +633,8 @@ const Fast = () => {
                         window.location.href = '/auth';
                         return;
                       }
-                      setClickedPool({ id: pool.id, side: 'nao' });
-                      setTimeout(() => setClickedPool(null), 300);
+                       setClickedPool({ id: pool.id, side: 'nao' });
+                      setTimeout(() => setClickedPool(null), 400);
                       placeBet(pool.id, 'nao', getOdds(pool.downOdds));
                     }}
                     disabled={countdown <= 10}
@@ -627,12 +642,12 @@ const Fast = () => {
                     data-side="nao"
                     className={`
                       h-14 flex flex-col gap-1 
-                      ${winnerResults[pool.id] === 'sim' ? 'bg-[#00ff90] text-black' : 'bg-[#ff2389] text-white'} 
+                      ${winnerResults[pool.id] === 'sim' ? 'bg-[#ffd800] text-gray-800' : 'bg-[#ff2389] text-white'} 
                       hover:bg-[#ff2389]/90
                       border-2 border-[#ff2389] hover:border-[#ff2389]/70
-                      transition-all duration-300 
+                      transition-all duration-500 
                       ${countdown <= 10 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
-                      ${clickedPool?.id === pool.id && clickedPool?.side === 'nao' ? 'animate-[bounce_0.3s_ease-in-out] scale-110 shadow-lg shadow-[#ff2389]/50' : ''}
+                      ${clickedPool?.id === pool.id && clickedPool?.side === 'nao' ? 'scale-[1.02] shadow-lg shadow-[#ff2389]/30 ring-2 ring-[#ff2389]/50' : ''}
                     `}
                   >
                     <div className="font-bold text-lg">NÃO</div>

@@ -1,4 +1,4 @@
-import { TrendingUp, Wallet, Trophy, Settings, LogOut, User, LogIn, Receipt, Newspaper, ArrowRightLeft, Menu, Plus, UserCircle, Zap } from 'lucide-react';
+import { TrendingUp, Wallet, Trophy, Settings, LogOut, User, LogIn, Receipt, Newspaper, ArrowRightLeft, Menu, Plus, UserCircle, Zap, ArrowLeft } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
@@ -102,11 +102,11 @@ const Header = () => {
                 </SheetHeader>
                 
                 <div className="flex flex-col mt-6 space-y-1">
-                  {/* User Info Section */}
+                      {/* User Info Section */}
                   {isLoggedIn && profile && (
                     <div className="border-b border-border pb-4 mb-4">
-                      <div className="flex items-center gap-3 p-2">
-                        <Avatar className="h-10 w-10">
+                      <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg">
+                        <Avatar className="h-12 w-12">
                           <AvatarFallback className="bg-primary text-primary-foreground">
                             {profile.nome ? profile.nome.charAt(0).toUpperCase() : 'U'}
                           </AvatarFallback>
@@ -114,6 +114,9 @@ const Header = () => {
                         <div>
                           <p className="text-sm font-medium text-white">{profile.nome || 'Usuário'}</p>
                           <p className="text-xs text-gray-300 capitalize">{profile.nivel || 'iniciante'}</p>
+                          <div className="text-xs text-primary font-medium mt-1">
+                            {(profile.saldo_moeda || 0).toLocaleString('pt-BR')} RZ
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -159,22 +162,40 @@ const Header = () => {
                         <Button 
                           variant={isActive ? "secondary" : "ghost"} 
                           size="sm" 
-                           className={`w-full justify-start gap-3 h-12 ${
+                          className={`w-full justify-start gap-3 h-12 ${
                              isActive 
-                               ? (item.href === '/fast' && resolvedTheme === 'light' 
-                                   ? 'bg-[#FFDFEC] text-gray-800 hover:bg-[#FFDFEC]/90' 
+                               ? (item.href === '/fast' 
+                                   ? 'bg-[#32162C] text-white hover:bg-[#32162C]/90' 
                                    : 'bg-[#00ff90] text-black hover:bg-[#00ff90]/90')
                                : 'text-white hover:text-foreground hover:bg-muted/10'
-                           } ${item.special === 'pulse' ? 'animate-[pulse_1s_ease-in-out_infinite]' : ''}`}
+                           }`}
                          >
-                           <item.icon className={`w-5 h-5 ${item.special === 'pulse' ? 'text-[#ff2389]' : ''}`} />
-                           <span className={item.special === 'pulse' ? 'text-[#ff2389]' : ''}>{item.label}</span>
+                           <item.icon className={`w-5 h-5 ${isActive && item.href === '/fast' ? 'text-white' : ''}`} />
+                           <span className={isActive && item.href === '/fast' ? 'text-white' : ''}>{item.label}</span>
                          </Button>
                       </Link>
                     );
                   })}
                   
-                  {/* Auth Actions */}
+                   {/* Wallet and Transactions Buttons */}
+                  {isLoggedIn && (
+                    <div className="border-t border-border pt-4 mt-2 space-y-2">
+                      <Link to="/wallet" onClick={handleMobileNavClick}>
+                        <Button variant="ghost" className="w-full justify-start gap-3 h-12 text-white hover:text-foreground hover:bg-muted/10">
+                          <Wallet className="w-5 h-5" />
+                          Carteira
+                        </Button>
+                      </Link>
+                      <Link to="/transactions" onClick={handleMobileNavClick}>
+                        <Button variant="ghost" className="w-full justify-start gap-3 h-12 text-white hover:text-foreground hover:bg-muted/10">
+                          <Receipt className="w-5 h-5" />
+                          Transações
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+
+                   {/* Auth Actions */}
                   {isLoggedIn ? (
                     <div className="border-t border-border pt-4 mt-4">
                       <Button 

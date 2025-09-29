@@ -98,20 +98,26 @@ const Admin = () => {
   const activeAnalysts = Object.values(pools).reduce((sum, pool) => sum + (pool.simCount > 0 || pool.naoCount > 0 ? 1 : 0), 0);
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex overflow-x-hidden">
       <AdminSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       
-      <div className="flex-1 lg:ml-0">
-        {/* Mobile header */}
-        <div className="lg:hidden flex items-center justify-between p-4 border-b border-border">
+      <div className="flex-1 lg:ml-0 min-w-0">
+        {/* Mobile header - Different from main header */}
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-border bg-card">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setSidebarOpen(true)}
+            className="p-2"
           >
             <Menu className="h-4 w-4" />
+            <span className="sr-only">Abrir menu admin</span>
           </Button>
-          <h1 className="font-bold">Admin Panel</h1>
+          <div className="flex items-center gap-2">
+            <Shield className="h-5 w-5 text-primary" />
+            <h1 className="font-bold text-lg">Admin Panel</h1>
+          </div>
+          <div className="w-8"></div> {/* Spacer for centering */}
         </div>
         
         <div className="max-w-[1400px] mx-auto px-4 py-8">

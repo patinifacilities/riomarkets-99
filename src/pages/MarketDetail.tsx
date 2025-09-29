@@ -195,11 +195,17 @@ const MarketDetail = () => {
                       variant="ghost" 
                       size="sm" 
                       className="text-muted-foreground hover:text-foreground"
+                      onClick={() => {
+                        const content = document.getElementById('wallet-content');
+                        if (content) {
+                          content.style.display = content.style.display === 'none' ? 'block' : 'none';
+                        }
+                      }}
                     >
-                      ↕️
+                      <ArrowLeft className="w-4 h-4" />
                     </Button>
                   </div>
-                  <div className="p-4">
+                  <div id="wallet-content" className="p-4">
                   
                    <div className="space-y-4">
                       {(userProfile?.saldo_moeda || 0) > 0 ? (
