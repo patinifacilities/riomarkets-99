@@ -9,10 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRightLeft, Wallet, Loader2, TrendingUp, Flame, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { ArrowRightLeft, Wallet, Loader2, TrendingUp, Flame, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useMarkets } from '@/hooks/useMarkets';
-import { useMarketStats } from '@/hooks/useMarketStats';
 
 const Exchange = () => {
   const { user } = useAuth();
@@ -232,7 +231,6 @@ const Exchange = () => {
         </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
           {/* Interface de Troca */}
           <Card className="lg:col-span-2">
             <CardHeader>
@@ -374,73 +372,6 @@ const Exchange = () => {
                     <Button 
                       onClick={handleExchange}
                       disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > getMaxAmount()}
-                      className="w-full"
-                    >
-                      {loading ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : (
-                        <ArrowRightLeft className="h-4 w-4 mr-2" />
-                      )}
-                      Comprar RIOZ
-                    </Button>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="sell" className="space-y-4">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Quantidade RIOZ a vender (máximo: {getMaxAmount().toLocaleString('pt-BR')} RZ)</Label>
-                      <Input
-                        type="number"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        placeholder="0"
-                        max={getMaxAmount()}
-                        step="1"
-                        min="0"
-                      />
-                    </div>
-
-                    {/* Slider Percentage */}
-                    <div className="space-y-3">
-                      <Label>Selecionar percentual do saldo</Label>
-                      <Slider
-                        value={sliderPercent}
-                        onValueChange={handleSliderChange}
-                        max={100}
-                        step={1}
-                        className="w-full"
-                      />
-                      <div className="flex justify-between gap-2 text-sm text-muted-foreground">
-                        {[0, 25, 50, 75, 100].map((percent) => (
-                          <span
-                            key={percent}
-                            className="cursor-pointer hover:text-foreground transition-colors"
-                            onClick={() => setPercentage(percent)}
-                          >
-                            {percent}%
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Calculation Display - only show when amount > 0 */}
-                    {(parseFloat(amount) > 0) && (
-                      <div className="bg-success/10 border border-success/20 rounded-lg p-4 space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Você vende:</span>
-                          <span className="font-medium">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
-                        </div>
-                        <div className="flex justify-between text-sm border-t pt-2">
-                          <span>Você recebe:</span>
-                          <span className="font-medium text-success">R$ {(parseFloat(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <Button 
-                      onClick={handleExchange}
-                      disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > getMaxAmount()}
                       variant="destructive"
                       className="w-full"
                     >
@@ -454,39 +385,6 @@ const Exchange = () => {
                   </div>
                 </TabsContent>
               </Tabs>
-            </CardContent>
-                    
-                    <Button 
-                      onClick={handleExchange}
-                      disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > getMaxAmount()}
-                      variant="destructive"
-                      className="w-full"
-                    >
-                      {loading ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : (
-                        <ArrowRightLeft className="h-4 w-4 mr-2" />
-                      )}
-                      Vender RIOZ
-                    </Button>
-                  </div>
-                </TabsContent>
-              </Tabs>
-
-              {/* Disclaimer - only show when user interacts */}
-              {(parseFloat(amount) > 0) && (
-                <div className="mt-6 bg-success/10 border border-success/20 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 text-success mt-0.5 flex-shrink-0" />
-                    <div className="text-sm">
-                      <p className="font-medium text-success mb-1">
-                        Uma taxa de <strong>1%</strong> é cobrada em todas as conversões. 
-                        Para realizar análises na plataforma, é necessário ter saldo em RIOZ Coin.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
 
