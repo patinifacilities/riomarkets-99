@@ -230,234 +230,235 @@ const Exchange = () => {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Interface de Troca */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ArrowRightLeft className="h-5 w-5" />
-                Trade
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Tabs value={activeTab} onValueChange={(value: any) => setActiveTab(value)}>
-                <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="buy" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+        {/* Interface de Troca */}
+        <Card className="max-w-4xl mx-auto mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ArrowRightLeft className="h-5 w-5" />
+              Trade
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={activeTab} onValueChange={(value: any) => setActiveTab(value)}>
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="buy" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  Comprar RIOZ
+                </TabsTrigger>
+                <TabsTrigger value="sell" className="data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground">
+                  Vender RIOZ
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="buy" className="space-y-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Valor a converter (máximo: R$ {getMaxAmount().toLocaleString('pt-BR', { minimumFractionDigits: 2 })})</Label>
+                    <Input
+                      type="number"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      placeholder="0"
+                      max={getMaxAmount()}
+                      step="1"
+                      min="0"
+                    />
+                  </div>
+
+                  {/* Slider Percentage */}
+                  <div className="space-y-3">
+                    <Label>Selecionar percentual do saldo</Label>
+                    <Slider
+                      value={sliderPercent}
+                      onValueChange={handleSliderChange}
+                      max={100}
+                      step={1}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between gap-2 text-sm text-muted-foreground">
+                      {[0, 25, 50, 75, 100].map((percent) => (
+                        <span
+                          key={percent}
+                          className="cursor-pointer hover:text-foreground transition-colors"
+                          onClick={() => setPercentage(percent)}
+                        >
+                          {percent}%
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Calculation Display - only show when amount > 0 */}
+                  {(parseFloat(amount) > 0) && (
+                    <div className="bg-success/10 border border-success/20 rounded-lg p-4 space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Valor:</span>
+                        <span className="font-medium">R$ {(parseFloat(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="flex justify-between text-sm border-t pt-2">
+                        <span>Você recebe:</span>
+                        <span className="font-medium text-success">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <Button 
+                    onClick={handleExchange}
+                    disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > getMaxAmount()}
+                    className="w-full"
+                  >
+                    {loading ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <ArrowRightLeft className="h-4 w-4 mr-2" />
+                    )}
                     Comprar RIOZ
-                  </TabsTrigger>
-                  <TabsTrigger value="sell" className="data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground">
+                  </Button>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="sell" className="space-y-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Quantidade RIOZ a vender (máximo: {getMaxAmount().toLocaleString('pt-BR')} RZ)</Label>
+                    <Input
+                      type="number"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      placeholder="0"
+                      max={getMaxAmount()}
+                      step="1"
+                      min="0"
+                    />
+                  </div>
+
+                  {/* Slider Percentage */}
+                  <div className="space-y-3">
+                    <Label>Selecionar percentual do saldo</Label>
+                    <Slider
+                      value={sliderPercent}
+                      onValueChange={handleSliderChange}
+                      max={100}
+                      step={1}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between gap-2 text-sm text-muted-foreground">
+                      {[0, 25, 50, 75, 100].map((percent) => (
+                        <span
+                          key={percent}
+                          className="cursor-pointer hover:text-foreground transition-colors"
+                          onClick={() => setPercentage(percent)}
+                        >
+                          {percent}%
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Calculation Display - only show when amount > 0 */}
+                  {(parseFloat(amount) > 0) && (
+                    <div className="bg-success/10 border border-success/20 rounded-lg p-4 space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Você vende:</span>
+                        <span className="font-medium">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
+                      </div>
+                      <div className="flex justify-between text-sm border-t pt-2">
+                        <span>Você recebe:</span>
+                        <span className="font-medium text-success">R$ {(parseFloat(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <Button 
+                    onClick={handleExchange}
+                    disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > getMaxAmount()}
+                    variant="destructive"
+                    className="w-full"
+                  >
+                    {loading ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <ArrowRightLeft className="h-4 w-4 mr-2" />
+                    )}
                     Vender RIOZ
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="buy" className="space-y-4">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Valor a converter (máximo: R$ {getMaxAmount().toLocaleString('pt-BR', { minimumFractionDigits: 2 })})</Label>
-                      <Input
-                        type="number"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        placeholder="0"
-                        max={getMaxAmount()}
-                        step="1"
-                        min="0"
-                      />
-                    </div>
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
 
-                    {/* Slider Percentage */}
-                    <div className="space-y-3">
-                      <Label>Selecionar percentual do saldo</Label>
-                      <Slider
-                        value={sliderPercent}
-                        onValueChange={handleSliderChange}
-                        max={100}
-                        step={1}
-                        className="w-full"
-                      />
-                      <div className="flex justify-between gap-2 text-sm text-muted-foreground">
-                        {[0, 25, 50, 75, 100].map((percent) => (
-                          <span
-                            key={percent}
-                            className="cursor-pointer hover:text-foreground transition-colors"
-                            onClick={() => setPercentage(percent)}
-                          >
-                            {percent}%
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Calculation Display - only show when amount > 0 */}
-                    {(parseFloat(amount) > 0) && (
-                      <div className="bg-success/10 border border-success/20 rounded-lg p-4 space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Valor:</span>
-                          <span className="font-medium">R$ {(parseFloat(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                        <div className="flex justify-between text-sm border-t pt-2">
-                          <span>Você recebe:</span>
-                          <span className="font-medium text-success">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
-                        </div>
+        {/* Hot Markets Horizontal Scrolling */}
+        <div className="mt-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Flame className="h-5 w-5 text-orange-500" />
+            <h2 className="text-xl font-semibold">Mercados Hot</h2>
+          </div>
+          
+          <div className="relative overflow-hidden">
+            <div className="flex gap-4 animate-scroll-right">
+              {[...topMarkets, ...topMarkets].map((market, index) => (
+                <Card 
+                  key={`${market.id}-${index}`} 
+                  className="min-w-[320px] cursor-pointer hover:border-primary/50 transition-all"
+                  onClick={() => window.location.href = `/market/${market.id}`}
+                >
+                  <CardContent className="p-4">
+                    {/* Thumbnail Image */}
+                    {market.thumbnail_url && (
+                      <div className="w-full h-20 mb-3 rounded-lg overflow-hidden">
+                        <img 
+                          src={market.thumbnail_url} 
+                          alt={market.titulo}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                     )}
                     
-                    <Button 
-                      onClick={handleExchange}
-                      disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > getMaxAmount()}
-                      className="w-full"
-                    >
-                      {loading ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : (
-                        <ArrowRightLeft className="h-4 w-4 mr-2" />
-                      )}
-                      Comprar RIOZ
-                    </Button>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="sell" className="space-y-4">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Quantidade RIOZ a vender (máximo: {getMaxAmount().toLocaleString('pt-BR')} RZ)</Label>
-                      <Input
-                        type="number"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        placeholder="0"
-                        max={getMaxAmount()}
-                        step="1"
-                        min="0"
-                      />
-                    </div>
-
-                    {/* Slider Percentage */}
-                    <div className="space-y-3">
-                      <Label>Selecionar percentual do saldo</Label>
-                      <Slider
-                        value={sliderPercent}
-                        onValueChange={handleSliderChange}
-                        max={100}
-                        step={1}
-                        className="w-full"
-                      />
-                      <div className="flex justify-between gap-2 text-sm text-muted-foreground">
-                        {[0, 25, 50, 75, 100].map((percent) => (
-                          <span
-                            key={percent}
-                            className="cursor-pointer hover:text-foreground transition-colors"
-                            onClick={() => setPercentage(percent)}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="destructive" className="text-xs animate-pulse">
+                            HOT
+                          </Badge>
+                          {index === 0 && (
+                            <TrendingUp className="h-4 w-4 text-success animate-bounce" />
+                          )}
+                        </div>
+                        <h4 className="font-medium text-sm leading-tight mb-2">
+                          {market.titulo}
+                        </h4>
+                        <div className="flex gap-2 mb-3">
+                          <Button 
+                            size="sm" 
+                            className="bg-[#00ff90] hover:bg-[#00ff90]/90 text-black text-xs px-3 py-1 h-7"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.location.href = `/market/${market.id}`;
+                            }}
                           >
-                            {percent}%
-                          </span>
-                        ))}
+                            SIM {market.odds?.sim?.toFixed(2)}x
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white text-xs px-3 py-1 h-7"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.location.href = `/market/${market.id}`;
+                            }}
+                          >
+                            NÃO {market.odds?.nao?.toFixed(2)}x
+                          </Button>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Volume: R$ {market.volume24h?.toLocaleString()}
+                        </div>
                       </div>
                     </div>
-
-                    {/* Calculation Display - only show when amount > 0 */}
-                    {(parseFloat(amount) > 0) && (
-                      <div className="bg-success/10 border border-success/20 rounded-lg p-4 space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Você vende:</span>
-                          <span className="font-medium">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
-                        </div>
-                        <div className="flex justify-between text-sm border-t pt-2">
-                          <span>Você recebe:</span>
-                          <span className="font-medium text-success">R$ {(parseFloat(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <Button 
-                      onClick={handleExchange}
-                      disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > getMaxAmount()}
-                      variant="destructive"
-                      className="w-full"
-                    >
-                      {loading ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : (
-                        <ArrowRightLeft className="h-4 w-4 mr-2" />
-                      )}
-                      Vender RIOZ
-                    </Button>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-
-          {/* Hot Markets Mini Cards */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Flame className="h-5 w-5 text-orange-500" />
-                Mercados Hot
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {topMarkets.length > 0 ? (
-                  topMarkets.map((market, index) => (
-                    <Card 
-                      key={market.id} 
-                      className="cursor-pointer hover:border-primary/50 transition-all"
-                      onClick={() => window.location.href = `/market/${market.id}`}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge variant="destructive" className="text-xs animate-pulse">
-                                HOT
-                              </Badge>
-                              {index === 0 && (
-                                <TrendingUp className="h-4 w-4 text-success animate-bounce" />
-                              )}
-                            </div>
-                            <h4 className="font-medium text-sm leading-tight mb-2">
-                              {market.titulo}
-                            </h4>
-                            <div className="flex gap-2 mb-3">
-                              <Button 
-                                size="sm" 
-                                className="bg-[#00ff90] hover:bg-[#00ff90]/90 text-black text-xs px-3 py-1 h-7"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  window.location.href = `/market/${market.id}`;
-                                }}
-                              >
-                                SIM {market.odds?.sim?.toFixed(2)}x
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white text-xs px-3 py-1 h-7"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  window.location.href = `/market/${market.id}`;
-                                }}
-                              >
-                                NÃO {(market.odds?.não || market.odds?.nao)?.toFixed(2)}x
-                              </Button>
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              Volume 24h: {market.volume24h.toLocaleString()} RZ
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                ) : (
-                  <div className="text-center py-4 text-muted-foreground">
-                    <Flame className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Nenhum mercado ativo</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

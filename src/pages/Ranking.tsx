@@ -10,7 +10,7 @@ import { useProfile } from '@/hooks/useProfile';
 const Ranking = () => {
   const { user } = useAuth();
   const { data: profile } = useProfile(user?.id);
-  const sortedUsers = [...fakeUsers].sort((a, b) => b.saldo_moeda - a.saldo_moeda);
+  const sortedUsers = [...fakeUsers, ...fakeUsers].sort((a, b) => b.saldo_moeda - a.saldo_moeda).slice(0, 25);
   
   const stats = {
     totalUsers: fakeUsers.length,
@@ -74,64 +74,6 @@ const Ranking = () => {
           </p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-sm">Total Analistas</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {stats.totalUsers}
-                  </p>
-                </div>
-                <Users className="w-8 h-8 text-primary" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-sm">Volume Total</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {stats.totalVolume.toLocaleString()} RZ
-                  </p>
-                </div>
-                <BarChart3 className="w-8 h-8 text-accent" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground text-sm">Precisão Média</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {stats.averageAccuracy}%
-                  </p>
-                </div>
-                <Target className="w-8 h-8 text-success" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-primary border-primary/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-primary-foreground/80 text-sm">Líder Atual</p>
-                  <p className="text-2xl font-bold text-primary-foreground">
-                    {sortedUsers[0]?.saldo_moeda.toLocaleString() || '0'} RZ
-                  </p>
-                </div>
-                <Award className="w-8 h-8 text-primary-foreground/60" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* User Progress Section */}
         {profile && (
@@ -223,15 +165,15 @@ const Ranking = () => {
               Ranking Geral
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-2">
             {sortedUsers.map((user, index) => (
-              <div key={user.id} className="flex items-center justify-between p-4 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-card/50 transition-all">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-bold">
+              <div key={`${user.id}-${index}`} className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-card/50 transition-all">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary font-bold text-sm">
                     {index + 1}
                   </div>
                   
-                  <Avatar className="w-12 h-12">
+                  <Avatar className="w-10 h-10">
                     <AvatarImage src={user.avatar} alt={user.nome} />
                     <AvatarFallback className="bg-primary/20 text-primary">
                       {user.nome.split(' ').map(n => n[0]).join('')}
@@ -240,23 +182,19 @@ const Ranking = () => {
                   
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold">{user.nome}</h3>
+                      <h3 className="font-semibold text-sm">{user.nome}</h3>
                       {getLevelBadge(user.nivel)}
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>Precisão: <span className="text-success font-medium">{((user.analises_certas / user.total_analises) * 100).toFixed(1)}%</span></span>
-                      <span>({user.analises_certas}/{user.total_analises})</span>
+                    <div className="text-xs text-muted-foreground">
+                      Precisão: <span className="text-success font-medium">{((user.analises_certas / user.total_analises) * 100).toFixed(1)}%</span> • ({user.analises_certas}/{user.total_analises})
                     </div>
                   </div>
                 </div>
                 
                 <div className="text-right">
-                  <div className="font-bold text-lg">{user.saldo_moeda.toLocaleString()} RZ</div>
-                  <div className="text-sm text-muted-foreground">
-                    Ganho: <span className="text-success">+{user.ganho_total.toLocaleString()} RZ</span>
-                  </div>
+                  <div className="font-bold text-sm">{user.saldo_moeda.toLocaleString()} RZ</div>
                   <div className="text-xs text-muted-foreground">
-                    Depositado: {user.total_depositado.toLocaleString()} RZ
+                    +{user.ganho_total.toLocaleString()} RZ
                   </div>
                 </div>
               </div>
