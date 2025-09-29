@@ -1,17 +1,28 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, TrendingUp, Percent, RefreshCw, ArrowLeft } from 'lucide-react';
+import { DollarSign, TrendingUp, Percent, RefreshCw, ArrowLeft, PieChart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { Navigate, Link } from 'react-router-dom';
+import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
+import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 interface RevenueData {
   cancellationFees: number;
   poolFees: number;
   conversionFees: number;
   totalRevenue: number;
+}
+
+interface PaymentMethodData {
+  method: string;
+  value: number;
+  percentage: number;
+  fill: string;
+  [key: string]: any;
 }
 
 const AdminRevenue = () => {
@@ -23,7 +34,10 @@ const AdminRevenue = () => {
     conversionFees: 0,
     totalRevenue: 0
   });
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethodData[]>([]);
+  const [monthlyRevenue, setMonthlyRevenue] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (user?.id && profile?.is_admin) {
@@ -53,8 +67,8 @@ const AdminRevenue = () => {
         .eq('status', 'liquidado');
 
       const cancellationFees = cancellationData?.reduce((sum, t) => sum + Math.abs(t.valor), 0) || 0;
-      const conversionFees = conversionData?.reduce((sum, t) => sum + t.valor, 0) || 0; // No need for Math.abs as it's already positive revenue
-      const poolFees = (marketsData?.length || 0) * 100; // Estimativa
+      const conversionFees = conversionData?.reduce((sum, t) => sum + t.valor, 0) || 0;
+      const poolFees = (marketsData?.length || 0) * 100;
 
       setRevenueData({
         cancellationFees,
@@ -62,6 +76,24 @@ const AdminRevenue = () => {
         conversionFees,
         totalRevenue: cancellationFees + poolFees + conversionFees
       });
+
+      // Mock data for payment methods (PIX, Credit Card, etc.)
+      setPaymentMethods([
+        { method: 'PIX', value: 125000, percentage: 65, fill: 'hsl(var(--chart-1))' },
+        { method: 'Cartão de Crédito', value: 48000, percentage: 25, fill: 'hsl(var(--chart-2))' },
+        { method: 'Boleto', value: 19200, percentage: 10, fill: 'hsl(var(--chart-3))' }
+      ]);
+
+      // Mock monthly revenue data
+      setMonthlyRevenue([
+        { month: 'Jan', revenue: 45000, fees: 2000 },
+        { month: 'Fev', revenue: 52000, fees: 2300 },
+        { month: 'Mar', revenue: 48000, fees: 2100 },
+        { month: 'Abr', revenue: 61000, fees: 2800 },
+        { month: 'Mai', revenue: 55000, fees: 2500 },
+        { month: 'Jun', revenue: 67000, fees: 3100 }
+      ]);
+
     } catch (error) {
       console.error('Erro ao buscar dados de receita:', error);
     } finally {
@@ -84,8 +116,11 @@ const AdminRevenue = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background flex">
+      <AdminSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      
+      <div className="flex-1 lg:ml-0">
+        <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
             <Link to="/admin" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-2">
@@ -161,8 +196,80 @@ const AdminRevenue = () => {
           </Card>
         </div>
 
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Payment Methods Distribution */}
+          <Card className="bg-card-secondary border-border-secondary">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <PieChart className="w-5 h-5" />
+                Métodos de Pagamento - Depósitos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={{
+                pix: { label: "PIX", color: "hsl(var(--chart-1))" },
+                credit: { label: "Cartão", color: "hsl(var(--chart-2))" },
+                boleto: { label: "Boleto", color: "hsl(var(--chart-3))" }
+              }}>
+                <ResponsiveContainer width="100%" height={300}>
+                  <RechartsPieChart>
+                    <Pie
+                      data={paymentMethods}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                      label={({ percentage }) => `${percentage}%`}
+                    >
+                      {paymentMethods.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip 
+                      content={<ChartTooltipContent />}
+                      formatter={(value: any) => [`R$ ${(value / 100).toLocaleString('pt-BR')}`, 'Valor']}
+                    />
+                  </RechartsPieChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+
+          {/* Monthly Revenue */}
+          <Card className="bg-card-secondary border-border-secondary">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                Receita Mensal
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={{
+                revenue: { label: "Receita", color: "hsl(var(--chart-1))" },
+                fees: { label: "Taxas", color: "hsl(var(--chart-2))" }
+              }}>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={monthlyRevenue}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis tickFormatter={(value) => `R$ ${(value / 100).toLocaleString('pt-BR')}`} />
+                    <ChartTooltip 
+                      content={<ChartTooltipContent />}
+                      formatter={(value: any) => [`R$ ${(value / 100).toLocaleString('pt-BR')}`, '']}
+                    />
+                    <Bar dataKey="revenue" fill="hsl(var(--chart-1))" name="Receita" />
+                    <Bar dataKey="fees" fill="hsl(var(--chart-2))" name="Taxas" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Revenue Breakdown */}
-        <Card>
+        <Card className="bg-card-secondary border-border-secondary">
           <CardHeader>
             <CardTitle>Detalhamento da Receita</CardTitle>
           </CardHeader>
@@ -220,6 +327,7 @@ const AdminRevenue = () => {
             )}
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );
