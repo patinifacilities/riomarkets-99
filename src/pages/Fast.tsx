@@ -219,8 +219,9 @@ const Fast = () => {
       for (const bet of currentRoundBets) {
         const poolWinner = poolResults[bet.poolId];
         if (bet.side === poolWinner) {
-          // Winner! Pay out the winnings
-          const winAmount = Math.floor(bet.amount * bet.odds);
+          // Winner! Calculate profit based on odds
+          const profit = Math.floor(bet.amount * bet.odds - bet.amount);
+          const totalPayout = bet.amount + profit;
           
           const { data: currentProfile } = await supabase
             .from('profiles')
@@ -232,7 +233,7 @@ const Fast = () => {
             await supabase
               .from('profiles')
               .update({ 
-                saldo_moeda: currentProfile.saldo_moeda + winAmount
+                saldo_moeda: currentProfile.saldo_moeda + totalPayout
               })
               .eq('id', bet.userId);
           }
@@ -244,13 +245,13 @@ const Fast = () => {
               id: `fast_win_${bet.poolId}_${bet.userId}_${Date.now()}`,
               user_id: bet.userId,
               tipo: 'credito',
-              valor: winAmount,
-              descricao: `Vitória Fast Market - Pool ${bet.poolId} (${poolWinner.toUpperCase()})`
+              valor: totalPayout,
+              descricao: `Vitória Fast Market - Pool ${bet.poolId} (${poolWinner.toUpperCase()}) - Lucro: ${profit} RZ`
             });
             
           // Track user winnings for animation
           if (bet.userId === user?.id) {
-            totalUserWinnings += winAmount;
+            totalUserWinnings += profit;
           }
         }
       }
@@ -260,15 +261,23 @@ const Fast = () => {
         const animationTarget = document.getElementById('fast-winner-animation-target');
         if (animationTarget) {
           const animationElement = document.createElement('div');
-          animationElement.className = 'bg-[#00ff90] text-black px-3 py-1 rounded-full text-sm font-bold animate-bounce shadow-lg whitespace-nowrap';
-          animationElement.textContent = `+${totalUserWinnings} RZ`;
-          animationTarget.appendChild(animationElement);
+          animationElement.className = 'fixed z-[100] bg-gradient-to-r from-[#00ff90] to-[#00ff90]/90 text-black px-4 py-2 rounded-full text-base font-bold animate-[bounce_0.5s_ease-in-out_3] shadow-2xl whitespace-nowrap border-2 border-white';
+          animationElement.textContent = `+${totalUserWinnings} RZ LUCRO!`;
+          animationElement.style.cssText = 'top: 60px; right: 20px; transform: translateX(-50%); animation-duration: 0.5s;';
+          document.body.appendChild(animationElement);
+          
+          // Show notification
+          toast({
+            title: "🎉 Parabéns!",
+            description: `Você ganhou ${totalUserWinnings} RZ de lucro!`,
+            className: "bg-[#00ff90] text-black border-[#00ff90]"
+          });
           
           setTimeout(() => {
-            if (animationTarget.contains(animationElement)) {
-              animationTarget.removeChild(animationElement);
+            if (document.body.contains(animationElement)) {
+              document.body.removeChild(animationElement);
             }
-          }, 3000);
+          }, 4000);
         }
       }
       
@@ -315,7 +324,7 @@ const Fast = () => {
       
       setTimeout(() => {
         setWinnerResults({});
-      }, 4500); // 50% mais tempo (3s -> 4.5s)
+      }, 6750); // Mais 50% do tempo (4.5s -> 6.75s)
     }
   }, [countdown, currentRound, currentPools]);
 
@@ -341,18 +350,8 @@ const Fast = () => {
       return;
     }
 
-    // Add click animation and visual feedback
+    // Simple visual feedback
     setClickedPool({ id: poolId, side });
-    
-    // Show success animation on the specific button
-    const buttonElement = document.querySelector(`[data-pool-id="${poolId}"][data-side="${side}"]`);
-    if (buttonElement) {
-      buttonElement.classList.add('animate-pulse', 'bg-[#00ff90]', 'scale-105');
-      setTimeout(() => {
-        buttonElement.classList.remove('animate-pulse', 'bg-[#00ff90]', 'scale-105');
-      }, 1000);
-    }
-    
     setTimeout(() => setClickedPool(null), 200);
 
     try {
@@ -394,8 +393,8 @@ const Fast = () => {
       localStorage.setItem('fastBets', JSON.stringify(fastBets));
 
       toast({
-        title: "Opinião registrada!",
-        description: `Você opinou ${side.toUpperCase()} com ${betAmount} RZ.`,
+        title: "Ordem enviada!",
+        description: `Opinião ${side.toUpperCase()} registrada com ${betAmount} RZ no Pool ${poolId}.`,
       });
 
       refetchProfile();
@@ -684,7 +683,7 @@ const Fast = () => {
                 <p>• Resultados individuais aleatórios para cada pool (MVP)</p>
                 <p>• Novos pools começam automaticamente a cada minuto</p>
                 <p>• Os odds diminuem conforme o tempo passa</p>
-                <p>• Taxa de 5% cobrada por cada opinião</p>
+                <p>• Lucro calculado baseado nas odds no momento da opinião</p>
               </div>
             </CardContent>
           </Card>
