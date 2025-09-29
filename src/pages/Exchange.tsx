@@ -193,7 +193,7 @@ const Exchange = () => {
             <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30">
               <ArrowRightLeft className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold text-success">
               Exchange RIOZ
             </h1>
           </div>
@@ -230,7 +230,7 @@ const Exchange = () => {
                 <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30">
                   <ArrowRightLeft className="h-6 w-6 text-primary" />
                 </div>
-                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                <span className="text-white">
                   Exchange Central
                 </span>
               </CardTitle>

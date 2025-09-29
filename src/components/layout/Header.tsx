@@ -1,4 +1,4 @@
-import { TrendingUp, Wallet, Trophy, Settings, LogOut, User, LogIn, Receipt, Newspaper, ArrowRightLeft, Menu, Plus, UserCircle } from 'lucide-react';
+import { TrendingUp, Wallet, Trophy, Settings, LogOut, User, LogIn, Receipt, Newspaper, ArrowRightLeft, Menu, Plus, UserCircle, Zap } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
@@ -54,9 +54,9 @@ const Header = () => {
   const [walletHoverOpen, setWalletHoverOpen] = useState(false);
 
   const navItems = [
+    { href: '/fast', icon: Zap, label: 'Fast', special: 'pulse' },
     { href: '/', icon: TrendingUp, label: 'Mercados' },
     { href: '/exchange', icon: ArrowRightLeft, label: 'Exchange', authRequired: true },
-    { href: '/transactions', icon: Receipt, label: 'Transações', authRequired: true },
     { href: '/ranking', icon: Trophy, label: 'Ranking' },
     { href: '/press', icon: Newspaper, label: 'Na mídia' },
     { href: '/admin', icon: Settings, label: 'Admin', adminRequired: true }
@@ -159,15 +159,15 @@ const Header = () => {
                         <Button 
                           variant={isActive ? "secondary" : "ghost"} 
                           size="sm" 
-                          className={`w-full justify-start gap-3 h-12 ${
-                            isActive 
-                              ? 'bg-[#00ff90] text-black hover:bg-[#00ff90]/90' 
-                              : 'text-white hover:text-foreground hover:bg-muted/10'
-                          }`}
-                        >
-                          <item.icon className="w-5 h-5" />
-                          {item.label}
-                        </Button>
+                           className={`w-full justify-start gap-3 h-12 ${
+                             isActive 
+                               ? 'bg-[#00ff90] text-black hover:bg-[#00ff90]/90' 
+                               : 'text-white hover:text-foreground hover:bg-muted/10'
+                           } ${item.special === 'pulse' ? 'animate-pulse' : ''}`}
+                         >
+                           <item.icon className={`w-5 h-5 ${item.special === 'pulse' ? 'text-[#ff2389]' : ''}`} />
+                           <span className={item.special === 'pulse' ? 'text-[#ff2389]' : ''}>{item.label}</span>
+                         </Button>
                       </Link>
                     );
                   })}
@@ -252,10 +252,10 @@ const Header = () => {
                       isActive 
                         ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
                         : 'text-foreground/80 hover:text-foreground'
-                    }`}
+                    } ${item.special === 'pulse' ? 'animate-pulse' : ''}`}
                   >
-                    <item.icon className="w-4 h-4" />
-                    {item.label}
+                    <item.icon className={`w-4 h-4 ${item.special === 'pulse' ? 'text-[#ff2389]' : ''}`} />
+                    <span className={item.special === 'pulse' ? 'text-[#ff2389]' : ''}>{item.label}</span>
                   </Button>
                 </Link>
               );
@@ -304,13 +304,19 @@ const Header = () => {
                      </Button>
                    </DropdownMenuTrigger>
                    <DropdownMenuContent align="end" className="w-48">
-                     <DropdownMenuItem asChild>
-                       <Link to="/profile" className="flex items-center gap-2">
-                         <User className="w-4 h-4" />
-                         Meu Perfil
-                       </Link>
-                     </DropdownMenuItem>
-                     <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Meu Perfil
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/transactions" className="flex items-center gap-2">
+                      <Receipt className="w-4 h-4" />
+                      Transações
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                      <DropdownMenuItem 
                        onClick={signOut}
                        className="flex items-center gap-2 text-red-600 focus:text-red-600"
