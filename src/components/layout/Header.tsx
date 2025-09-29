@@ -26,7 +26,7 @@ import { DarkModeToggle } from './DarkModeToggle';
 import { AddBrlModal } from '@/components/exchange/AddBrlModal';
 
 import logoImageWhite from '@/assets/rio-markets-logo-new.png';
-import logoImageBlack from '@/assets/rio-markets-logo-new.png';
+import logoImageBlack from '@/assets/rio-markets-logo-light.png';
 import menuLogoWhite from '@/assets/riov3-markets-white-menu.png';
 import { useTheme } from 'next-themes';
 
@@ -163,7 +163,7 @@ const Header = () => {
                              isActive 
                                ? 'bg-[#00ff90] text-black hover:bg-[#00ff90]/90' 
                                : 'text-white hover:text-foreground hover:bg-muted/10'
-                           } ${item.special === 'pulse' ? 'animate-pulse' : ''}`}
+                           } ${item.special === 'pulse' ? 'animate-[pulse_1s_ease-in-out_infinite]' : ''}`}
                          >
                            <item.icon className={`w-5 h-5 ${item.special === 'pulse' ? 'text-[#ff2389]' : ''}`} />
                            <span className={item.special === 'pulse' ? 'text-[#ff2389]' : ''}>{item.label}</span>
@@ -252,7 +252,7 @@ const Header = () => {
                       isActive 
                         ? (item.href === '/fast' ? 'bg-[#32162C] text-white hover:bg-[#32162C]/90' : 'bg-primary text-primary-foreground hover:bg-primary/90')
                         : 'text-foreground/80 hover:text-foreground'
-                    } ${item.special === 'pulse' ? 'animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]' : ''}`}
+                    } ${item.special === 'pulse' ? 'animate-[pulse_1s_ease-in-out_infinite]' : ''}`}
                   >
                     <item.icon className={`w-4 h-4 ${item.special === 'pulse' ? 'text-[#ff2389]' : ''}`} />
                     <span className={item.special === 'pulse' ? 'text-[#ff2389]' : ''}>{item.label}</span>

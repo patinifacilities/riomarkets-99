@@ -10,6 +10,7 @@ import { useExchangeStore } from '@/stores/useExchangeStore';
 import { AddBrlModal } from '@/components/exchange/AddBrlModal';
 import { WithdrawModal } from '@/components/wallet/WithdrawModal';
 import { CancelBetModal } from '@/components/wallet/CancelBetModal';
+import { OrderHistoryCard } from '@/components/wallet/OrderHistoryCard';
 import TransactionItem from '@/components/wallet/TransactionItem';
 import OrderItem from '@/components/wallet/OrderItem';
 import ExportCSVButton from '@/components/ui/export-csv-button';
@@ -181,63 +182,11 @@ const WalletPage = () => {
           </Card>
 
           {/* Order History */}
-          <Card className="bg-secondary-glass border-border/50">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Histórico de Ordens</CardTitle>
-                <div className="flex gap-2">
-                  <Button 
-                    size="sm"
-                    variant="outline"
-                    className="text-xs px-2 py-1"
-                  >
-                    Sacar agora
-                  </Button>
-                  <Button 
-                    size="sm"
-                    variant="outline"
-                    style={{ backgroundColor: '#ff2389', color: 'white', borderColor: '#ff2389' }}
-                    className="hover:bg-[#ff2389]/90 text-xs px-2 py-1"
-                  >
-                    Cancelar
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {loadingOrders ? (
-                <div className="space-y-3">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-16 bg-muted/20 rounded animate-pulse" />
-                  ))}
-                </div>
-               ) : allOrders && allOrders.length > 0 ? (
-                 <div className="space-y-3 max-h-[500px] overflow-y-auto">
-                   {allOrders.map((order) => {
-                     const market = markets?.find(m => m.id === order.market_id);
-                     return (
-                        <div 
-                          key={order.id} 
-                          className="p-5 rounded-lg border border-border/50 hover:border-primary/30 transition-all cursor-pointer"
-                          onClick={() => market && (window.location.href = `/market/${market.id}`)}
-                        >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <OrderItem order={order} market={market} />
-                          </div>
-                        </div>
-                        </div>
-                     );
-                   })}
-                 </div>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>Nenhuma ordem encontrada</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <OrderHistoryCard onRefresh={() => {
+            refetchProfile();
+            refetchTransactions();
+            fetchBalance();
+          }} />
         </div>
 
         {/* Modals */}

@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useTheme } from 'next-themes';
 
 const Fast = () => {
   const [countdown, setCountdown] = useState(60);
@@ -19,6 +20,7 @@ const Fast = () => {
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
+  const { resolvedTheme } = useTheme();
   
   // Calculate dynamic odds based on countdown
   const getOdds = (baseOdds: number) => {
@@ -238,23 +240,27 @@ const Fast = () => {
       
       refetchProfile();
       
-      // Show winner notification with animation
-      const winnerElement = document.createElement('div');
-      winnerElement.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 text-white px-8 py-4 rounded-xl shadow-2xl animate-[scale-in_0.5s_ease-out] text-center min-w-[300px]';
-      winnerElement.innerHTML = `
-        <div class="text-2xl font-bold mb-2">🎉 Round #${currentRound - 1} Encerrado!</div>
-        <div class="text-lg">Vencedor: <span class="font-bold">${winningOption.toUpperCase()}</span></div>
-        <div class="text-sm opacity-90 mt-2">${currentRoundBets.filter((b: any) => b.side === winningOption).length} opinião(ões) premiada(s)</div>
-      `;
-      
-      document.body.appendChild(winnerElement);
-      
+      // Show winner notification with animation when round ends (last second)
       setTimeout(() => {
-        winnerElement.classList.add('animate-[fade-out_0.5s_ease-out]');
+        const winnerElement = document.createElement('div');
+        winnerElement.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 text-white px-8 py-4 rounded-xl shadow-2xl animate-[scale-in_0.5s_ease-out] text-center min-w-[300px]';
+        winnerElement.innerHTML = `
+          <div class="text-2xl font-bold mb-2">🎉 Round #${currentRound - 1} Encerrado!</div>
+          <div class="text-lg">Vencedor: <span class="font-bold">${winningOption.toUpperCase()}</span></div>
+          <div class="text-sm opacity-90 mt-2">${currentRoundBets.filter((b: any) => b.side === winningOption).length} opinião(ões) premiada(s)</div>
+        `;
+        
+        document.body.appendChild(winnerElement);
+        
         setTimeout(() => {
-          document.body.removeChild(winnerElement);
-        }, 500);
-      }, 3000);
+          winnerElement.classList.add('animate-[fade-out_0.5s_ease-out]');
+          setTimeout(() => {
+            if (document.body.contains(winnerElement)) {
+              document.body.removeChild(winnerElement);
+            }
+          }, 500);
+        }, 3000);
+      }, 500); // Show after half second to simulate last second animation
 
       toast({
         title: `Resultado Round #${currentRound - 1}`,
@@ -378,9 +384,9 @@ const Fast = () => {
             <Badge variant="destructive" className="bg-[#ff2389] text-white text-lg px-4 py-2">
               Round #{currentRound}
             </Badge>
-            <div className="flex items-center gap-2 text-2xl font-mono font-bold text-white">
+            <div className="flex items-center gap-2 text-2xl font-mono font-bold text-[#ff2389]">
               <Clock className="h-6 w-6 text-[#ff2389]" />
-              <span className="text-white">{formatTime(countdown)}</span>
+              <span className="text-[#ff2389]">{formatTime(countdown)}</span>
             </div>
           </div>
         </div>
@@ -393,13 +399,13 @@ const Fast = () => {
               {categories.map((category) => {
                 let activeClasses = "data-[state=active]:text-white";
                 if (category.id === 'commodities') {
-                  activeClasses = "data-[state=active]:bg-[#ffd800] data-[state=active]:text-gray-800";
+                  activeClasses = "data-[state=active]:bg-[#ffd800] data-[state=active]:text-gray-800 dark:data-[state=active]:bg-[#ffd800] dark:data-[state=active]:text-gray-800 light:data-[state=active]:bg-[#FFDFEC] light:data-[state=active]:text-gray-800";
                 } else if (category.id === 'crypto') {
-                  activeClasses = "data-[state=active]:bg-[#FF6101] data-[state=active]:text-white";
+                  activeClasses = "data-[state=active]:bg-[#FF6101] data-[state=active]:text-white dark:data-[state=active]:bg-[#FF6101] dark:data-[state=active]:text-white light:data-[state=active]:bg-[#FFDFEC] light:data-[state=active]:text-gray-800";
                 } else if (category.id === 'stocks') {
-                  activeClasses = "data-[state=active]:bg-[#00ff90] data-[state=active]:text-black";
+                  activeClasses = "data-[state=active]:bg-[#00ff90] data-[state=active]:text-black dark:data-[state=active]:bg-[#00ff90] dark:data-[state=active]:text-black light:data-[state=active]:bg-[#FFDFEC] light:data-[state=active]:text-gray-800";
                 } else {
-                  activeClasses = "data-[state=active]:bg-[#ff2389] data-[state=active]:text-white";
+                  activeClasses = "data-[state=active]:bg-[#ff2389] data-[state=active]:text-white dark:data-[state=active]:bg-[#ff2389] dark:data-[state=active]:text-white light:data-[state=active]:bg-[#FFDFEC] light:data-[state=active]:text-gray-800";
                 }
                 
                 return (
@@ -448,47 +454,143 @@ const Fast = () => {
           </div>
         </div>
 
-        {/* Bet Amount Selector - Positioned more discretely */}
+        {/* Bet Amount Slider - More discrete */}
         {user && (
-          <div className="fixed bottom-4 left-4 right-4 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:max-w-sm md:mx-auto md:mb-8">
-            <Card className="border border-[#ff2389]/20 bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm shadow-xl">
+          <div className="max-w-sm mx-auto mb-8">
+            <Card className="border border-[#ff2389]/20 bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-medium text-muted-foreground">Valor da Opinião</span>
                   <span className="text-sm font-bold text-primary">{(profile?.saldo_moeda || 0).toLocaleString()} RZ</span>
                 </div>
                 
-                <div className="flex items-center gap-2 mb-3">
+                <div className="space-y-3">
                   <input
-                    type="number"
-                    value={betAmount}
-                    onChange={(e) => setBetAmount(Math.max(1, Math.min(parseInt(e.target.value) || 0, profile?.saldo_moeda || 0)))}
-                    min="1"
-                    max={profile?.saldo_moeda || 0}
-                    className="flex-1 bg-background border border-border rounded px-3 py-2 text-center font-mono text-lg"
-                    placeholder="Valor"
+                    type="range"
+                    min="2"
+                    max="1000"
+                    value={Math.min(betAmount, Math.min(1000, profile?.saldo_moeda || 0))}
+                    onChange={(e) => setBetAmount(Math.min(parseInt(e.target.value), profile?.saldo_moeda || 0))}
+                    className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer slider-thumb"
+                    style={{
+                      background: `linear-gradient(to right, #ff2389 0%, #ff2389 ${(betAmount / Math.min(1000, profile?.saldo_moeda || 1000)) * 100}%, hsl(var(--muted)) ${(betAmount / Math.min(1000, profile?.saldo_moeda || 1000)) * 100}%, hsl(var(--muted)) 100%)`
+                    }}
                   />
-                  <span className="text-sm text-muted-foreground">RZ</span>
-                </div>
-                
-                <div className="grid grid-cols-4 gap-1">
-                  {[25, 50, 100, 200].map((amount) => (
-                    <Button
-                      key={amount}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setBetAmount(Math.min(amount, profile?.saldo_moeda || 0))}
-                      className="text-xs h-8"
-                      disabled={amount > (profile?.saldo_moeda || 0)}
-                    >
-                      {amount}
-                    </Button>
-                  ))}
+                  
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>2 RZ</span>
+                    <div className="text-center">
+                      <span className="text-lg font-bold text-primary">{betAmount} RZ</span>
+                    </div>
+                    <span>1.000 RZ</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
         )}
+
+        {/* Current Pools */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {currentPools.map((pool) => (
+            <Card 
+              key={pool.id} 
+              className={`
+                group transition-all duration-300 hover:scale-[1.02] cursor-pointer
+                bg-gradient-to-br from-card/95 to-card/80 
+                border border-border/50 hover:border-primary/30
+                backdrop-blur-sm
+                ${countdown <= 8 ? 'animate-pulse border-[#ff2389]/50' : ''}
+                ${resolvedTheme === 'light' ? 'border-2' : ''}
+              `}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <Badge 
+                      variant="secondary" 
+                      className={`mb-2 ${
+                        selectedCategory === 'commodities' ? 'bg-[#ffd800]/20 text-[#ffd800] border-[#ffd800]/50' :
+                        selectedCategory === 'crypto' ? 'bg-[#FF6101]/20 text-[#FF6101] border-[#FF6101]/50' :
+                        selectedCategory === 'stocks' ? 'bg-[#00ff90]/20 text-[#00ff90] border-[#00ff90]/50' :
+                        'bg-[#ff2389]/20 text-[#ff2389] border-[#ff2389]/50'
+                      }`}
+                    >
+                      {pool.asset}
+                    </Badge>
+                    <CardTitle className="text-lg leading-tight">{pool.question}</CardTitle>
+                  </div>
+                  <div className="text-right ml-4">
+                    <div className="text-sm text-muted-foreground">Preço Atual</div>
+                    <div className="font-mono font-bold text-primary">{pool.currentPrice}</div>
+                  </div>
+                </div>
+              </CardHeader>
+              
+              <CardContent className="pt-0">
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    onClick={() => placeBet(pool.id, 'sim', getOdds(pool.upOdds))}
+                    disabled={!user || countdown <= 5}
+                    className={`
+                      h-14 flex flex-col gap-1 bg-[#00ff90] text-black hover:bg-[#00ff90]/90 
+                      border-2 border-[#00ff90] hover:border-[#00ff90]/70
+                      transition-all duration-200 active:scale-95
+                      ${countdown <= 5 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
+                    `}
+                  >
+                    <div className="font-bold text-lg">SIM</div>
+                    <div className="text-sm font-mono">{getOdds(pool.upOdds).toFixed(2)}x</div>
+                  </Button>
+                  
+                  <Button
+                    onClick={() => placeBet(pool.id, 'nao', getOdds(pool.downOdds))}
+                    disabled={!user || countdown <= 5}
+                    className={`
+                      h-14 flex flex-col gap-1 bg-[#ff2389] text-white hover:bg-[#ff2389]/90
+                      border-2 border-[#ff2389] hover:border-[#ff2389]/70
+                      transition-all duration-200 active:scale-95
+                      ${countdown <= 5 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
+                    `}
+                  >
+                    <div className="font-bold text-lg">NÃO</div>
+                    <div className="text-sm font-mono">{getOdds(pool.downOdds).toFixed(2)}x</div>
+                  </Button>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-border/50">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>Encerra em</span>
+                    <span className="font-mono font-bold text-[#ff2389]">{formatTime(countdown)}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <style>{`
+          .slider-thumb::-webkit-slider-thumb {
+            appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #ff2389;
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 10px rgba(255, 35, 137, 0.5);
+          }
+          
+          .slider-thumb::-moz-range-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #ff2389;
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 10px rgba(255, 35, 137, 0.5);
+          }
+        `}</style>
 
         {/* Fast Pools Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

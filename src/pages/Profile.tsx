@@ -39,12 +39,12 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    // Only redirect if we're certain user is not authenticated
-    if (!isLoading && !isAuthenticated && !user) {
+    // Only redirect if we're certain user is not authenticated and there's no loading
+    if (!isLoading && !user) {
       navigate('/auth');
       return;
     }
-  }, [isAuthenticated, user, navigate, isLoading]);
+  }, [user, navigate, isLoading]);
 
   useEffect(() => {
     if (profile) {
