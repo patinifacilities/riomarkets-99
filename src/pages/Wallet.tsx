@@ -158,7 +158,7 @@ const WalletPage = () => {
                 <CardTitle>Histórico de Transações</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="bg-secondary-glass">
+            <CardContent className="bg-card">
               {loadingTransactions ? (
                 <div className="space-y-3">
                   {[...Array(5)].map((_, i) => (

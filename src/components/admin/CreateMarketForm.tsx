@@ -269,14 +269,14 @@ const CreateMarketForm = ({ onSuccess, onCancel }: CreateMarketFormProps) => {
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">Imagem do Mercado (URL)</label>
+          <label className="text-sm font-medium mb-2 block">Imagem do Mercado</label>
           <Input
             placeholder="https://exemplo.com/imagem.jpg"
             value={newMarket.thumbnailUrl}
             onChange={(e) => setNewMarket({...newMarket, thumbnailUrl: e.target.value})}
           />
           <p className="text-xs text-muted-foreground mt-1">
-            URL da imagem que será exibida no card do mercado
+            URL da imagem (JPG/PNG) ou faça upload de uma imagem
           </p>
         </div>
 

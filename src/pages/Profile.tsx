@@ -39,11 +39,11 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !user) {
       navigate('/auth');
       return;
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
     if (profile) {

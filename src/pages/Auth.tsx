@@ -457,7 +457,7 @@ const Auth = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <Button
                     type="button"
-                    className="min-h-[44px] bg-black text-white border border-gray-800 hover:bg-gray-900"
+                    className="min-h-[44px] bg-white text-black border border-gray-300 hover:bg-gray-50"
                     onClick={async () => {
                       try {
                         const { error } = await supabase.auth.signInWithOAuth({

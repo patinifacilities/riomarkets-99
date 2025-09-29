@@ -20,6 +20,7 @@ export const useMarkets = (categoryId?: string) => {
       if (error) throw error;
       return (data || []).map(market => adaptMarketFromDB(market)) as Market[];
     },
+    refetchInterval: 2000, // Auto-refresh every 2 seconds for real-time updates
   });
 };
 

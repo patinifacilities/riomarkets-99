@@ -1,6 +1,9 @@
+import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { useMarketPoolDetailed } from '@/hooks/useMarketPoolsDetailed';
+import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Market } from '@/types';
 
 interface OrderBookChartProps {
@@ -9,6 +12,33 @@ interface OrderBookChartProps {
 
 export const OrderBookChart = ({ market }: OrderBookChartProps) => {
   const marketPool = useMarketPoolDetailed(market);
+  const queryClient = useQueryClient();
+
+  // Set up real-time updates
+  useEffect(() => {
+    const subscription = supabase
+      .channel(`market_orderbook_${market.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'market_order_book_pools',
+          filter: `market_id=eq.${market.id}`
+        },
+        () => {
+          console.log('Order book updated, refreshing...');
+          // Invalidate and refetch market pools
+          queryClient.invalidateQueries({ queryKey: ['market-pools'] });
+          queryClient.invalidateQueries({ queryKey: ['market-pool', market.id] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [market.id, queryClient]);
 
   // Get aggregated data for SIM and NÃO
   const simData = marketPool?.options.find(opt => 
