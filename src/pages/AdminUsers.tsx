@@ -8,6 +8,7 @@ import { useProfiles } from '@/hooks/useProfiles';
 import { UserEditModal } from '@/components/admin/UserEditModal';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
 const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,8 +34,11 @@ const AdminUsers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background flex">
+      <AdminSidebar isOpen={false} onToggle={() => {}} />
+      
+      <div className="flex-1 lg:ml-0">
+        <div className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8">
           <Button
             variant="ghost"
@@ -48,7 +52,7 @@ const AdminUsers = () => {
         </div>
 
         {/* Search */}
-        <Card className="mb-6">
+        <Card className="mb-6 bg-card-secondary border-border-secondary">
           <CardContent className="p-6">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -63,7 +67,7 @@ const AdminUsers = () => {
         </Card>
 
         {/* Users Table */}
-        <Card>
+        <Card className="bg-card-secondary border-border-secondary">
           <CardHeader>
             <CardTitle>Lista de Usuários ({filteredUsers.length})</CardTitle>
           </CardHeader>
@@ -143,6 +147,7 @@ const AdminUsers = () => {
             setEditingUser(null);
           }}
         />
+        </div>
       </div>
     </div>
   );

@@ -1,267 +1,226 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { ArrowLeft, ArrowUpRight, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Link, Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { CreditCard, Search, Filter, Download, Eye } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-
-interface Payout {
-  id: string;
-  user_id: string;
-  user_name: string;
-  user_email: string;
-  amount_brl: number;
-  method: string;
-  pix_key?: string;
-  status: 'pending' | 'approved' | 'rejected' | 'processed';
-  created_at: string;
-  processed_at?: string;
-  admin_notes?: string;
-}
+import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
+import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
 const AdminPayouts = () => {
-  const [payouts, setPayouts] = useState<Payout[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const { toast } = useToast();
+  const { user, loading: authLoading } = useAuth();
+  const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  useEffect(() => {
-    fetchPayouts();
-  }, []);
+  // Security check
+  if (authLoading || profileLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
-  const fetchPayouts = async () => {
-    try {
-      setLoading(true);
-      
-      // Mock data for demonstration - replace with actual Supabase query
-      const mockPayouts: Payout[] = [
-        {
-          id: '1',
-          user_id: 'user-1',
-          user_name: 'João Silva',
-          user_email: 'joao@example.com',
-          amount_brl: 500.00,
-          method: 'PIX',
-          pix_key: 'joao@example.com',
-          status: 'pending',
-          created_at: new Date().toISOString()
-        },
-        {
-          id: '2',
-          user_id: 'user-2',
-          user_name: 'Maria Santos',
-          user_email: 'maria@example.com',
-          amount_brl: 1200.00,
-          method: 'PIX',
-          pix_key: '+55 11 99999-9999',
-          status: 'approved',
-          created_at: new Date(Date.now() - 86400000).toISOString(),
-          processed_at: new Date().toISOString()
-        }
-      ];
-      
-      setPayouts(mockPayouts);
-    } catch (error) {
-      console.error('Error fetching payouts:', error);
-      toast({
-        title: "Erro",
-        description: "Falha ao carregar saques",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
+  if (!user || !profile?.is_admin) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Mock payouts data
+  const payouts = [
+    {
+      id: '1',
+      user: 'Ana Costa',
+      amount: 750.00,
+      method: 'PIX',
+      status: 'completed',
+      date: '2024-01-15T14:20:00Z',
+      pixKey: 'ana@email.com'
+    },
+    {
+      id: '2',
+      user: 'Carlos Lima',
+      amount: 1200.00,
+      method: 'Transferência',
+      status: 'pending',
+      date: '2024-01-15T11:30:00Z',
+      bankAccount: '***-1234'
+    },
+    {
+      id: '3',
+      user: 'Fernanda Souza',
+      amount: 450.00,
+      method: 'PIX',
+      status: 'failed',
+      date: '2024-01-14T18:15:00Z',
+      pixKey: 'fernanda@email.com'
+    }
+  ];
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle className="w-4 h-4 text-success" />;
+      case 'pending':
+        return <Clock className="w-4 h-4 text-warning" />;
+      case 'failed':
+        return <XCircle className="w-4 h-4 text-destructive" />;
+      default:
+        return null;
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      pending: { variant: 'secondary' as const, text: 'Pendente' },
-      approved: { variant: 'default' as const, text: 'Aprovado' },
-      rejected: { variant: 'destructive' as const, text: 'Rejeitado' },
-      processed: { variant: 'default' as const, text: 'Processado' }
-    };
-    
-    const config = variants[status as keyof typeof variants] || variants.pending;
-    return <Badge variant={config.variant}>{config.text}</Badge>;
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return 'bg-success text-success-foreground';
+      case 'pending':
+        return 'bg-warning text-warning-foreground';
+      case 'failed':
+        return 'bg-destructive text-destructive-foreground';
+      default:
+        return 'bg-muted text-muted-foreground';
+    }
   };
 
-  const filteredPayouts = payouts.filter(payout => {
-    const matchesSearch = payout.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         payout.user_email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || payout.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
-  const totalAmount = filteredPayouts.reduce((sum, payout) => sum + payout.amount_brl, 0);
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Payouts</h1>
-          <p className="text-muted-foreground">
-            Gerencie solicitações de saque da plataforma
-          </p>
-        </div>
-        <Button className="gap-2">
-          <Download className="h-4 w-4" />
-          Exportar
-        </Button>
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4 text-primary" />
-              <div>
-                <p className="text-sm text-muted-foreground">Total Solicitado</p>
-                <p className="text-lg font-bold">
-                  R$ {totalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
+    <div className="min-h-screen bg-background flex">
+      <AdminSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      
+      <div className="flex-1 lg:ml-0">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <div className="flex items-center justify-between mb-8">
             <div>
-              <p className="text-sm text-muted-foreground">Pendentes</p>
-              <p className="text-lg font-bold">
-                {payouts.filter(p => p.status === 'pending').length}
+              <Link to="/admin" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-2">
+                <ArrowLeft className="w-4 h-4" />
+                Voltar
+              </Link>
+              <h1 className="text-3xl font-bold mb-2">Saques (Payouts)</h1>
+              <p className="text-muted-foreground">
+                Gerenciar e processar saques dos usuários
               </p>
             </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Aprovados</p>
-              <p className="text-lg font-bold">
-                {payouts.filter(p => p.status === 'approved').length}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Processados</p>
-              <p className="text-lg font-bold">
-                {payouts.filter(p => p.status === 'processed').length}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input
-                  placeholder="Buscar por usuário ou email..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="pending">Pendente</SelectItem>
-                <SelectItem value="approved">Aprovado</SelectItem>
-                <SelectItem value="rejected">Rejeitado</SelectItem>
-                <SelectItem value="processed">Processado</SelectItem>
-              </SelectContent>
-            </Select>
+            <Badge variant="destructive" className="text-xs">
+              ADMIN
+            </Badge>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Payouts Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Solicitações de Saque</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Usuário</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Valor</TableHead>
-                  <TableHead>Método</TableHead>
-                  <TableHead>Chave PIX</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredPayouts.map((payout) => (
-                  <TableRow key={payout.id}>
-                    <TableCell className="font-medium">{payout.user_name}</TableCell>
-                    <TableCell>{payout.user_email}</TableCell>
-                    <TableCell>
-                      R$ {payout.amount_brl.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </TableCell>
-                    <TableCell>{payout.method}</TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {payout.pix_key || '-'}
-                    </TableCell>
-                    <TableCell>{getStatusBadge(payout.status)}</TableCell>
-                    <TableCell>
-                      {new Date(payout.created_at).toLocaleDateString('pt-BR')}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        {payout.status === 'pending' && (
-                          <>
-                            <Button variant="default" size="sm">
-                              Aprovar
-                            </Button>
-                            <Button variant="destructive" size="sm">
-                              Rejeitar
-                            </Button>
-                          </>
-                        )}
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <Card className="bg-card-secondary border-border-secondary">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-destructive/10">
+                    <ArrowUpRight className="w-5 h-5 text-destructive" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Sacado</p>
+                    <p className="text-2xl font-bold">R$ 8.920</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card-secondary border-border-secondary">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-success/10">
+                    <CheckCircle className="w-5 h-5 text-success" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Processados</p>
+                    <p className="text-2xl font-bold">67</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card-secondary border-border-secondary">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-warning/10">
+                    <Clock className="w-5 h-5 text-warning" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Pendentes</p>
+                    <p className="text-2xl font-bold">8</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card-secondary border-border-secondary">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-destructive/10">
+                    <XCircle className="w-5 h-5 text-destructive" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Falharam</p>
+                    <p className="text-2xl font-bold">2</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Payouts Table */}
+          <Card className="bg-card-secondary border-border-secondary">
+            <CardHeader>
+              <CardTitle>Saques Recentes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {payouts.map((payout) => (
+                  <div
+                    key={payout.id}
+                    className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50"
+                  >
+                    <div className="flex items-center gap-4">
+                      {getStatusIcon(payout.status)}
+                      <div>
+                        <h3 className="font-semibold">{payout.user}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(payout.date).toLocaleString('pt-BR')}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {payout.pixKey || payout.bankAccount}
+                        </p>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-lg font-bold">
+                          R$ {payout.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </p>
+                        <p className="text-sm text-muted-foreground">{payout.method}</p>
+                      </div>
+
+                      <Badge className={getStatusColor(payout.status)}>
+                        {payout.status === 'completed' && 'Processado'}
+                        {payout.status === 'pending' && 'Pendente'}
+                        {payout.status === 'failed' && 'Falhou'}
+                      </Badge>
+
+                      <div className="flex gap-2">
+                        {payout.status === 'pending' && (
+                          <Button size="sm" className="bg-success hover:bg-success/90">
+                            Aprovar
+                          </Button>
+                        )}
+                        <Button variant="outline" size="sm">
+                          Ver Detalhes
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };

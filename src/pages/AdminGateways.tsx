@@ -1,4 +1,4 @@
-import { ArrowLeft, CreditCard, Globe, Shield, Settings } from 'lucide-react';
+import { ArrowLeft, CreditCard, Globe, Shield, Settings, BarChart3, TrendingUp } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +8,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { useState } from 'react';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 const AdminGateways = () => {
   const { user, loading: authLoading } = useAuth();
@@ -35,7 +37,9 @@ const AdminGateways = () => {
       description: 'Sistema de pagamentos instantâneos do Brasil',
       icon: <Globe className="w-5 h-5" />,
       fees: '0%',
-      limits: 'R$ 1,00 - R$ 100.000,00'
+      limits: 'R$ 1,00 - R$ 100.000,00',
+      conversionRate: 98.5,
+      usage: 65
     },
     {
       id: 'stripe',
@@ -44,7 +48,9 @@ const AdminGateways = () => {
       description: 'Gateway internacional para cartões de crédito',
       icon: <CreditCard className="w-5 h-5" />,
       fees: '3.9% + R$ 0,39',
-      limits: 'R$ 5,00 - R$ 50.000,00'
+      limits: 'R$ 5,00 - R$ 50.000,00',
+      conversionRate: 94.2,
+      usage: 25
     },
     {
       id: 'mercadopago',
@@ -53,7 +59,20 @@ const AdminGateways = () => {
       description: 'Gateway brasileiro multiplataforma',
       icon: <Shield className="w-5 h-5" />,
       fees: '4.99%',
-      limits: 'R$ 1,00 - R$ 25.000,00'
+      limits: 'R$ 1,00 - R$ 25.000,00',
+      conversionRate: 96.8,
+      usage: 10
+    },
+    {
+      id: 'crypto',
+      name: 'Crypto',
+      status: true,
+      description: 'Gateway para pagamentos em criptomoedas',
+      icon: <Shield className="w-5 h-5" />,
+      fees: '1.5%',
+      limits: 'R$ 10,00 - R$ 500.000,00',
+      conversionRate: 99.1,
+      usage: 5
     }
   ];
 
@@ -114,7 +133,12 @@ const AdminGateways = () => {
                       <p className="text-sm text-muted-foreground">{gateway.limits}</p>
                     </div>
                     <div className="flex justify-end">
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="gap-2"
+                        onClick={() => window.location.href = `/admin/gateway-config/${gateway.id}`}
+                      >
                         <Settings className="w-4 h-4" />
                         Configurar
                       </Button>
@@ -125,6 +149,79 @@ const AdminGateways = () => {
             ))}
           </div>
 
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+            {/* Conversion Rate Line Chart */}
+            <Card className="bg-card-secondary border-border-secondary">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" />
+                  Taxa de Conversão por Gateway
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={{
+                  pix: { label: "PIX", color: "hsl(var(--chart-1))" },
+                  stripe: { label: "Stripe", color: "hsl(var(--chart-2))" },
+                  mercadopago: { label: "Mercado Pago", color: "hsl(var(--chart-3))" },
+                  crypto: { label: "Crypto", color: "hsl(var(--chart-4))" }
+                }}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={[
+                      { month: 'Jan', pix: 98.5, stripe: 94.2, mercadopago: 96.8, crypto: 99.1 },
+                      { month: 'Fev', pix: 98.8, stripe: 94.5, mercadopago: 97.1, crypto: 99.3 },
+                      { month: 'Mar', pix: 98.3, stripe: 93.8, mercadopago: 96.5, crypto: 99.0 },
+                      { month: 'Abr', pix: 98.7, stripe: 94.1, mercadopago: 96.9, crypto: 99.2 },
+                      { month: 'Mai', pix: 98.9, stripe: 94.6, mercadopago: 97.2, crypto: 99.4 },
+                      { month: 'Jun', pix: 98.6, stripe: 94.3, mercadopago: 97.0, crypto: 99.1 }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis domain={[90, 100]} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Line type="monotone" dataKey="pix" stroke="hsl(var(--chart-1))" strokeWidth={2} />
+                      <Line type="monotone" dataKey="stripe" stroke="hsl(var(--chart-2))" strokeWidth={2} />
+                      <Line type="monotone" dataKey="mercadopago" stroke="hsl(var(--chart-3))" strokeWidth={2} />
+                      <Line type="monotone" dataKey="crypto" stroke="hsl(var(--chart-4))" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+
+            {/* Usage Bar Chart */}
+            <Card className="bg-card-secondary border-border-secondary">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5" />
+                  Uso por Gateway
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={{
+                  usage: { label: "Uso", color: "hsl(var(--chart-1))" }
+                }}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={gateways.sort((a, b) => b.usage - a.usage).map((gateway, index) => ({
+                      name: gateway.name,
+                      usage: gateway.usage,
+                      fill: index === 0 ? '#00ff90' : index === 1 ? '#ff2389' : '#ff6100'
+                    }))}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <ChartTooltip 
+                        content={<ChartTooltipContent />}
+                        formatter={(value) => [`${value}%`, 'Uso']}
+                      />
+                      <Bar dataKey="usage" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Summary */}
           <Card className="mt-8 bg-card-secondary border-border-secondary">
             <CardHeader>
@@ -133,7 +230,7 @@ const AdminGateways = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-success">2</div>
+                  <div className="text-2xl font-bold text-success">3</div>
                   <p className="text-sm text-muted-foreground">Gateways Ativos</p>
                 </div>
                 <div className="text-center">
@@ -141,7 +238,7 @@ const AdminGateways = () => {
                   <p className="text-sm text-muted-foreground">Gateways Inativos</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">R$ 100K</div>
+                  <div className="text-2xl font-bold text-primary">R$ 500K</div>
                   <p className="text-sm text-muted-foreground">Limite Máximo</p>
                 </div>
               </div>

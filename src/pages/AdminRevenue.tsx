@@ -77,21 +77,21 @@ const AdminRevenue = () => {
         totalRevenue: cancellationFees + poolFees + conversionFees
       });
 
-      // Mock data for payment methods (PIX, Credit Card, etc.)
+      // Mock data for payment methods (PIX, Credit Card, etc.) with specific colors
       setPaymentMethods([
-        { method: 'PIX', value: 125000, percentage: 65, fill: 'hsl(var(--chart-1))' },
-        { method: 'Cartão de Crédito', value: 48000, percentage: 25, fill: 'hsl(var(--chart-2))' },
-        { method: 'Boleto', value: 19200, percentage: 10, fill: 'hsl(var(--chart-3))' }
+        { method: 'PIX', value: 125000, percentage: 65, fill: '#00ff90' },
+        { method: 'Cartão de Crédito', value: 48000, percentage: 25, fill: '#ff2389' },
+        { method: 'Boleto', value: 19200, percentage: 10, fill: '#ff6100' }
       ]);
 
-      // Mock monthly revenue data
+      // Mock monthly revenue data with specific colors based on fee values
       setMonthlyRevenue([
-        { month: 'Jan', revenue: 45000, fees: 2000 },
-        { month: 'Fev', revenue: 52000, fees: 2300 },
-        { month: 'Mar', revenue: 48000, fees: 2100 },
-        { month: 'Abr', revenue: 61000, fees: 2800 },
-        { month: 'Mai', revenue: 55000, fees: 2500 },
-        { month: 'Jun', revenue: 67000, fees: 3100 }
+        { month: 'Jan', revenue: 45000, fees: 2000, feeColor: 'white' },
+        { month: 'Fev', revenue: 52000, fees: 2300, feeColor: '#ff2389' },
+        { month: 'Mar', revenue: 48000, fees: 2100, feeColor: 'white' },
+        { month: 'Abr', revenue: 61000, fees: 2800, feeColor: '#ff2389' },
+        { month: 'Mai', revenue: 55000, fees: 2500, feeColor: '#ff2389' },
+        { month: 'Jun', revenue: 67000, fees: 3100, feeColor: '#00ff90' }
       ]);
 
     } catch (error) {
@@ -259,8 +259,16 @@ const AdminRevenue = () => {
                       content={<ChartTooltipContent />}
                       formatter={(value: any) => [`R$ ${(value / 100).toLocaleString('pt-BR')}`, '']}
                     />
-                    <Bar dataKey="revenue" fill="hsl(var(--chart-1))" name="Receita" />
-                    <Bar dataKey="fees" fill="hsl(var(--chart-2))" name="Taxas" />
+                     <Bar 
+                       dataKey="revenue" 
+                       fill="hsl(var(--chart-1))" 
+                       name="Receita" 
+                     />
+                     <Bar 
+                       dataKey="fees" 
+                       name="Taxas"
+                       fill="hsl(var(--chart-2))"
+                     />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartContainer>

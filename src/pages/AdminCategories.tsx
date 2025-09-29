@@ -11,6 +11,7 @@ import CategoryModal from '@/components/admin/CategoryModal';
 import DeleteConfirmDialog from '@/components/admin/DeleteConfirmDialog';
 import { Category } from '@/hooks/useCategories';
 import { useNavigate } from 'react-router-dom';
+import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
 const AdminCategories = () => {
   const { toast } = useToast();
@@ -84,8 +85,11 @@ const AdminCategories = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background flex">
+      <AdminSidebar isOpen={false} onToggle={() => {}} />
+      
+      <div className="flex-1 lg:ml-0">
+        <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
@@ -110,7 +114,7 @@ const AdminCategories = () => {
 
         {/* Search and Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="md:col-span-2">
+          <Card className="md:col-span-2 bg-card-secondary border-border-secondary">
             <CardContent className="p-6">
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -124,7 +128,7 @@ const AdminCategories = () => {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-card-secondary border-border-secondary">
             <CardContent className="p-6">
               <div className="text-center">
                 <p className="text-2xl font-bold">{categories.length}</p>
@@ -138,7 +142,7 @@ const AdminCategories = () => {
         </div>
 
         {/* Categories Table */}
-        <Card>
+        <Card className="bg-card-secondary border-border-secondary">
           <CardHeader>
             <CardTitle>Categorias</CardTitle>
           </CardHeader>
@@ -182,6 +186,7 @@ const AdminCategories = () => {
           category={deletingCategory}
           isLoading={deleteCategory.isPending}
         />
+        </div>
       </div>
     </div>
   );

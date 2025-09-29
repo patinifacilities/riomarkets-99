@@ -23,6 +23,7 @@ import AdminGateways from '@/pages/AdminGateways';
 import AdminLogs from '@/pages/AdminLogs';
 import AdminNews from '@/pages/AdminNews';
 import AdminMarkets from '@/pages/AdminMarkets';
+import AdminGatewayConfig from '@/pages/AdminGatewayConfig';
 import Opinioes from '@/pages/Opinioes';
 import FiatRequests from '@/pages/FiatRequests';
 import NotFound from '@/pages/NotFound';
@@ -62,6 +63,7 @@ function App() {
             <Route path="/admin/logs" element={<AdminLogs />} />
             <Route path="/admin/news" element={<AdminNews />} />
             <Route path="/admin/markets" element={<AdminMarkets />} />
+            <Route path="/admin/gateway-config/:gatewayId" element={<AdminGatewayConfig />} />
           <Route path="/opinioes" element={<Opinioes />} />
           <Route path="/fiat-requests" element={<FiatRequests />} />
           <Route path="*" element={<NotFound />} />
