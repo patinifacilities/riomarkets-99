@@ -25,7 +25,7 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, poolId, timeLeft }: F
   const { user } = useAuth();
   const { data: profile } = useProfile(user?.id);
   const { toast } = useToast();
-  const [betAmount, setBetAmount] = useState(10);
+  const [betAmount, setBetAmount] = useState(0.1);
   const [selectedSide, setSelectedSide] = useState<'sim' | 'nao' | null>(null);
   const [countdown, setCountdown] = useState(timeLeft);
   const [clickedSide, setClickedSide] = useState<'sim' | 'nao' | null>(null);
@@ -138,7 +138,12 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, poolId, timeLeft }: F
             Pool {poolId} - Histórico
           </DialogTitle>
           <DialogDescription className="text-center">
-            Últimos 10 resultados e opine neste pool
+            <div className="text-sm text-muted-foreground mb-2">
+              Pergunta: O ativo vai subir nos próximos 60 segundos?
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Categoria: Commodities
+            </div>
           </DialogDescription>
         </DialogHeader>
 
@@ -167,21 +172,24 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, poolId, timeLeft }: F
           </div>
         </div>
 
-        {/* Betting amount */}
+        {/* Betting slider */}
         <div className="mb-4">
-          <label className="text-sm font-medium mb-2 block">Valor da opinião</label>
-          <div className="flex gap-2">
-            {[5, 10, 25, 50].map((amount) => (
-              <Button
-                key={amount}
-                variant={betAmount === amount ? "default" : "outline"}
-                size="sm"
-                onClick={() => setBetAmount(amount)}
-                className="flex-1"
-              >
-                {amount} RZ
-              </Button>
-            ))}
+          <label className="text-sm font-medium mb-2 block">Valor da opinião: {betAmount} RZ</label>
+          <div className="px-3 py-2 bg-muted/20 rounded-lg mb-3">
+            <div className="text-sm font-medium mb-2">Deslize para selecionar</div>
+            <input
+              type="range"
+              min="0.1"
+              max="100"
+              step="0.1"
+              value={betAmount}
+              onChange={(e) => setBetAmount(Number(e.target.value))}
+              className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer slider"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground mt-1">
+              <span>0.1 RZ</span>
+              <span>100 RZ</span>
+            </div>
           </div>
         </div>
 
@@ -192,9 +200,9 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, poolId, timeLeft }: F
             disabled={countdown <= 10}
             className={`h-12 ${
               clickedSide === 'sim' 
-                ? 'animate-pulse scale-105' 
+                ? 'animate-[bounce_0.3s_ease-in-out] scale-110 shadow-lg shadow-[#00ff90]/50' 
                 : ''
-            } bg-[#00ff90] hover:bg-[#00ff90]/90 text-black font-semibold transition-all duration-200`}
+            } bg-[#00ff90] hover:bg-[#00ff90]/90 text-black font-semibold transition-all duration-300`}
           >
             SIM
           </Button>
@@ -203,9 +211,9 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, poolId, timeLeft }: F
             disabled={countdown <= 10}
             className={`h-12 ${
               clickedSide === 'nao' 
-                ? 'animate-pulse scale-105' 
+                ? 'animate-[bounce_0.3s_ease-in-out] scale-110 shadow-lg shadow-[#ff2389]/50' 
                 : ''
-            } bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-semibold transition-all duration-200`}
+            } bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-semibold transition-all duration-300`}
           >
             NÃO
           </Button>

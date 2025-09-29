@@ -246,22 +246,22 @@ const Exchange = () => {
           </CardHeader>
           <CardContent>
             {/* Saldos Modernizados */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
-              <div className="text-center p-4 bg-gradient-to-br from-muted/20 to-muted/10 rounded-xl border border-border/30 backdrop-blur-sm">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Wallet className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">BRL</span>
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="text-center p-3 bg-gradient-to-br from-muted/20 to-muted/10 rounded-lg border border-border/20">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <Wallet className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground uppercase tracking-wide">BRL</span>
                 </div>
-                <div className="text-2xl font-bold text-foreground">
+                <div className="text-lg font-bold text-foreground">
                   R$ {brlBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </div>
               </div>
-              <div className="text-center p-4 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl border border-primary/30 backdrop-blur-sm">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <TrendingUp className="h-4 w-4 text-primary" />
-                  <span className="text-xs font-medium text-primary uppercase tracking-wide">RIOZ</span>
+              <div className="text-center p-3 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg border border-primary/20">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <TrendingUp className="h-3 w-3 text-primary" />
+                  <span className="text-xs text-primary uppercase tracking-wide">RIOZ</span>
                 </div>
-                <div className="text-2xl font-bold text-primary">
+                <div className="text-lg font-bold text-primary">
                   {riozBalance.toLocaleString('pt-BR')} RZ
                 </div>
               </div>

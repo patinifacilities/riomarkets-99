@@ -61,7 +61,7 @@ const Fast = () => {
   // Categories/themes for the fast pools
   const categories = [
     { id: 'crypto', name: 'Cripto', icon: '₿' },
-    { id: 'commodities', name: 'Commodity', icon: '🛢️' },
+    { id: 'commodities', name: window.innerWidth < 768 ? 'Commod' : 'Commodities', icon: '🛢️' },
     { id: 'forex', name: 'Forex', icon: '💱' },
     { id: 'stocks', name: 'Ações', icon: '📈' }
   ];
@@ -264,7 +264,12 @@ const Fast = () => {
           // Track user winnings for animation
           if (bet.userId === user?.id) {
             totalUserWinnings += profit;
+            
+            // Play cash sound
+            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwgAjOK1/HIcCEFL4PL7+OUOwgcb7/u4ZdMEAZUqOTzunIjAzOH0fDGbCAGMYnJ7eeVOwcedbvt3Y5NEAnVqOTzu3AjBSuAye7kizYHLILK7OGNOwgGhHPq66lSEgwZhrTr4qRUFAhBpOHvunAjB');
+            audio.play().catch(() => {});
           }
+          totalUserWinnings += profit;
         }
       }
       
@@ -336,12 +341,19 @@ const Fast = () => {
       
       setTimeout(() => {
         setWinnerResults({});
-      }, 6750); // Mais 50% do tempo (4.5s -> 6.75s)
+      }, 6750); // Extended display time for better visibility
     }
   }, [countdown, currentRound, currentPools]);
 
   const placeBet = async (poolId: number, side: 'sim' | 'nao', odds: number) => {
-    if (!user || !profile || betAmount <= 0) return;
+    if (!user || !profile || betAmount < 0.1) {
+      toast({
+        title: "Valor mínimo",
+        description: "O valor mínimo para opinar é 0.1 RZ.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     // Block bets when 10 seconds or less remaining
     if (countdown <= 10) {
@@ -362,9 +374,9 @@ const Fast = () => {
       return;
     }
 
-    // Simple visual feedback
+    // Enhanced animation feedback
     setClickedPool({ id: poolId, side });
-    setTimeout(() => setClickedPool(null), 200);
+    setTimeout(() => setClickedPool(null), 300);
 
     try {
       // Deduct amount from user balance immediately
@@ -538,6 +550,10 @@ const Fast = () => {
                 }
               `}
               onClick={() => {
+                if (!user) {
+                  window.location.href = '/auth';
+                  return;
+                }
                 setSelectedPool(pool.id.toString());
                 setPoolHistoryOpen(true);
               }}
@@ -570,19 +586,25 @@ const Fast = () => {
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (!user) {
+                        window.location.href = '/auth';
+                        return;
+                      }
                       setClickedPool({ id: pool.id, side: 'sim' });
-                      setTimeout(() => setClickedPool(null), 200);
+                      setTimeout(() => setClickedPool(null), 300);
                       placeBet(pool.id, 'sim', getOdds(pool.upOdds));
                     }}
-                    disabled={!user || countdown <= 10}
+                    disabled={countdown <= 10}
                     data-pool-id={pool.id}
                     data-side="sim"
                     className={`
-                      h-14 flex flex-col gap-1 bg-[#00ff90] text-black hover:bg-[#00ff90]/90 
+                      h-14 flex flex-col gap-1 
+                      ${winnerResults[pool.id] === 'nao' ? 'bg-[#ff2389] text-white' : 'bg-[#00ff90] text-black'} 
+                      hover:bg-[#00ff90]/90 
                       border-2 border-[#00ff90] hover:border-[#00ff90]/70
                       transition-all duration-300 
                       ${countdown <= 10 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
-                      ${clickedPool?.id === pool.id && clickedPool?.side === 'sim' ? 'animate-pulse scale-105' : ''}
+                      ${clickedPool?.id === pool.id && clickedPool?.side === 'sim' ? 'animate-[bounce_0.3s_ease-in-out] scale-110 shadow-lg shadow-[#00ff90]/50' : ''}
                     `}
                   >
                     <div className="font-bold text-lg">SIM</div>
@@ -592,19 +614,25 @@ const Fast = () => {
                   <Button
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (!user) {
+                        window.location.href = '/auth';
+                        return;
+                      }
                       setClickedPool({ id: pool.id, side: 'nao' });
-                      setTimeout(() => setClickedPool(null), 200);
+                      setTimeout(() => setClickedPool(null), 300);
                       placeBet(pool.id, 'nao', getOdds(pool.downOdds));
                     }}
-                    disabled={!user || countdown <= 10}
+                    disabled={countdown <= 10}
                     data-pool-id={pool.id}
                     data-side="nao"
                     className={`
-                      h-14 flex flex-col gap-1 bg-[#ff2389] text-white hover:bg-[#ff2389]/90
+                      h-14 flex flex-col gap-1 
+                      ${winnerResults[pool.id] === 'sim' ? 'bg-[#00ff90] text-black' : 'bg-[#ff2389] text-white'} 
+                      hover:bg-[#ff2389]/90
                       border-2 border-[#ff2389] hover:border-[#ff2389]/70
                       transition-all duration-300 
                       ${countdown <= 10 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
-                      ${clickedPool?.id === pool.id && clickedPool?.side === 'nao' ? 'animate-pulse scale-105' : ''}
+                      ${clickedPool?.id === pool.id && clickedPool?.side === 'nao' ? 'animate-[bounce_0.3s_ease-in-out] scale-110 shadow-lg shadow-[#ff2389]/50' : ''}
                     `}
                   >
                     <div className="font-bold text-lg">NÃO</div>

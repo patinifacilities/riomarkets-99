@@ -184,12 +184,22 @@ const MarketDetail = () => {
 
             {/* User Info Panel - Mobile (positioned after market details) */}
             <div className="lg:hidden">
-              <Card id="wallet-section">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <Wallet className="w-5 h-5" />
-                    Sua Carteira
-                  </h3>
+              <Card id="wallet-section" className="bg-gradient-card border-border/50">
+                <CardContent className="p-0">
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-border/30">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                      <Wallet className="w-5 h-5" />
+                      Sua Carteira
+                    </h3>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      ↕️
+                    </Button>
+                  </div>
+                  <div className="p-4">
                   
                    <div className="space-y-4">
                       {(userProfile?.saldo_moeda || 0) > 0 ? (
@@ -236,11 +246,13 @@ const MarketDetail = () => {
                       
                       <div className="text-center text-sm text-muted-foreground">ou use o slider</div>
                       
-                      <BetSlider 
-                        balance={userProfile?.saldo_moeda || 0}
-                        onAmountChange={(amount) => setBetAmount(amount)}
-                        estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
-                      />
+                      <div className="lg:hidden">
+                        <BetSlider 
+                          balance={userProfile?.saldo_moeda || 0}
+                          onAmountChange={(amount) => setBetAmount(amount)}
+                          estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
+                        />
+                      </div>
                     
                     {selectedOption && (
                       <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">
@@ -317,10 +329,11 @@ const MarketDetail = () => {
                          }}
                        />
                      )}
-                   </div>
-                 </CardContent>
-               </Card>
-             </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* Pool Progress Bar */}
             <div>
