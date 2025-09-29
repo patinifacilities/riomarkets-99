@@ -72,16 +72,13 @@ const Exchange = () => {
     }
 
     const amountNum = parseFloat(amount);
-    const feeRate = 0.01; // 1% de taxa
-    const fee = amountNum * feeRate;
     
-    // New validation logic - should always allow if using calculated max amount
+    // Simple validation for 1:1 conversion
     if (activeTab === 'buy') {
-      const totalCost = amountNum + fee;
-      if (brlBalance < totalCost) {
+      if (brlBalance < amountNum) {
         toast({
           title: "Erro",
-          description: "Saldo BRL insuficiente (incluindo taxa de 1%)",
+          description: "Saldo BRL insuficiente",
           variant: "destructive",
         });
         return;
@@ -100,110 +97,44 @@ const Exchange = () => {
     setLoading(true);
     
     try {
-      if (activeTab === 'buy') {
-        // Comprar RIOZ com BRL (descontando taxa)
-        const totalCost = amountNum + fee;
-        const newBrlBalance = brlBalance - totalCost;
-        const newRiozBalance = riozBalance + amountNum;
-        
-        // Atualizar saldos no banco de dados
-        const updatePromises = [
-          supabase.from('balances').update({ 
-            brl_balance: newBrlBalance,
-            rioz_balance: newRiozBalance 
-          }).eq('user_id', user.id),
-          
-          supabase.from('profiles').update({ 
-            saldo_moeda: newRiozBalance 
-          }).eq('id', user.id),
+      // Call the simplified edge function
+      const { data, error } = await supabase.functions.invoke('exchange-convert', {
+        body: {
+          operation: activeTab === 'buy' ? 'buy_rioz' : 'sell_rioz',
+          amount: amountNum
+        }
+      });
 
-          // Log da receita de taxa
-          supabase.from('wallet_transactions').insert({
-            id: 'fee_conversion_' + Date.now(),
-            user_id: user.id,
-            tipo: 'credito',
-            valor: Math.round(fee * 100),
-            descricao: 'Receita - Taxa de conversão (1%) - Compra RIOZ'
-          })
-        ];
-
-        await Promise.all(updatePromises);
-        
-        // Atualizar estados locais
-        setBrlBalance(newBrlBalance);
-        setRiozBalance(newRiozBalance);
-        
-        toast({
-          title: "Compra realizada!",
-          description: `Você comprou ${amountNum} RIOZ por R$ ${amountNum} (+ R$ ${fee.toFixed(2)} de taxa)`,
-        });
-      } else {
-        // Vender RIOZ por BRL (descontando taxa)
-        const totalReceived = amountNum - fee;
-        const newBrlBalance = brlBalance + totalReceived;
-        const newRiozBalance = riozBalance - amountNum;
-        
-        // Atualizar saldos no banco de dados
-        const updatePromises = [
-          supabase.from('balances').update({ 
-            brl_balance: newBrlBalance,
-            rioz_balance: newRiozBalance 
-          }).eq('user_id', user.id),
-          
-          supabase.from('profiles').update({ 
-            saldo_moeda: newRiozBalance 
-          }).eq('id', user.id),
-
-          // Log da receita de taxa
-          supabase.from('wallet_transactions').insert({
-            id: 'fee_conversion_' + Date.now(),
-            user_id: user.id,
-            tipo: 'credito',
-            valor: Math.round(fee * 100),
-            descricao: 'Receita - Taxa de conversão (1%) - Venda RIOZ'
-          })
-        ];
-
-        await Promise.all(updatePromises);
-        
-        // Atualizar estados locais
-        setBrlBalance(newBrlBalance);
-        setRiozBalance(newRiozBalance);
-        
-        toast({
-          title: "Venda realizada!",
-          description: `Você vendeu ${amountNum} RIOZ e recebeu R$ ${totalReceived.toFixed(2)} (- R$ ${fee.toFixed(2)} de taxa)`,
-        });
+      if (error || !data.success) {
+        throw new Error(data?.error || 'Erro na conversão');
       }
+
+      // Update local states with response
+      setBrlBalance(data.new_brl_balance);
+      setRiozBalance(data.new_rioz_balance);
       
-      // Log da transação
-      await supabase.from('exchange_orders').insert({
-        user_id: user.id,
-        side: activeTab === 'buy' ? 'buy_rioz' : 'sell_rioz',
-        price_brl_per_rioz: 1.0,
-        amount_rioz: amountNum,
-        amount_brl: amountNum,
-        fee_brl: activeTab === 'buy' ? fee : 0,
-        fee_rioz: activeTab === 'sell' ? fee : 0,
-        status: 'filled',
-        filled_at: new Date().toISOString()
+      toast({
+        title: activeTab === 'buy' ? "Compra realizada!" : "Venda realizada!",
+        description: activeTab === 'buy' 
+          ? `Você comprou ${amountNum} RIOZ por R$ ${amountNum}`
+          : `Você vendeu ${amountNum} RIOZ por R$ ${amountNum}`,
       });
       
-      // Limpar formulário
+      // Clear form
       setAmount('');
       setSliderPercent([0]);
       
-      // Mostrar animação de sucesso
+      // Show success notification
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 3000);
       
-      // Force refresh all balances to ensure UI updates
+      // Force refresh all balances
       await Promise.all([
         fetchBalances(),
         refetchProfile()
       ]);
       
-      // Trigger refresh in other components that might be using balance
+      // Trigger refresh in other components
       setRefreshKey(prev => prev + 1);
       window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
       
@@ -211,7 +142,7 @@ const Exchange = () => {
       console.error('Erro na troca:', error);
       toast({
         title: "Erro na operação",
-        description: "Tente novamente",
+        description: error instanceof Error ? error.message : "Tente novamente",
         variant: "destructive",
       });
     } finally {
@@ -220,14 +151,11 @@ const Exchange = () => {
   };
 
   const getMaxAmount = () => {
-    // Calculate max amount after deducting fee
-    const feeRate = 0.01; // 1% fee
+    // Simple max amount calculation for 1:1 conversion
     if (activeTab === 'buy') {
-      // For buying: max amount is BRL balance divided by (1 + fee rate)
-      return brlBalance / (1 + feeRate);
+      return brlBalance; // Can convert all BRL to RIOZ
     } else {
-      // For selling: max amount is RIOZ balance (fee is deducted from received BRL)
-      return riozBalance;
+      return riozBalance; // Can convert all RIOZ to BRL
     }
   };
 
@@ -273,7 +201,7 @@ const Exchange = () => {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4">Exchange RIOZ/BRL</h1>
           <p className="text-muted-foreground">
-            Converta entre RIOZ e Reais brasileiros com taxa de 1%
+            Converta entre RIOZ e Reais brasileiros com conversão 1:1
           </p>
         </div>
 
@@ -369,13 +297,9 @@ const Exchange = () => {
                           <span>Valor:</span>
                           <span className="font-medium">R$ {(parseFloat(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Taxa (1%):</span>
-                          <span className="font-medium text-success">- R$ {((parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
                         <div className="flex justify-between text-sm border-t pt-2">
                           <span>Você recebe:</span>
-                          <span className="font-medium text-success">{((parseFloat(amount) || 0) - (parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR')} RZ</span>
+                          <span className="font-medium text-success">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
                         </div>
                       </div>
                     )}
@@ -440,16 +364,97 @@ const Exchange = () => {
                           <span>Você vende:</span>
                           <span className="font-medium">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Taxa (1%):</span>
-                          <span className="font-medium text-success">- R$ {((parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
                         <div className="flex justify-between text-sm border-t pt-2">
                           <span>Você recebe:</span>
-                          <span className="font-medium text-success">R$ {((parseFloat(amount) || 0) - (parseFloat(amount) || 0) * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                          <span className="font-medium text-success">R$ {(parseFloat(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                         </div>
                       </div>
                     )}
+                    
+                    <Button 
+                      onClick={handleExchange}
+                      disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > getMaxAmount()}
+                      className="w-full"
+                    >
+                      {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <ArrowRightLeft className="h-4 w-4 mr-2" />
+                      )}
+                      Comprar RIOZ
+                    </Button>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="sell" className="space-y-4">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Quantidade RIOZ a vender (máximo: {getMaxAmount().toLocaleString('pt-BR')} RZ)</Label>
+                      <Input
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="0"
+                        max={getMaxAmount()}
+                        step="1"
+                        min="0"
+                      />
+                    </div>
+
+                    {/* Slider Percentage */}
+                    <div className="space-y-3">
+                      <Label>Selecionar percentual do saldo</Label>
+                      <Slider
+                        value={sliderPercent}
+                        onValueChange={handleSliderChange}
+                        max={100}
+                        step={1}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between gap-2 text-sm text-muted-foreground">
+                        {[0, 25, 50, 75, 100].map((percent) => (
+                          <span
+                            key={percent}
+                            className="cursor-pointer hover:text-foreground transition-colors"
+                            onClick={() => setPercentage(percent)}
+                          >
+                            {percent}%
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Calculation Display - only show when amount > 0 */}
+                    {(parseFloat(amount) > 0) && (
+                      <div className="bg-success/10 border border-success/20 rounded-lg p-4 space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Você vende:</span>
+                          <span className="font-medium">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
+                        </div>
+                        <div className="flex justify-between text-sm border-t pt-2">
+                          <span>Você recebe:</span>
+                          <span className="font-medium text-success">R$ {(parseFloat(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <Button 
+                      onClick={handleExchange}
+                      disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > getMaxAmount()}
+                      variant="destructive"
+                      className="w-full"
+                    >
+                      {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <ArrowRightLeft className="h-4 w-4 mr-2" />
+                      )}
+                      Vender RIOZ
+                    </Button>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
                     
                     <Button 
                       onClick={handleExchange}

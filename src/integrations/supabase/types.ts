@@ -1212,6 +1212,10 @@ export type Database = {
           transaction_count: number
         }[]
       }
+      exchange_convert_simple: {
+        Args: { p_amount: number; p_operation: string; p_user_id: string }
+        Returns: Json
+      }
       execute_limit_order_atomic: {
         Args: { p_current_price: number; p_order_id: string }
         Returns: {
