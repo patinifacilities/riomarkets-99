@@ -38,7 +38,7 @@ export function PressCard({ article }: PressCardProps) {
 
   return (
     <>
-      <article className="bg-card rounded-xl border border-border hover:border-primary/40 transition-all duration-200 group cursor-pointer" onClick={handleReadMore}>
+      <article className="bg-secondary-glass rounded-xl border border-border hover:border-primary/40 transition-all duration-200 group cursor-pointer" onClick={handleReadMore}>
         {/* Relevance Tag */}
         <div className="p-4 pb-0">
           <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">

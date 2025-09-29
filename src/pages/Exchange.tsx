@@ -387,77 +387,85 @@ const Exchange = () => {
           </CardContent>
         </Card>
 
-        {/* Hot Markets Horizontal Scrolling */}
+        {/* Hot Markets - Modern Grid Layout */}
         <div className="mt-8">
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-6">
             <Flame className="h-5 w-5 text-orange-500" />
-            <h2 className="text-xl font-semibold">Mercados Hot</h2>
+            <h2 className="text-2xl font-semibold">Mercados Hot</h2>
+            <Badge variant="destructive" className="text-xs">
+              Alta demanda
+            </Badge>
           </div>
           
-          <div className="relative overflow-hidden">
-            <div className="flex gap-4 animate-scroll-right">
-              {[...topMarkets, ...topMarkets].map((market, index) => (
-                <Card 
-                  key={`${market.id}-${index}`} 
-                  className="min-w-[320px] cursor-pointer hover:border-primary/50 transition-all"
-                  onClick={() => window.location.href = `/market/${market.id}`}
-                >
-                  <CardContent className="p-4">
-                    {/* Thumbnail Image */}
-                    {market.thumbnail_url && (
-                      <div className="w-full h-20 mb-3 rounded-lg overflow-hidden">
-                        <img 
-                          src={market.thumbnail_url} 
-                          alt={market.titulo}
-                          className="w-full h-full object-cover"
-                        />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {topMarkets.slice(0, 6).map((market, index) => (
+              <Card 
+                key={market.id} 
+                className="cursor-pointer hover:border-primary/50 transition-all hover:shadow-lg group"
+                onClick={() => window.location.href = `/market/${market.id}`}
+              >
+                <CardContent className="p-6">
+                  {/* Thumbnail Image with 16:7 aspect ratio */}
+                  {market.thumbnail_url && (
+                    <div className="w-full mb-4 rounded-lg overflow-hidden">
+                      <img 
+                        src={market.thumbnail_url} 
+                        alt={market.titulo}
+                        className="w-full h-full object-cover"
+                        style={{ aspectRatio: '16/7' }}
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="destructive" className="text-xs">
+                          #{index + 1} HOT
+                        </Badge>
+                        <TrendingUp className="h-4 w-4 text-success" />
                       </div>
-                    )}
+                      <h4 className="font-semibold text-sm leading-tight group-hover:text-primary transition-colors">
+                        {market.titulo}
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {market.categoria}
+                      </p>
+                    </div>
                     
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="destructive" className="text-xs animate-pulse">
-                            HOT
-                          </Badge>
-                          {index === 0 && (
-                            <TrendingUp className="h-4 w-4 text-success animate-bounce" />
-                          )}
-                        </div>
-                        <h4 className="font-medium text-sm leading-tight mb-2">
-                          {market.titulo}
-                        </h4>
-                        <div className="flex gap-2 mb-3">
-                          <Button 
-                            size="sm" 
-                            className="bg-[#00ff90] hover:bg-[#00ff90]/90 text-black text-xs px-3 py-1 h-7"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              window.location.href = `/market/${market.id}`;
-                            }}
-                          >
-                            SIM {market.odds?.sim?.toFixed(2)}x
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white text-xs px-3 py-1 h-7"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              window.location.href = `/market/${market.id}`;
-                            }}
-                          >
-                            NÃO {market.odds?.nao?.toFixed(2)}x
-                          </Button>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Volume: R$ {market.volume24h?.toLocaleString()}
-                        </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button 
+                        size="sm" 
+                        className="bg-[#00ff90] hover:bg-[#00ff90]/90 text-black text-xs font-medium"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.location.href = `/market/${market.id}`;
+                        }}
+                      >
+                        SIM {market.odds?.sim?.toFixed(1) || '1.8'}x
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white text-xs font-medium"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.location.href = `/market/${market.id}`;
+                        }}
+                      >
+                        NÃO {market.odds?.nao?.toFixed(1) || '2.1'}x
+                      </Button>
+                    </div>
+                    
+                    <div className="pt-2 border-t border-border/50">
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Volume 24h:</span>
+                        <span className="font-medium">R$ {market.volume24h?.toLocaleString()}</span>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </div>

@@ -151,10 +151,8 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
                   }
                 `}
                 onClick={() => {
-                  // Close sidebar on mobile after clicking
-                  if (window.innerWidth < 1024) {
-                    onToggle();
-                  }
+                  // Keep sidebar open on all screen sizes
+                  // Sidebar should remain persistent for navigation
                 }}
               >
                 <item.icon className="h-4 w-4" />
