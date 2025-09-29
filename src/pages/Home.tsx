@@ -337,9 +337,16 @@ const Home = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-16 pb-[env(safe-area-inset-bottom)]">
-            {sortedAndFilteredMarkets.map(market => (
-              <MarketCardKalshi key={market.id} market={market} />
-            ))}
+            {sortedAndFilteredMarkets.map((market, index) => {
+              const isHighVolume = index < 3; // Top 3 markets get hot icon
+              return (
+                <MarketCardKalshi 
+                  key={market.id} 
+                  market={market} 
+                  showHotIcon={isHighVolume}
+                />
+              );
+            })}
           </div>
         )}
       </div>

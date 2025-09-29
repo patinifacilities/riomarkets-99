@@ -37,36 +37,47 @@ const Auth = () => {
   useEffect(() => {
     let mounted = true;
     
-    // Quando acessar /auth, sempre deslogar primeiro para garantir que pode fazer login
+    // Check initial auth state without forcing logout
     const handleInitialAuth = async () => {
       try {
-        // Sempre fazer logout primeiro quando acessar /auth
         const { data: { session } } = await supabase.auth.getSession();
         
+        // If user is already logged in and accessing auth page, redirect to home
         if (session?.user) {
-          console.log('User is logged in, logging out to access auth page...');
-          await supabase.auth.signOut();
+          console.log('User already logged in, redirecting to home...');
+          navigate('/', { replace: true });
+          return;
         }
       } catch (error) {
-        console.error('Error handling initial auth:', error);
+        console.error('Error checking initial auth:', error);
       }
     };
     
     handleInitialAuth();
     
-    // Configura o listener para mudanças de auth
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!mounted) return;
         
-        // Se o usuário fez login com sucesso, redireciona para home e abre onboarding
+        console.log('Auth state changed:', event, session?.user ? 'User logged in' : 'No user');
+        
+        // If user successfully signed in, redirect to home and trigger onboarding
         if (event === 'SIGNED_IN' && session?.user) {
           console.log('Login successful, redirecting to home...');
-          // Trigger onboarding after successful login
+          navigate('/', { replace: true });
+          // Trigger onboarding after navigation
           setTimeout(() => {
             openOnFirstVisit();
-          }, 1000);
-          navigate('/', { replace: true });
+          }, 500);
+        }
+        
+        // Handle sign out - stay on auth page
+        if (event === 'SIGNED_OUT') {
+          console.log('User signed out');
+          // Clear any existing state
+          setUser(null);
+          setSession(null);
         }
       }
     );
@@ -469,28 +480,29 @@ const Auth = () => {
                   
                   <Button
                     type="button"
-                    className="min-h-[44px] bg-[#1877F2] text-white hover:bg-[#166FE5]"
+                    className="min-h-[44px] bg-black text-white hover:bg-gray-800"
                     onClick={async () => {
                       try {
                         const { error } = await supabase.auth.signInWithOAuth({
-                          provider: 'facebook',
+                          provider: 'apple',
                           options: {
                             redirectTo: `${window.location.origin}/`
                           }
                         });
                         if (error) throw error;
                       } catch (error) {
-                        console.error('Facebook auth error:', error);
-                        setError('Erro ao conectar com Facebook');
+                        console.error('Apple auth error:', error);
+                        setError('Erro ao conectar com Apple');
                       }
                     }}
                     disabled={loading}
-                    aria-label="Entrar com Facebook"
+                    aria-label="Entrar com Apple"
                   >
                     <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      <path d="M12.017 0C8.396 0 8.025.01 7.021.048 6.02.087 5.347.22 4.79.42a7.001 7.001 0 0 0-2.534 1.649A7.014 7.014 0 0 0 .607 4.603C.407 5.16.273 5.833.235 6.834.197 7.838.187 8.21.187 11.831s.01 4.993.048 5.998c.038 1 .17 1.674.371 2.23a7.014 7.014 0 0 0 1.649 2.535 7.001 7.001 0 0 0 2.534 1.648c.557.2 1.23.333 2.231.372 1.004.038 1.376.048 4.997.048s3.993-.01 4.998-.048c1-.04 1.674-.172 2.23-.372a7.014 7.014 0 0 0 2.535-1.648 7.001 7.001 0 0 0 1.648-2.535c.2-.556.333-1.23.372-2.23.038-1.005.048-1.377.048-4.998S23.98 7.838 23.942 6.834c-.04-1.001-.172-1.674-.372-2.231a7.014 7.014 0 0 0-1.648-2.534A7.001 7.001 0 0 0 19.387.607c-.556-.2-1.23-.333-2.231-.371C16.152.01 15.78 0 12.159 0h-.142zm-.125 2.315c3.548 0 3.97.013 5.365.066.922.042 1.422.196 1.754.326.441.171.756.377 1.087.708.331.331.537.646.708 1.087.13.332.284.832.326 1.754.053 1.395.066 1.817.066 5.365s-.013 3.97-.066 5.365c-.042.922-.196 1.422-.326 1.754a2.93 2.93 0 0 1-.708 1.087 2.93 2.93 0 0 1-1.087.708c-.332.13-.832.284-1.754.326-1.395.053-1.817.066-5.365.066s-3.97-.013-5.365-.066c-.922-.042-1.422-.196-1.754-.326a2.93 2.93 0 0 1-1.087-.708 2.93 2.93 0 0 1-.708-1.087c-.13-.332-.284-.832-.326-1.754-.053-1.395-.066-1.817-.066-5.365s.013-3.97.066-5.365c.042-.922.196-1.422.326-1.754.171-.441.377-.756.708-1.087a2.93 2.93 0 0 1 1.087-.708c.332-.13.832-.284 1.754-.326 1.395-.053 1.817-.066 5.365-.066z"/>
+                      <path d="M12.017 5.782a6.035 6.035 0 1 0 0 12.07 6.035 6.035 0 0 0 0-12.07zm0 9.956a3.92 3.92 0 1 1 0-7.84 3.92 3.92 0 0 1 0 7.84zM19.846 5.595a1.407 1.407 0 1 1-2.814 0 1.407 1.407 0 0 1 2.814 0z"/>
                     </svg>
-                    Facebook
+                    Apple
                   </Button>
                 </div>
               </div>

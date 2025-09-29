@@ -278,30 +278,30 @@ const AdminRevenue = () => {
                 conversionFees: { label: "Conversão", color: "hsl(var(--chart-3))" }
               }}>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={monthlyRevenue}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis tickFormatter={(value) => `R$ ${(value / 100).toLocaleString('pt-BR')}`} />
-                    <ChartTooltip 
-                      content={<ChartTooltipContent />}
-                      formatter={(value: any) => [`R$ ${(value / 100).toLocaleString('pt-BR')}`, '']}
-                    />
-                     <Bar 
-                       dataKey="cancellationFees" 
-                       fill="#ff2389"
-                       name="Taxas de Cancelamento" 
+                   <BarChart data={monthlyRevenue}>
+                     <CartesianGrid strokeDasharray="3 3" />
+                     <XAxis dataKey="month" />
+                     <YAxis tickFormatter={(value) => `R$ ${(value / 100).toLocaleString('pt-BR')}`} />
+                     <ChartTooltip 
+                       content={<ChartTooltipContent />}
+                       formatter={(value: any) => [`R$ ${(value / 100).toLocaleString('pt-BR')}`, '']}
                      />
-                     <Bar 
-                       dataKey="poolFees" 
-                       fill="white"
-                       name="Taxas de Pool" 
-                     />
-                     <Bar 
-                       dataKey="conversionFees" 
-                       fill="#00ff90"
-                       name="Taxas de Conversão" 
-                     />
-                  </BarChart>
+                     <Bar dataKey="cancellationFees" name="Taxas de Cancelamento">
+                       {monthlyRevenue.map((entry, index) => (
+                         <Cell key={`cell-cancellation-${index}`} fill={entry.cancellationFeesColor} />
+                       ))}
+                     </Bar>
+                     <Bar dataKey="poolFees" name="Taxas de Pool">
+                       {monthlyRevenue.map((entry, index) => (
+                         <Cell key={`cell-pool-${index}`} fill={entry.poolFeesColor} />
+                       ))}
+                     </Bar>
+                     <Bar dataKey="conversionFees" name="Taxas de Conversão">
+                       {monthlyRevenue.map((entry, index) => (
+                         <Cell key={`cell-conversion-${index}`} fill={entry.conversionFeesColor} />
+                       ))}
+                     </Bar>
+                   </BarChart>
                 </ResponsiveContainer>
               </ChartContainer>
             </CardContent>

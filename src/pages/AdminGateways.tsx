@@ -144,15 +144,16 @@ const AdminGateways = () => {
                       <p className="text-sm text-muted-foreground">{gateway.limits}</p>
                     </div>
                     <div className="flex justify-end">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="gap-2"
-                        onClick={() => window.location.href = `/admin/gateway-config/${gateway.id}`}
-                      >
-                        <Settings className="w-4 h-4" />
-                        Configurar
-                      </Button>
+                       <Link to={`/admin/gateway-config-${gateway.id}`}>
+                         <Button 
+                           variant="outline" 
+                           size="sm" 
+                           className="gap-2"
+                         >
+                           <Settings className="w-4 h-4" />
+                           Configurar
+                         </Button>
+                       </Link>
                     </div>
                   </div>
                 </CardContent>

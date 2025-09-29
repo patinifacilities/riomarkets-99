@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bookmark, Share2, Clock } from 'lucide-react';
+import { Bookmark, Share2, Clock, Flame } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Market } from '@/types';
 import BetModal from './BetModal';
@@ -19,9 +19,10 @@ import { useToast } from '@/hooks/use-toast';
 interface MarketCardKalshiProps {
   market: Market;
   className?: string;
+  showHotIcon?: boolean;
 }
 
-const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, className }: MarketCardKalshiProps) {
+const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, className, showHotIcon }: MarketCardKalshiProps) {
   const [betModalOpen, setBetModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string>('sim');
   const navigate = useNavigate();
@@ -135,7 +136,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
           <div className="p-4 pb-3">
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-sm bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-sm bg-gray-100 flex items-center justify-center flex-shrink-0 relative">
                   {market.thumbnail_url ? (
                     <img 
                       src={market.thumbnail_url}
@@ -151,6 +152,11 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                         e.currentTarget.style.display = 'none';
                       }}
                     />
+                  )}
+                  {showHotIcon && (
+                    <div className="absolute -top-1 -right-1 bg-gradient-to-r from-orange-500 to-red-500 rounded-full p-1 animate-pulse">
+                      <Flame className="w-3 h-3 text-white animate-bounce" />
+                    </div>
                   )}
                 </div>
                 <Badge variant="secondary" className="text-xs px-2 py-1 bg-muted text-muted-foreground rounded-full">
