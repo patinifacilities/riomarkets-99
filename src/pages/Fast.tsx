@@ -17,6 +17,8 @@ const Fast = () => {
   const [countdown, setCountdown] = useState(60);
   const [currentRound, setCurrentRound] = useState(1);
   const [betAmount, setBetAmount] = useState(100);
+  const [clickedPool, setClickedPool] = useState<{id: number, side: string} | null>(null);
+  const [winnerAnimation, setWinnerAnimation] = useState<{poolId: number, winner: string} | null>(null);
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
@@ -230,7 +232,7 @@ const Fast = () => {
       }
       
       // Show notification for current user wins if they're on another page
-      if (currentUserWins.length > 0) {
+      if (currentUserWins.length > 0 && window.location.pathname !== '/fast') {
         showFastWinNotification(currentUserWins);
       }
       
@@ -240,28 +242,6 @@ const Fast = () => {
       
       refetchProfile();
       
-      // Show winner notification with animation when round ends (last second)
-      setTimeout(() => {
-        const winnerElement = document.createElement('div');
-        winnerElement.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 text-white px-8 py-4 rounded-xl shadow-2xl animate-[scale-in_0.5s_ease-out] text-center min-w-[300px]';
-        winnerElement.innerHTML = `
-          <div class="text-2xl font-bold mb-2">🎉 Round #${currentRound - 1} Encerrado!</div>
-          <div class="text-lg">Vencedor: <span class="font-bold">${winningOption.toUpperCase()}</span></div>
-          <div class="text-sm opacity-90 mt-2">${currentRoundBets.filter((b: any) => b.side === winningOption).length} opinião(ões) premiada(s)</div>
-        `;
-        
-        document.body.appendChild(winnerElement);
-        
-        setTimeout(() => {
-          winnerElement.classList.add('animate-[fade-out_0.5s_ease-out]');
-          setTimeout(() => {
-            if (document.body.contains(winnerElement)) {
-              document.body.removeChild(winnerElement);
-            }
-          }, 500);
-        }, 3000);
-      }, 500); // Show after half second to simulate last second animation
-
       toast({
         title: `Resultado Round #${currentRound - 1}`,
         description: `Vencedor: ${winningOption.toUpperCase()}! ${currentRoundBets.filter((b: any) => b.side === winningOption).length} opinião(ões) premiada(s).`,
@@ -287,6 +267,19 @@ const Fast = () => {
     return () => clearInterval(timer);
   }, [currentRound]);
 
+  // Winner animation effect for last second
+  useEffect(() => {
+    if (countdown === 1) {
+      // Show winner animation in the last second
+      const winningOption = (currentRound + 1) % 2 === 0 ? 'sim' : 'nao';
+      setWinnerAnimation({ poolId: 0, winner: winningOption }); // poolId 0 means all pools
+      
+      setTimeout(() => {
+        setWinnerAnimation(null);
+      }, 1000);
+    }
+  }, [countdown, currentRound]);
+
   const placeBet = async (poolId: number, side: 'sim' | 'nao', odds: number) => {
     if (!user || !profile || betAmount <= 0) return;
 
@@ -298,6 +291,10 @@ const Fast = () => {
       });
       return;
     }
+
+    // Add click animation
+    setClickedPool({ id: poolId, side });
+    setTimeout(() => setClickedPool(null), 200);
 
     try {
       // Deduct amount from user balance immediately
@@ -384,9 +381,9 @@ const Fast = () => {
             <Badge variant="destructive" className="bg-[#ff2389] text-white text-lg px-4 py-2">
               Round #{currentRound}
             </Badge>
-            <div className="flex items-center gap-2 text-2xl font-mono font-bold text-[#ff2389]">
+            <div className="flex items-center gap-2 text-2xl font-mono font-bold">
               <Clock className="h-6 w-6 text-[#ff2389]" />
-              <span className="text-[#ff2389]">{formatTime(countdown)}</span>
+              <span className="text-white">{formatTime(countdown)}</span>
             </div>
           </div>
         </div>
@@ -454,49 +451,13 @@ const Fast = () => {
           </div>
         </div>
 
-        {/* Bet Amount Slider - More discrete */}
-        {user && (
-          <div className="max-w-sm mx-auto mb-8">
-            <Card className="border border-[#ff2389]/20 bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-muted-foreground">Valor da Opinião</span>
-                  <span className="text-sm font-bold text-primary">{(profile?.saldo_moeda || 0).toLocaleString()} RZ</span>
-                </div>
-                
-                <div className="space-y-3">
-                  <input
-                    type="range"
-                    min="2"
-                    max="1000"
-                    value={Math.min(betAmount, Math.min(1000, profile?.saldo_moeda || 0))}
-                    onChange={(e) => setBetAmount(Math.min(parseInt(e.target.value), profile?.saldo_moeda || 0))}
-                    className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer slider-thumb"
-                    style={{
-                      background: `linear-gradient(to right, #ff2389 0%, #ff2389 ${(betAmount / Math.min(1000, profile?.saldo_moeda || 1000)) * 100}%, hsl(var(--muted)) ${(betAmount / Math.min(1000, profile?.saldo_moeda || 1000)) * 100}%, hsl(var(--muted)) 100%)`
-                    }}
-                  />
-                  
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>2 RZ</span>
-                    <div className="text-center">
-                      <span className="text-lg font-bold text-primary">{betAmount} RZ</span>
-                    </div>
-                    <span>1.000 RZ</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
         {/* Current Pools */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {currentPools.map((pool) => (
             <Card 
               key={pool.id} 
               className={`
-                group transition-all duration-300 hover:scale-[1.02] cursor-pointer
+                group transition-all duration-300 hover:scale-[1.02] cursor-pointer relative
                 bg-gradient-to-br from-card/95 to-card/80 
                 border border-border/50 hover:border-primary/30
                 backdrop-blur-sm
@@ -504,6 +465,17 @@ const Fast = () => {
                 ${resolvedTheme === 'light' ? 'border-2' : ''}
               `}
             >
+              {/* Winner Animation Overlay */}
+              {winnerAnimation && countdown === 1 && (
+                <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center z-10">
+                  <div className="text-center animate-bounce">
+                    <div className="text-3xl font-bold text-white mb-2">
+                      {winnerAnimation.winner === 'sim' ? '🟢 SIM VENCEU!' : '🔴 NÃO VENCEU!'}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -535,8 +507,9 @@ const Fast = () => {
                     className={`
                       h-14 flex flex-col gap-1 bg-[#00ff90] text-black hover:bg-[#00ff90]/90 
                       border-2 border-[#00ff90] hover:border-[#00ff90]/70
-                      transition-all duration-200 active:scale-95
+                      transition-all duration-200 
                       ${countdown <= 5 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
+                      ${clickedPool?.id === pool.id && clickedPool?.side === 'sim' ? 'animate-pulse scale-95' : ''}
                     `}
                   >
                     <div className="font-bold text-lg">SIM</div>
@@ -549,8 +522,9 @@ const Fast = () => {
                     className={`
                       h-14 flex flex-col gap-1 bg-[#ff2389] text-white hover:bg-[#ff2389]/90
                       border-2 border-[#ff2389] hover:border-[#ff2389]/70
-                      transition-all duration-200 active:scale-95
+                      transition-all duration-200 
                       ${countdown <= 5 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
+                      ${clickedPool?.id === pool.id && clickedPool?.side === 'nao' ? 'animate-pulse scale-95' : ''}
                     `}
                   >
                     <div className="font-bold text-lg">NÃO</div>
@@ -558,128 +532,12 @@ const Fast = () => {
                   </Button>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-border/50">
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>Encerra em</span>
-                    <span className="font-mono font-bold text-[#ff2389]">{formatTime(countdown)}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <style>{`
-          .slider-thumb::-webkit-slider-thumb {
-            appearance: none;
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background: #ff2389;
-            cursor: pointer;
-            border: 2px solid #ffffff;
-            box-shadow: 0 0 10px rgba(255, 35, 137, 0.5);
-          }
-          
-          .slider-thumb::-moz-range-thumb {
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background: #ff2389;
-            cursor: pointer;
-            border: 2px solid #ffffff;
-            box-shadow: 0 0 10px rgba(255, 35, 137, 0.5);
-          }
-        `}</style>
-
-        {/* Fast Pools Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {currentPools.map((pool) => (
-            <Card 
-              key={pool.id} 
-              className="border border-[#ff2389]/20 bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm hover:border-[#ff2389]/40 transition-all"
-            >
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between mb-2">
-                  <Badge variant="outline" className="text-xs border-[#ff2389]/50 text-[#ff2389]">
-                    <Zap className="h-3 w-3 mr-1" />
-                    60s
-                  </Badge>
-                  <div className="text-xs text-muted-foreground font-mono">
-                    #{pool.id}
-                  </div>
-                </div>
-                <CardTitle className="text-sm leading-tight">
-                  {pool.question}
-                </CardTitle>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <BarChart3 className="h-3 w-3" />
-                  <span>{pool.asset}</span>
-                  <span className="font-mono">{pool.currentPrice}</span>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="grid grid-cols-2 gap-4">
-                  <Button 
-                    className="bg-success hover:bg-success/90 text-black font-medium h-20 flex flex-col gap-1 text-sm"
-                    onClick={() => {
-                      if (user) {
-                        placeBet(pool.id, 'sim', getOdds(pool.upOdds));
-                      }
-                    }}
-                    disabled={!user || countdown <= 5}
-                  >
-                    <TrendingUp className="h-5 w-5" />
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm">⬆️ SIM</span>
-                      <span className="text-sm font-bold transition-all duration-300">
-                        {getOdds(pool.upOdds).toFixed(2)}x
-                      </span>
-                    </div>
-                    {user && (
-                      <div className="text-xs opacity-75">
-                        {betAmount} RZ
-                      </div>
-                    )}
-                  </Button>
-                  <Button 
-                    className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-medium h-20 flex flex-col gap-1 text-sm"
-                    onClick={() => {
-                      if (user) {
-                        placeBet(pool.id, 'nao', getOdds(pool.downOdds));
-                      }
-                    }}
-                    disabled={!user || countdown <= 5}
-                  >
-                    <TrendingDown className="h-5 w-5" />
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm">⬇️ NÃO</span>
-                      <span className="text-sm font-bold transition-all duration-300">
-                        {getOdds(pool.downOdds).toFixed(2)}x
-                      </span>
-                    </div>
-                    {user && (
-                      <div className="text-xs opacity-75">
-                        {betAmount} RZ
-                      </div>
-                    )}
-                  </Button>
-                </div>
-                
-                {!user && (
-                  <div className="text-center mt-3">
-                    <p className="text-xs text-muted-foreground">
-                      Faça login para opinar nos Fast Markets
-                    </p>
-                  </div>
-                )}
-                
-                {/* Progress bar for time remaining */}
+                {/* Countdown bar */}
                 <div className="mt-4">
-                  <div className="w-full bg-muted rounded-full h-2">
+                  <div className="w-full bg-muted rounded-full h-1.5">
                     <div 
                       className={cn(
-                        "bg-[#ff2389] h-2 rounded-full transition-all duration-1000",
+                        "bg-[#ff2389] h-1.5 rounded-full transition-all duration-1000",
                         countdown <= 8 && "animate-pulse"
                       )}
                       style={{ 
@@ -688,11 +546,74 @@ const Fast = () => {
                       }}
                     ></div>
                   </div>
+                  <div className="flex items-center justify-between text-sm text-muted-foreground mt-2">
+                    <span>Encerra em</span>
+                    <span className="font-mono font-bold text-white">{formatTime(countdown)}</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
+
+        {/* Quantity Selector - Moved to bottom */}
+        {user && (
+          <div className="max-w-lg mx-auto mt-8">
+            <Card className="border border-[#ff2389]/20 bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-muted-foreground">Quantidade</span>
+                  <span className="text-sm font-bold text-primary">{(profile?.saldo_moeda || 0).toLocaleString()} RZ</span>
+                </div>
+                
+                <div className="space-y-3">
+                  <input
+                    type="range"
+                    min="2"
+                    max="1000"
+                    value={Math.min(betAmount, Math.min(1000, profile?.saldo_moeda || 0))}
+                    onChange={(e) => setBetAmount(Math.min(parseInt(e.target.value), profile?.saldo_moeda || 0))}
+                    className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer slider-thumb"
+                    style={{
+                      background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${(betAmount / Math.min(1000, profile?.saldo_moeda || 1000)) * 100}%, hsl(var(--muted)) ${(betAmount / Math.min(1000, profile?.saldo_moeda || 1000)) * 100}%, hsl(var(--muted)) 100%)`
+                    }}
+                  />
+                  
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>2 RZ</span>
+                    <div className="text-center">
+                      <span className="text-lg font-bold text-primary">{betAmount} RZ</span>
+                    </div>
+                    <span>1.000 RZ</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        <style>{`
+          .slider-thumb::-webkit-slider-thumb {
+            appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #00ff90;
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 10px rgba(0, 255, 144, 0.5);
+          }
+          
+          .slider-thumb::-moz-range-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #00ff90;
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 10px rgba(0, 255, 144, 0.5);
+          }
+        `}</style>
 
         {/* Info Section */}
         <div className="mt-12 text-center">
