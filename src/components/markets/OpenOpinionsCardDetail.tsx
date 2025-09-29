@@ -70,6 +70,17 @@ export const OpenOpinionsCardDetail: React.FC<OpenOpinionsCardDetailProps> = ({
 
   useEffect(() => {
     fetchOpenOrders();
+    
+    // Listen for refresh events
+    const handleRefresh = () => {
+      fetchOpenOrders();
+    };
+    
+    window.addEventListener('refreshOpenOpinions', handleRefresh);
+    
+    return () => {
+      window.removeEventListener('refreshOpenOpinions', handleRefresh);
+    };
   }, [user, marketId]);
 
   const handleCancelOrder = async (orderId: string, orderAmount: number) => {

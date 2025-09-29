@@ -231,34 +231,37 @@ const MarketDetail = () => {
                      <SliderConfirm
                        selectedOption={selectedOption}
                        disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
-                      onConfirm={async () => {
-                        try {
-                          const { error } = await supabase.functions.invoke('execute-market-order', {
-                            body: { 
-                              market_id: market.id, 
-                              side: selectedOption,
-                              amount: betAmount,
-                              user_id: authUser?.id
-                            }
-                          });
-                          
-                          if (error) throw error;
-                          
-                          toast({
-                            title: "Opinião registrada!",
-                            description: `Você opinou ${selectedOption.toUpperCase()} com ${betAmount} Rioz Coin.`
-                          });
-                          
-                          handleBetSuccess();
-                        } catch (error) {
-                          console.error('Error placing bet:', error);
-                          toast({
-                            title: "Erro ao registrar opinião",
-                            description: "Tente novamente em alguns instantes.",
-                            variant: "destructive"
-                          });
-                        }
-                      }}
+                       onConfirm={async () => {
+                         try {
+                           const { error } = await supabase.functions.invoke('execute-market-order', {
+                             body: { 
+                               market_id: market.id, 
+                               side: selectedOption,
+                               amount: betAmount,
+                               user_id: authUser?.id
+                             }
+                           });
+                           
+                           if (error) throw error;
+                           
+                           toast({
+                             title: "Opinião registrada!",
+                             description: `Você opinou ${selectedOption.toUpperCase()} com ${betAmount} Rioz Coin.`
+                           });
+                           
+                           handleBetSuccess();
+                           
+                           // Force refresh of open opinions card
+                           window.dispatchEvent(new CustomEvent('refreshOpenOpinions'));
+                         } catch (error) {
+                           console.error('Error placing bet:', error);
+                           toast({
+                             title: "Erro ao registrar opinião",
+                             description: "Tente novamente em alguns instantes.",
+                             variant: "destructive"
+                           });
+                         }
+                       }}
                      />
                    )}
                  </div>

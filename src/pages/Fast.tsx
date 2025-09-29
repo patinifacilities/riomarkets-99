@@ -6,6 +6,7 @@ import { TrendingUp, TrendingDown, Zap, Clock, BarChart3 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { FastBetSelector, useFastBetting } from '@/components/markets/FastBetSelector';
+import { showFastWinNotification } from '@/components/layout/WinnerNotification';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useToast } from '@/hooks/use-toast';
@@ -117,6 +118,22 @@ const Fast = () => {
         currentPrice: '$1.26',
         upOdds: 1.65,
         downOdds: 1.65
+      },
+      { 
+        id: 13, 
+        question: 'O AUD/USD vai subir nos próximos 60 segundos?', 
+        asset: 'AUD/USD',
+        currentPrice: '$0.67',
+        upOdds: 1.65,
+        downOdds: 1.65
+      },
+      { 
+        id: 14, 
+        question: 'O USD/JPY vai descer nos próximos 60 segundos?', 
+        asset: 'USD/JPY',
+        currentPrice: '¥148.50',
+        upOdds: 1.65,
+        downOdds: 1.65
       }
     ],
     stocks: [
@@ -143,6 +160,22 @@ const Fast = () => {
         currentPrice: '$248.85',
         upOdds: 1.65,
         downOdds: 1.65
+      },
+      { 
+        id: 15, 
+        question: 'A Google vai subir nos próximos 60 segundos?', 
+        asset: 'GOOGL',
+        currentPrice: '$142.50',
+        upOdds: 1.65,
+        downOdds: 1.65
+      },
+      { 
+        id: 16, 
+        question: 'A Amazon vai descer nos próximos 60 segundos?', 
+        asset: 'AMZN',
+        currentPrice: '$155.80',
+        upOdds: 1.65,
+        downOdds: 1.65
       }
     ]
   };
@@ -157,6 +190,9 @@ const Fast = () => {
 
       // MVP Logic: Alternate between "sim" and "não" results
       const winningOption = currentRound % 2 === 0 ? 'sim' : 'nao';
+      
+      const winningBets = currentRoundBets.filter((bet: any) => bet.side === winningOption);
+      const currentUserWins = winningBets.filter((bet: any) => bet.userId === user?.id);
       
       for (const bet of currentRoundBets) {
         if (bet.side === winningOption) {
@@ -191,12 +227,35 @@ const Fast = () => {
         }
       }
       
+      // Show notification for current user wins if they're on another page
+      if (currentUserWins.length > 0) {
+        showFastWinNotification(currentUserWins);
+      }
+      
       // Remove processed bets
       const remainingBets = fastBets.filter((bet: any) => bet.roundNumber !== currentRound - 1);
       localStorage.setItem('fastBets', JSON.stringify(remainingBets));
       
       refetchProfile();
       
+      // Show winner notification with animation
+      const winnerElement = document.createElement('div');
+      winnerElement.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 text-white px-8 py-4 rounded-xl shadow-2xl animate-[scale-in_0.5s_ease-out] text-center min-w-[300px]';
+      winnerElement.innerHTML = `
+        <div class="text-2xl font-bold mb-2">🎉 Round #${currentRound - 1} Encerrado!</div>
+        <div class="text-lg">Vencedor: <span class="font-bold">${winningOption.toUpperCase()}</span></div>
+        <div class="text-sm opacity-90 mt-2">${currentRoundBets.filter((b: any) => b.side === winningOption).length} opinião(ões) premiada(s)</div>
+      `;
+      
+      document.body.appendChild(winnerElement);
+      
+      setTimeout(() => {
+        winnerElement.classList.add('animate-[fade-out_0.5s_ease-out]');
+        setTimeout(() => {
+          document.body.removeChild(winnerElement);
+        }, 500);
+      }, 3000);
+
       toast({
         title: `Resultado Round #${currentRound - 1}`,
         description: `Vencedor: ${winningOption.toUpperCase()}! ${currentRoundBets.filter((b: any) => b.side === winningOption).length} opinião(ões) premiada(s).`,
@@ -319,9 +378,9 @@ const Fast = () => {
             <Badge variant="destructive" className="bg-[#ff2389] text-white text-lg px-4 py-2">
               Round #{currentRound}
             </Badge>
-            <div className="flex items-center gap-2 text-2xl font-mono font-bold text-[#ff2389]">
-              <Clock className="h-6 w-6" />
-              {formatTime(countdown)}
+            <div className="flex items-center gap-2 text-2xl font-mono font-bold text-white">
+              <Clock className="h-6 w-6 text-[#ff2389]" />
+              <span className="text-white">{formatTime(countdown)}</span>
             </div>
           </div>
         </div>
@@ -360,31 +419,46 @@ const Fast = () => {
 
         {/* Live Pools Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ff2389]/10 to-[#ff2389]/5 px-4 py-2 rounded-full border border-[#ff2389]/20">
-            <div className="animate-pulse">
-              <div className="w-2 h-2 rounded-full bg-[#ff2389]"></div>
+          <div className={`inline-flex items-center gap-2 bg-gradient-to-r from-[#ff2389]/10 to-[#ff2389]/5 px-4 py-2 rounded-full border border-[#ff2389]/20 ${
+            countdown <= 8 ? 'animate-pulse' : ''
+          }`}>
+            <div className={countdown <= 8 ? 'animate-pulse' : ''}>
+              <div className={`w-2 h-2 rounded-full bg-[#ff2389] ${countdown <= 8 ? 'animate-pulse' : ''}`}></div>
             </div>
             <span className="text-sm font-medium text-[#ff2389] uppercase tracking-wide">
               AO VIVO - {currentPools.length} Pools Ativos
             </span>
-            <div className="animate-pulse">
-              <div className="w-2 h-2 rounded-full bg-[#ff2389]"></div>
+            <div className={countdown <= 8 ? 'animate-pulse' : ''}>
+              <div className={`w-2 h-2 rounded-full bg-[#ff2389] ${countdown <= 8 ? 'animate-pulse' : ''}`}></div>
+            </div>
+          </div>
+          
+          {/* Countdown bar */}
+          <div className="w-full max-w-md mx-auto mt-4">
+            <div className={`h-2 bg-muted rounded-full overflow-hidden ${
+              countdown <= 8 ? `animate-pulse` : ''
+            }`}>
+              <div 
+                className={`h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 transition-all duration-1000 ${
+                  countdown <= 8 ? 'animate-[pulse_0.5s_ease-in-out_infinite]' : ''
+                }`}
+                style={{ width: `${(countdown / 60) * 100}%` }}
+              />
             </div>
           </div>
         </div>
 
-        {/* Bet Amount Selector */}
+        {/* Bet Amount Selector - Positioned more discretely */}
         {user && (
-          <div className="max-w-md mx-auto mb-8">
-            <Card className="border border-[#ff2389]/20 bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-semibold text-center flex items-center justify-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#ff2389] animate-pulse"></div>
-                  Seletor de Valor - {(profile?.saldo_moeda || 0).toLocaleString()} RZ
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-2">
+          <div className="fixed bottom-4 left-4 right-4 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:max-w-sm md:mx-auto md:mb-8">
+            <Card className="border border-[#ff2389]/20 bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm shadow-xl">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-muted-foreground">Valor da Opinião</span>
+                  <span className="text-sm font-bold text-primary">{(profile?.saldo_moeda || 0).toLocaleString()} RZ</span>
+                </div>
+                
+                <div className="flex items-center gap-2 mb-3">
                   <input
                     type="number"
                     value={betAmount}
@@ -397,25 +471,19 @@ const Fast = () => {
                   <span className="text-sm text-muted-foreground">RZ</span>
                 </div>
                 
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-4 gap-1">
                   {[25, 50, 100, 200].map((amount) => (
                     <Button
                       key={amount}
                       variant="outline"
                       size="sm"
                       onClick={() => setBetAmount(Math.min(amount, profile?.saldo_moeda || 0))}
-                      className="text-xs"
+                      className="text-xs h-8"
                       disabled={amount > (profile?.saldo_moeda || 0)}
                     >
                       {amount}
                     </Button>
                   ))}
-                </div>
-
-                <div className="text-center pt-2 border-t border-border/50">
-                  <p className="text-xs text-muted-foreground">
-                    Clique em SIM ou NÃO nos pools para opinar com este valor
-                  </p>
                 </div>
               </CardContent>
             </Card>

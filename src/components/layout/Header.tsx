@@ -252,7 +252,7 @@ const Header = () => {
                       isActive 
                         ? (item.href === '/fast' ? 'bg-[#32162C] text-white hover:bg-[#32162C]/90' : 'bg-primary text-primary-foreground hover:bg-primary/90')
                         : 'text-foreground/80 hover:text-foreground'
-                    } ${item.special === 'pulse' ? 'animate-[pulse_1.2s_cubic-bezier(0.4,0,0.6,1)_infinite]' : ''}`}
+                    } ${item.special === 'pulse' ? 'animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]' : ''}`}
                   >
                     <item.icon className={`w-4 h-4 ${item.special === 'pulse' ? 'text-[#ff2389]' : ''}`} />
                     <span className={item.special === 'pulse' ? 'text-[#ff2389]' : ''}>{item.label}</span>
