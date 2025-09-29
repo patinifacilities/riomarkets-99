@@ -158,7 +158,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
         <span 
           className="text-sm font-medium transition-none"
           style={{
-            color: progress > 0 && selectedOption === 'nao' ? '#000' : 'white'
+            color: progress > 0 && selectedOption === 'sim' ? '#374151' : 'white'
           }}
         >
           {text}

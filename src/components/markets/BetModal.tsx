@@ -267,7 +267,8 @@ const BetModal = ({
             <SliderConfirm
               onConfirm={handleBet}
               disabled={!!errorMessage || isLoading}
-              text={isLoading ? "Processando..." : `Deslize para opinar ${betValue || 0} Rioz Coin`}
+              text={isLoading ? "Processando..." : "Deslize para confirmar opinião"}
+              selectedOption={selectedOption}
               className="w-full"
             />
             <Button 

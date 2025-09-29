@@ -451,14 +451,16 @@ const MarketDetail = () => {
                            window.dispatchEvent(new CustomEvent('balanceUpdated'));
                           window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
 
-                           // Success notification with opinion color
-                           const backgroundColor = selectedOption === 'sim' ? '#00ff90' : '#ff2389';
-                           
-                           // Custom toast with background color
-                           const toastElement = document.createElement('div');
-                           toastElement.className = 'fixed top-4 right-4 z-50 p-4 rounded-lg text-white font-medium shadow-lg animate-in fade-in slide-in-from-top-2';
-                           toastElement.style.backgroundColor = backgroundColor;
-                           toastElement.textContent = `Opinião ${selectedOption.toUpperCase()} confirmada! ${betAmount} Rioz apostado.`;
+                            // Success notification with opinion color
+                            const backgroundColor = selectedOption === 'sim' ? '#00ff90' : '#ff2389';
+                            const textColor = selectedOption === 'sim' ? '#374151' : '#ffffff';
+                            
+                            // Custom toast with background color
+                            const toastElement = document.createElement('div');
+                            toastElement.className = 'fixed top-4 right-4 z-50 p-4 rounded-lg font-medium shadow-lg animate-in fade-in slide-in-from-top-2';
+                            toastElement.style.backgroundColor = backgroundColor;
+                            toastElement.style.color = textColor;
+                            toastElement.textContent = 'Opinião confirmada.';
                            
                            document.body.appendChild(toastElement);
                            
