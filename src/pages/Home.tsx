@@ -346,19 +346,6 @@ const Home = () => {
                     market={market} 
                     showHotIcon={isHighVolume}
                   />
-                  {isHighVolume && (
-                    <div className="absolute top-2 right-2 z-10">
-                      <img 
-                        src={hotFire} 
-                        alt="Hot" 
-                        className="w-6 h-6 animate-pulse"
-                        style={{
-                          filter: 'drop-shadow(0 0 8px rgba(255, 100, 0, 0.8))',
-                          animation: 'pulse 2s infinite'
-                        }}
-                      />
-                    </div>
-                  )}
                 </div>
               );
             })}
