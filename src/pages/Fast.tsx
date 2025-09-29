@@ -255,12 +255,21 @@ const Fast = () => {
         }
       }
       
-      // Show winner balance animation for current user
+      // Show winner balance animation for current user in header
       if (totalUserWinnings > 0) {
-        setShowWinnerBalance({ amount: totalUserWinnings, show: true });
-        setTimeout(() => {
-          setShowWinnerBalance({ amount: 0, show: false });
-        }, 3000);
+        const animationTarget = document.getElementById('fast-winner-animation-target');
+        if (animationTarget) {
+          const animationElement = document.createElement('div');
+          animationElement.className = 'bg-[#00ff90] text-black px-3 py-1 rounded-full text-sm font-bold animate-bounce shadow-lg whitespace-nowrap';
+          animationElement.textContent = `+${totalUserWinnings} RZ`;
+          animationTarget.appendChild(animationElement);
+          
+          setTimeout(() => {
+            if (animationTarget.contains(animationElement)) {
+              animationTarget.removeChild(animationElement);
+            }
+          }, 3000);
+        }
       }
       
       // Remove processed bets
@@ -306,12 +315,22 @@ const Fast = () => {
       
       setTimeout(() => {
         setWinnerResults({});
-      }, 1000);
+      }, 3000);
     }
   }, [countdown, currentRound, currentPools]);
 
   const placeBet = async (poolId: number, side: 'sim' | 'nao', odds: number) => {
     if (!user || !profile || betAmount <= 0) return;
+
+    // Block bets when 10 seconds or less remaining
+    if (countdown <= 10) {
+      toast({
+        title: "Pool fechado",
+        description: "Não é possível enviar ordens nos últimos 10 segundos.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     if (betAmount > profile.saldo_moeda) {
       toast({
@@ -433,28 +452,6 @@ const Fast = () => {
             </div>
           </div>
           
-          {/* Winner Balance Animation in Header */}
-          {user && showWinnerBalance.show && (
-            <div className="flex justify-center items-center gap-4 mt-4">
-              <div className="relative">
-                <Link to="/wallet">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-xl"
-                  >
-                    <Wallet className="w-4 h-4" />
-                    {(profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RZ
-                  </Button>
-                </Link>
-                
-                {/* Winner Balance Animation */}
-                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-[#00ff90] text-black px-3 py-1 rounded-full text-sm font-bold animate-bounce z-50 shadow-lg">
-                  +{showWinnerBalance.amount} RZ
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Category Selection */}

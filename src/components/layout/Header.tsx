@@ -271,16 +271,23 @@ const Header = () => {
             {isLoggedIn ? (
               <>
                 {/* Wallet Balance */}
-                <Link to="/wallet">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-xl"
-                  >
-                    <Wallet className="w-4 h-4" />
-                    {(profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RZ
-                  </Button>
-                </Link>
+                <div className="relative">
+                  <Link to="/wallet">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-xl"
+                    >
+                      <Wallet className="w-4 h-4" />
+                      {(profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RZ
+                    </Button>
+                  </Link>
+                  
+                  {/* Winner Balance Animation for Fast Markets */}
+                  {location.pathname === '/fast' && (
+                    <div id="fast-winner-animation-target" className="absolute -top-8 left-1/2 transform -translate-x-1/2 pointer-events-none z-50"></div>
+                  )}
+                </div>
                 
                   {/* Deposit Button */}
                 <Button 

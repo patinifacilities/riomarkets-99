@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { AlertTriangle, Zap } from 'lucide-react';
+import rioLogoFast from '@/assets/rio-white-logo-fast.png';
 
 interface FastMarketTermsModalProps {
   open: boolean;
@@ -34,7 +35,7 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
         <DialogHeader>
           <div className="flex justify-center mb-4">
             <img 
-              src="/assets/rio-markets-logo.png" 
+              src={rioLogoFast} 
               alt="Rio Markets" 
               className="h-12 w-auto" 
             />
