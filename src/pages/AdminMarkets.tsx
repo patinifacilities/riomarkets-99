@@ -144,13 +144,15 @@ const AdminMarkets = () => {
               <Badge variant="destructive" className="text-xs">
                 ADMIN
               </Badge>
-              <Button 
-                onClick={() => setShowCreateForm(!showCreateForm)}
-                className="gap-2 shadow-success min-h-[44px]"
-              >
-                <Plus className="w-4 h-4" />
-                Criar Mercado
-              </Button>
+              <div className="hidden md:block">
+                <Button 
+                  onClick={() => setShowCreateForm(!showCreateForm)}
+                  className="gap-2 shadow-success min-h-[44px]"
+                >
+                  <Plus className="w-4 h-4" />
+                  Criar Mercado
+                </Button>
+              </div>
             </div>
           </div>
 

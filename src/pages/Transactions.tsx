@@ -99,7 +99,13 @@ const Transactions = () => {
           }))
         ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-        setTransactions(allTransactions, allTransactions.length, Math.ceil(allTransactions.length / 20));
+        // Apply pagination - show 10 per page
+        const pageSize = 10;
+        const startIndex = ((filters.page || 1) - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const paginatedTransactions = allTransactions.slice(startIndex, endIndex);
+        
+        setTransactions(paginatedTransactions, allTransactions.length, Math.ceil(allTransactions.length / pageSize));
       } catch (error) {
         console.error('Error loading transactions:', error);
         setError(error instanceof Error ? error.message : 'Erro ao carregar transações');
@@ -262,7 +268,7 @@ const Transactions = () => {
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Enviado</p>
+                  <p className="text-sm text-muted-foreground">Total Opinado</p>
                   <p className="text-2xl font-bold text-danger tabular-nums">
                     -{stats.totalDebits.toLocaleString('pt-BR')}
                   </p>
@@ -276,8 +282,10 @@ const Transactions = () => {
         </div>
       </div>
 
-      {/* Sticky Toolbar with filters but no export */}
-      <TransactionsToolbar onExport={async () => {}} />
+      {/* Fixed Toolbar with filters */}
+      <div className="sticky top-[calc(env(safe-area-inset-top)+3.5rem)] z-40 bg-background/95 backdrop-blur-sm border-b border-border">
+        <TransactionsToolbar onExport={async () => {}} />
+      </div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 pb-[env(safe-area-inset-bottom)] max-w-6xl">

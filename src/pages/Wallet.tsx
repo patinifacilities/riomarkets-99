@@ -75,7 +75,7 @@ const WalletPage = () => {
           <div>
             <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
               <Wallet className="w-8 h-8" />
-              Minha Carteira
+              Carteira
             </h1>
             <p className="text-muted-foreground">
               Gerencie seus fundos e acompanhe suas transações
@@ -84,13 +84,6 @@ const WalletPage = () => {
           
           {/* Action Buttons - Top Right */}
           <div className="flex gap-3">
-            <Button 
-              onClick={() => setShowDepositModal(true)}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Depositar
-            </Button>
             <Button 
               onClick={() => setShowWithdrawModal(true)}
               variant="outline"

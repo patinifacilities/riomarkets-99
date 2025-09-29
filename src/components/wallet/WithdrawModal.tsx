@@ -147,7 +147,7 @@ export const WithdrawModal = ({ open, onOpenChange, onSuccess }: WithdrawModalPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ArrowRightLeft className="w-5 h-5" />
@@ -211,20 +211,24 @@ export const WithdrawModal = ({ open, onOpenChange, onSuccess }: WithdrawModalPr
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Tipo de Chave PIX</Label>
-                <RadioGroup
-                  value={pixKeyType}
-                  onValueChange={setPixKeyType}
-                  className="grid grid-cols-2 gap-2"
-                >
+                <div className="grid grid-cols-1 gap-2">
                   {pixKeyTypes.map((type) => (
-                    <div key={type.id} className="flex items-center space-x-2">
+                    <div 
+                      key={type.id} 
+                      className={`flex items-center space-x-3 p-2 rounded-lg border cursor-pointer transition-colors ${
+                        pixKeyType === type.id 
+                          ? 'border-primary bg-primary/10' 
+                          : 'border-border hover:bg-muted/50'
+                      }`}
+                      onClick={() => setPixKeyType(type.id)}
+                    >
                       <RadioGroupItem value={type.id} id={type.id} />
-                      <Label htmlFor={type.id} className="text-sm cursor-pointer">
+                      <Label htmlFor={type.id} className="text-sm cursor-pointer flex-1">
                         {type.label}
                       </Label>
                     </div>
                   ))}
-                </RadioGroup>
+                </div>
               </div>
               
               <div className="space-y-2">

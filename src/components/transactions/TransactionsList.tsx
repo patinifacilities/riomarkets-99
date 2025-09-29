@@ -1,10 +1,12 @@
-import { ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
 import { WalletTransaction } from '@/types';
-import { format } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { track } from '@/lib/analytics';
+import { Badge } from '@/components/ui/badge';
+import { Link } from 'react-router-dom';
+import { ExternalLink, ArrowUpCircle, ArrowDownCircle, TrendingUp, TrendingDown, ChevronDown, ChevronUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 interface TransactionsListProps {
@@ -13,6 +15,24 @@ interface TransactionsListProps {
 }
 
 const TransactionsList = ({ transactions, className }: TransactionsListProps) => {
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  
+  const toggleExpanded = (id: string) => {
+    setExpandedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+  
+  // Calculate stats for expanded view
+  const totalReceived = transactions.filter(t => t.tipo === 'credito').reduce((sum, t) => sum + t.valor, 0);
+  const totalOpinado = transactions.filter(t => t.tipo === 'debito').reduce((sum, t) => sum + t.valor, 0);
+
   const getStatusBadge = (transaction: WalletTransaction) => {
     return (
       <Badge variant="outline" className="bg-emerald-500/15 text-emerald-300 border-emerald-500/40 text-xs">
@@ -35,92 +55,135 @@ const TransactionsList = ({ transactions, className }: TransactionsListProps) =>
     );
   };
 
-  if (transactions.length === 0) {
-    return (
-      <div className="text-center py-12 px-4">
-        <div className="text-white mb-4">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" className="mx-auto mb-4 opacity-50">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">
-          Nenhuma transação no período selecionado
-        </h3>
-        <p className="text-muted-foreground mb-4 text-sm">
-          Não há transações para exibir com os filtros selecionados.
-        </p>
-        <Button 
-          variant="outline" 
-          onClick={() => window.location.href = '/'}
-          className="border-primary/40 text-primary hover:bg-primary/10"
-        >
-          Explorar mercados
-        </Button>
-      </div>
-    );
-  }
-
   return (
-    <div className={cn("space-y-3", className)}>
-      {transactions.map((transaction) => (
-        <div
-          key={transaction.id}
-          className="p-4 rounded-lg border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-150 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-background"
-        >
-          {/* Line 1: Market Title */}
-          <div className="flex items-start justify-between mb-2">
-            <h3 className="font-medium text-foreground truncate flex-1 mr-2">
-              {transaction.descricao}
-            </h3>
-            {transaction.market_id && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  track('row_open_market', { market_id: transaction.market_id });
-                  window.location.href = `/market/${transaction.market_id}`;
-                }}
-                className="h-auto p-1 hover:bg-primary/10 flex-shrink-0 min-h-[44px] w-[44px]"
-                aria-label="Ver mercado relacionado"
-              >
-                <ExternalLink className="w-4 h-4" />
-              </Button>
-            )}
-          </div>
-
-          {/* Line 2: Date • Type • Status */}
-          <div className="flex items-center gap-2 mb-3 text-sm">
-            <span className="text-muted-foreground tabular-nums">
-              {format(new Date(transaction.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
-            </span>
-            <span className="w-1 h-1 bg-muted-foreground rounded-full" />
-            {getTypeBadge(transaction.tipo)}
-            <span className="w-1 h-1 bg-muted-foreground rounded-full" />
-            {getStatusBadge(transaction)}
-          </div>
-
-          {/* Line 3: Value */}
+    <div className={cn("space-y-4", className)}>
+      {/* Stats Card - Expandable */}
+      <Card className="bg-card border-border">
+        <CardContent className="p-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">Valor</span>
-            <span className={cn(
-              "font-semibold tabular-nums text-lg",
-              transaction.tipo === 'credito' ? "text-success" : "text-danger"
-            )}>
-              {transaction.tipo === 'credito' ? '+' : '-'}{transaction.valor.toLocaleString('pt-BR')} Rioz Coin
-            </span>
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-primary/10">
+                <TrendingUp className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-medium text-foreground">Resumo das Transações</p>
+                <p className="text-sm text-muted-foreground">
+                  {transactions.length} transação{transactions.length !== 1 ? 'ões' : ''}
+                </p>
+              </div>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => toggleExpanded('stats')}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              {expandedItems.has('stats') ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </Button>
           </div>
-
-          {/* Additional info if market_id exists */}
-          {transaction.market_id && (
-            <div className="mt-2 pt-2 border-t border-border">
-              <span className="text-xs text-muted-foreground">
-                ID do Mercado: {transaction.market_id}
-              </span>
+          
+          {expandedItems.has('stats') && (
+            <div className="mt-4 pt-4 border-t border-border">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-3 rounded-lg bg-success/10">
+                  <p className="text-sm text-muted-foreground">Total Recebido</p>
+                  <p className="text-lg font-bold text-success">
+                    +{totalReceived.toLocaleString('pt-BR')} RZ
+                  </p>
+                </div>
+                <div className="text-center p-3 rounded-lg bg-danger/10">
+                  <p className="text-sm text-muted-foreground">Total Opinado</p>
+                  <p className="text-lg font-bold text-danger">
+                    -{totalOpinado.toLocaleString('pt-BR')} RZ
+                  </p>
+                </div>
+              </div>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {transactions.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="text-muted-foreground mb-4">
+            <TrendingUp className="w-12 h-12 mx-auto mb-4 opacity-50" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground mb-2">Nenhuma transação encontrada</h3>
+          <p className="text-muted-foreground mb-6">
+            Suas transações aparecerão aqui quando você começar a participar dos mercados.
+          </p>
+          <Link to="/">
+            <Button className="gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Explorar Mercados
+            </Button>
+          </Link>
         </div>
-      ))}
+      ) : (
+        <div className="space-y-3">
+          {transactions.map((transaction) => (
+            <div 
+              key={transaction.id} 
+              className="flex items-center justify-between p-4 rounded-lg bg-card border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-150"
+            >
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className={`p-2 rounded-full ${
+                  transaction.tipo === 'credito' 
+                    ? 'bg-success/20 text-success' 
+                    : 'bg-danger/20 text-danger'
+                }`}>
+                  {transaction.tipo === 'credito' ? (
+                    <ArrowUpCircle className="w-4 h-4" />
+                  ) : (
+                    <ArrowDownCircle className="w-4 h-4" />
+                  )}
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-medium text-foreground truncate">
+                      {transaction.descricao}
+                    </p>
+                    {getStatusBadge(transaction)}
+                    {getTypeBadge(transaction.tipo)}
+                  </div>
+                  
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                    <span>
+                      {formatDistanceToNow(new Date(transaction.created_at), { 
+                        addSuffix: true, 
+                        locale: ptBR 
+                      })}
+                    </span>
+                    
+                    {transaction.market_id && (
+                      <Link 
+                        to={`/market/${transaction.market_id}`}
+                        className="inline-flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
+                      >
+                        <span>Ver mercado</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-right">
+                <div className={`font-semibold ${
+                  transaction.tipo === 'credito' ? 'text-success' : 'text-danger'
+                }`}>
+                  {transaction.tipo === 'credito' ? '+' : '-'}{transaction.valor.toLocaleString('pt-BR')} RIOZ
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

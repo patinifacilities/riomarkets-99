@@ -55,10 +55,12 @@ const Header = () => {
 
   const navItems = [
     { href: '/fast', icon: Zap, label: 'Fast', special: 'pulse' },
+    { href: '/wallet', icon: Wallet, label: 'Carteira', authRequired: true },
     { href: '/', icon: TrendingUp, label: 'Mercados' },
     { href: '/exchange', icon: ArrowRightLeft, label: 'Exchange', authRequired: true },
     { href: '/ranking', icon: Trophy, label: 'Ranking' },
     { href: '/press', icon: Newspaper, label: 'Na mídia' },
+    { href: '/transactions', icon: Receipt, label: 'Transações', authRequired: true },
     { href: '/admin', icon: Settings, label: 'Admin', adminRequired: true }
   ];
 
@@ -90,7 +92,7 @@ const Header = () => {
                   <Menu className="h-5 w-5 text-white" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-80 bg-black border-border">
+              <SheetContent side="left" className="w-80 bg-black dark:bg-black border-border">
                 <SheetHeader className="border-b border-border pb-4">
                   <div className="text-left">
                     <img 
@@ -113,9 +115,12 @@ const Header = () => {
                         </Avatar>
                         <div>
                           <p className="text-sm font-medium text-white">{profile.nome || 'Usuário'}</p>
-                          <p className="text-xs text-gray-300 capitalize">{profile.nivel || 'iniciante'}</p>
+                          <p className="text-sm text-muted-foreground capitalize">{profile.nivel || 'iniciante'}</p>
                           <div className="text-xs text-primary font-medium mt-1">
-                            {(profile.saldo_moeda || 0).toLocaleString('pt-BR')} RZ
+                            {profile.saldo_moeda >= 1000 
+                              ? Math.floor(profile.saldo_moeda).toLocaleString('pt-BR') 
+                              : (profile.saldo_moeda || 0).toLocaleString('pt-BR')
+                            } RZ
                           </div>
                         </div>
                       </div>
@@ -162,39 +167,39 @@ const Header = () => {
                         <Button 
                           variant={isActive ? "secondary" : "ghost"} 
                           size="sm" 
-                          className={`w-full justify-start gap-3 h-12 ${
+                          className={`w-full justify-start gap-3 h-12 transition-all duration-200 ${
                              isActive 
                                ? (item.href === '/fast' 
-                                   ? 'bg-[#32162C] text-white hover:bg-[#32162C]/90' 
+                                   ? 'bg-[#32162C] text-white hover:bg-[#32162C]/90 outline-none' 
                                    : 'bg-[#00ff90] text-black hover:bg-[#00ff90]/90')
                                : 'text-white hover:text-foreground hover:bg-muted/10'
-                           }`}
+                           } ${item.special === 'pulse' && isActive ? '' : item.special === 'pulse' ? '' : ''}`}
                          >
-                           <item.icon className={`w-5 h-5 ${isActive && item.href === '/fast' ? 'text-white' : ''}`} />
-                           <span className={isActive && item.href === '/fast' ? 'text-white' : ''}>{item.label}</span>
+                           <item.icon className={`w-5 h-5 transition-all duration-200 ${
+                             isActive && item.href === '/fast' 
+                               ? 'text-white' 
+                               : item.special === 'pulse' && isActive 
+                                 ? 'text-white animate-[pulse_1s_ease-in-out_infinite]' 
+                                 : item.special === 'pulse' 
+                                   ? 'text-[#ff2389] animate-[pulse_1s_ease-in-out_infinite]' 
+                                   : ''
+                           }`} />
+                           <span className={`transition-all duration-200 ${
+                             isActive && item.href === '/fast' 
+                               ? 'text-white' 
+                               : item.special === 'pulse' && isActive 
+                                 ? 'text-white animate-[pulse_1s_ease-in-out_infinite]' 
+                                 : item.special === 'pulse' 
+                                   ? 'text-[#ff2389] animate-[pulse_1s_ease-in-out_infinite]' 
+                                   : ''
+                           }`}>
+                             {item.label}
+                           </span>
                          </Button>
                       </Link>
                     );
                   })}
                   
-                   {/* Wallet and Transactions Buttons */}
-                  {isLoggedIn && (
-                    <div className="border-t border-border pt-4 mt-2 space-y-2">
-                      <Link to="/wallet" onClick={handleMobileNavClick}>
-                        <Button variant="ghost" className="w-full justify-start gap-3 h-12 text-white hover:text-foreground hover:bg-muted/10">
-                          <Wallet className="w-5 h-5" />
-                          Carteira
-                        </Button>
-                      </Link>
-                      <Link to="/transactions" onClick={handleMobileNavClick}>
-                        <Button variant="ghost" className="w-full justify-start gap-3 h-12 text-white hover:text-foreground hover:bg-muted/10">
-                          <Receipt className="w-5 h-5" />
-                          Transações
-                        </Button>
-                      </Link>
-                    </div>
-                  )}
-
                    {/* Auth Actions */}
                   {isLoggedIn ? (
                     <div className="border-t border-border pt-4 mt-4">
@@ -225,13 +230,23 @@ const Header = () => {
             </Sheet>
           )}
 
-          <Link to="/" className="flex items-center space-x-3">
-            <img 
-              src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
-              alt="Rio Markets" 
-              className="h-8 w-auto" 
-            />
-          </Link>
+          {isMobile && location.pathname === '/wallet' ? (
+            <div className="flex items-center space-x-3">
+              <img 
+                src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
+                alt="Rio Markets" 
+                className="h-8 w-auto" 
+              />
+            </div>
+          ) : (
+            <Link to="/" className="flex items-center space-x-3">
+              <img 
+                src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
+                alt="Rio Markets" 
+                className="h-8 w-auto" 
+              />
+            </Link>
+          )}
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
@@ -300,7 +315,10 @@ const Header = () => {
                       className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-xl"
                     >
                       <Wallet className="w-4 h-4" />
-                      {(profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RZ
+                      {profile?.saldo_moeda >= 1000 
+                        ? Math.floor(profile.saldo_moeda).toLocaleString('pt-BR') 
+                        : (profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                      } RZ
                     </Button>
                   </Link>
                   
@@ -330,7 +348,7 @@ const Header = () => {
                      <Button 
                        variant="ghost" 
                        size="sm"
-                       className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-full p-2"
+                       className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-full p-2 overflow-hidden"
                      >
                        <UserCircle className="w-6 h-6" />
                      </Button>

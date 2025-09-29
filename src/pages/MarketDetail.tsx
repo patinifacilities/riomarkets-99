@@ -198,11 +198,12 @@ const MarketDetail = () => {
                       onClick={() => {
                         const content = document.getElementById('wallet-content');
                         if (content) {
-                          content.style.display = content.style.display === 'none' ? 'block' : 'none';
+                          const isHidden = content.style.display === 'none';
+                          content.style.display = isHidden ? 'block' : 'none';
                         }
                       }}
                     >
-                      <ArrowLeft className="w-4 h-4" />
+                      <ArrowLeft className="w-4 h-4 transition-transform" />
                     </Button>
                   </div>
                   <div id="wallet-content" className="p-4">
