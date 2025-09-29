@@ -156,18 +156,13 @@ const WalletPage = () => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Histórico de Transações</CardTitle>
-                <ExportCSVButton 
-                  data={transactions || []}
-                  filename="transacoes"
-                  headers={['ID', 'Tipo', 'Valor', 'Descrição']}
-                />
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="bg-secondary-glass">
               {loadingTransactions ? (
                 <div className="space-y-3">
                   {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-16 bg-muted/20 rounded animate-pulse" />
+                    <div key={i} className="h-16 bg-secondary-glass rounded animate-pulse" />
                   ))}
                 </div>
                ) : transactions && transactions.length > 0 ? (

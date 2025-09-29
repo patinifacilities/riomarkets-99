@@ -8,12 +8,17 @@ import { OnboardingModal } from '@/components/onboarding/OnboardingModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useOnboarding } from '@/stores/useOnboarding';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const { user, loading } = useAuth();
   const { data: profile } = useProfile(user?.id);
   const { openOnFirstVisit, setMounted } = useOnboarding();
+  const isMobile = useIsMobile();
+  
+  const isAuthPage = location.pathname === '/auth';
+  const shouldHideHeaderFooter = isMobile && isAuthPage;
 
   // Initialize onboarding after hydration
   useEffect(() => {
@@ -56,11 +61,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      {!shouldHideHeaderFooter && <Header />}
       <main className="flex-1 min-h-0">
         {children}
       </main>
-      <Footer />
+      {!shouldHideHeaderFooter && <Footer />}
       <ComplianceBanner variant="sticky" />
       <OnboardingModal />
       <RianaChat />

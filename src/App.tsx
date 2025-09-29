@@ -69,9 +69,6 @@ function App() {
             <Route path="/admin/logs" element={<AdminLogs />} />
             <Route path="/admin/news" element={<AdminNews />} />
             <Route path="/admin/markets" element={<AdminMarkets />} />
-            <Route path="/admin/gateway-config/pix" element={<AdminGatewayConfigPix />} />
-            <Route path="/admin/gateway-config/stripe" element={<AdminGatewayConfigStripe />} />
-            <Route path="/admin/gateway-config/crypto" element={<AdminGatewayConfigCrypto />} />
             <Route path="/admin/gateway-config/:gatewayId" element={<AdminGatewayConfig />} />
             <Route path="/admin/gateways-saque" element={<AdminGatewaysSaque />} />
           <Route path="/opinioes" element={<Opinioes />} />

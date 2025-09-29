@@ -152,21 +152,22 @@ export const OpenOpinionsCard = ({ marketId, onOrderCancelled }: OpenOpinionsCar
                   <Button 
                     size="sm"
                     variant="outline"
-                    className="border-danger/30 text-danger hover:bg-danger/10 text-xs px-2 py-1"
+                    className="border-success/30 text-success hover:bg-success/10 text-xs px-2 py-1"
+                    disabled
+                  >
+                    <DollarSign className="w-3 h-3 mr-1" />
+                    Sacar agora
+                  </Button>
+                  <Button 
+                    size="sm"
+                    variant="outline"
+                    style={{ backgroundColor: '#ff2389', color: 'white', borderColor: '#ff2389' }}
+                    className="hover:bg-[#ff2389]/90 text-xs px-2 py-1"
                     onClick={() => handleCancelOrder(order.id, order.quantidade_moeda)}
                     disabled={loading}
                   >
                     <X className="w-3 h-3 mr-1" />
                     Cancelar
-                  </Button>
-                  <Button 
-                    size="sm"
-                    variant="outline"
-                    className="border-success/30 text-success hover:bg-success/10 text-xs px-2 py-1"
-                    disabled
-                  >
-                    <DollarSign className="w-3 h-3 mr-1" />
-                    Sacar
                   </Button>
                 </div>
               </div>

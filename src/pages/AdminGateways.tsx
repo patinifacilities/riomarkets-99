@@ -115,7 +115,8 @@ const AdminGateways = () => {
                 <Link to="/admin/gateways-saque">
                   <Button 
                     variant="outline"
-                    className="gap-2"
+                    style={{ backgroundColor: '#00ff90', color: '#1a1a1a', borderColor: '#00ff90' }}
+                    className="gap-2 hover:bg-[#00ff90]/90"
                   >
                     <ArrowRightLeft className="w-4 h-4" />
                     Gateways de Saque
@@ -162,7 +163,7 @@ const AdminGateways = () => {
                       <p className="text-sm text-muted-foreground">{gateway.limits}</p>
                     </div>
                     <div className="flex justify-end">
-                       <Link to={`/admin/gateway-config-${gateway.id}`}>
+                       <Link to={`/admin/gateway-config/${gateway.id}`}>
                          <Button 
                            variant="outline" 
                            size="sm" 
