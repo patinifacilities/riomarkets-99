@@ -49,7 +49,7 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
               <div className="flex items-start gap-3 p-4 bg-[#ff2389]/10 rounded-lg border border-[#ff2389]/20">
                 <AlertTriangle className="w-5 h-5 text-[#ff2389] mt-0.5 flex-shrink-0" />
                 <div className="text-sm">
-                  <p className="font-semibold text-[#ff2389] mb-2">⚡ Mercados Ultra-rápidos</p>
+                  <p className="font-semibold text-[#ff2389] mb-2">Mercados Ultra-rápidos</p>
                   <p className="mb-2">
                     Os Fast Markets são pools de opinião com duração de apenas 60 segundos, 
                     projetados para traders experientes.
@@ -59,7 +59,7 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
 
               <div className="space-y-3 text-sm">
                 <div>
-                  <h4 className="font-semibold mb-1">🎯 Como funcionam:</h4>
+                  <h4 className="font-semibold mb-1">Como funcionam:</h4>
                   <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-2">
                     <li>Cada pool dura exatamente 60 segundos</li>
                     <li>Você opina se o ativo vai subir (SIM) ou descer (NÃO)</li>
@@ -69,7 +69,7 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-1">⚠️ Riscos importantes:</h4>
+                  <h4 className="font-semibold mb-1">Riscos importantes:</h4>
                   <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-2">
                     <li>Alta volatilidade e risco de perda total</li>
                     <li>Resultados aleatórios durante fase de testes</li>
@@ -79,7 +79,7 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-1">💰 Sistema de recompensas:</h4>
+                  <h4 className="font-semibold mb-1">Sistema de recompensas:</h4>
                   <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-2">
                     <li>Odds dinâmicas que mudam conforme o tempo</li>
                     <li>Maiores odds no início do pool (primeiros 25 segundos)</li>

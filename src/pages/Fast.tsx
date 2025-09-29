@@ -315,7 +315,7 @@ const Fast = () => {
       
       setTimeout(() => {
         setWinnerResults({});
-      }, 3000);
+      }, 4500); // 50% mais tempo (3s -> 4.5s)
     }
   }, [countdown, currentRound, currentPools]);
 
@@ -341,8 +341,18 @@ const Fast = () => {
       return;
     }
 
-    // Add click animation
+    // Add click animation and visual feedback
     setClickedPool({ id: poolId, side });
+    
+    // Show success animation on the specific button
+    const buttonElement = document.querySelector(`[data-pool-id="${poolId}"][data-side="${side}"]`);
+    if (buttonElement) {
+      buttonElement.classList.add('animate-pulse', 'bg-[#00ff90]', 'scale-105');
+      setTimeout(() => {
+        buttonElement.classList.remove('animate-pulse', 'bg-[#00ff90]', 'scale-105');
+      }, 1000);
+    }
+    
     setTimeout(() => setClickedPool(null), 200);
 
     try {
@@ -544,12 +554,14 @@ const Fast = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <Button
                     onClick={() => placeBet(pool.id, 'sim', getOdds(pool.upOdds))}
-                    disabled={!user || countdown <= 5}
+                    disabled={!user || countdown <= 10}
+                    data-pool-id={pool.id}
+                    data-side="sim"
                     className={`
                       h-14 flex flex-col gap-1 bg-[#00ff90] text-black hover:bg-[#00ff90]/90 
                       border-2 border-[#00ff90] hover:border-[#00ff90]/70
-                      transition-all duration-200 
-                      ${countdown <= 5 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
+                      transition-all duration-300 
+                      ${countdown <= 10 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
                       ${clickedPool?.id === pool.id && clickedPool?.side === 'sim' ? 'animate-pulse scale-95' : ''}
                     `}
                   >
@@ -559,12 +571,14 @@ const Fast = () => {
                   
                   <Button
                     onClick={() => placeBet(pool.id, 'nao', getOdds(pool.downOdds))}
-                    disabled={!user || countdown <= 5}
+                    disabled={!user || countdown <= 10}
+                    data-pool-id={pool.id}
+                    data-side="nao"
                     className={`
                       h-14 flex flex-col gap-1 bg-[#ff2389] text-white hover:bg-[#ff2389]/90
                       border-2 border-[#ff2389] hover:border-[#ff2389]/70
-                      transition-all duration-200 
-                      ${countdown <= 5 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
+                      transition-all duration-300 
+                      ${countdown <= 10 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
                       ${clickedPool?.id === pool.id && clickedPool?.side === 'nao' ? 'animate-pulse scale-95' : ''}
                     `}
                   >
