@@ -56,6 +56,9 @@ function App() {
           <Route path="/admin/payouts" element={<AdminPayouts />} />
           <Route path="/admin/deposits" element={<AdminDeposits />} />
           <Route path="/admin/gateways" element={<AdminGateways />} />
+          <Route path="/admin/logs" element={<Admin />} />
+          <Route path="/admin/news" element={<Admin />} />
+          <Route path="/admin/markets" element={<Admin />} />
           <Route path="/opinioes" element={<Opinioes />} />
           <Route path="/fiat-requests" element={<FiatRequests />} />
           <Route path="*" element={<NotFound />} />

@@ -204,34 +204,24 @@ const Exchange = () => {
           </p>
         </div>
 
-        {/* Saldos */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Wallet className="h-5 w-5" />
-              Seus Saldos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-4 bg-primary/10 rounded-lg">
-                <div className="text-2xl font-bold text-primary">
-                  R$ {brlBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </div>
-                <div className="text-sm text-muted-foreground">Real Brasileiro</div>
-              </div>
-              <div className="text-center p-4 bg-secondary/10 rounded-lg">
-                <div className="text-2xl font-bold text-secondary-foreground">
-                  {riozBalance.toLocaleString('pt-BR')} RZ
-                </div>
-                <div className="text-sm text-muted-foreground">RIOZ Coin</div>
-              </div>
+        {/* Saldos Compactos */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="text-center p-3 bg-primary/20 rounded-lg border border-primary/30">
+            <div className="text-lg font-bold text-primary">
+              R$ {brlBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </div>
-          </CardContent>
-        </Card>
+            <div className="text-xs text-muted-foreground">BRL</div>
+          </div>
+          <div className="text-center p-3 bg-secondary/20 rounded-lg border border-secondary/30">
+            <div className="text-lg font-bold text-secondary-foreground">
+              {riozBalance.toLocaleString('pt-BR')} RZ
+            </div>
+            <div className="text-xs text-muted-foreground">RIOZ</div>
+          </div>
+        </div>
 
         {/* Interface de Troca */}
-        <Card className="max-w-4xl mx-auto mb-8">
+        <Card className="max-w-4xl mx-auto mb-8 bg-gradient-card border-primary/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ArrowRightLeft className="h-5 w-5" />
@@ -397,17 +387,17 @@ const Exchange = () => {
             </Badge>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {topMarkets.slice(0, 6).map((market, index) => (
               <Card 
                 key={market.id} 
-                className="cursor-pointer hover:border-primary/50 transition-all hover:shadow-lg group"
+                className="cursor-pointer hover:border-primary/50 transition-all hover:shadow-lg group bg-gradient-card border-primary/20"
                 onClick={() => window.location.href = `/market/${market.id}`}
               >
-                <CardContent className="p-6">
+                <CardContent className="p-4">
                   {/* Thumbnail Image with 16:7 aspect ratio */}
                   {market.thumbnail_url && (
-                    <div className="w-full mb-4 rounded-lg overflow-hidden">
+                    <div className="w-full mb-3 rounded-lg overflow-hidden">
                       <img 
                         src={market.thumbnail_url} 
                         alt={market.titulo}
@@ -417,15 +407,15 @@ const Exchange = () => {
                     </div>
                   )}
                   
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div>
                       <div className="flex items-center gap-2 mb-2">
                         <Badge variant="destructive" className="text-xs">
                           #{index + 1} HOT
                         </Badge>
-                        <TrendingUp className="h-4 w-4 text-success" />
+                        <TrendingUp className="h-3 w-3 text-success" />
                       </div>
-                      <h4 className="font-semibold text-sm leading-tight group-hover:text-primary transition-colors">
+                      <h4 className="font-semibold text-xs leading-tight group-hover:text-primary transition-colors line-clamp-2">
                         {market.titulo}
                       </h4>
                       <p className="text-xs text-muted-foreground mt-1">
@@ -433,10 +423,10 @@ const Exchange = () => {
                       </p>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2">
                       <Button 
                         size="sm" 
-                        className="bg-[#00ff90] hover:bg-[#00ff90]/90 text-black text-xs font-medium"
+                        className="bg-[#00ff90] hover:bg-[#00ff90]/90 text-black text-xs font-medium h-8"
                         onClick={(e) => {
                           e.stopPropagation();
                           window.location.href = `/market/${market.id}`;
@@ -446,7 +436,7 @@ const Exchange = () => {
                       </Button>
                       <Button 
                         size="sm" 
-                        className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white text-xs font-medium"
+                        className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white text-xs font-medium h-8"
                         onClick={(e) => {
                           e.stopPropagation();
                           window.location.href = `/market/${market.id}`;
@@ -456,7 +446,7 @@ const Exchange = () => {
                       </Button>
                     </div>
                     
-                    <div className="pt-2 border-t border-border/50">
+                    <div className="pt-2 border-t border-border/30">
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span>Volume 24h:</span>
                         <span className="font-medium">R$ {market.volume24h?.toLocaleString()}</span>

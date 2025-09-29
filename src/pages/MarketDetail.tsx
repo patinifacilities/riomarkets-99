@@ -273,7 +273,9 @@ const MarketDetail = () => {
             </div>
 
             {/* Order Book */}
-            <OrderBookChart market={market} />
+            <Card className="bg-gradient-card border-primary/20">
+              <OrderBookChart market={market} />
+            </Card>
 
             {/* Open Opinions Card */}
             <OpenOpinionsCard 

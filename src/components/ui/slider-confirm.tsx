@@ -148,8 +148,7 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
         className="absolute inset-0 transition-none rounded-full"
         style={{
           background: fillColor,
-          width: `${Math.min(progress * 100, 95)}%`,
-          maxWidth: 'calc(100% - 56px)', // Prevent overlapping thumb (56px = thumb width)
+          width: `${Math.min(progress * 100, 100)}%`,
         }}
       />
       
