@@ -353,8 +353,6 @@ const Home = () => {
         )}
       </div>
       
-        {/* Top Analysts Section */}
-        <TopAnalysts />
         
         {/* FAQ Section */}
         <FAQ />

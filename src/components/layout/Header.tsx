@@ -25,8 +25,8 @@ import { WalletHoverCard } from '@/components/wallet/WalletHoverCard';
 import { DarkModeToggle } from './DarkModeToggle';
 import { AddBrlModal } from '@/components/exchange/AddBrlModal';
 
-import logoImageWhite from '@/assets/riov3-markets-white.png';
-import logoImageBlack from '@/assets/riov3-markets-white.png';
+import logoImageWhite from '@/assets/rio-markets-logo-new.png';
+import logoImageBlack from '@/assets/rio-markets-logo-new.png';
 import menuLogoWhite from '@/assets/riov3-markets-white-menu.png';
 import { useTheme } from 'next-themes';
 

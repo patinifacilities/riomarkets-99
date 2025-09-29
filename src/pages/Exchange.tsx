@@ -189,10 +189,27 @@ const Exchange = () => {
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4">Exchange RIOZ/BRL</h1>
-          <p className="text-muted-foreground">
-            Converta entre RIOZ e Reais brasileiros com conversão 1:1
+          <div className="inline-flex items-center gap-3 mb-4">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30">
+              <ArrowRightLeft className="h-8 w-8 text-primary" />
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Exchange RIOZ
+            </h1>
+          </div>
+          <p className="text-muted-foreground text-lg">
+            Converta entre RIOZ e Reais brasileiros com conversão 1:1 instantânea
           </p>
+          <div className="flex justify-center gap-4 mt-4">
+            <div className="flex items-center gap-2 text-sm text-success">
+              <div className="w-2 h-2 rounded-full bg-success"></div>
+              Taxa fixa 1:1
+            </div>
+            <div className="flex items-center gap-2 text-sm text-primary">
+              <div className="w-2 h-2 rounded-full bg-primary"></div>
+              Conversão instantânea
+            </div>
+          </div>
         </div>
 
         {/* Success Notification - Inside Card */}
@@ -205,35 +222,48 @@ const Exchange = () => {
           </div>
         )}
 
-        {/* Interface de Troca Unificada */}
-        <Card className="max-w-4xl mx-auto mb-8 bg-gradient-to-br from-card via-card-secondary to-card border-primary/20 shadow-xl">
-          <CardHeader className="bg-gradient-to-r from-primary/5 to-secondary/5 border-b border-border-secondary/50">
-            <CardTitle className="flex items-center gap-3 text-xl">
-              <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
-                <ArrowRightLeft className="h-6 w-6 text-primary" />
+        {/* Interface de Troca Modernizada */}
+        <Card className="max-w-4xl mx-auto mb-8 bg-gradient-to-br from-card/95 to-card-secondary/95 border border-primary/30 shadow-2xl backdrop-blur-sm">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-primary/20">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-3 text-2xl">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30">
+                  <ArrowRightLeft className="h-6 w-6 text-primary" />
+                </div>
+                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  Exchange Central
+                </span>
+              </CardTitle>
+              <div className="flex gap-2">
+                <Badge variant="outline" className="border-success/50 text-success">
+                  Taxa 1:1
+                </Badge>
+                <Badge variant="outline" className="border-primary/50 text-primary">
+                  Instantâneo
+                </Badge>
               </div>
-              <span className="text-foreground">
-                Exchange RIOZ/BRL
-              </span>
-              <Badge variant="secondary" className="ml-auto text-xs">
-                Taxa 1:1
-              </Badge>
-            </CardTitle>
+            </div>
           </CardHeader>
           <CardContent>
-            {/* Saldos Compactos */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="text-center p-3 bg-muted/10 rounded-lg border border-border/20">
-                <div className="text-lg font-bold text-muted-foreground mb-1">
+            {/* Saldos Modernizados */}
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="text-center p-4 bg-gradient-to-br from-muted/20 to-muted/10 rounded-xl border border-border/30 backdrop-blur-sm">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Wallet className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">BRL</span>
+                </div>
+                <div className="text-2xl font-bold text-foreground">
                   R$ {brlBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </div>
-                <div className="text-xs text-muted-foreground">BRL</div>
               </div>
-              <div className="text-center p-3 bg-primary/10 rounded-lg border border-primary/20">
-                <div className="text-lg font-bold text-[#00ff90] mb-1">
+              <div className="text-center p-4 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl border border-primary/30 backdrop-blur-sm">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <span className="text-xs font-medium text-primary uppercase tracking-wide">RIOZ</span>
+                </div>
+                <div className="text-2xl font-bold text-primary">
                   {riozBalance.toLocaleString('pt-BR')} RZ
                 </div>
-                <div className="text-xs text-muted-foreground">RIOZ</div>
               </div>
             </div>
             <Tabs value={activeTab} onValueChange={(value: any) => setActiveTab(value)}>
