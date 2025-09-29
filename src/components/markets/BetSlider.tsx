@@ -25,7 +25,7 @@ export const BetSlider = ({ balance, onAmountChange, estimatedReward }: BetSlide
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label className="text-sm">Quantidade a apostar</Label>
+        <Label className="text-sm">Quantidade para opinar</Label>
         
         <div className="px-3 py-2 bg-muted/20 rounded-lg">
           <div className="text-lg font-semibold">

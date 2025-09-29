@@ -5,10 +5,19 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Zap, Clock, BarChart3 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import { FastBetSelector, useFastBetting } from '@/components/markets/FastBetSelector';
+import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Fast = () => {
   const [countdown, setCountdown] = useState(60);
   const [currentRound, setCurrentRound] = useState(1);
+  const [betAmount, setBetAmount] = useState(100);
+  const { user } = useAuth();
+  const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
+  const { toast } = useToast();
   
   // Calculate dynamic odds based on countdown
   const getOdds = (baseOdds: number) => {
@@ -38,24 +47,24 @@ const Fast = () => {
         question: 'O Petróleo vai subir nos próximos 60 segundos?', 
         asset: 'Petróleo WTI',
         currentPrice: '$73.45',
-        upOdds: 2.15,
-        downOdds: 2.22
+        upOdds: 1.65,
+        downOdds: 1.65
       },
       { 
         id: 2, 
         question: 'O Ouro vai descer nos próximos 60 segundos?', 
         asset: 'Ouro',
         currentPrice: '$2,018.30',
-        upOdds: 2.08,
-        downOdds: 2.35
+        upOdds: 1.65,
+        downOdds: 1.65
       },
       { 
         id: 3, 
         question: 'A Prata vai subir nos próximos 60 segundos?', 
         asset: 'Prata',
         currentPrice: '$24.12',
-        upOdds: 2.20,
-        downOdds: 2.18
+        upOdds: 1.65,
+        downOdds: 1.65
       }
     ],
     crypto: [
@@ -64,38 +73,137 @@ const Fast = () => {
         question: 'O Bitcoin vai subir nos próximos 60 segundos?', 
         asset: 'Bitcoin',
         currentPrice: '$42,350.00',
-        upOdds: 2.12,
-        downOdds: 2.25
+        upOdds: 1.65,
+        downOdds: 1.65
       },
       { 
         id: 5, 
         question: 'O Ethereum vai descer nos próximos 60 segundos?', 
         asset: 'Ethereum',
         currentPrice: '$2,545.80',
-        upOdds: 2.05,
-        downOdds: 2.38
+        upOdds: 1.65,
+        downOdds: 1.65
+      },
+      { 
+        id: 6, 
+        question: 'A Solana vai subir nos próximos 60 segundos?', 
+        asset: 'Solana',
+        currentPrice: '$98.75',
+        upOdds: 1.65,
+        downOdds: 1.65
       }
     ],
     forex: [
       { 
-        id: 6, 
+        id: 7, 
         question: 'O USD/BRL vai subir nos próximos 60 segundos?', 
         asset: 'USD/BRL',
         currentPrice: 'R$ 5.12',
-        upOdds: 2.18,
-        downOdds: 2.20
+        upOdds: 1.65,
+        downOdds: 1.65
+      },
+      { 
+        id: 8, 
+        question: 'O EUR/USD vai descer nos próximos 60 segundos?', 
+        asset: 'EUR/USD',
+        currentPrice: '$1.08',
+        upOdds: 1.65,
+        downOdds: 1.65
+      },
+      { 
+        id: 9, 
+        question: 'O GBP/USD vai subir nos próximos 60 segundos?', 
+        asset: 'GBP/USD',
+        currentPrice: '$1.26',
+        upOdds: 1.65,
+        downOdds: 1.65
       }
     ],
     stocks: [
       { 
-        id: 7, 
+        id: 10, 
         question: 'A Apple vai subir nos próximos 60 segundos?', 
         asset: 'AAPL',
         currentPrice: '$185.40',
-        upOdds: 2.15,
-        downOdds: 2.22
+        upOdds: 1.65,
+        downOdds: 1.65
+      },
+      { 
+        id: 11, 
+        question: 'A Microsoft vai descer nos próximos 60 segundos?', 
+        asset: 'MSFT',
+        currentPrice: '$375.20',
+        upOdds: 1.65,
+        downOdds: 1.65
+      },
+      { 
+        id: 12, 
+        question: 'A Tesla vai subir nos próximos 60 segundos?', 
+        asset: 'TSLA',
+        currentPrice: '$248.85',
+        upOdds: 1.65,
+        downOdds: 1.65
       }
     ]
+  };
+
+  // Process results when countdown ends
+  const processResults = async () => {
+    try {
+      const fastBets = JSON.parse(localStorage.getItem('fastBets') || '[]');
+      const currentRoundBets = fastBets.filter((bet: any) => bet.roundNumber === currentRound - 1);
+      
+      if (currentRoundBets.length === 0) return;
+
+      // MVP Logic: Alternate between "sim" and "não" results
+      const winningOption = currentRound % 2 === 0 ? 'sim' : 'nao';
+      
+      for (const bet of currentRoundBets) {
+        if (bet.side === winningOption) {
+          // Winner! Pay out the winnings
+          const winAmount = Math.floor(bet.amount * bet.odds);
+          
+          const { data: currentProfile } = await supabase
+            .from('profiles')
+            .select('saldo_moeda')
+            .eq('id', bet.userId)
+            .single();
+          
+          if (currentProfile) {
+            await supabase
+              .from('profiles')
+              .update({ 
+                saldo_moeda: currentProfile.saldo_moeda + winAmount
+              })
+              .eq('id', bet.userId);
+          }
+
+          // Create winning transaction
+          await supabase
+            .from('wallet_transactions')
+            .insert({
+              id: `fast_win_${bet.poolId}_${bet.userId}_${Date.now()}`,
+              user_id: bet.userId,
+              tipo: 'credito',
+              valor: winAmount,
+              descricao: `Vitória Fast Market - Pool ${bet.poolId} (${bet.side.toUpperCase()})`
+            });
+        }
+      }
+      
+      // Remove processed bets
+      const remainingBets = fastBets.filter((bet: any) => bet.roundNumber !== currentRound - 1);
+      localStorage.setItem('fastBets', JSON.stringify(remainingBets));
+      
+      refetchProfile();
+      
+      toast({
+        title: `Resultado Round #${currentRound - 1}`,
+        description: `Vencedor: ${winningOption.toUpperCase()}! ${currentRoundBets.filter((b: any) => b.side === winningOption).length} opinião(ões) premiada(s).`,
+      });
+    } catch (error) {
+      console.error('Error processing results:', error);
+    }
   };
 
   // Countdown timer
@@ -104,6 +212,7 @@ const Fast = () => {
       setCountdown(prev => {
         if (prev <= 1) {
           setCurrentRound(r => r + 1);
+          processResults(); // Process results when round ends
           return 60;
         }
         return prev - 1;
@@ -111,7 +220,73 @@ const Fast = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [currentRound]);
+
+  const placeBet = async (poolId: number, side: 'sim' | 'nao', odds: number) => {
+    if (!user || !profile || betAmount <= 0) return;
+
+    if (betAmount > profile.saldo_moeda) {
+      toast({
+        title: "Saldo insuficiente",
+        description: "Você não tem RZ suficiente para esta opinião.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Deduct amount from user balance immediately
+      const { error: balanceError } = await supabase
+        .from('profiles')
+        .update({ saldo_moeda: profile.saldo_moeda - betAmount })
+        .eq('id', user.id);
+
+      if (balanceError) throw balanceError;
+
+      // Create transaction record
+      const transactionId = `fast_${poolId}_${user.id}_${Date.now()}`;
+      const { error: transactionError } = await supabase
+        .from('wallet_transactions')
+        .insert({
+          id: transactionId,
+          user_id: user.id,
+          tipo: 'debito',
+          valor: betAmount,
+          descricao: `Opinião Fast Market - Pool ${poolId} (${side.toUpperCase()})`
+        });
+
+      if (transactionError) throw transactionError;
+
+      // Store the bet
+      const betData = {
+        poolId,
+        side,
+        amount: betAmount,
+        odds,
+        userId: user.id,
+        timestamp: Date.now(),
+        roundNumber: currentRound
+      };
+
+      const fastBets = JSON.parse(localStorage.getItem('fastBets') || '[]');
+      fastBets.push(betData);
+      localStorage.setItem('fastBets', JSON.stringify(fastBets));
+
+      toast({
+        title: "Opinião registrada!",
+        description: `Você opinou ${side.toUpperCase()} com ${betAmount} RZ.`,
+      });
+
+      refetchProfile();
+    } catch (error) {
+      console.error('Error placing fast bet:', error);
+      toast({
+        title: "Erro ao registrar opinião",
+        description: "Tente novamente em alguns instantes.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const formatTime = (seconds: number) => {
     return `${seconds.toString().padStart(2, '0')}s`;
@@ -198,6 +373,55 @@ const Fast = () => {
           </div>
         </div>
 
+        {/* Bet Amount Selector */}
+        {user && (
+          <div className="max-w-md mx-auto mb-8">
+            <Card className="border border-[#ff2389]/20 bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-semibold text-center flex items-center justify-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-[#ff2389] animate-pulse"></div>
+                  Seletor de Valor - {(profile?.saldo_moeda || 0).toLocaleString()} RZ
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    value={betAmount}
+                    onChange={(e) => setBetAmount(Math.max(1, Math.min(parseInt(e.target.value) || 0, profile?.saldo_moeda || 0)))}
+                    min="1"
+                    max={profile?.saldo_moeda || 0}
+                    className="flex-1 bg-background border border-border rounded px-3 py-2 text-center font-mono text-lg"
+                    placeholder="Valor"
+                  />
+                  <span className="text-sm text-muted-foreground">RZ</span>
+                </div>
+                
+                <div className="grid grid-cols-4 gap-2">
+                  {[25, 50, 100, 200].map((amount) => (
+                    <Button
+                      key={amount}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setBetAmount(Math.min(amount, profile?.saldo_moeda || 0))}
+                      className="text-xs"
+                      disabled={amount > (profile?.saldo_moeda || 0)}
+                    >
+                      {amount}
+                    </Button>
+                  ))}
+                </div>
+
+                <div className="text-center pt-2 border-t border-border/50">
+                  <p className="text-xs text-muted-foreground">
+                    Clique em SIM ou NÃO nos pools para opinar com este valor
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Fast Pools Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {currentPools.map((pool) => (
@@ -227,11 +451,13 @@ const Fast = () => {
               <CardContent className="pt-0">
                 <div className="grid grid-cols-2 gap-4">
                   <Button 
-                    className="bg-success hover:bg-success/90 text-black font-medium h-16 flex flex-col gap-1 text-sm"
+                    className="bg-success hover:bg-success/90 text-black font-medium h-20 flex flex-col gap-1 text-sm"
                     onClick={() => {
-                      // Handle bet logic here
-                      console.log('Bet UP on', pool.asset);
+                      if (user) {
+                        placeBet(pool.id, 'sim', getOdds(pool.upOdds));
+                      }
                     }}
+                    disabled={!user || countdown <= 5}
                   >
                     <TrendingUp className="h-5 w-5" />
                     <div className="flex items-center gap-1">
@@ -240,13 +466,20 @@ const Fast = () => {
                         {getOdds(pool.upOdds).toFixed(2)}x
                       </span>
                     </div>
+                    {user && (
+                      <div className="text-xs opacity-75">
+                        {betAmount} RZ
+                      </div>
+                    )}
                   </Button>
                   <Button 
-                    className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-medium h-16 flex flex-col gap-1 text-sm"
+                    className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-medium h-20 flex flex-col gap-1 text-sm"
                     onClick={() => {
-                      // Handle bet logic here
-                      console.log('Bet DOWN on', pool.asset);
+                      if (user) {
+                        placeBet(pool.id, 'nao', getOdds(pool.downOdds));
+                      }
                     }}
+                    disabled={!user || countdown <= 5}
                   >
                     <TrendingDown className="h-5 w-5" />
                     <div className="flex items-center gap-1">
@@ -255,8 +488,21 @@ const Fast = () => {
                         {getOdds(pool.downOdds).toFixed(2)}x
                       </span>
                     </div>
+                    {user && (
+                      <div className="text-xs opacity-75">
+                        {betAmount} RZ
+                      </div>
+                    )}
                   </Button>
                 </div>
+                
+                {!user && (
+                  <div className="text-center mt-3">
+                    <p className="text-xs text-muted-foreground">
+                      Faça login para opinar nos Fast Markets
+                    </p>
+                  </div>
+                )}
                 
                 {/* Progress bar for time remaining */}
                 <div className="mt-4">
@@ -288,9 +534,10 @@ const Fast = () => {
               </div>
               <div className="text-sm text-muted-foreground space-y-2">
                 <p>• Cada pool dura exatamente 60 segundos</p>
-                <p>• Aposte se o preço vai subir (⬆️) ou descer (⬇️)</p>
-                <p>• Resultados são baseados na variação real dos preços</p>
+                <p>• Opine se o preço vai subir (⬆️) ou descer (⬇️)</p>
+                <p>• Resultados alternam entre SIM e NÃO a cada round</p>
                 <p>• Novos pools começam automaticamente a cada minuto</p>
+                <p>• Os odds diminuem conforme o tempo passa</p>
               </div>
             </CardContent>
           </Card>

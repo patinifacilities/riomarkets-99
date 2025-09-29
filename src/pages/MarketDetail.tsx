@@ -23,6 +23,7 @@ import { OrderBookChart } from '@/components/markets/OrderBookChart';
 import { BetSlider } from '@/components/markets/BetSlider';
 import { SliderConfirm } from '@/components/ui/slider-confirm';
 import { OpenOpinionsCard } from '@/components/markets/OpenOpinionsCard';
+import { OpenOpinionsCardDetail } from '@/components/markets/OpenOpinionsCardDetail';
 
 const MarketDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -205,15 +206,15 @@ const MarketDetail = () => {
                      </div>
                    ) : (
                      <div className="grid grid-cols-2 gap-2 mt-4">
-                       <Button 
-                         onClick={() => setSelectedOption('sim')}
-                         disabled={market.status !== 'aberto'}
-                         className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-[#00ff90] hover:bg-[#00ff90]/90 text-black font-semibold' : 'bg-[#00ff90] text-black border-2 hover:bg-[#00ff90]/90 font-semibold'}`}
-                         size="sm"
-                         aria-label="Opinar Sim"
-                       >
-                         Opinar Sim
-                       </Button>
+                        <Button 
+                          onClick={() => setSelectedOption('sim')}
+                          disabled={market.status !== 'aberto'}
+                          className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-[#00ff90] hover:bg-[#00ff90]/90 text-black font-semibold' : 'bg-[#00ff90] text-black border-2 hover:bg-[#00ff90]/90 font-semibold'}`}
+                          size="sm"
+                          aria-label="Opinar Sim"
+                        >
+                          Opinar Sim
+                        </Button>
                        <Button 
                          onClick={() => setSelectedOption('nao')}
                          disabled={market.status !== 'aberto'}
@@ -323,6 +324,15 @@ const MarketDetail = () => {
                 naoOdds={market.odds?.não || market.odds?.nao || 1.5}
               />
             </div>
+
+            {/* Open Opinions Card */}
+            <OpenOpinionsCardDetail 
+              marketId={market.id}
+              onOrderCancelled={() => {
+                refetchMarket();
+                // Optionally refetch user profile to update balance
+              }}
+            />
 
             {/* Probability Chart */}
             <ProbabilityChart 

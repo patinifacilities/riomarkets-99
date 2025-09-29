@@ -189,6 +189,13 @@ const WalletPage = () => {
                   <Button 
                     size="sm"
                     variant="outline"
+                    className="text-xs px-2 py-1"
+                  >
+                    Sacar agora
+                  </Button>
+                  <Button 
+                    size="sm"
+                    variant="outline"
                     style={{ backgroundColor: '#ff2389', color: 'white', borderColor: '#ff2389' }}
                     className="hover:bg-[#ff2389]/90 text-xs px-2 py-1"
                   >
