@@ -27,6 +27,7 @@ import { AddBrlModal } from '@/components/exchange/AddBrlModal';
 
 import logoImageWhite from '@/assets/riov3-markets-white.png';
 import logoImageBlack from '@/assets/riov3-markets-white.png';
+import menuLogoWhite from '@/assets/riov3-markets-white-menu.png';
 import { useTheme } from 'next-themes';
 
 const Header = () => {
@@ -91,7 +92,13 @@ const Header = () => {
               </SheetTrigger>
               <SheetContent side="left" className="w-80 bg-black border-border">
                 <SheetHeader className="border-b border-border pb-4">
-                  <SheetTitle className="text-white text-left">Rio Markets</SheetTitle>
+                  <div className="text-left">
+                    <img 
+                      src={menuLogoWhite} 
+                      alt="Rio Markets" 
+                      className="h-8 w-auto" 
+                    />
+                  </div>
                 </SheetHeader>
                 
                 <div className="flex flex-col mt-6 space-y-1">
@@ -109,12 +116,6 @@ const Header = () => {
                           <p className="text-xs text-gray-300 capitalize">{profile.nivel || 'iniciante'}</p>
                         </div>
                       </div>
-                    <Link to="/wallet" onClick={handleMobileNavClick}>
-                      <div className="px-2 py-2 mt-2 rounded-lg bg-gradient-primary text-primary-foreground font-semibold text-center cursor-pointer hover:opacity-90 transition-opacity">
-                        <Wallet className="w-4 h-4 inline mr-2" />
-                     {(profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RZ
-                      </div>
-                    </Link>
                     </div>
                   )}
                   
@@ -160,7 +161,7 @@ const Header = () => {
                           size="sm" 
                           className={`w-full justify-start gap-3 h-12 ${
                             isActive 
-                              ? 'text-black' 
+                              ? 'bg-[#00ff90] text-black hover:bg-[#00ff90]/90' 
                               : 'text-white hover:text-foreground hover:bg-muted/10'
                           }`}
                         >
