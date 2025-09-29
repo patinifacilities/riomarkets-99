@@ -95,15 +95,15 @@ const Ranking = () => {
             <CardContent>
               <div className="flex items-center gap-6">
                 <Avatar className="w-16 h-16">
-                  <AvatarImage src={profile.profile_pic_url} alt={profile.nome} />
+                  <AvatarImage src={profile.profile_pic_url} alt={profile.nome || 'Usuário'} />
                   <AvatarFallback className="bg-primary/20 text-primary text-lg">
-                    {profile.nome.split(' ').map(n => n[0]).join('')}
+                    {profile.nome ? profile.nome.split(' ').map(n => n[0]).join('') : 'U'}
                   </AvatarFallback>
                 </Avatar>
                 
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold">{profile.nome}</h3>
+                    <h3 className="text-lg font-semibold">{profile.nome || 'Usuário'}</h3>
                     {profile.username && (
                       <span className="text-sm text-muted-foreground">@{profile.username}</span>
                     )}

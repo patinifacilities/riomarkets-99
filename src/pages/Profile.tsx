@@ -182,11 +182,11 @@ const Profile = () => {
                 <Avatar className="w-24 h-24 mx-auto mb-4">
                   <AvatarImage src={profile.profile_pic_url} />
                   <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-                    {profile.nome.charAt(0).toUpperCase()}
+                    {profile.nome ? profile.nome.charAt(0).toUpperCase() : 'U'}
                   </AvatarFallback>
                 </Avatar>
                 
-                <h2 className="text-xl font-semibold mb-2">{profile.nome}</h2>
+                <h2 className="text-xl font-semibold mb-2">{profile.nome || 'Usuário'}</h2>
                 <Badge variant="secondary" className="mb-4 capitalize">
                   {profile.nivel}
                 </Badge>

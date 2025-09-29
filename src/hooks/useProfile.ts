@@ -47,10 +47,13 @@ export const useProfile = (userId?: string) => {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
-      if (error) return null;
-      return data as Profile;
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
+      }
+      return data as Profile | null;
     },
     enabled: !!userId,
   });

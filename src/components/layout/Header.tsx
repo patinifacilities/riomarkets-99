@@ -96,17 +96,17 @@ const Header = () => {
                 
                 <div className="flex flex-col mt-6 space-y-1">
                   {/* User Info Section */}
-                  {isLoggedIn && (
+                  {isLoggedIn && profile && (
                     <div className="border-b border-border pb-4 mb-4">
                       <div className="flex items-center gap-3 p-2">
                         <Avatar className="h-10 w-10">
                           <AvatarFallback className="bg-primary text-primary-foreground">
-                            {profile.nome.charAt(0).toUpperCase()}
+                            {profile.nome ? profile.nome.charAt(0).toUpperCase() : 'U'}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="text-sm font-medium text-white">{profile.nome}</p>
-                          <p className="text-xs text-gray-300 capitalize">{profile.nivel}</p>
+                          <p className="text-sm font-medium text-white">{profile.nome || 'Usuário'}</p>
+                          <p className="text-xs text-gray-300 capitalize">{profile.nivel || 'iniciante'}</p>
                         </div>
                       </div>
                     <Link to="/wallet" onClick={handleMobileNavClick}>
