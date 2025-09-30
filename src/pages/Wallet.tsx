@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Wallet, TrendingUp, TrendingDown, Users, Plus, ArrowRightLeft, DollarSign, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useWalletTransactions, useUserOrders } from '@/hooks/useWallet';
@@ -43,10 +44,10 @@ const WalletPage = () => {
     }
   }, [showDepositModal, showWithdrawModal, user, refetchProfile, refetchTransactions, fetchBalance]);
 
-  // Calculate totals - Use real balance from exchange store
+  // Calculate totals - Use profile balance as primary source
   const totalCredits = transactions?.filter(t => t.tipo === 'credito').reduce((sum, t) => sum + t.valor, 0) || 0;
   const totalDebits = transactions?.filter(t => t.tipo === 'debito').reduce((sum, t) => sum + t.valor, 0) || 0;
-  const currentBalance = balance?.rioz_balance || profile?.saldo_moeda || 0;
+  const currentBalance = profile?.saldo_moeda || 0;
   const brlBalance = balance?.brl_balance || 0;
   const totalInOrders = orders?.filter(o => o.status === 'ativa').reduce((sum, o) => sum + o.quantidade_moeda, 0) || 0;
 
@@ -83,7 +84,15 @@ const WalletPage = () => {
             </p>
           </div>
           
-          {/* No action buttons */}
+          <Button
+            onClick={() => setShowWithdrawModal(true)}
+            variant="default"
+            size="sm"
+            className="gap-2"
+          >
+            <DollarSign className="w-4 h-4" />
+            Saque
+          </Button>
         </div>
 
         {/* Expandable RIOZ Balance Card */}
@@ -105,31 +114,64 @@ const WalletPage = () => {
 
           {/* Transaction History */}
           <Card className="bg-secondary-glass border-border/50">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Histórico de Transações</CardTitle>
-              </div>
+            <CardHeader className="md:hidden">
+              <Collapsible>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" className="w-full flex items-center justify-between p-0">
+                    <CardTitle>Histórico de Transações</CardTitle>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent className="bg-card px-0 pt-4">
+                    {loadingTransactions ? (
+                      <div className="space-y-3">
+                        {[...Array(5)].map((_, i) => (
+                          <div key={i} className="h-16 bg-secondary-glass rounded animate-pulse" />
+                        ))}
+                      </div>
+                    ) : transactions && transactions.length > 0 ? (
+                      <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                        {transactions.map((transaction) => (
+                          <TransactionItem key={transaction.id} transaction={transaction} />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Wallet className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                        <p>Nenhuma transação encontrada</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </CollapsibleContent>
+              </Collapsible>
             </CardHeader>
-            <CardContent className="bg-card">
-              {loadingTransactions ? (
-                <div className="space-y-3">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-16 bg-secondary-glass rounded animate-pulse" />
-                  ))}
-                </div>
-               ) : transactions && transactions.length > 0 ? (
-                 <div className="space-y-3 max-h-[500px] overflow-y-auto">
-                   {transactions.map((transaction) => (
-                     <TransactionItem key={transaction.id} transaction={transaction} />
-                   ))}
-                 </div>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Wallet className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>Nenhuma transação encontrada</p>
-                </div>
-              )}
-            </CardContent>
+            
+            <div className="hidden md:block">
+              <CardHeader>
+                <CardTitle>Histórico de Transações</CardTitle>
+              </CardHeader>
+              <CardContent className="bg-card">
+                {loadingTransactions ? (
+                  <div className="space-y-3">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="h-16 bg-secondary-glass rounded animate-pulse" />
+                    ))}
+                  </div>
+                ) : transactions && transactions.length > 0 ? (
+                  <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                    {transactions.map((transaction) => (
+                      <TransactionItem key={transaction.id} transaction={transaction} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Wallet className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>Nenhuma transação encontrada</p>
+                  </div>
+                )}
+              </CardContent>
+            </div>
           </Card>
         </div>
 

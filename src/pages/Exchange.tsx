@@ -194,15 +194,17 @@ const ExchangeNew = () => {
               </div>
               
               <div className="relative">
-                <Input
-                  type="number"
-                  placeholder="0"
-                  value={fromAmount}
-                  onChange={(e) => handleAmountChange(e.target.value)}
-                  className="pr-20 text-right text-lg font-medium"
-                  step={fromCurrency === 'BRL' ? '0.01' : '1'}
-                />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    {fromCurrency === 'BRL' ? (
+                      <span className="text-sm font-bold">R$</span>
+                    ) : (
+                      <span className="text-sm font-bold">R</span>
+                    )}
+                  </div>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {fromCurrency}
+                  </span>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -211,10 +213,15 @@ const ExchangeNew = () => {
                   >
                     MAX
                   </Button>
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {fromCurrency}
-                  </span>
                 </div>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={fromAmount}
+                  onChange={(e) => handleAmountChange(e.target.value)}
+                  className="pl-36 pr-4 h-16 text-right text-lg font-medium"
+                  step={fromCurrency === 'BRL' ? '0.01' : '1'}
+                />
               </div>
             </div>
 
@@ -243,18 +250,25 @@ const ExchangeNew = () => {
               </div>
               
               <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    {toCurrency === 'BRL' ? (
+                      <span className="text-sm font-bold">R$</span>
+                    ) : (
+                      <span className="text-sm font-bold">R</span>
+                    )}
+                  </div>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {toCurrency}
+                  </span>
+                </div>
                 <Input
                   type="number"
                   placeholder="0"
                   value={toAmount}
                   readOnly
-                  className="pr-16 text-right text-lg font-medium bg-muted/50"
+                  className="pl-32 pr-4 h-16 text-right text-lg font-medium bg-muted/50"
                 />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {toCurrency}
-                  </span>
-                </div>
               </div>
             </div>
 
@@ -287,7 +301,7 @@ const ExchangeNew = () => {
               ) : (
                 <>
                   <ArrowUpDown className="h-5 w-5 mr-2" />
-                  Converter {fromCurrency} → {toCurrency}
+                  Converter
                 </>
               )}
             </Button>

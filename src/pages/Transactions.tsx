@@ -251,7 +251,7 @@ const Transactions = () => {
               </div>
             </Card>
 
-            <Card className="p-4">
+            <Card className="p-4 hidden md:block">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Total Pago</p>
@@ -266,10 +266,10 @@ const Transactions = () => {
             </Card>
           </div>
         </div>
+        
+        {/* Toolbar with filters */}
+        <TransactionsToolbar onExport={async () => {}} />
       </div>
-
-          {/* Toolbar with filters */}
-          <TransactionsToolbar onExport={async () => {}} />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 pb-[env(safe-area-inset-bottom)] max-w-6xl">

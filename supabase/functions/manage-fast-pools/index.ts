@@ -72,9 +72,38 @@ async function getCurrentPool(supabase: any, category = 'crypto') {
 
   let activePools = validPools;
 
-  // If we don't have 3 active pools, create new synchronized set
+  // If we don't have 3 active pools for this category, check if we need to create pools for ALL categories
   if (validPools.length < 3) {
-    activePools = await createSynchronizedPools(supabase, category);
+    // Check if ANY category has active pools
+    const { data: allActivePools } = await supabase
+      .from('fast_pools')
+      .select('category, round_end_time')
+      .eq('status', 'active')
+      .eq('paused', false);
+    
+    const hasActivePoolsInAnyCategory = allActivePools?.some((pool: any) => 
+      new Date(pool.round_end_time) > now
+    );
+    
+    // If no category has active pools, create synchronized pools for ALL categories
+    if (!hasActivePoolsInAnyCategory) {
+      await createAllCategoriesPools(supabase);
+      
+      // Fetch the newly created pools for this category
+      const { data: newPools } = await supabase
+        .from('fast_pools')
+        .select('*')
+        .eq('status', 'active')
+        .eq('category', category)
+        .eq('paused', false)
+        .order('created_at', { ascending: false })
+        .limit(3);
+      
+      activePools = newPools || [];
+    } else {
+      // Some category has active pools, just create for this category
+      activePools = await createSynchronizedPools(supabase, category);
+    }
   }
 
   return new Response(
@@ -354,4 +383,70 @@ function getFallbackPriceForSymbol(symbol: string): number {
     'AMZN': 185.25
   };
   return fallbackPrices[symbol as keyof typeof fallbackPrices] || 100;
+}
+
+async function createAllCategoriesPools(supabase: any) {
+  const categories = ['commodities', 'crypto', 'forex', 'stocks'];
+  const now = new Date();
+  const endTime = new Date(now.getTime() + 60000); // 60 seconds from now
+
+  // Get current round number
+  const { data: lastPool } = await supabase
+    .from('fast_pools')
+    .select('round_number')
+    .order('round_number', { ascending: false })
+    .limit(1);
+
+  const nextRoundNumber = (lastPool?.[0]?.round_number || 0) + 1;
+
+  // Collect all pool configurations for all categories
+  const allPoolsToInsert = [];
+  const allSymbols: string[] = [];
+
+  for (const category of categories) {
+    const poolConfigs = getPoolConfigurations(category);
+    poolConfigs.forEach(config => allSymbols.push(config.symbol));
+  }
+
+  // Get real market prices for all symbols at once
+  const { data: marketData } = await supabase.functions.invoke('get-market-data', {
+    body: { symbols: allSymbols }
+  });
+
+  const prices = marketData?.prices || {};
+
+  // Create pools for all categories with same timing
+  for (const category of categories) {
+    const poolConfigs = getPoolConfigurations(category);
+    
+    for (const config of poolConfigs) {
+      allPoolsToInsert.push({
+        round_number: nextRoundNumber,
+        asset_symbol: config.symbol,
+        asset_name: config.name,
+        question: config.question,
+        category: category,
+        opening_price: prices[config.symbol] || config.fallbackPrice,
+        round_start_time: now.toISOString(),
+        round_end_time: endTime.toISOString(),
+        base_odds: 1.65,
+        status: 'active',
+        paused: false
+      });
+    }
+  }
+
+  // Insert all pools at once
+  const { data: pools, error } = await supabase
+    .from('fast_pools')
+    .insert(allPoolsToInsert)
+    .select();
+
+  if (error) {
+    console.error('Error creating all category pools:', error);
+    throw error;
+  }
+
+  console.log(`Created ${pools?.length} pools across all categories`);
+  return pools;
 }

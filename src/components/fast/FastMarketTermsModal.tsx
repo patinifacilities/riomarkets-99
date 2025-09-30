@@ -46,17 +46,6 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
           </DialogTitle>
           <DialogDescription asChild>
             <div className="space-y-4 text-foreground">
-              <div className="flex items-start gap-3 p-4 bg-[#ff2389]/10 rounded-lg border border-[#ff2389]/20">
-                <AlertTriangle className="w-5 h-5 text-[#ff2389] mt-0.5 flex-shrink-0" />
-                <div className="text-sm">
-                  <p className="font-semibold text-[#ff2389] mb-2">Mercados Rápidos</p>
-                  <p className="mb-2">
-                    Os Fast Markets são pools de opinião com duração de apenas 60 segundos, 
-                    projetados para traders experientes.
-                  </p>
-                </div>
-              </div>
-
               <div className="space-y-3 text-sm">
                 <div>
                   <h4 className="font-semibold mb-1">Como funcionam:</h4>
@@ -72,8 +61,7 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
                   <h4 className="font-semibold mb-1 text-yellow-600 dark:text-yellow-500">⚠️ Liquidação quando o preço mantém:</h4>
                   <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-2">
                     <li>Se o preço do ativo não variar (mantém), ambos os lados são liquidados</li>
-                    <li>A liquidez é retida pela plataforma</li>
-                    <li>Esta liquidez é reaplicada como liquidez contrária nos próximos pools</li>
+                    <li>A liquidez é retida pela plataforma e reaplicada nos pools como liquidez</li>
                   </ul>
                 </div>
 
@@ -103,6 +91,20 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
         <div className="space-y-3">
           <div className="flex items-center space-x-2 p-4 bg-muted/20 rounded-lg">
             <Checkbox 
+              id="non-cancellable" 
+              checked={hasAcceptedTerms}
+              onCheckedChange={(checked) => setHasAcceptedTerms(checked === true)}
+            />
+            <label
+              htmlFor="non-cancellable"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer text-foreground"
+            >
+              Entendo que opiniões enviadas no Fast Markets não podem ser canceladas.
+            </label>
+          </div>
+
+          <div className="flex items-center space-x-2 p-4 bg-muted/20 rounded-lg">
+            <Checkbox 
               id="terms" 
               checked={hasAcceptedTerms}
               onCheckedChange={(checked) => setHasAcceptedTerms(checked === true)}
@@ -112,20 +114,6 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
             >
               Li e aceito os termos. Entendo os riscos dos Fast Markets.
-            </label>
-          </div>
-
-          <div className="flex items-center space-x-2 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-            <Checkbox 
-              id="non-cancellable" 
-              checked={hasAcceptedTerms}
-              onCheckedChange={(checked) => setHasAcceptedTerms(checked === true)}
-            />
-            <label
-              htmlFor="non-cancellable"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer text-red-600 dark:text-red-500"
-            >
-              Entendo que opiniões enviadas no Fast Markets não podem ser canceladas.
             </label>
           </div>
         </div>

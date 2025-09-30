@@ -552,8 +552,8 @@ const Fast = () => {
             Opine se o ativo vai subir ou descer nos próximos 60 segundos. Odds dinâmicas baseadas em dados reais de mercado.
           </p>
           
-          {/* Category Selector and Terms Button */}
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
+          {/* Category Selector */}
+          <div className="flex justify-center items-center mb-6">
             <div className="flex gap-2 p-1 bg-muted rounded-xl">
               {categoryOptions.map((category) => (
                 <Button
@@ -578,16 +578,6 @@ const Fast = () => {
                 </Button>
               ))}
             </div>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowTermsModal(true)}
-              className="gap-2 text-muted-foreground hover:text-foreground"
-            >
-              <AlertTriangle className="w-4 h-4" />
-              Termos Fast Markets
-            </Button>
           </div>
         </div>
 
@@ -876,6 +866,19 @@ const Fast = () => {
             </Card>
           </div>
         )}
+        
+        {/* Terms Button at Bottom */}
+        <div className="max-w-4xl mx-auto mt-8 text-center">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowTermsModal(true)}
+            className="gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <AlertTriangle className="w-4 h-4" />
+            Termos Fast Markets
+          </Button>
+        </div>
       </div>
 
       {/* Opinion Notifications Stack */}
