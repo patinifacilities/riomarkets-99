@@ -56,10 +56,11 @@ const MarketCard = ({ market }: MarketCardProps) => {
   const noRecompensa = market.odds?.não || market.odds?.nao || 1.5;
 
   return (
-    <Card className={`market-card transition-all duration-300 hover:shadow-lg border-border/50 bg-secondary-glass border-border-secondary ${
+    <Card className={`market-card transition-all duration-300 hover:shadow-lg border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm ${
       isHovered ? 'ring-2 ring-[#ff2389]/50 shadow-[#ff2389]/20' : ''
     }`}>
-      <CardContent className="p-4 space-y-4">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5 pointer-events-none"></div>
+      <CardContent className="p-4 space-y-4 relative z-10">
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-2 flex-1">

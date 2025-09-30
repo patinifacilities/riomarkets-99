@@ -51,7 +51,7 @@ const Fast = () => {
   const [poolHistoryOpen, setPoolHistoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('commodities');
   const [lastPoolIds, setLastPoolIds] = useState<string[]>([]);
-  const [opinionNotifications, setOpinionNotifications] = useState<{id: string, text: string, side?: 'subiu' | 'desceu'}[]>([]);
+  const [opinionNotifications, setOpinionNotifications] = useState<{id: string, text: string, side?: 'subiu' | 'desceu', timestamp: number}[]>([]);
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
@@ -387,7 +387,8 @@ const Fast = () => {
       const newNotification = {
         id: Date.now().toString(),
         text: 'Opinião registrada',
-        side: side
+        side: side,
+        timestamp: Date.now()
       };
       setOpinionNotifications(prev => [...prev, newNotification]);
       
@@ -870,19 +871,18 @@ const Fast = () => {
         </div>
       </div>
 
-      {/* Opinion Notifications Stack */}
-      <div className="fixed bottom-4 right-4 z-40 space-y-2">
+      {/* Opinion Notifications Stack - Below header ticker */}
+      <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-30 space-y-2 max-w-md w-full px-4">
         {opinionNotifications.map((notification, index) => (
           <div 
             key={notification.id}
-            className={`px-6 py-3 rounded-xl shadow-lg border animate-fade-in transition-opacity duration-300 ${
+            className={`px-6 py-3 rounded-xl shadow-lg border animate-scale-in transition-opacity duration-300 ${
               notification.side === 'subiu' 
                 ? 'bg-[#00ff90] text-black border-[#00ff90]' 
                 : 'bg-[#ff2389] text-white border-[#ff2389]'
             }`}
             style={{ 
-              marginBottom: '8px',
-              zIndex: 50 - index 
+              zIndex: 30 - index 
             }}
           >
             <p className="font-medium">{notification.text}</p>

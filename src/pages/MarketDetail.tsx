@@ -189,65 +189,150 @@ const MarketDetail = () => {
 
             {/* User Info Panel - Mobile (positioned after market details) */}
             <div className="lg:hidden">
-              <Card id="wallet-section" className="bg-secondary border-border/50">
-                <CardContent className="p-0">
-                  <div className="flex items-center justify-between p-4 bg-secondary border-b border-border/30">
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
-                      <Wallet className="w-5 h-5" />
-                      Sua Carteira
-                    </h3>
-                  </div>
-
-                  {/* Always visible opinion buttons and slider */}
-                  <div className="p-4 space-y-4">
-                    <div className="text-center text-sm text-muted-foreground">Quantidade para opinar</div>
+              <Card id="wallet-section">
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Wallet className="w-5 h-5" />
+                    Sua Carteira
+                  </h3>
+                  
+                   <div className="space-y-4">
+                      {(userProfile?.saldo_moeda || 0) > 0 ? (
+                        <>
+                          <div>
+                            <Label htmlFor="bet-amount-mobile" className="text-sm font-medium">
+                              Quantidade
+                            </Label>
+                            <Input
+                              id="bet-amount-mobile"
+                              type="number"
+                              placeholder="Digite a quantidade..."
+                              value={betAmount || ''}
+                              onChange={(e) => setBetAmount(Number(e.target.value) || 0)}
+                              min="5"
+                              max={userProfile?.saldo_moeda || 0}
+                              className="mt-2"
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <div className="p-4 bg-muted/50 rounded-lg text-center">
+                          <p className="text-sm text-muted-foreground mb-3">
+                            Você precisa de Rioz Coin para opinar neste mercado
+                          </p>
+                          <div className="flex flex-col gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => navigate('/exchange')}
+                              className="w-full"
+                            >
+                              Depositar R$ ou Trocar por RZ
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="text-center text-sm text-muted-foreground">ou use o slider</div>
+                      
+                      <BetSlider 
+                        balance={userProfile?.saldo_moeda || 0}
+                        onAmountChange={(amount) => setBetAmount(amount)}
+                        estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
+                      />
                     
-                    <BetSlider 
-                      balance={userProfile?.saldo_moeda || 0}
-                      onAmountChange={(amount) => setBetAmount(amount)}
-                      estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
-                    />
-
-                    {(userProfile?.saldo_moeda || 0) === 0 ? (
-                      <div className="p-4 bg-warning/10 border border-warning rounded-lg text-center">
-                        <p className="text-sm text-warning mb-2">Saldo insuficiente para opinar</p>
-                        <p className="text-xs text-muted-foreground">Deposite R$ ou troque R$ por RIOZ para começar a opinar</p>
+                    {selectedOption && (
+                      <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">
+                        <div className="text-sm text-muted-foreground mb-2">Opção selecionada:</div>
+                        <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
+                        <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
+                        <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
+                        <div className="text-lg font-bold text-success bg-success/10 px-2 py-1 rounded">Lucro estimado: +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz</div>
                       </div>
-                    ) : (
-                      <div className="grid grid-cols-2 gap-2">
+                    )}
+                    
+                     {(userProfile?.saldo_moeda || 0) === 0 ? (
+                       <div className="p-4 bg-warning/10 border border-warning rounded-lg text-center">
+                         <p className="text-sm text-warning mb-2">Saldo insuficiente para opinar</p>
+                         <p className="text-xs text-muted-foreground">Deposite R$ ou troque R$ por RIOZ para começar a opinar</p>
+                       </div>
+                     ) : (
+                       <div className="grid grid-cols-2 gap-2 mt-4">
                          <Button 
-                           onClick={() => {
-                             setSelectedOption('sim');
-                             handleOpenBetModal('sim');
-                           }}
-                           variant={selectedOption === 'sim' ? 'default' : 'outline'}
-                           className={`flex-1 ${selectedOption === 'sim' ? 'bg-success hover:bg-success/90 text-white' : 'border-success/30 text-success hover:bg-success/10'}`}
-                           disabled={!betAmount || betAmount <= 0 || betAmount > (userProfile?.saldo_moeda || 0)}
+                           onClick={() => setSelectedOption('sim')}
+                           disabled={market.status !== 'aberto'}
+                           className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-[#00ff90] hover:bg-[#00ff90]/90 text-black font-semibold' : 'bg-[#00ff90] text-black border-2 hover:bg-[#00ff90]/90 font-semibold'}`}
+                           size="sm"
+                           aria-label="Opinar Sim"
                          >
-                           SIM
+                           Opinar Sim
                          </Button>
                          <Button 
-                           onClick={() => {
-                             setSelectedOption('nao');
-                             handleOpenBetModal('nao');
-                           }}
-                           variant={selectedOption === 'nao' ? 'default' : 'outline'}
-                           className={`flex-1 ${selectedOption === 'nao' ? 'bg-destructive hover:bg-destructive/90 text-white' : 'border-destructive/30 text-destructive hover:bg-destructive/10'}`}
-                           disabled={!betAmount || betAmount <= 0 || betAmount > (userProfile?.saldo_moeda || 0)}
+                           onClick={() => setSelectedOption('nao')}
+                           disabled={market.status !== 'aberto'}
+                           className={`min-h-[44px] ${selectedOption === 'nao' ? 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-semibold' : 'bg-[#ff2389] text-white border-2 hover:bg-[#ff2389]/90 font-semibold'}`}
+                           size="sm"
+                           aria-label="Opinar Não"
                          >
-                           NÃO
+                           Opinar Não
                          </Button>
                        </div>
-                    )}
+                     )}
+                   
+                     {selectedOption && betAmount && betAmount > 0 && (
+                       <SliderConfirm
+                         selectedOption={selectedOption}
+                         disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
+                        onConfirm={async () => {
+                          if (!authUser?.id) {
+                            toast({
+                              title: "Erro",
+                              description: "Você precisa estar logado para opinar",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
 
-                    {selectedOption && (
-                      <SliderConfirm
-                        onConfirm={() => handleOpenBetModal(selectedOption)}
-                        disabled={!betAmount || betAmount <= 0 || betAmount > (userProfile?.saldo_moeda || 0)}
+                           try {
+                             const recompensa = market.odds?.[selectedOption] || 1.5;
+                             
+                             // Insert into market_order_book_pools for pool-specific orderbook
+                             const { error: orderBookError } = await supabase
+                               .from('market_order_book_pools')
+                               .insert({
+                                 market_id: market.id,
+                                 user_id: authUser.id,
+                                 side: selectedOption,
+                                 quantity: betAmount,
+                                 price: recompensa,
+                                 status: 'filled',
+                                 filled_at: new Date().toISOString()
+                               });
+
+                             if (orderBookError) throw orderBookError;
+
+                             toast({
+                               title: "Opinião registrada!",
+                               description: `Você opinou ${selectedOption.toUpperCase()} com ${betAmount} RIOZ`,
+                             });
+
+                             setSelectedOption('');
+                             setBetAmount(0);
+                             refetchMarket();
+
+                           } catch (error) {
+                             console.error('Error placing bet:', error);
+                             toast({
+                               title: "Erro ao registrar opinião",
+                               description: "Tente novamente mais tarde",
+                               variant: "destructive",
+                             });
+                           }
+                        }}
                         className="w-full"
                       />
                      )}
-                  </div>
+                   </div>
                 </CardContent>
               </Card>
             </div>

@@ -354,17 +354,21 @@ const Home = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-16 pb-[env(safe-area-inset-bottom)]">
-            {sortedAndFilteredMarkets.map((market, index) => {
-              const isHighVolume = index < 3; // Top 3 markets get hot icon
-              return (
-                <div key={market.id} className="relative">
-                  <MarketCardKalshi
-                    market={market} 
-                    showHotIcon={isHighVolume}
-                  />
-                </div>
-              );
-            })}
+            {sortedAndFilteredMarkets
+              .filter((market, index, self) => 
+                index === self.findIndex((m) => m.id === market.id)
+              )
+              .map((market, index) => {
+                const isHighVolume = index < 3; // Top 3 markets get hot icon
+                return (
+                  <div key={`${market.id}-${index}`} className="relative">
+                    <MarketCardKalshi
+                      market={market} 
+                      showHotIcon={isHighVolume}
+                    />
+                  </div>
+                );
+              })}
           </div>
         )}
       </div>

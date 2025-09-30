@@ -40,13 +40,18 @@ export const OrderBookChart = ({ market }: OrderBookChartProps) => {
     };
   }, [market.id, queryClient]);
 
-  // Get aggregated data for SIM and NÃO
-  const simData = marketPool?.options.find(opt => 
-    opt.label.toLowerCase().includes('sim') || opt.label.toLowerCase().includes('yes')
-  );
-  const naoData = marketPool?.options.find(opt => 
-    opt.label.toLowerCase().includes('não') || opt.label.toLowerCase().includes('nao') || opt.label.toLowerCase().includes('no')
-  );
+  // Get aggregated data for SIM and NÃO - check all options
+  console.log('Market pool options:', marketPool?.options);
+  
+  const simData = marketPool?.options.find(opt => {
+    const label = opt.label.toLowerCase();
+    return label.includes('sim') || label.includes('yes') || label === 'sim';
+  });
+  
+  const naoData = marketPool?.options.find(opt => {
+    const label = opt.label.toLowerCase();
+    return label.includes('não') || label.includes('nao') || label.includes('no') || label === 'não' || label === 'nao';
+  });
 
   const simTotal = simData?.pool || 0;
   const naoTotal = naoData?.pool || 0;
