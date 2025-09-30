@@ -65,12 +65,9 @@ export const FastPoolExpandedModal = ({
   opinionNotifications = [],
   poolSpecificHistory = []
 }: FastPoolExpandedModalProps) => {
+  // ALL HOOKS MUST BE CALLED BEFORE ANY EARLY RETURNS
   const [poolHistory, setPoolHistory] = React.useState<FastPoolResult[]>([]);
   const [historyIndex, setHistoryIndex] = React.useState(0);
-  
-  if (!pool) return null;
-
-  const currentOdds = getOdds();
   
   // Load pool-specific history from database
   React.useEffect(() => {
@@ -98,6 +95,11 @@ export const FastPoolExpandedModal = ({
     
     loadPoolHistory();
   }, [pool, open]);
+  
+  // NOW we can do early returns after all hooks are called
+  if (!pool) return null;
+
+  const currentOdds = getOdds();
   
   // Get 4 results to display based on current index
   const displayedResults = poolHistory.slice(historyIndex, historyIndex + 4);
