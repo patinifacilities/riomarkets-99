@@ -208,13 +208,13 @@ const AdminFast = () => {
   const getResultColor = (result: string) => {
     switch (result) {
       case 'subiu':
-        return 'text-[#00ff90]';
+        return 'bg-gray-700 text-white';
       case 'desceu':
-        return 'text-[#ff2389]';
+        return 'bg-[#ff2389] text-white';
       case 'manteve':
-        return 'text-[#FFD800]';
+        return 'bg-[#FFD800] text-gray-700';
       default:
-        return 'text-muted-foreground';
+        return 'bg-muted text-muted-foreground';
     }
   };
 

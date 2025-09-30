@@ -21,6 +21,7 @@ const ExchangeNew = () => {
   const [toAmount, setToAmount] = useState('');
   const [swapDirection, setSwapDirection] = useState<'brl-to-rioz' | 'rioz-to-brl'>('brl-to-rioz');
   const [loading, setLoading] = useState(false);
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -107,6 +108,9 @@ const ExchangeNew = () => {
 
       setBrlBalance(data.new_brl_balance);
       setRiozBalance(data.new_rioz_balance);
+      
+      setShowSuccessNotification(true);
+      setTimeout(() => setShowSuccessNotification(false), 5000);
       
       toast({
         title: "Conversão realizada!",
@@ -195,11 +199,13 @@ const ExchangeNew = () => {
               
               <div className="relative">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    fromCurrency === 'BRL' ? 'bg-[#ff2389]' : 'bg-[#00ff90]'
+                  }`}>
                     {fromCurrency === 'BRL' ? (
-                      <span className="text-sm font-bold">R$</span>
+                      <span className="text-sm font-bold text-white">R$</span>
                     ) : (
-                      <span className="text-sm font-bold">R</span>
+                      <span className="text-sm font-bold text-background">R</span>
                     )}
                   </div>
                   <span className="text-sm font-medium text-muted-foreground">
@@ -209,7 +215,7 @@ const ExchangeNew = () => {
                     variant="ghost"
                     size="sm"
                     onClick={handleMaxAmount}
-                    className="text-xs px-2 py-1 h-6"
+                    className="text-xs px-2 py-1 h-6 ml-1"
                   >
                     MAX
                   </Button>
@@ -219,7 +225,7 @@ const ExchangeNew = () => {
                   placeholder="0"
                   value={fromAmount}
                   onChange={(e) => handleAmountChange(e.target.value)}
-                  className="pl-36 pr-4 h-16 text-right text-lg font-medium"
+                  className="pl-36 pr-4 h-20 text-right text-2xl font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   step={fromCurrency === 'BRL' ? '0.01' : '1'}
                 />
               </div>
@@ -229,11 +235,11 @@ const ExchangeNew = () => {
             <div className="flex justify-center">
               <Button
                 variant="outline"
-                size="sm"
+                size="icon"
                 onClick={handleSwapDirection}
-                className="rounded-full p-3 border-2 hover:border-primary/50"
+                className="rounded-full h-12 w-12 border-2 hover:border-primary/50 hover:scale-110 transition-all"
               >
-                <ArrowUpDown className="h-4 w-4" />
+                <ArrowUpDown className="h-5 w-5" />
               </Button>
             </div>
 
@@ -251,11 +257,13 @@ const ExchangeNew = () => {
               
               <div className="relative">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    toCurrency === 'BRL' ? 'bg-[#ff2389]' : 'bg-[#00ff90]'
+                  }`}>
                     {toCurrency === 'BRL' ? (
-                      <span className="text-sm font-bold">R$</span>
+                      <span className="text-sm font-bold text-white">R$</span>
                     ) : (
-                      <span className="text-sm font-bold">R</span>
+                      <span className="text-sm font-bold text-background">R</span>
                     )}
                   </div>
                   <span className="text-sm font-medium text-muted-foreground">
@@ -267,7 +275,7 @@ const ExchangeNew = () => {
                   placeholder="0"
                   value={toAmount}
                   readOnly
-                  className="pl-32 pr-4 h-16 text-right text-lg font-medium bg-muted/50"
+                  className="pl-32 pr-4 h-20 text-right text-2xl font-bold bg-muted/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
             </div>
@@ -305,6 +313,12 @@ const ExchangeNew = () => {
                 </>
               )}
             </Button>
+            
+            {showSuccessNotification && (
+              <div className="bg-success-muted text-success px-4 py-3 rounded-lg text-sm font-medium animate-in fade-in slide-in-from-top-2">
+                ✓ Conversão realizada com sucesso!
+              </div>
+            )}
           </CardContent>
         </Card>
 

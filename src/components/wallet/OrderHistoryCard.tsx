@@ -21,15 +21,10 @@ export const OrderHistoryCard = ({ onRefresh }: OrderHistoryCardProps) => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
-  // Sort orders: active first, then by date
-  const allOrders = orders?.sort((a, b) => {
-    // Active orders first
-    if (a.status === 'ativa' && b.status !== 'ativa') return -1;
-    if (b.status === 'ativa' && a.status !== 'ativa') return 1;
-    
-    // Then by date (newest first)
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-  }) || [];
+  // Filter only active orders
+  const activeOrders = orders?.filter(o => o.status === 'ativa').sort((a, b) => 
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  ) || [];
 
   const handleCashout = (order: any) => {
     setSelectedOrder(order);
@@ -56,9 +51,9 @@ export const OrderHistoryCard = ({ onRefresh }: OrderHistoryCardProps) => {
                 <div key={i} className="h-20 bg-muted/20 rounded animate-pulse" />
               ))}
             </div>
-          ) : allOrders && allOrders.length > 0 ? (
+          ) : activeOrders && activeOrders.length > 0 ? (
             <div className="space-y-3 max-h-[400px] overflow-y-auto">
-              {allOrders.map((order) => {
+              {activeOrders.map((order) => {
                 const market = markets?.find(m => m.id === order.market_id);
                 const isActive = order.status === 'ativa';
                 
