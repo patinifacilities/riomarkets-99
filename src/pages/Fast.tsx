@@ -1,12 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, Zap, Clock, BarChart3, Wallet, Plus } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { TrendingUp, TrendingDown, Zap, Clock, BarChart3, Wallet, Plus, ArrowUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { FastBetSelector, useFastBetting } from '@/components/markets/FastBetSelector';
-import { showFastWinNotification } from '@/components/layout/WinnerNotification';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useToast } from '@/hooks/use-toast';
@@ -16,13 +13,37 @@ import { FastMarketTermsModal } from '@/components/fast/FastMarketTermsModal';
 import { FastPoolHistoryModal } from '@/components/fast/FastPoolHistoryModal';
 import { Link } from 'react-router-dom';
 
+interface FastPool {
+  id: string;
+  round_number: number;
+  asset_symbol: string;
+  asset_name: string;
+  question: string;
+  category: string;
+  opening_price: number;
+  closing_price?: number;
+  round_start_time: string;
+  round_end_time: string;
+  base_odds: number;
+  status: string;
+  result?: string;
+}
+
+interface FastPoolResult {
+  id: string;
+  result: 'subiu' | 'desceu' | 'manteve';
+  opening_price: number;
+  closing_price: number;
+  price_change_percent: number;
+  created_at: string;
+}
+
 const Fast = () => {
+  const [currentPool, setCurrentPool] = useState<FastPool | null>(null);
+  const [poolHistory, setPoolHistory] = useState<FastPoolResult[]>([]);
   const [countdown, setCountdown] = useState(60);
-  const [currentRound, setCurrentRound] = useState(1);
   const [betAmount, setBetAmount] = useState(100);
-  const [clickedPool, setClickedPool] = useState<{id: number, side: string} | null>(null);
-  const [winnerResults, setWinnerResults] = useState<{[poolId: number]: string}>({});
-  const [showWinnerBalance, setShowWinnerBalance] = useState<{amount: number, show: boolean}>({amount: 0, show: false});
+  const [clickedPool, setClickedPool] = useState<{id: string, side: string} | null>(null);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [selectedPool, setSelectedPool] = useState<string | null>(null);
   const [poolHistoryOpen, setPoolHistoryOpen] = useState(false);
@@ -30,7 +51,44 @@ const Fast = () => {
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
   const { resolvedTheme } = useTheme();
-  
+
+  // Realtime subscription for pool updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('fast-pools-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'fast_pools'
+        },
+        (payload) => {
+          console.log('Pool update:', payload);
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            loadCurrentPool();
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'fast_pool_results'
+        },
+        (payload) => {
+          console.log('New result:', payload);
+          loadPoolHistory();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   // Check if user has already accepted terms and is logged in
   useEffect(() => {
     if (!user) {
@@ -47,712 +105,417 @@ const Fast = () => {
       setShowTermsModal(true);
     }
   }, [user, toast]);
-  
+
+  // Load current pool and history
+  const loadCurrentPool = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('manage-fast-pools', {
+        body: { action: 'get_current_pool' }
+      });
+      
+      if (error) throw error;
+      
+      if (data?.pool) {
+        setCurrentPool(data.pool);
+        calculateCountdown(data.pool);
+      }
+    } catch (error) {
+      console.error('Error loading pool:', error);
+    }
+  }, []);
+
+  // Load pool history
+  const loadPoolHistory = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('fast_pool_results')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10);
+      
+      if (error) throw error;
+      
+      const typedResults = (data || []).map(result => ({
+        ...result,
+        result: result.result as 'subiu' | 'desceu' | 'manteve'
+      }));
+      
+      setPoolHistory(typedResults);
+    } catch (error) {
+      console.error('Error loading history:', error);
+    }
+  }, []);
+
+  // Calculate countdown based on pool end time
+  const calculateCountdown = useCallback((pool: FastPool) => {
+    const now = new Date().getTime();
+    const endTime = new Date(pool.round_end_time).getTime();
+    const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
+    setCountdown(timeLeft);
+  }, []);
+
+  // Initialize
+  useEffect(() => {
+    loadCurrentPool();
+    loadPoolHistory();
+  }, [loadCurrentPool, loadPoolHistory]);
+
+  // Countdown timer with smooth updates
+  useEffect(() => {
+    if (!currentPool || countdown <= 0) return;
+    
+    const timer = setInterval(() => {
+      calculateCountdown(currentPool);
+    }, 100); // Update every 100ms for smooth animation
+
+    return () => clearInterval(timer);
+  }, [currentPool, countdown, calculateCountdown]);
+
+  // Pool finalization and new pool creation
+  useEffect(() => {
+    if (countdown <= 0 && currentPool) {
+      finalizePool();
+    }
+  }, [countdown, currentPool]);
+
+  const finalizePool = async () => {
+    if (!currentPool) return;
+    
+    try {
+      await supabase.functions.invoke('manage-fast-pools', {
+        body: { 
+          action: 'finalize_pool',
+          poolId: currentPool.id 
+        }
+      });
+      
+      // Wait a moment then load new pool
+      setTimeout(() => {
+        loadCurrentPool();
+        loadPoolHistory();
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error finalizing pool:', error);
+    }
+  };
+
   // Calculate dynamic odds based on countdown
   const getOdds = (baseOdds: number) => {
     const timeElapsed = 60 - countdown;
-    if (timeElapsed >= 35) { // 25 seconds remaining
+    if (timeElapsed >= 35) { // Last 25 seconds
       return 1.0;
     }
     const reduction = (timeElapsed / 35) * (baseOdds - 1.0);
     return Math.max(1.0, baseOdds - reduction);
   };
 
-  // Categories/themes for the fast pools
-  const categories = [
-    { id: 'crypto', name: 'Cripto', icon: '₿' },
-    { id: 'commodities', name: window.innerWidth < 768 ? 'Commod' : 'Commodities', icon: '🛢️' },
-    { id: 'forex', name: 'Forex', icon: '💱' },
-    { id: 'stocks', name: 'Ações', icon: '📈' }
-  ];
-
-  const [selectedCategory, setSelectedCategory] = useState('commodities');
-
-  // Sample pools based on category
-  const pools = {
-    commodities: [
-      { 
-        id: 1, 
-        question: 'O Petróleo vai subir nos próximos 60 segundos?', 
-        asset: 'Petróleo WTI',
-        currentPrice: '$73.45',
-        upOdds: 1.65,
-        downOdds: 1.65
-      },
-      { 
-        id: 2, 
-        question: 'O Ouro vai descer nos próximos 60 segundos?', 
-        asset: 'Ouro',
-        currentPrice: '$2,018.30',
-        upOdds: 1.65,
-        downOdds: 1.65
-      },
-      { 
-        id: 3, 
-        question: 'A Prata vai subir nos próximos 60 segundos?', 
-        asset: 'Prata',
-        currentPrice: '$24.12',
-        upOdds: 1.65,
-        downOdds: 1.65
-      }
-    ],
-    crypto: [
-      { 
-        id: 4, 
-        question: 'O Bitcoin vai subir nos próximos 60 segundos?', 
-        asset: 'Bitcoin',
-        currentPrice: '$42,350.00',
-        upOdds: 1.65,
-        downOdds: 1.65
-      },
-      { 
-        id: 5, 
-        question: 'O Ethereum vai descer nos próximos 60 segundos?', 
-        asset: 'Ethereum',
-        currentPrice: '$2,545.80',
-        upOdds: 1.65,
-        downOdds: 1.65
-      },
-      { 
-        id: 6, 
-        question: 'A Solana vai subir nos próximos 60 segundos?', 
-        asset: 'Solana',
-        currentPrice: '$98.75',
-        upOdds: 1.65,
-        downOdds: 1.65
-      }
-    ],
-    forex: [
-      { 
-        id: 7, 
-        question: 'O USD/BRL vai subir nos próximos 60 segundos?', 
-        asset: 'USD/BRL',
-        currentPrice: 'R$ 5.12',
-        upOdds: 1.65,
-        downOdds: 1.65
-      },
-      { 
-        id: 8, 
-        question: 'O EUR/USD vai descer nos próximos 60 segundos?', 
-        asset: 'EUR/USD',
-        currentPrice: '$1.08',
-        upOdds: 1.65,
-        downOdds: 1.65
-      },
-      { 
-        id: 9, 
-        question: 'O GBP/USD vai subir nos próximos 60 segundos?', 
-        asset: 'GBP/USD',
-        currentPrice: '$1.26',
-        upOdds: 1.65,
-        downOdds: 1.65
-      },
-      { 
-        id: 13, 
-        question: 'O AUD/USD vai subir nos próximos 60 segundos?', 
-        asset: 'AUD/USD',
-        currentPrice: '$0.67',
-        upOdds: 1.65,
-        downOdds: 1.65
-      },
-      { 
-        id: 14, 
-        question: 'O USD/JPY vai descer nos próximos 60 segundos?', 
-        asset: 'USD/JPY',
-        currentPrice: '¥148.50',
-        upOdds: 1.65,
-        downOdds: 1.65
-      }
-    ],
-    stocks: [
-      { 
-        id: 10, 
-        question: 'A Apple vai subir nos próximos 60 segundos?', 
-        asset: 'AAPL',
-        currentPrice: '$185.40',
-        upOdds: 1.65,
-        downOdds: 1.65
-      },
-      { 
-        id: 11, 
-        question: 'A Microsoft vai descer nos próximos 60 segundos?', 
-        asset: 'MSFT',
-        currentPrice: '$375.20',
-        upOdds: 1.65,
-        downOdds: 1.65
-      },
-      { 
-        id: 12, 
-        question: 'A Tesla vai subir nos próximos 60 segundos?', 
-        asset: 'TSLA',
-        currentPrice: '$248.85',
-        upOdds: 1.65,
-        downOdds: 1.65
-      },
-      { 
-        id: 15, 
-        question: 'A Google vai subir nos próximos 60 segundos?', 
-        asset: 'GOOGL',
-        currentPrice: '$142.50',
-        upOdds: 1.65,
-        downOdds: 1.65
-      },
-      { 
-        id: 16, 
-        question: 'A Amazon vai descer nos próximos 60 segundos?', 
-        asset: 'AMZN',
-        currentPrice: '$155.80',
-        upOdds: 1.65,
-        downOdds: 1.65
-      }
-    ]
-  };
-
-  const currentPools = pools[selectedCategory as keyof typeof pools] || pools.commodities;
-
-  // Process results when countdown ends
-  const processResults = async () => {
-    try {
-      const fastBets = JSON.parse(localStorage.getItem('fastBets') || '[]');
-      const currentRoundBets = fastBets.filter((bet: any) => bet.roundNumber === currentRound - 1);
-      
-      if (currentRoundBets.length === 0) return;
-
-      // MVP Logic: Random results for each pool individually
-      const poolResults: {[poolId: number]: string} = {};
-      const uniquePools = [...new Set(currentRoundBets.map((bet: any) => bet.poolId))];
-      
-      uniquePools.forEach((poolId: number) => {
-        const random = Math.random();
-        if (random > 0.66) {
-          poolResults[poolId] = 'sim';
-        } else if (random > 0.33) {
-          poolResults[poolId] = 'nao';
-        } else {
-          poolResults[poolId] = 'manteve';
-        }
-      });
-      
-      let totalUserWinnings = 0;
-      
-      for (const bet of currentRoundBets) {
-        const poolWinner = poolResults[bet.poolId];
-        if (bet.side === poolWinner) {
-          // Winner! Calculate profit based on odds
-          const profit = Math.floor(bet.amount * bet.odds - bet.amount);
-          const totalPayout = bet.amount + profit;
-          
-          const { data: currentProfile } = await supabase
-            .from('profiles')
-            .select('saldo_moeda')
-            .eq('id', bet.userId)
-            .single();
-          
-          if (currentProfile) {
-            await supabase
-              .from('profiles')
-              .update({ 
-                saldo_moeda: currentProfile.saldo_moeda + totalPayout
-              })
-              .eq('id', bet.userId);
-          }
-
-          // Create winning transaction
-          await supabase
-            .from('wallet_transactions')
-            .insert({
-              id: `fast_win_${bet.poolId}_${bet.userId}_${Date.now()}`,
-              user_id: bet.userId,
-              tipo: 'credito',
-              valor: totalPayout,
-              descricao: `Vitória Fast Market - Pool ${bet.poolId} (${poolWinner.toUpperCase()}) - Lucro: ${profit} RZ`
-            });
-            
-          // Track user winnings for animation
-          if (bet.userId === user?.id) {
-            totalUserWinnings += profit;
-            
-            // Play cash sound
-            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwgAjOK1/HIcCEFL4PL7+OUOwgcb7/u4ZdMEAZUqOTzunIjAzOH0fDGbCAGMYnJ7eeVOwcedbvt3Y5NEAnVqOTzu3AjBSuAye7kizYHLILK7OGNOwgGhHPq66lSEgwZhrTr4qRUFAhBpOHvunAjB');
-            audio.play().catch(() => {});
-          }
-          totalUserWinnings += profit;
-        }
-      }
-      
-      // Show winner balance animation for current user in header
-      if (totalUserWinnings > 0) {
-        const animationTarget = document.getElementById('fast-winner-animation-target');
-        if (animationTarget) {
-          const animationElement = document.createElement('div');
-          animationElement.className = 'fixed z-[100] bg-gradient-to-r from-[#00ff90] to-[#00ff90]/90 text-black px-4 py-2 rounded-full text-base font-bold animate-[bounce_0.5s_ease-in-out_3] shadow-2xl whitespace-nowrap border-2 border-white';
-          animationElement.textContent = `+${totalUserWinnings} RZ LUCRO!`;
-          animationElement.style.cssText = 'top: 60px; right: 20px; transform: translateX(-50%); animation-duration: 0.5s;';
-          document.body.appendChild(animationElement);
-          
-          // Show notification
-          toast({
-            title: "🎉 Parabéns!",
-            description: `Você ganhou ${totalUserWinnings} RZ de lucro!`,
-            className: "bg-[#00ff90] text-black border-[#00ff90]"
-          });
-          
-          setTimeout(() => {
-            if (document.body.contains(animationElement)) {
-              document.body.removeChild(animationElement);
-            }
-          }, 4000);
-        }
-      }
-      
-      // Remove processed bets
-      const remainingBets = fastBets.filter((bet: any) => bet.roundNumber !== currentRound - 1);
-      localStorage.setItem('fastBets', JSON.stringify(remainingBets));
-      
-      refetchProfile();
-      
+  const handleBet = async (side: 'subiu' | 'desceu') => {
+    if (!user || !currentPool) {
       toast({
-        title: `Resultado Round #${currentRound - 1}`,
-        description: `Resultados individuais por pool! ${Object.values(poolResults).length} pool(s) processado(s).`,
-      });
-    } catch (error) {
-      console.error('Error processing results:', error);
-    }
-  };
-
-  // Countdown timer
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          setCurrentRound(r => r + 1);
-          processResults(); // Process results when round ends
-          return 60;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [currentRound]);
-
-  // Winner results for last second
-  useEffect(() => {
-    if (countdown === 1) {
-      // Generate individual random results for each pool
-      const results: {[poolId: number]: string} = {};
-      currentPools.forEach(pool => {
-        const random = Math.random();
-        if (random > 0.66) {
-          results[pool.id] = 'sim';
-        } else if (random > 0.33) {
-          results[pool.id] = 'nao';
-        } else {
-          results[pool.id] = 'manteve';
-        }
-      });
-      setWinnerResults(results);
-      
-      setTimeout(() => {
-        setWinnerResults({});
-      }, 6750); // Extended display time for better visibility
-    }
-  }, [countdown, currentRound, currentPools]);
-
-  const placeBet = async (poolId: number, side: 'sim' | 'nao', odds: number) => {
-    if (!user || !profile || betAmount < 0.1) {
-      toast({
-        title: "Valor mínimo",
-        description: "O valor mínimo para opinar é 0.1 RZ.",
+        title: "Erro",
+        description: "Você precisa estar logado e ter um pool ativo.",
         variant: "destructive"
       });
       return;
     }
 
-    // Block bets when 10 seconds or less remaining
     if (countdown <= 10) {
       toast({
-        title: "Pool fechado",
-        description: "Não é possível enviar ordens nos últimos 10 segundos.",
+        title: "Tempo esgotado",
+        description: "Não é possível apostar nos últimos 10 segundos.",
         variant: "destructive"
       });
       return;
     }
 
-    if (betAmount > profile.saldo_moeda) {
+    if (!profile?.saldo_moeda || profile.saldo_moeda < betAmount) {
       toast({
         title: "Saldo insuficiente",
-        description: "Você não tem RZ suficiente para esta opinião.",
+        description: "Você não tem saldo suficiente para esta aposta.",
         variant: "destructive"
       });
       return;
     }
 
-    // Enhanced animation feedback
-    setClickedPool({ id: poolId, side });
-    setTimeout(() => setClickedPool(null), 300);
-
     try {
-      // Deduct amount from user balance immediately
-      const { error: balanceError } = await supabase
-        .from('profiles')
-        .update({ saldo_moeda: profile.saldo_moeda - betAmount })
-        .eq('id', user.id);
-
-      if (balanceError) throw balanceError;
-
-      // Create transaction record for the bet
-      const transactionId = `fast_${poolId}_${user.id}_${Date.now()}`;
-      const { error: transactionError } = await supabase
-        .from('wallet_transactions')
-        .insert({
-          id: transactionId,
-          user_id: user.id,
-          tipo: 'debito',
-          valor: betAmount,
-          descricao: `Opinião Fast Market - Pool ${poolId} (${side.toUpperCase()})`
-        });
-
-      if (transactionError) throw transactionError;
-
-      // Store the bet
-      const betData = {
-        poolId,
-        side,
-        amount: betAmount,
-        odds,
-        userId: user.id,
-        timestamp: Date.now(),
-        roundNumber: currentRound
-      };
-
-      const fastBets = JSON.parse(localStorage.getItem('fastBets') || '[]');
-      fastBets.push(betData);
-      localStorage.setItem('fastBets', JSON.stringify(fastBets));
-
-      toast({
-        title: "Ordem enviada!",
-        description: `Opinião ${side.toUpperCase()} registrada com ${betAmount} RZ no Pool ${poolId}.`,
+      // Deduct bet amount from user balance
+      const { error: deductError } = await supabase.rpc('increment_balance', {
+        user_id: user.id,
+        amount: -betAmount
       });
 
-      refetchProfile();
-    } catch (error) {
-      console.error('Error placing fast bet:', error);
+      if (deductError) throw deductError;
+
+      // Place bet
+      const { error: betError } = await supabase
+        .from('fast_pool_bets')
+        .insert({
+          user_id: user.id,
+          pool_id: currentPool.id,
+          side: side,
+          amount_rioz: betAmount,
+          odds: getOdds(currentPool.base_odds)
+        });
+
+      if (betError) throw betError;
+
+      // Add click animation
+      setClickedPool({ id: currentPool.id, side });
+      setTimeout(() => setClickedPool(null), 400);
+
       toast({
-        title: "Erro ao registrar opinião",
-        description: "Tente novamente em alguns instantes.",
+        title: "Aposta realizada!",
+        description: `Aposta de ${betAmount} RZ em "${side.toUpperCase()}" confirmada.`,
+      });
+
+      // Refresh profile
+      refetchProfile();
+
+    } catch (error) {
+      console.error('Bet error:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao processar aposta. Tente novamente.",
         variant: "destructive"
       });
     }
   };
 
-  const formatTime = (seconds: number) => {
-    return `${seconds.toString().padStart(2, '0')}s`;
+  const openHistoryModal = () => {
+    if (currentPool) {
+      setSelectedPool(currentPool.asset_symbol);
+      setPoolHistoryOpen(true);
+    }
   };
 
+  if (!currentPool) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando Fast Markets...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
-      <div className="max-w-6xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="container mx-auto px-4 pt-8 pb-20">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[#ff2389]/20 to-[#ff2389]/10 border border-[#ff2389]/30">
-              <Zap className="h-8 w-8 text-[#ff2389]" />
-            </div>
-            <h1 className="text-4xl font-bold text-[#ff2389]">
-              Fast Markets
-            </h1>
-            <div className="animate-pulse">
-              <div className="w-3 h-3 rounded-full bg-[#ff2389]"></div>
-            </div>
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ff2389]/10 to-[#ff2389]/5 px-6 py-3 rounded-full border border-[#ff2389]/20 mb-4">
+            <Zap className="w-5 h-5 text-[#ff2389] animate-pulse" />
+            <span className="text-[#ff2389] font-semibold tracking-wide">FAST MARKETS</span>
           </div>
-          <p className="text-muted-foreground text-lg">
-            Mercados de opinião ultrarrápidos - Pools a cada 60 segundos ⚡️
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            Pools de opinião de <span className="text-primary">60 segundos</span>
+          </h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Opine se o ativo vai subir ou descer nos próximos 60 segundos. Odds dinâmicas baseadas em dados reais de mercado.
           </p>
-          
-          {/* Live Round Counter */}
-          <div className="flex justify-center items-center gap-4 mt-6">
-            <Badge variant="destructive" className="bg-[#ff2389] text-white text-lg px-4 py-2">
-              Round #{currentRound}
-            </Badge>
-            <div className="flex items-center gap-2 text-2xl font-mono font-bold">
-              <Clock className="h-6 w-6 text-[#ff2389]" />
-              <span className="text-white">{formatTime(countdown)}</span>
-            </div>
-          </div>
-          
         </div>
 
-        {/* Category Selection */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 text-center">Selecione o Tema</h2>
-          <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-            <TabsList className="grid w-full grid-cols-4 mb-6">
-              {categories.map((category) => {
-                let activeClasses = "data-[state=active]:text-white";
-                if (category.id === 'commodities') {
-                  activeClasses = "data-[state=active]:bg-[#ffd800] data-[state=active]:text-gray-800 dark:data-[state=active]:bg-[#ffd800] dark:data-[state=active]:text-gray-800 light:data-[state=active]:bg-[#FFDFEC] light:data-[state=active]:text-gray-800";
-                } else if (category.id === 'crypto') {
-                  activeClasses = "data-[state=active]:bg-[#FF6101] data-[state=active]:text-white dark:data-[state=active]:bg-[#FF6101] dark:data-[state=active]:text-white light:data-[state=active]:bg-[#FFDFEC] light:data-[state=active]:text-gray-800";
-                } else if (category.id === 'stocks') {
-                  activeClasses = "data-[state=active]:bg-[#00ff90] data-[state=active]:text-black dark:data-[state=active]:bg-[#00ff90] dark:data-[state=active]:text-black light:data-[state=active]:bg-[#FFDFEC] light:data-[state=active]:text-gray-800";
-                } else {
-                  activeClasses = "data-[state=active]:bg-[#ff2389] data-[state=active]:text-white dark:data-[state=active]:bg-[#ff2389] dark:data-[state=active]:text-white light:data-[state=active]:bg-[#FFDFEC] light:data-[state=active]:text-gray-800";
-                }
-                
-                return (
-                  <TabsTrigger 
-                    key={category.id} 
-                    value={category.id}
-                    className={activeClasses}
-                  >
-                    <span className="mr-2">{category.icon}</span>
-                    {category.name}
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
-          </Tabs>
-        </div>
-
-        {/* Live Pools Header */}
-        <div className="text-center mb-6">
-          <div className={`inline-flex items-center gap-2 bg-gradient-to-r from-[#ff2389]/10 to-[#ff2389]/5 px-4 py-2 rounded-full border border-[#ff2389]/20 ${
-            countdown <= 8 ? 'animate-pulse' : ''
-          }`}>
-            <div className={countdown <= 8 ? 'animate-pulse' : ''}>
-              <div className={`w-2 h-2 rounded-full bg-[#ff2389] ${countdown <= 8 ? 'animate-pulse' : ''}`}></div>
-            </div>
-            <span className="text-sm font-medium text-[#ff2389] uppercase tracking-wide">
-              AO VIVO - {currentPools.length} Pools Ativos
-            </span>
-            <div className={countdown <= 8 ? 'animate-pulse' : ''}>
-              <div className={`w-2 h-2 rounded-full bg-[#ff2389] ${countdown <= 8 ? 'animate-pulse' : ''}`}></div>
-            </div>
-          </div>
-          
-          {/* Countdown bar */}
-          <div className="w-full max-w-md mx-auto mt-4">
-            <div className={`h-2 bg-muted rounded-full overflow-hidden ${
-              countdown <= 8 ? `animate-pulse` : ''
-            }`}>
-              <div 
-                className={`h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 transition-all duration-1000 ${
-                  countdown <= 8 ? 'animate-[pulse_0.5s_ease-in-out_infinite]' : ''
-                }`}
-                style={{ width: `${(countdown / 60) * 100}%` }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Current Pools */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {currentPools.map((pool) => (
-            <Card 
-              key={pool.id} 
-              className={`
-                group transition-all duration-500 hover:scale-[1.02] cursor-pointer relative
-                bg-gradient-to-br from-card/95 to-card/80 
-                border border-border/50 hover:border-primary/30
-                backdrop-blur-sm
-                ${countdown <= 8 ? 'animate-pulse border-[#ff2389]/50' : ''}
-                ${resolvedTheme === 'light' ? 'border-2' : ''}
-                ${countdown === 1 && winnerResults[pool.id] ? 
-                  (winnerResults[pool.id] === 'sim' ? 'bg-[#00ff90]/90' : 
-                   winnerResults[pool.id] === 'nao' ? 'bg-[#ff2389]/90' : 'bg-[#ffd800]/90')
-                  : ''
-                }
-              `}
-              onClick={() => {
-                if (!user) {
-                  window.location.href = '/auth';
-                  return;
-                }
-                setSelectedPool(pool.id.toString());
-                setPoolHistoryOpen(true);
-              }}
-            >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <Badge 
-                      variant="secondary" 
-                      className={`mb-2 ${
-                        selectedCategory === 'commodities' ? 'bg-[#ffd800]/20 text-[#ffd800] border-[#ffd800]/50' :
-                        selectedCategory === 'crypto' ? 'bg-[#FF6101]/20 text-[#FF6101] border-[#FF6101]/50' :
-                        selectedCategory === 'stocks' ? 'bg-[#00ff90]/20 text-[#00ff90] border-[#00ff90]/50' :
-                        'bg-[#ff2389]/20 text-[#ff2389] border-[#ff2389]/50'
-                      }`}
-                    >
-                      {pool.asset}
-                    </Badge>
-                    <CardTitle className="text-lg leading-tight">{pool.question}</CardTitle>
-                  </div>
-                  <div className="text-right ml-4">
-                    <div className="text-sm text-muted-foreground">Preço Atual</div>
-                    <div className="font-mono font-bold text-primary">{pool.currentPrice}</div>
-                  </div>
-                </div>
-              </CardHeader>
+        {/* Current Pool Card */}
+        <div className="max-w-2xl mx-auto mb-8">
+          <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5"></div>
+            
+            <CardHeader className="relative z-10 text-center pb-3">
+              <div className="flex items-center justify-between mb-2">
+                <Badge variant="secondary" className="bg-primary/10 text-primary">
+                  Pool #{currentPool.round_number}
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={openHistoryModal}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <BarChart3 className="w-4 h-4 mr-1" />
+                  Histórico
+                </Button>
+              </div>
               
-              <CardContent className="pt-0">
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!user) {
-                        window.location.href = '/auth';
-                        return;
-                      }
-                       setClickedPool({ id: pool.id, side: 'sim' });
-                      setTimeout(() => setClickedPool(null), 400);
-                      placeBet(pool.id, 'sim', getOdds(pool.upOdds));
-                    }}
-                    disabled={countdown <= 10}
-                    data-pool-id={pool.id}
-                    data-side="sim"
-                    className={`
-                      h-14 flex flex-col gap-1 
-                      ${winnerResults[pool.id] === 'nao' ? 'bg-[#ffd800] text-gray-800' : 'bg-[#00ff90] text-black'} 
-                      hover:bg-[#00ff90]/90 
-                      border-2 border-[#00ff90] hover:border-[#00ff90]/70
-                      transition-all duration-500 
-                      ${countdown <= 10 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
-                      ${clickedPool?.id === pool.id && clickedPool?.side === 'sim' ? 'scale-[1.02] shadow-lg shadow-[#00ff90]/30 ring-2 ring-[#00ff90]/50' : ''}
-                    `}
-                  >
-                    <div className="font-bold text-lg">SIM</div>
-                    <div className="text-sm font-mono">{getOdds(pool.upOdds).toFixed(2)}x</div>
-                  </Button>
-                  
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!user) {
-                        window.location.href = '/auth';
-                        return;
-                      }
-                       setClickedPool({ id: pool.id, side: 'nao' });
-                      setTimeout(() => setClickedPool(null), 400);
-                      placeBet(pool.id, 'nao', getOdds(pool.downOdds));
-                    }}
-                    disabled={countdown <= 10}
-                    data-pool-id={pool.id}
-                    data-side="nao"
-                    className={`
-                      h-14 flex flex-col gap-1 
-                      ${winnerResults[pool.id] === 'sim' ? 'bg-[#ffd800] text-gray-800' : 'bg-[#ff2389] text-white'} 
-                      hover:bg-[#ff2389]/90
-                      border-2 border-[#ff2389] hover:border-[#ff2389]/70
-                      transition-all duration-500 
-                      ${countdown <= 10 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}
-                      ${clickedPool?.id === pool.id && clickedPool?.side === 'nao' ? 'scale-[1.02] shadow-lg shadow-[#ff2389]/30 ring-2 ring-[#ff2389]/50' : ''}
-                    `}
-                  >
-                    <div className="font-bold text-lg">NÃO</div>
-                    <div className="text-sm font-mono">{getOdds(pool.downOdds).toFixed(2)}x</div>
-                  </Button>
-                </div>
+              <CardTitle className="text-xl md:text-2xl mb-2">
+                {currentPool.question}
+              </CardTitle>
+              
+              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <span className="bg-muted/50 px-2 py-1 rounded">{currentPool.asset_name}</span>
+                <span>•</span>
+                <span>Preço atual: ${currentPool.opening_price.toLocaleString()}</span>
+              </div>
+            </CardHeader>
 
-                {/* Countdown bar */}
-                <div className="mt-4">
-                  <div className="w-full bg-muted rounded-full h-1.5">
-                    <div 
-                      className={cn(
-                        "bg-[#ff2389] h-1.5 rounded-full transition-all duration-1000",
-                        countdown <= 8 && "animate-pulse"
-                      )}
-                      style={{ 
-                        width: `${(countdown / 60) * 100}%`,
-                        animationDuration: countdown <= 8 ? `${Math.max(0.1, countdown * 0.1)}s` : '2s'
-                      }}
-                    ></div>
-                  </div>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground mt-2">
-                    <span>Encerra em</span>
-                    <span className="font-mono font-bold text-white">{formatTime(countdown)}</span>
-                  </div>
+            <CardContent className="relative z-10 space-y-6">
+              {/* Countdown */}
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-[#ff2389] mb-2">
+                  {countdown}s
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                <div className="w-full bg-muted/20 rounded-full h-3 overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 transition-all duration-100 ease-linear"
+                    style={{ width: `${(countdown / 60) * 100}%` }}
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Tempo restante para apostar
+                </p>
+              </div>
 
-        {/* Quantity Selector - Moved to bottom */}
-        {user && (
-          <div className="max-w-lg mx-auto mt-8">
-            <Card className="border border-[#ff2389]/20 bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-muted-foreground">Quantidade</span>
-                  <span className="text-sm font-bold text-primary">{(profile?.saldo_moeda || 0).toLocaleString()} RZ</span>
-                </div>
-                
-                <div className="space-y-3">
+              {/* Bet Amount Slider */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium">
+                  Valor da aposta: {betAmount} RZ
+                </label>
+                <div className="px-4 py-3 bg-muted/20 rounded-lg">
                   <input
                     type="range"
-                    min="2"
+                    min="10"
                     max="1000"
-                    value={Math.min(betAmount, Math.min(1000, profile?.saldo_moeda || 0))}
-                    onChange={(e) => setBetAmount(Math.min(parseInt(e.target.value), profile?.saldo_moeda || 0))}
-                    className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer slider-thumb"
+                    step="10"
+                    value={betAmount}
+                    onChange={(e) => setBetAmount(Number(e.target.value))}
+                    className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer slider"
                     style={{
-                      background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${(betAmount / Math.min(1000, profile?.saldo_moeda || 1000)) * 100}%, hsl(var(--muted)) ${(betAmount / Math.min(1000, profile?.saldo_moeda || 1000)) * 100}%, hsl(var(--muted)) 100%)`
+                      background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 10) / 990) * 100}%, hsl(var(--muted)) ${((betAmount - 10) / 990) * 100}%, hsl(var(--muted)) 100%)`
                     }}
                   />
-                  
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>2 RZ</span>
-                    <div className="text-center">
-                      <span className="text-lg font-bold text-primary">{betAmount} RZ</span>
-                    </div>
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>10 RZ</span>
                     <span>1.000 RZ</span>
                   </div>
+                </div>
+              </div>
+
+              {/* Bet Buttons */}
+              <div className="grid grid-cols-2 gap-4">
+                <Button
+                  onClick={() => handleBet('subiu')}
+                  disabled={countdown <= 10}
+                  className={`h-16 text-lg font-semibold transition-all duration-300 ${
+                    clickedPool?.id === currentPool.id && clickedPool?.side === 'subiu'
+                      ? 'scale-[1.02] shadow-lg shadow-[#00ff90]/30 ring-2 ring-[#00ff90]/50'
+                      : ''
+                  } bg-[#00ff90] hover:bg-[#00ff90]/90 text-black`}
+                >
+                  <div className="flex flex-col items-center">
+                    <TrendingUp className="w-6 h-6 mb-1" />
+                    <span>SUBIU</span>
+                    <span className="text-sm opacity-80">
+                      x{getOdds(currentPool.base_odds).toFixed(2)}
+                    </span>
+                  </div>
+                </Button>
+                
+                <Button
+                  onClick={() => handleBet('desceu')}
+                  disabled={countdown <= 10}
+                  className={`h-16 text-lg font-semibold transition-all duration-300 ${
+                    clickedPool?.id === currentPool.id && clickedPool?.side === 'desceu'
+                      ? 'scale-[1.02] shadow-lg shadow-[#ff2389]/30 ring-2 ring-[#ff2389]/50'
+                      : ''
+                  } bg-[#ff2389] hover:bg-[#ff2389]/90 text-white`}
+                >
+                  <div className="flex flex-col items-center">
+                    <TrendingDown className="w-6 h-6 mb-1" />
+                    <span>DESCEU</span>
+                    <span className="text-sm opacity-80">
+                      x{getOdds(currentPool.base_odds).toFixed(2)}
+                    </span>
+                  </div>
+                </Button>
+              </div>
+
+              {countdown <= 10 && (
+                <div className="text-center text-sm text-muted-foreground">
+                  ⏰ Apostas bloqueadas nos últimos 10 segundos
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Results */}
+        {poolHistory.length > 0 && (
+          <div className="max-w-4xl mx-auto">
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ArrowUpDown className="w-5 h-5" />
+                  Últimos Resultados
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                  {poolHistory.slice(0, 10).map((result, index) => (
+                    <div
+                      key={result.id}
+                      className="flex flex-col items-center p-3 rounded-lg bg-muted/20 border"
+                    >
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
+                        result.result === 'subiu' 
+                          ? 'bg-green-100 dark:bg-green-900/30' 
+                          : result.result === 'desceu'
+                          ? 'bg-red-100 dark:bg-red-900/30'
+                          : 'bg-gray-100 dark:bg-gray-900/30'
+                      }`}>
+                        {result.result === 'subiu' ? (
+                          <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        ) : result.result === 'desceu' ? (
+                          <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />
+                        ) : (
+                          <span className="text-xs font-bold text-gray-600 dark:text-gray-400">=</span>
+                        )}
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {result.price_change_percent > 0 ? '+' : ''}{result.price_change_percent.toFixed(2)}%
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
           </div>
         )}
 
-        <style>{`
-          .slider-thumb::-webkit-slider-thumb {
-            appearance: none;
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background: #00ff90;
-            cursor: pointer;
-            border: 2px solid #ffffff;
-            box-shadow: 0 0 10px rgba(0, 255, 144, 0.5);
-          }
-          
-          .slider-thumb::-moz-range-thumb {
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background: #00ff90;
-            cursor: pointer;
-            border: 2px solid #ffffff;
-            box-shadow: 0 0 10px rgba(0, 255, 144, 0.5);
-          }
-        `}</style>
-
-        {/* Info Section */}
-        <div className="mt-12 text-center">
-          <Card className="max-w-2xl mx-auto bg-gradient-to-br from-[#ff2389]/5 to-transparent border border-[#ff2389]/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Zap className="h-5 w-5 text-[#ff2389]" />
-                <h3 className="text-lg font-semibold text-[#ff2389]">Como Funciona</h3>
-              </div>
-              <div className="text-sm text-muted-foreground space-y-2">
+        {/* Info Cards */}
+        <div className="max-w-4xl mx-auto mt-12 grid md:grid-cols-2 gap-6">
+          <Card className="bg-gradient-to-br from-primary/5 via-transparent to-transparent border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-primary">
+                <Zap className="w-5 h-5" />
+                Como Funciona
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              <div className="space-y-2">
                 <p>• Cada pool dura exatamente 60 segundos</p>
-                <p>• Opine se o preço vai subir (⬆️) ou descer (⬇️)</p>
-                <p>• Resultados individuais aleatórios para cada pool (MVP)</p>
-                <p>• Novos pools começam automaticamente a cada minuto</p>
-                <p>• Os odds diminuem conforme o tempo passa</p>
-                <p>• Lucro calculado baseado nas odds no momento da opinião</p>
+                <p>• Opine se o ativo vai subir (SIM) ou descer (NÃO)</p>
+                <p>• Resultado baseado em dados reais de mercado</p>
+                <p>• Odds dinâmicas que diminuem com o tempo</p>
+                <p>• Apostas bloqueadas nos últimos 10 segundos</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-[#ff2389]/5 via-transparent to-transparent border-[#ff2389]/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-[#ff2389]">
+                <BarChart3 className="w-5 h-5" />
+                Sistema de Odds
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              <div className="space-y-2">
+                <p>• Odds iniciais baseadas no ativo</p>
+                <p>• Redução gradual conforme o tempo passa</p>
+                <p>• Odds mínimas de 1.0x nos últimos 25 segundos</p>
+                <p>• Lucro calculado no momento da aposta</p>
+                <p>• Pagamento automático para vencedores</p>
               </div>
             </CardContent>
           </Card>

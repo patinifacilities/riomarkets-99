@@ -131,17 +131,17 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, assetSymbol, timeLeft
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-center">
+          <DialogTitle className="flex items-center gap-2 text-xl font-bold text-center">
             <ArrowUpDown className="w-5 h-5" />
             Pool {assetSymbol} - Histórico
           </DialogTitle>
           <DialogDescription className="text-center">
-            <div className="text-sm text-muted-foreground mb-2">
-              Pergunta: O ativo vai subir nos próximos 60 segundos?
+            <div className="text-base font-medium mb-2">
+              {mockHistory[0]?.time ? 'O ativo vai subir nos próximos 60 segundos?' : 'Pergunta carregando...'}
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-sm text-muted-foreground">
               Categoria: Commodities
             </div>
           </DialogDescription>
@@ -153,9 +153,9 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, assetSymbol, timeLeft
             <span className="text-sm font-medium">Tempo restante</span>
             <span className="text-lg font-bold text-[#ff2389]">{countdown}s</span>
           </div>
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
+          <div className="h-3 bg-muted rounded-full overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 transition-all duration-1000 ease-linear"
+              className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 transition-all duration-100 ease-linear"
               style={{ width: `${(countdown / 60) * 100}%` }}
             />
           </div>
@@ -180,8 +180,7 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, assetSymbol, timeLeft
         {/* Betting slider */}
         <div className="mb-4">
           <label className="text-sm font-medium mb-2 block">Valor da opinião: {betAmount} RZ</label>
-          <div className="px-3 py-2 bg-muted/20 rounded-lg mb-3">
-            <div className="text-sm font-medium mb-2">Deslize para selecionar</div>
+          <div className="px-4 py-3 bg-muted/20 rounded-lg">
             <input
               type="range"
               min="0.1"
@@ -190,6 +189,9 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, assetSymbol, timeLeft
               value={betAmount}
               onChange={(e) => setBetAmount(Number(e.target.value))}
               className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer slider"
+              style={{
+                background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 0.1) / 99.9) * 100}%, hsl(var(--muted)) ${((betAmount - 0.1) / 99.9) * 100}%, hsl(var(--muted)) 100%)`
+              }}
             />
             <div className="flex justify-between text-xs text-muted-foreground mt-1">
               <span>0.1 RZ</span>
