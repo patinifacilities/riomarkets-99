@@ -55,12 +55,13 @@ serve(async (req) => {
 });
 
 async function getCurrentPool(supabase: any, category = 'crypto') {
-  // Get all active pools for selected category
+  // Get all active pools for selected category (excluding paused pools)
   const { data: pools, error } = await supabase
     .from('fast_pools')
     .select('*')
     .eq('status', 'active')
     .eq('category', category)
+    .eq('paused', false)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
@@ -136,7 +137,8 @@ async function createSynchronizedPools(supabase: any, category = 'crypto') {
     round_start_time: now.toISOString(),
     round_end_time: endTime.toISOString(),
     base_odds: 1.65,
-    status: 'active'
+    status: 'active',
+    paused: false
   }));
 
   const { data: pools, error } = await supabase

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, Zap, Clock, BarChart3, Wallet, Plus, ArrowUpDown, ArrowUp, ArrowDown, Bitcoin, DollarSign, Coins, TrendingUpIcon } from 'lucide-react';
+import { TrendingUp, TrendingDown, Zap, Clock, BarChart3, Wallet, Plus, ArrowUpDown, ArrowUp, ArrowDown, Bitcoin, DollarSign, Coins, TrendingUpIcon, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
@@ -264,11 +264,11 @@ const Fast = () => {
         )
       );
       
-      // Wait a moment then load new pools
+      // Immediately load new pools after finalization
       setTimeout(() => {
         loadCurrentPools();
         loadPoolHistory();
-      }, 2000);
+      }, 500);
       
     } catch (error) {
       console.error('Error finalizing pools:', error);
@@ -554,8 +554,8 @@ const Fast = () => {
             Opine se o ativo vai subir ou descer nos próximos 60 segundos. Odds dinâmicas baseadas em dados reais de mercado.
           </p>
           
-          {/* Category Selector - Horizontal with themed styling */}
-          <div className="flex justify-center mb-6">
+          {/* Category Selector and Terms Button */}
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
             <div className="flex gap-2 p-1 bg-muted rounded-xl">
               {categoryOptions.map((category) => (
                 <Button
@@ -580,6 +580,16 @@ const Fast = () => {
                 </Button>
               ))}
             </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowTermsModal(true)}
+              className="gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <AlertTriangle className="w-4 h-4" />
+              Termos Fast Markets
+            </Button>
           </div>
         </div>
 
@@ -587,8 +597,21 @@ const Fast = () => {
         <div className="max-w-6xl mx-auto mb-8">
           <div className="grid md:grid-cols-3 gap-6">
             {currentPools.map((pool, index) => (
-              <Card key={pool.id} className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm">
+              <Card key={pool.id} className={cn(
+                "relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm",
+                (pool as any).paused && "opacity-50 grayscale"
+              )}>
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5"></div>
+                
+                {(pool as any).paused && (
+                  <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center rounded-lg">
+                    <div className="text-center">
+                      <div className="text-4xl mb-2">⏸️</div>
+                      <p className="text-white font-semibold">Pool Pausado</p>
+                      <p className="text-white/70 text-sm">Aguarde retorno</p>
+                    </div>
+                  </div>
+                )}
                 
                 <CardHeader className="relative z-10 text-center pb-3">
                   <div className="flex items-center justify-between mb-2">

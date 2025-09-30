@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
@@ -31,6 +32,7 @@ const AdminFast = () => {
   const { user, loading: authLoading } = useAuth();
   const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [pools, setPools] = useState<FastPool[]>([]);
   const [loading, setLoading] = useState(true);
@@ -221,14 +223,21 @@ const AdminFast = () => {
                               API Conectada
                             </Badge>
                           )}
+                          {(pool as any).paused && (
+                            <Badge className="bg-yellow-500/10 text-yellow-600">
+                              Pausado
+                            </Badge>
+                          )}
                         </div>
-                        <p className="text-sm text-muted-foreground mb-2">{pool.question}</p>
+                        <p className="text-sm font-medium mb-1">Configuração de API (Geral)</p>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {pool.api_connected 
+                            ? `API: ${pool.api_url?.substring(0, 50)}...` 
+                            : 'Usando API padrão de mercado'}
+                        </p>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
                           <span>Símbolo: {pool.asset_symbol}</span>
-                          <span>Round: #{pool.round_number}</span>
-                          {pool.opening_price && (
-                            <span>Preço Inicial: ${pool.opening_price.toFixed(2)}</span>
-                          )}
+                          <span>Categoria: {pool.category}</span>
                           {pool.last_api_sync && (
                             <span>Última Sync: {new Date(pool.last_api_sync).toLocaleString('pt-BR')}</span>
                           )}
@@ -245,6 +254,39 @@ const AdminFast = () => {
                       >
                         <Settings className="w-4 h-4" />
                         Configurar API
+                      </Button>
+                      
+                      <Button 
+                        variant={(pool as any).paused ? "default" : "outline"}
+                        size="sm" 
+                        className="gap-2"
+                        onClick={async () => {
+                          try {
+                            const { error } = await supabase
+                              .from('fast_pools')
+                              .update({ paused: !(pool as any).paused })
+                              .eq('asset_symbol', pool.asset_symbol)
+                              .eq('category', pool.category);
+                            
+                            if (error) throw error;
+                            
+                            toast({
+                              title: (pool as any).paused ? "Pool retomado" : "Pool pausado",
+                              description: `${pool.asset_name} foi ${(pool as any).paused ? 'retomado' : 'pausado'}`,
+                            });
+                            
+                            fetchPools();
+                          } catch (error) {
+                            console.error('Error toggling pause:', error);
+                            toast({
+                              title: "Erro",
+                              description: "Falha ao pausar/retomar pool",
+                              variant: "destructive"
+                            });
+                          }
+                        }}
+                      >
+                        {(pool as any).paused ? 'Retomar' : 'Pausar'}
                       </Button>
                     </div>
                   </div>

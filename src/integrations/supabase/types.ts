@@ -332,6 +332,7 @@ export type Database = {
           id: string
           last_api_sync: string | null
           opening_price: number | null
+          paused: boolean | null
           question: string
           result: string | null
           round_end_time: string
@@ -354,6 +355,7 @@ export type Database = {
           id?: string
           last_api_sync?: string | null
           opening_price?: number | null
+          paused?: boolean | null
           question: string
           result?: string | null
           round_end_time: string
@@ -376,6 +378,7 @@ export type Database = {
           id?: string
           last_api_sync?: string | null
           opening_price?: number | null
+          paused?: boolean | null
           question?: string
           result?: string | null
           round_end_time?: string
