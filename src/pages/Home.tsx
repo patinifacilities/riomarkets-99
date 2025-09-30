@@ -250,8 +250,12 @@ const Home = () => {
               <Filter className="w-5 h-5 text-primary" />
               <h4 className="text-base font-bold text-foreground uppercase tracking-wide">Tópicos</h4>
             </div>
-            <div className="relative overflow-visible py-2">
-              <div className="overflow-x-auto scrollbar-hide scroll-smooth overflow-visible" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="relative py-2">
+              {/* Fade overlays */}
+              <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none"></div>
+              <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none"></div>
+              
+              <div className="overflow-x-auto scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 <div className="flex gap-4 pb-2 min-w-max animate-infinite-scroll hover:pause">
                   {/* First set of topics */}
                   {topicFilters.map((topic) => {
@@ -263,14 +267,15 @@ const Home = () => {
                         onClick={() => handleTopicSelect(topic.id)}
                         className={`
                           flex items-center gap-4 px-10 py-7 rounded-2xl text-lg font-bold whitespace-nowrap
-                          transition-all duration-300 hover:scale-110 border-2 shadow-lg
+                          transition-all duration-300 hover:scale-110 hover:-translate-y-1 border-2 shadow-lg
+                          animate-fade-in
                           ${isSelected 
                             ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50' 
                             : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm'
                           }
                         `}
                       >
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 hover:rotate-12 hover:scale-110 ${
                           isSelected ? 'bg-primary-foreground/20' : 'bg-primary/10'
                         }`}>
                           <IconComponent className="w-8 h-8" />
@@ -298,14 +303,15 @@ const Home = () => {
                         onClick={() => handleTopicSelect(topic.id)}
                         className={`
                           flex items-center gap-4 px-10 py-7 rounded-2xl text-lg font-bold whitespace-nowrap
-                          transition-all duration-300 hover:scale-110 border-2 shadow-lg
+                          transition-all duration-300 hover:scale-110 hover:-translate-y-1 border-2 shadow-lg
+                          animate-fade-in
                           ${isSelected 
                             ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50' 
                             : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm'
                           }
                         `}
                       >
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 hover:rotate-12 hover:scale-110 ${
                           isSelected ? 'bg-primary-foreground/20' : 'bg-primary/10'
                         }`}>
                           <IconComponent className="w-8 h-8" />

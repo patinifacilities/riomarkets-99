@@ -269,23 +269,40 @@
     display: none;
   }
 
-  /* Infinite scroll animation */
-  @keyframes infinite-scroll {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(-50%);
-    }
+/* Infinite scroll animation */
+@keyframes infinite-scroll {
+  0% {
+    transform: translateX(0);
   }
+  100% {
+    transform: translateX(-50%);
+  }
+}
 
-  .animate-infinite-scroll {
-    animation: infinite-scroll 30s linear infinite;
+/* Gentle pulse animation for 60 seconds */
+@keyframes pulse-gentle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
   }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+}
 
-  .animate-infinite-scroll.pause:hover {
-    animation-play-state: paused;
-  }
+.animate-infinite-scroll {
+  animation: infinite-scroll 60s linear infinite;
+}
+
+.hover\:pause:hover {
+  animation-play-state: paused;
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 3s ease-in-out;
+  animation-iteration-count: 20; /* 60 seconds / 3 seconds per iteration */
+}
 
 /* Custom styles for skeleton loading */
 @keyframes pulse {

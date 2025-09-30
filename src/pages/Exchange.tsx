@@ -58,8 +58,13 @@ const ExchangeNew = () => {
   };
 
   const handleAmountChange = (value: string) => {
-    // Remove all non-numeric characters except dot and comma
-    const cleanValue = value.replace(/[^\d.,]/g, '');
+    // Remove all non-numeric characters except dot
+    const cleanValue = value.replace(/[^\d.]/g, '');
+    
+    // Validate max amount (1 million)
+    const numValue = parseFloat(cleanValue);
+    if (numValue > 1000000) return;
+    
     setFromAmount(cleanValue);
     // 1:1 conversion rate
     setToAmount(cleanValue);
@@ -67,12 +72,8 @@ const ExchangeNew = () => {
 
   const formatNumber = (value: string) => {
     if (!value) return '';
-    const numValue = parseFloat(value.replace(/[^\d.]/g, ''));
-    if (isNaN(numValue)) return '';
-    return numValue.toLocaleString('pt-BR', {
-      minimumFractionDigits: swapDirection === 'brl-to-rioz' ? 2 : 0,
-      maximumFractionDigits: swapDirection === 'brl-to-rioz' ? 2 : 0
-    });
+    // Just return the raw value without formatting while typing
+    return value;
   };
 
   const handleSwapDirection = () => {
@@ -300,7 +301,7 @@ const ExchangeNew = () => {
                     placeholder="0"
                     value={formatNumber(fromAmount)}
                     onChange={(e) => handleAmountChange(e.target.value)}
-                    className="pl-32 pr-4 h-32 text-right text-[120px] leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
+                    className="pl-32 pr-4 h-32 text-right text-[160px] leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
                   />
                 </div>
                 {fromAmount && parseFloat(fromAmount.replace(/[^\d.]/g, '')) > fromBalance && (
@@ -374,7 +375,7 @@ const ExchangeNew = () => {
                   placeholder="0"
                   value={formatNumber(toAmount)}
                   readOnly
-                  className="pl-32 pr-4 h-32 text-right text-[120px] leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
+                  className="pl-32 pr-4 h-32 text-right text-[160px] leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
                 />
               </div>
             </div>
@@ -422,7 +423,7 @@ const ExchangeNew = () => {
                 
                 <Button
                   asChild
-                  className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 hover:from-[#ff2389]/90 hover:to-[#ff2389]/70"
+                  className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 hover:from-[#ff2389]/90 hover:to-[#ff2389]/70 animate-pulse-gentle"
                   size="lg"
                 >
                   <a href="/fast" className="flex items-center gap-2">
