@@ -85,8 +85,8 @@ export default function Press() {
           </p>
         </header>
 
-        {/* Filters */}
-        <div className="mb-8">
+        {/* Filters - Hidden on mobile */}
+        <div className="mb-8 hidden md:block">
           <PressFilter />
         </div>
 

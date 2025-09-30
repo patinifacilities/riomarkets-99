@@ -47,32 +47,6 @@ export const OrderHistoryCard = ({ onRefresh }: OrderHistoryCardProps) => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Suas Opiniões Abertas</CardTitle>
-            <div className="flex gap-2">
-              <Button 
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  const activeOrder = allOrders.find(o => o.status === 'ativa');
-                  if (activeOrder) handleCashout(activeOrder);
-                }}
-                disabled={!allOrders.some(o => o.status === 'ativa')}
-                className="text-xs px-2 py-1"
-              >
-                Sacar agora
-              </Button>
-              <Button 
-                size="sm"
-                variant="destructive"
-                onClick={() => {
-                  const activeOrder = allOrders.find(o => o.status === 'ativa');
-                  if (activeOrder) handleCancel(activeOrder);
-                }}
-                disabled={!allOrders.some(o => o.status === 'ativa')}
-                className="text-xs px-3 py-1.5 bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-0 font-medium"
-              >
-                Cancelar
-              </Button>
-            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -143,11 +117,24 @@ export const OrderHistoryCard = ({ onRefresh }: OrderHistoryCardProps) => {
                           </div>
                           
                           {isActive && (
-                            <div className="flex items-center gap-1">
-                              <DollarSign className="w-3 h-3 text-primary" />
-                              <span className="text-primary font-medium">
-                                Retorno potencial: {(order.quantidade_moeda * (order.preco || 1)).toLocaleString('pt-BR')} RZ
-                              </span>
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1">
+                                <DollarSign className="w-3 h-3 text-primary" />
+                                <span className="text-primary font-medium">
+                                  Retorno potencial: {(order.quantidade_moeda * (order.preco || 1)).toLocaleString('pt-BR')} RZ
+                                </span>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCancel(order);
+                                }}
+                                className="text-xs px-2 py-1 h-6 bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-0"
+                              >
+                                Cancelar
+                              </Button>
                             </div>
                           )}
                         </div>

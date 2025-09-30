@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TrendingUp, TrendingDown, Zap, Clock, BarChart3, Wallet, Plus, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -48,10 +49,20 @@ const Fast = () => {
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [selectedPool, setSelectedPool] = useState<string | null>(null);
   const [poolHistoryOpen, setPoolHistoryOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('commodities');
+  const [lastPoolId, setLastPoolId] = useState<string | null>(null);
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
   const { resolvedTheme } = useTheme();
+
+  // Category options for fast pools
+  const categoryOptions = [
+    { value: 'commodities', label: 'Commodities' },
+    { value: 'crypto', label: 'Cripto' },
+    { value: 'forex', label: 'Forex' },
+    { value: 'stocks', label: 'Ações' }
+  ];
 
   // Realtime subscription for pool updates
   useEffect(() => {
@@ -170,7 +181,27 @@ const Fast = () => {
     const endTime = new Date(pool.round_end_time).getTime();
     const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
     setCountdown(timeLeft);
-  }, []);
+    
+    // Check if this is a new pool (first second)
+    if (timeLeft === 59 && pool.id !== lastPoolId) {
+      setLastPoolId(pool.id);
+      
+      // Get the last result to show notification
+      if (poolHistory.length > 0) {
+        const lastResult = poolHistory[0];
+        setTimeout(() => {
+          toast({
+            title: lastResult.result === 'subiu' ? "Subiu! 📈" : lastResult.result === 'desceu' ? "Desceu! 📉" : "Manteve! ➡️",
+            description: `Variação: ${lastResult.price_change_percent > 0 ? '+' : ''}${lastResult.price_change_percent.toFixed(2)}%`,
+            duration: 2000,
+            className: lastResult.result === 'subiu' ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 
+                      lastResult.result === 'desceu' ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 
+                      'border-gray-500 bg-gray-50 dark:bg-gray-900/20'
+          });
+        }, 500);
+      }
+    }
+  }, [lastPoolId, poolHistory, toast]);
 
   // Initialize
   useEffect(() => {
@@ -236,6 +267,32 @@ const Fast = () => {
     }
   };
 
+  // Check for user winnings
+  const checkForWinnings = useCallback(async () => {
+    if (!user || !currentPool) return;
+    
+    try {
+      const { data: winningBets } = await supabase
+        .from('fast_pool_bets')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('pool_id', currentPool.id)
+        .eq('processed', true)
+        .gt('payout_amount', 0);
+        
+      if (winningBets && winningBets.length > 0) {
+        const totalWinnings = winningBets.reduce((sum, bet) => sum + bet.payout_amount, 0);
+        toast({
+          title: "🎉 Você ganhou!",
+          description: `Parabéns! Você recebeu ${totalWinnings.toFixed(0)} RZ`,
+          duration: 6000,
+        });
+      }
+    } catch (error) {
+      console.error('Error checking winnings:', error);
+    }
+  }, [user, currentPool, toast]);
+
   const handleBet = async (side: 'subiu' | 'desceu') => {
     if (!user || !currentPool) {
       toast({
@@ -298,28 +355,9 @@ const Fast = () => {
       // Refresh profile and check for winnings after a delay
       refetchProfile();
       
-      // Check for winnings after pool finishes (60 seconds + processing time)
-      setTimeout(async () => {
-        try {
-          const { data: winningBets } = await supabase
-            .from('fast_pool_bets')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('pool_id', currentPool.id)
-            .eq('processed', true)
-            .gt('payout_amount', 0);
-            
-          if (winningBets && winningBets.length > 0) {
-            const totalWinnings = winningBets.reduce((sum, bet) => sum + bet.payout_amount, 0);
-            toast({
-              title: "🎉 Você ganhou!",
-              description: `Parabéns! Você recebeu ${totalWinnings.toFixed(0)} RZ`,
-              duration: 6000,
-            });
-          }
-        } catch (error) {
-          console.error('Error checking winnings:', error);
-        }
+      // Check for winnings after pool finishes (65 seconds + processing time)
+      setTimeout(() => {
+        checkForWinnings();
       }, 65000);
 
     } catch (error) {
@@ -404,9 +442,25 @@ const Fast = () => {
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
             Pools de opinião de <span className="text-primary">60 segundos</span>
           </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
             Opine se o ativo vai subir ou descer nos próximos 60 segundos. Odds dinâmicas baseadas em dados reais de mercado.
           </p>
+          
+          {/* Category Selector */}
+          <div className="flex justify-center mb-4">
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Selecione uma categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                {categoryOptions.map((category) => (
+                  <SelectItem key={category.value} value={category.value}>
+                    {category.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* Current Pool Card */}
@@ -449,8 +503,11 @@ const Fast = () => {
                 </div>
                 <div className="w-full bg-muted/20 rounded-full h-3 overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 transition-all duration-100 ease-linear"
-                    style={{ width: `${(countdown / 60) * 100}%` }}
+                    className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 transition-all duration-[100ms] ease-linear"
+                    style={{ 
+                      width: `${(countdown / 60) * 100}%`,
+                      transition: 'width 100ms linear'
+                    }}
                   />
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">
@@ -630,6 +687,13 @@ const Fast = () => {
         assetSymbol={selectedPool || ''}
         timeLeft={countdown}
       />
+      
+      {/* Remove Riana Chat Button on Mobile - handled by CSS */}
+      <style>{`
+        @media (max-width: 768px) {
+          .riana-chat-button { display: none !important; }
+        }
+      `}</style>
     </div>
   );
 };

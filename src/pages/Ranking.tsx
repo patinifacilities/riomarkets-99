@@ -141,13 +141,42 @@ const Ranking = () => {
 
         {/* Levels Modal */}
         <Dialog open={showLevelsModal} onOpenChange={setShowLevelsModal}>
-          <DialogContent className="sm:max-w-4xl">
+          <DialogContent className="sm:max-w-4xl max-w-[90vw] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-2xl">
                 <Award className="w-6 h-6 text-primary" />
                 Níveis de Analista
               </DialogTitle>
             </DialogHeader>
+            
+            {/* User Progress Bar */}
+            {profile && (
+              <div className="mb-6 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                <h3 className="text-lg font-semibold mb-2">Seu Progresso</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Nível atual: <span className="font-semibold text-primary">{getUserLevelProgress(profile.saldo_moeda).current}</span></span>
+                    <span>Saldo: <span className="font-semibold">{profile.saldo_moeda.toLocaleString()} RZ</span></span>
+                  </div>
+                  
+                  {getUserLevelProgress(profile.saldo_moeda).nextLevel && (
+                    <>
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <span>Próximo nível: {getUserLevelProgress(profile.saldo_moeda).nextLevel}</span>
+                        <span>{Math.round(getUserLevelProgress(profile.saldo_moeda).progress)}%</span>
+                      </div>
+                      <Progress 
+                        value={getUserLevelProgress(profile.saldo_moeda).progress} 
+                        className="h-3"
+                      />
+                      <div className="text-xs text-muted-foreground">
+                        Faltam {(getUserLevelProgress(profile.saldo_moeda).nextLevelRequirement! - profile.saldo_moeda).toLocaleString()} RZ para o próximo nível
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               <div className="p-6 rounded-xl bg-gradient-to-br from-gray-500/10 to-gray-600/5 border border-gray-500/20 shadow-lg">
                 <div className="flex items-center gap-3 mb-4">
