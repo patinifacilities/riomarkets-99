@@ -228,7 +228,7 @@ const ExchangeNew = () => {
                   placeholder="0"
                   value={fromAmount}
                   onChange={(e) => handleAmountChange(e.target.value)}
-                  className="pl-32 pr-4 h-24 text-right text-5xl font-bold bg-transparent border-0 focus-visible:ring-0 cursor-text [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="pl-32 pr-4 h-24 text-right text-5xl font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   step={fromCurrency === 'BRL' ? '0.01' : '1'}
                 />
               </div>

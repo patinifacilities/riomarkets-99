@@ -783,14 +783,10 @@ const Fast = () => {
                             : poolResults[selectedCategory] === 'manteve'
                             ? 'text-muted-foreground'
                             : 'text-muted-foreground animate-pulse'
-                          : countdown <= 37 && countdown > 23
-                          ? 'text-[#ff2389] animate-pulse'
-                          : countdown <= 23
-                          ? 'text-[#ff2389]'
                           : 'text-[#ff2389]'
                       }`}
                       style={countdown <= 23 && countdown > 0 ? {
-                        animation: `heartbeat ${Math.max(0.3, countdown / 60)}s ease-in-out infinite`
+                        animation: `pulse ${Math.max(0.2, (countdown - 23) / 37 * 2)}s cubic-bezier(0.4, 0, 0.6, 1) infinite`
                       } : undefined}
                       >
                          {countdown > 0 
@@ -882,8 +878,8 @@ const Fast = () => {
           </div>
         </div>
 
-        {/* Recent Results for Current Category */}
-        {currentCategoryHistory.length > 0 && (
+        {/* Recent Results - All Categories */}
+        {Object.values(poolHistory).flat().length > 0 && (
           <div className="max-w-4xl mx-auto">
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
                <CardHeader>
@@ -894,39 +890,49 @@ const Fast = () => {
                </CardHeader>
                <CardContent>
                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                    {currentCategoryHistory.slice(0, 10).map((result, index) => (
-                      <div
-                        key={result.id}
-                        className={`flex flex-col items-center p-3 rounded-lg border transition-all duration-300 relative animate-fade-in ${
-                          index < 3 
-                            ? `bg-primary/10 border-primary/30 shadow-sm ring-1 ring-primary/20`
-                            : 'bg-muted/20 border-border'
-                        }`}
-                        style={{
-                          animationDelay: `${index * 50}ms`
-                        }}
-                      >
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
-                        result.result === 'subiu' 
-                          ? 'bg-green-100 dark:bg-green-900/30' 
-                          : result.result === 'desceu'
-                          ? 'bg-red-100 dark:bg-red-900/30'
-                          : 'bg-gray-100 dark:bg-gray-900/30'
-                      }`}>
-                        {result.result === 'subiu' ? (
-                          <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
-                        ) : result.result === 'desceu' ? (
-                          <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />
-                        ) : (
-                          <span className="text-xs font-bold text-gray-600 dark:text-gray-400">=</span>
-                        )}
+                    {Object.values(poolHistory).flat().sort((a, b) => 
+                      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                    ).slice(0, 10).map((result, index) => {
+                      const isRecent = index < 3;
+                      const highlightColor = result.result === 'subiu' 
+                        ? 'bg-[#00ff90]/10 border-[#00ff90]/30 ring-1 ring-[#00ff90]/20' 
+                        : result.result === 'desceu'
+                        ? 'bg-[#ff2389]/10 border-[#ff2389]/30 ring-1 ring-[#ff2389]/20'
+                        : 'bg-muted/30 border-muted-foreground/30 ring-1 ring-muted-foreground/20';
+                      
+                      return (
+                        <div
+                          key={result.id}
+                          className={`flex flex-col items-center p-3 rounded-lg border transition-all duration-300 relative animate-fade-in ${
+                            isRecent 
+                              ? highlightColor + ' shadow-sm'
+                              : 'bg-muted/20 border-border'
+                          }`}
+                          style={{
+                            animationDelay: `${index * 50}ms`
+                          }}
+                        >
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
+                          result.result === 'subiu' 
+                            ? 'bg-green-100 dark:bg-green-900/30' 
+                            : result.result === 'desceu'
+                            ? 'bg-red-100 dark:bg-red-900/30'
+                            : 'bg-gray-100 dark:bg-gray-900/30'
+                        }`}>
+                          {result.result === 'subiu' ? (
+                            <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+                          ) : result.result === 'desceu' ? (
+                            <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />
+                          ) : (
+                            <span className="text-xs font-bold text-gray-600 dark:text-gray-400">=</span>
+                          )}
+                        </div>
+                        <span className="text-xs font-medium">{result.asset_symbol}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {result.price_change_percent > 0 ? '+' : ''}{result.price_change_percent.toFixed(2)}%
+                        </span>
                       </div>
-                      <span className="text-xs font-medium">{result.asset_symbol}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {result.price_change_percent > 0 ? '+' : ''}{result.price_change_percent.toFixed(2)}%
-                      </span>
-                    </div>
-                  ))}
+                    )})}
                 </div>
               </CardContent>
             </Card>
