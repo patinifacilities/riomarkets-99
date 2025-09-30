@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, Zap, Clock, BarChart3, Wallet, Plus, ArrowUpDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, Zap, Clock, BarChart3, Wallet, Plus, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTheme } from 'next-themes';
 import { FastMarketTermsModal } from '@/components/fast/FastMarketTermsModal';
 import { FastPoolHistoryModal } from '@/components/fast/FastPoolHistoryModal';
+import { DarkModeToggle } from '@/components/layout/DarkModeToggle';
 import { Link } from 'react-router-dom';
 
 interface FastPool {
@@ -223,7 +224,7 @@ const Fast = () => {
     if (countdown <= 10) {
       toast({
         title: "Tempo esgotado",
-        description: "Não é possível apostar nos últimos 10 segundos.",
+        description: "Não é possível opinar nos últimos 10 segundos.",
         variant: "destructive"
       });
       return;
@@ -232,7 +233,7 @@ const Fast = () => {
     if (!profile?.saldo_moeda || profile.saldo_moeda < betAmount) {
       toast({
         title: "Saldo insuficiente",
-        description: "Você não tem saldo suficiente para esta aposta.",
+        description: "Você não tem saldo suficiente para esta opinião.",
         variant: "destructive"
       });
       return;
@@ -265,8 +266,8 @@ const Fast = () => {
       setTimeout(() => setClickedPool(null), 400);
 
       toast({
-        title: "Aposta realizada!",
-        description: `Aposta de ${betAmount} RZ em "${side.toUpperCase()}" confirmada.`,
+        title: "Opinião enviada!",
+        description: `Opinião de ${betAmount} RZ em "${side === 'subiu' ? 'Subir' : 'Descer'}" confirmada.`,
       });
 
       // Refresh profile
@@ -276,7 +277,7 @@ const Fast = () => {
       console.error('Bet error:', error);
       toast({
         title: "Erro",
-        description: "Erro ao processar aposta. Tente novamente.",
+        description: "Erro ao processar opinião. Tente novamente.",
         variant: "destructive"
       });
     }
@@ -300,9 +301,51 @@ const Fast = () => {
     );
   }
 
+  // Show login warning for unauthenticated users
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+        <div className="container mx-auto px-4 pt-8 pb-20">
+          {/* Theme toggle */}
+          <div className="absolute top-4 right-4">
+            <DarkModeToggle />
+          </div>
+          
+          {/* Login warning */}
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <Card className="max-w-md mx-auto text-center">
+              <CardHeader>
+                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ff2389]/10 to-[#ff2389]/5 px-6 py-3 rounded-full border border-[#ff2389]/20 mb-4 mx-auto w-fit">
+                  <Zap className="w-5 h-5 text-[#ff2389] animate-pulse" />
+                  <span className="text-[#ff2389] font-semibold tracking-wide">FAST MARKETS</span>
+                </div>
+                <CardTitle className="text-2xl mb-2">Login Necessário</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-6">
+                  Você precisa estar logado para acessar os Fast Markets e enviar suas opiniões.
+                </p>
+                <Link to="/auth">
+                  <Button className="w-full">
+                    Fazer Login
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       <div className="container mx-auto px-4 pt-8 pb-20">
+        {/* Theme toggle */}
+        <div className="absolute top-4 right-4">
+          <DarkModeToggle />
+        </div>
+        
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ff2389]/10 to-[#ff2389]/5 px-6 py-3 rounded-full border border-[#ff2389]/20 mb-4">
@@ -362,14 +405,14 @@ const Fast = () => {
                   />
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Tempo restante para apostar
+                  Tempo restante para opinar
                 </p>
               </div>
 
               {/* Bet Amount Slider */}
               <div className="space-y-3">
                 <label className="text-sm font-medium">
-                  Valor da aposta: {betAmount} RZ
+                  Opinar {betAmount} RZ
                 </label>
                 <div className="px-4 py-3 bg-muted/20 rounded-lg">
                   <input
@@ -391,20 +434,20 @@ const Fast = () => {
                 </div>
               </div>
 
-              {/* Bet Buttons */}
+              {/* Opinion Buttons */}
               <div className="grid grid-cols-2 gap-4">
                 <Button
                   onClick={() => handleBet('subiu')}
                   disabled={countdown <= 10}
                   className={`h-16 text-lg font-semibold transition-all duration-300 ${
                     clickedPool?.id === currentPool.id && clickedPool?.side === 'subiu'
-                      ? 'scale-[1.02] shadow-lg shadow-[#00ff90]/30 ring-2 ring-[#00ff90]/50'
+                      ? 'scale-[1.02] shadow-lg shadow-[#00ff90]/30 ring-2 ring-[#00ff90]/50 animate-pulse'
                       : ''
                   } bg-[#00ff90] hover:bg-[#00ff90]/90 text-black`}
                 >
-                  <div className="flex flex-col items-center">
-                    <TrendingUp className="w-6 h-6 mb-1" />
-                    <span>SUBIU</span>
+                  <div className="flex items-center justify-between w-full px-2">
+                    <ArrowUp className="w-6 h-6" />
+                    <span>Subir</span>
                     <span className="text-sm opacity-80">
                       x{getOdds(currentPool.base_odds).toFixed(2)}
                     </span>
@@ -416,13 +459,13 @@ const Fast = () => {
                   disabled={countdown <= 10}
                   className={`h-16 text-lg font-semibold transition-all duration-300 ${
                     clickedPool?.id === currentPool.id && clickedPool?.side === 'desceu'
-                      ? 'scale-[1.02] shadow-lg shadow-[#ff2389]/30 ring-2 ring-[#ff2389]/50'
+                      ? 'scale-[1.02] shadow-lg shadow-[#ff2389]/30 ring-2 ring-[#ff2389]/50 animate-pulse'
                       : ''
                   } bg-[#ff2389] hover:bg-[#ff2389]/90 text-white`}
                 >
-                  <div className="flex flex-col items-center">
-                    <TrendingDown className="w-6 h-6 mb-1" />
-                    <span>DESCEU</span>
+                  <div className="flex items-center justify-between w-full px-2">
+                    <ArrowDown className="w-6 h-6" />
+                    <span>Descer</span>
                     <span className="text-sm opacity-80">
                       x{getOdds(currentPool.base_odds).toFixed(2)}
                     </span>
@@ -432,7 +475,7 @@ const Fast = () => {
 
               {countdown <= 10 && (
                 <div className="text-center text-sm text-muted-foreground">
-                  ⏰ Apostas bloqueadas nos últimos 10 segundos
+                  ⏰ Opiniões bloqueadas nos últimos 10 segundos
                 </div>
               )}
             </CardContent>
