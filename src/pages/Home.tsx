@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Filter, LogIn, UserPlus, BarChart3, Zap, Target, Shield, Sparkles } from 'lucide-react';
+import { Filter, LogIn, UserPlus, BarChart3, Zap, Target, Shield, Sparkles, X } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,14 +29,14 @@ const Home = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Topic filters similar to Kalshi
+  // Topic filters with icons
   const topicFilters = [
-    { id: 'politics', label: 'Política', value: 'politica' },
-    { id: 'economics', label: 'Economia', value: 'economia' },
-    { id: 'sports', label: 'Esportes', value: 'esportes' },
-    { id: 'tech', label: 'Tecnologia', value: 'tecnologia' },
-    { id: 'entertainment', label: 'Entretenimento', value: 'entretenimento' },
-    { id: 'climate', label: 'Clima', value: 'clima' }
+    { id: 'politics', label: 'Política', value: 'politica', icon: '/assets/icons/politica.png' },
+    { id: 'economics', label: 'Economia', value: 'economia', icon: '/assets/icons/economia.png' },
+    { id: 'sports', label: 'Esportes', value: 'esportes', icon: '/assets/icons/esportes.png' },
+    { id: 'tech', label: 'Tecnologia', value: 'tecnologia', icon: '/assets/icons/tecnologia.png' },
+    { id: 'entertainment', label: 'Entretenimento', value: 'entretenimento', icon: '/assets/icons/entretenimento.png' },
+    { id: 'climate', label: 'Clima', value: 'clima', icon: '/assets/icons/clima.png' }
   ];
 
   // Status filters
@@ -241,22 +241,46 @@ const Home = () => {
         </section>
 
 
-      {/* Compact Filters Section */}
-      <div className="container mx-auto px-4 py-4 bg-gradient-to-b from-background/95 to-background/60 border-t border-border/30 backdrop-blur-sm">
-        <div className="flex flex-col sm:flex-row gap-4">
-          {/* Topic Filters - Compact */}
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h4 className="text-xs font-semibold text-foreground uppercase tracking-wide">Tópicos</h4>
+      {/* Enhanced Filters Section */}
+      <div className="container mx-auto px-4 py-6 bg-gradient-to-b from-background/95 to-background/60 border-t border-border/30 backdrop-blur-sm">
+        <div className="flex flex-col gap-6">
+          {/* Topic Filters - Enhanced with icons */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Filter className="w-4 h-4 text-primary" />
+              <h4 className="text-sm font-bold text-foreground uppercase tracking-wide">Tópicos</h4>
             </div>
-            <FilterChips
-              chips={topicFilters}
-              selectedChips={selectedTopics}
-              onChipSelect={handleTopicSelect}
-              onRemoveChip={handleRemoveTopic}
-              chipClassName="px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200"
-              className="flex flex-wrap gap-2"
-            />
+            <div className="flex flex-wrap gap-3">
+              {topicFilters.map((topic) => {
+                const isSelected = selectedTopics.includes(topic.id);
+                return (
+                  <button
+                    key={topic.id}
+                    onClick={() => handleTopicSelect(topic.id)}
+                    className={`
+                      flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium
+                      transition-all duration-200 hover:scale-105 border-2
+                      ${isSelected 
+                        ? 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg border-primary' 
+                        : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/5 bg-background/80'
+                      }
+                    `}
+                  >
+                    <img src={topic.icon} alt="" className="w-5 h-5 object-contain" />
+                    <span>{topic.label}</span>
+                    {isSelected && (
+                      <X 
+                        className="w-4 h-4 ml-1" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveTopic(topic.id);
+                        }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Status Filters - Compact */}

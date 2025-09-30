@@ -265,6 +265,54 @@ export type Database = {
           },
         ]
       }
+      fast_pool_configs: {
+        Row: {
+          api_connected: boolean | null
+          api_key: string | null
+          api_url: string | null
+          asset_name: string
+          asset_symbol: string
+          base_odds: number
+          category: string
+          created_at: string
+          id: string
+          paused: boolean | null
+          question: string
+          updated_at: string
+          webhook_url: string | null
+        }
+        Insert: {
+          api_connected?: boolean | null
+          api_key?: string | null
+          api_url?: string | null
+          asset_name: string
+          asset_symbol: string
+          base_odds?: number
+          category?: string
+          created_at?: string
+          id?: string
+          paused?: boolean | null
+          question: string
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Update: {
+          api_connected?: boolean | null
+          api_key?: string | null
+          api_url?: string | null
+          asset_name?: string
+          asset_symbol?: string
+          base_odds?: number
+          category?: string
+          created_at?: string
+          id?: string
+          paused?: boolean | null
+          question?: string
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
       fast_pool_results: {
         Row: {
           asset_symbol: string

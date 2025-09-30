@@ -15,18 +15,22 @@ interface FastPool {
   asset_symbol: string;
   asset_name: string;
   question: string;
-  round_number: number;
-  status: string;
+  round_number?: number;
+  status?: string;
   category: string;
-  opening_price: number;
-  closing_price: number;
-  round_start_time: string;
-  round_end_time: string;
+  opening_price?: number;
+  closing_price?: number;
+  round_start_time?: string;
+  round_end_time?: string;
   api_connected: boolean;
   api_url?: string;
   last_api_sync?: string;
   created_at: string;
   paused?: boolean;
+  base_odds?: number;
+  api_key?: string;
+  webhook_url?: string;
+  updated_at?: string;
 }
 
 interface PoolResult {
@@ -91,26 +95,17 @@ const AdminFast = () => {
 
   const fetchGeneralPoolConfigs = async () => {
     try {
-      // Get one pool per category for general configuration display
+      // Get general pool configurations from fast_pool_configs table
       const { data, error } = await supabase
-        .from('fast_pools')
+        .from('fast_pool_configs')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       
-      // Group by category and asset_symbol, get only unique configurations
-      const uniqueConfigs = new Map();
-      data?.forEach((pool: any) => {
-        const key = `${pool.category}-${pool.asset_symbol}`;
-        if (!uniqueConfigs.has(key)) {
-          uniqueConfigs.set(key, pool);
-        }
-      });
-      
-      setPools(Array.from(uniqueConfigs.values()));
+      setPools(data || []);
     } catch (error) {
-      console.error('Error fetching pools:', error);
+      console.error('Error fetching pool configs:', error);
     } finally {
       setLoading(false);
     }
@@ -168,13 +163,22 @@ const AdminFast = () => {
 
   const handleTogglePause = async (pool: FastPool) => {
     try {
-      const { error } = await supabase
+      // Update the config in fast_pool_configs
+      const { error: configError } = await supabase
+        .from('fast_pool_configs')
+        .update({ paused: !pool.paused })
+        .eq('asset_symbol', pool.asset_symbol);
+      
+      if (configError) throw configError;
+      
+      // Also update all active rounds in fast_pools
+      const { error: poolsError } = await supabase
         .from('fast_pools')
         .update({ paused: !pool.paused })
         .eq('asset_symbol', pool.asset_symbol)
-        .eq('category', pool.category);
+        .eq('status', 'active');
       
-      if (error) throw error;
+      if (poolsError) throw poolsError;
       
       toast({
         title: pool.paused ? "Pool retomado" : "Pool pausado",
@@ -331,7 +335,7 @@ const AdminFast = () => {
                     return 0;
                   })
                   .map(pool => (
-                  <div key={`${pool.category}-${pool.asset_symbol}`} className="p-4 rounded-lg border border-border bg-card/50 hover:border-primary/50 transition-colors">
+                  <div key={pool.id} className="p-4 rounded-lg border border-border bg-card/50 hover:border-primary/50 transition-colors">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2 flex-wrap">

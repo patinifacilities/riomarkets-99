@@ -151,12 +151,12 @@ const Fast = () => {
       if (error) throw error;
       
       if (data?.pools && Array.isArray(data.pools)) {
-        // Remove duplicates and filter out paused pools
+        // Remove duplicates by asset_symbol and filter out paused pools
         const poolMap = new Map<string, FastPool>();
         (data.pools as FastPool[]).forEach((pool: FastPool) => {
-          // Only add active (non-paused) pools
-          if (!pool.paused && !poolMap.has(pool.id)) {
-            poolMap.set(pool.id, pool);
+          // Only add active (non-paused) pools, using asset_symbol as key to avoid duplicates
+          if (!pool.paused && !poolMap.has(pool.asset_symbol)) {
+            poolMap.set(pool.asset_symbol, pool);
           }
         });
         // Sort by asset_symbol to maintain consistent order

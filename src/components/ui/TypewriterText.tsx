@@ -68,13 +68,13 @@ export const TypewriterText = ({
         <>
           <span className="block">{baseText}</span>
           <span className="block" style={currentColor ? { color: currentColor } : {}}>
-            {currentText}<span className="animate-pulse">|</span>
+            {currentText}<span className="animate-pulse" style={currentColor ? { color: currentColor } : {}}>|</span>
           </span>
         </>
       ) : (
         <>
           {baseText} <span style={currentColor ? { color: currentColor } : {}}>{currentText}</span>
-          <span className="animate-pulse">|</span>
+          <span className="animate-pulse" style={currentColor ? { color: currentColor } : {}}>|</span>
         </>
       )}
     </span>
