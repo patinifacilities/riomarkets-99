@@ -82,7 +82,17 @@ const WalletPage = () => {
             </p>
           </div>
           
-          {/* No action buttons */}
+          {/* Action Buttons - Top Right */}
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => setShowWithdrawModal(true)}
+              variant="outline"
+              className="border-primary/30 text-primary hover:bg-primary/10"
+            >
+              <ArrowRightLeft className="w-4 h-4 mr-2" />
+              Sacar
+            </Button>
+          </div>
         </div>
 
         {/* Balance Cards */}
