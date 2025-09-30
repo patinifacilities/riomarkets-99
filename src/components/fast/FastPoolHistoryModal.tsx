@@ -131,7 +131,7 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, assetSymbol, timeLeft
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg rounded-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold text-center">
             <ArrowUpDown className="w-5 h-5" />

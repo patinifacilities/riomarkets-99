@@ -125,7 +125,7 @@ const Fast = () => {
     }
   }, []);
 
-  // Load pool history
+  // Load pool history and check for new results
   const loadPoolHistory = useCallback(async () => {
     try {
       const { data, error } = await supabase
@@ -141,11 +141,28 @@ const Fast = () => {
         result: result.result as 'subiu' | 'desceu' | 'manteve'
       }));
       
+      // Check if there's a new result to show notification
+      const lastResult = typedResults[0];
+      const lastShownResult = localStorage.getItem('lastShownFastResult');
+      
+      if (lastResult && lastResult.id !== lastShownResult) {
+        // Show result notification
+        setTimeout(() => {
+          toast({
+            title: lastResult.result === 'subiu' ? "Subiu! 📈" : lastResult.result === 'desceu' ? "Desceu! 📉" : "Manteve! ➡️",
+            description: `Variação: ${lastResult.price_change_percent > 0 ? '+' : ''}${lastResult.price_change_percent.toFixed(2)}%`,
+            duration: 4000,
+          });
+        }, 1000);
+        
+        localStorage.setItem('lastShownFastResult', lastResult.id);
+      }
+      
       setPoolHistory(typedResults);
     } catch (error) {
       console.error('Error loading history:', error);
     }
-  }, []);
+  }, [toast]);
 
   // Calculate countdown based on pool end time
   const calculateCountdown = useCallback((pool: FastPool) => {
@@ -202,13 +219,21 @@ const Fast = () => {
   };
 
   // Calculate dynamic odds based on countdown
-  const getOdds = (baseOdds: number) => {
+  const getOdds = () => {
     const timeElapsed = 60 - countdown;
-    if (timeElapsed >= 35) { // Last 25 seconds
-      return 1.0;
+    
+    if (timeElapsed <= 28) {
+      // First 28 seconds: 1.80x to 1.20x
+      const progress = timeElapsed / 28;
+      return Math.max(1.20, 1.80 - (progress * 0.60));
+    } else if (timeElapsed <= 50) {
+      // 28-50 seconds (22 seconds): 1.20x to 1.10x
+      const progress = (timeElapsed - 28) / 22;
+      return Math.max(1.10, 1.20 - (progress * 0.10));
+    } else {
+      // Last 10 seconds: 1.10x
+      return 1.10;
     }
-    const reduction = (timeElapsed / 35) * (baseOdds - 1.0);
-    return Math.max(1.0, baseOdds - reduction);
   };
 
   const handleBet = async (side: 'subiu' | 'desceu') => {
@@ -256,7 +281,7 @@ const Fast = () => {
           pool_id: currentPool.id,
           side: side,
           amount_rioz: betAmount,
-          odds: getOdds(currentPool.base_odds)
+          odds: getOdds()
         });
 
       if (betError) throw betError;
@@ -270,8 +295,32 @@ const Fast = () => {
         description: `Opinião de ${betAmount} RZ em "${side === 'subiu' ? 'Subir' : 'Descer'}" confirmada.`,
       });
 
-      // Refresh profile
+      // Refresh profile and check for winnings after a delay
       refetchProfile();
+      
+      // Check for winnings after pool finishes (60 seconds + processing time)
+      setTimeout(async () => {
+        try {
+          const { data: winningBets } = await supabase
+            .from('fast_pool_bets')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('pool_id', currentPool.id)
+            .eq('processed', true)
+            .gt('payout_amount', 0);
+            
+          if (winningBets && winningBets.length > 0) {
+            const totalWinnings = winningBets.reduce((sum, bet) => sum + bet.payout_amount, 0);
+            toast({
+              title: "🎉 Você ganhou!",
+              description: `Parabéns! Você recebeu ${totalWinnings.toFixed(0)} RZ`,
+              duration: 6000,
+            });
+          }
+        } catch (error) {
+          console.error('Error checking winnings:', error);
+        }
+      }, 65000);
 
     } catch (error) {
       console.error('Bet error:', error);
@@ -417,18 +466,18 @@ const Fast = () => {
                 <div className="px-4 py-3 bg-muted/20 rounded-lg">
                   <input
                     type="range"
-                    min="10"
+                    min="1"
                     max="1000"
-                    step="10"
+                    step="1"
                     value={betAmount}
                     onChange={(e) => setBetAmount(Number(e.target.value))}
                     className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer slider"
                     style={{
-                      background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 10) / 990) * 100}%, hsl(var(--muted)) ${((betAmount - 10) / 990) * 100}%, hsl(var(--muted)) 100%)`
+                      background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) 100%)`
                     }}
                   />
                   <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                    <span>10 RZ</span>
+                    <span>1 RZ</span>
                     <span>1.000 RZ</span>
                   </div>
                 </div>
@@ -449,7 +498,7 @@ const Fast = () => {
                     <ArrowUp className="w-6 h-6" />
                     <span>Subir</span>
                     <span className="text-sm opacity-80">
-                      x{getOdds(currentPool.base_odds).toFixed(2)}
+                      x{getOdds().toFixed(2)}
                     </span>
                   </div>
                 </Button>
@@ -467,7 +516,7 @@ const Fast = () => {
                     <ArrowDown className="w-6 h-6" />
                     <span>Descer</span>
                     <span className="text-sm opacity-80">
-                      x{getOdds(currentPool.base_odds).toFixed(2)}
+                      x{getOdds().toFixed(2)}
                     </span>
                   </div>
                 </Button>

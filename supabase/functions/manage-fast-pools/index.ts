@@ -194,24 +194,39 @@ async function finalizePool(supabase: any, poolId: string) {
   for (const bet of bets || []) {
     if (bet.side === 'subiu') totalBetsSubiu += bet.amount_rioz;
     if (bet.side === 'desceu') totalBetsDesceu += bet.amount_rioz;
+  }
 
-    const isWinner = bet.side === result;
-    let payout = 0;
-
-    if (isWinner) {
-      payout = bet.amount_rioz * bet.odds;
-      winnersCount++;
-      totalPayout += payout;
-
-      // Update user balance (you might want to use a database function for this)
-      await updateUserBalance(supabase, bet.user_id, payout);
+  // Get winning bets and process payouts
+  const winningBets = (bets || []).filter((bet: any) => bet.side === result);
+  
+  if (winningBets.length > 0) {
+    // Call the payout processing function
+    const { error: payoutError } = await supabase.functions.invoke('process-fast-pool-payout', {
+      body: {
+        poolId: poolId,
+        result: result,
+        winningBets: winningBets
+      }
+    });
+    
+    if (payoutError) {
+      console.error('Error processing payouts:', payoutError);
+    } else {
+      console.log(`Processed ${winningBets.length} winning bets for pool ${poolId}`);
     }
+  }
 
-    // Mark bet as processed
+  // Calculate totals
+  winnersCount = winningBets.length;
+  totalPayout = winningBets.reduce((sum: number, bet: any) => sum + (bet.amount_rioz * bet.odds), 0);
+
+  // Mark all bets as processed
+  for (const bet of bets || []) {
+    const isWinner = bet.side === result;
     await supabase
       .from('fast_pool_bets')
       .update({
-        payout_amount: payout,
+        payout_amount: isWinner ? bet.amount_rioz * bet.odds : 0,
         processed: true
       })
       .eq('id', bet.id);

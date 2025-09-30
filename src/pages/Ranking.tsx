@@ -3,13 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { fakeUsers } from '@/data/fake-users';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
+import { useState } from 'react';
 
 const Ranking = () => {
   const { user } = useAuth();
   const { data: profile } = useProfile(user?.id);
+  const [showLevelsModal, setShowLevelsModal] = useState(false);
   const sortedUsers = [...fakeUsers, ...fakeUsers].sort((a, b) => b.saldo_moeda - a.saldo_moeda).slice(0, 25);
   
   const stats = {
@@ -85,7 +89,7 @@ const Ranking = () => {
 
         {/* User Progress Section */}
         {profile && (
-          <Card className="mb-8 bg-gradient-primary/10 border-primary/20">
+          <Card className="mb-8 bg-gradient-primary/10 border-primary/20 cursor-pointer hover:bg-gradient-primary/15 transition-colors" onClick={() => setShowLevelsModal(true)}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="w-5 h-5" />
@@ -135,17 +139,17 @@ const Ranking = () => {
           </Card>
         )}
 
-        {/* Level Badges */}
-        <Card className="mb-8 bg-secondary-glass border-border/50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              <Award className="w-6 h-6 text-primary" />
-              Níveis de Analista
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="p-6 rounded-xl bg-gradient-to-br from-gray-500/10 to-gray-600/5 border border-gray-500/20 shadow-lg hover:shadow-xl transition-all duration-300">
+        {/* Levels Modal */}
+        <Dialog open={showLevelsModal} onOpenChange={setShowLevelsModal}>
+          <DialogContent className="sm:max-w-4xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-2xl">
+                <Award className="w-6 h-6 text-primary" />
+                Níveis de Analista
+              </DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <div className="p-6 rounded-xl bg-gradient-to-br from-gray-500/10 to-gray-600/5 border border-gray-500/20 shadow-lg">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-gray-500/20 flex items-center justify-center">
                     <Target className="w-5 h-5 text-gray-400" />
@@ -155,7 +159,7 @@ const Ranking = () => {
                 <p className="text-sm text-muted-foreground font-medium">0 - 1.500 Rioz Coin</p>
                 <p className="text-xs text-muted-foreground/70 mt-2">Primeiros passos no mercado</p>
               </div>
-              <div className="p-6 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/20 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="p-6 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/20 shadow-lg">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
                     <BarChart3 className="w-5 h-5 text-accent" />
@@ -165,7 +169,7 @@ const Ranking = () => {
                 <p className="text-sm text-muted-foreground font-medium">1.5K - 100K Rioz Coin</p>
                 <p className="text-xs text-muted-foreground/70 mt-2">Análises consistentes</p>
               </div>
-              <div className="p-6 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="p-6 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-lg">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                     <TrendingUp className="w-5 h-5 text-primary" />
@@ -175,7 +179,7 @@ const Ranking = () => {
                 <p className="text-sm text-muted-foreground font-medium">100K+ Rioz Coin</p>
                 <p className="text-xs text-muted-foreground/70 mt-2">Expert em predições</p>
               </div>
-              <div className="p-6 rounded-xl bg-gradient-to-br from-danger/10 to-danger/5 border border-danger/20 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="p-6 rounded-xl bg-gradient-to-br from-danger/10 to-danger/5 border border-danger/20 shadow-lg">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-danger/20 flex items-center justify-center">
                     <Trophy className="w-5 h-5 text-danger" />
@@ -186,8 +190,11 @@ const Ranking = () => {
                 <p className="text-xs text-muted-foreground/70 mt-2">Elite dos analistas</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex justify-end mt-6">
+              <Button onClick={() => setShowLevelsModal(false)}>Fechar</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Ranking List */}
         <Card>

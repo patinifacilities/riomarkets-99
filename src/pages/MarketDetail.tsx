@@ -184,9 +184,9 @@ const MarketDetail = () => {
 
             {/* User Info Panel - Mobile (positioned after market details) */}
             <div className="lg:hidden">
-              <Card id="wallet-section" className="bg-gradient-card border-border/50">
+              <Card id="wallet-section" className="bg-secondary border-border/50">
                 <CardContent className="p-0">
-                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-border/30">
+                  <div className="flex items-center justify-between p-4 bg-secondary border-b border-border/30">
                     <h3 className="text-lg font-semibold flex items-center gap-2">
                       <Wallet className="w-5 h-5" />
                       Sua Carteira
@@ -206,7 +206,7 @@ const MarketDetail = () => {
                       <ArrowLeft className="w-4 h-4 transition-transform" />
                     </Button>
                   </div>
-                  <div id="wallet-content" className="p-4">
+                  <div id="wallet-content" className="p-4" style={{ display: 'none' }}>
                   
                    <div className="space-y-4">
                       {(userProfile?.saldo_moeda || 0) > 0 ? (
@@ -250,9 +250,10 @@ const MarketDetail = () => {
                           </div>
                         </div>
                       )}
+                      </div>
                       
                       <div className="text-center text-sm text-muted-foreground">ou use o slider</div>
-                      
+                       
                       <div className="lg:hidden">
                         <BetSlider 
                           balance={userProfile?.saldo_moeda || 0}
@@ -260,6 +261,8 @@ const MarketDetail = () => {
                           estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
                         />
                       </div>
+                      
+                      <div className="space-y-4">
                     
                     {selectedOption && (
                       <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">
