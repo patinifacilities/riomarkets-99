@@ -35,9 +35,11 @@ export const BalanceDonutChart = () => {
                 dataKey="value"
                 startAngle={90}
                 endAngle={450}
+                stroke="none"
+                strokeWidth={0}
               >
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                  <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
                 ))}
               </Pie>
             </PieChart>

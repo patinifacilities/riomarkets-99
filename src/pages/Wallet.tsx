@@ -1,38 +1,29 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wallet, TrendingUp, TrendingDown, Users, Plus, ArrowRightLeft, DollarSign, X, ChevronDown, ChevronUp } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Wallet, DollarSign } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useWalletTransactions, useUserOrders } from '@/hooks/useWallet';
-import { useMarkets } from '@/hooks/useMarkets';
 import { useExchangeStore } from '@/stores/useExchangeStore';
 import { AddBrlModal } from '@/components/exchange/AddBrlModal';
 import { WithdrawModal } from '@/components/wallet/WithdrawModal';
 import { CancelBetModal } from '@/components/wallet/CancelBetModal';
 import { OrderHistoryCard } from '@/components/wallet/OrderHistoryCard';
-import TransactionItem from '@/components/wallet/TransactionItem';
-import OrderItem from '@/components/wallet/OrderItem';
-import ExportCSVButton from '@/components/ui/export-csv-button';
 import { ExpandableRiozCard } from '@/components/wallet/ExpandableRiozCard';
 import { BalanceDonutChart } from '@/components/exchange/BalanceDonutChart';
 import { CompletedOrdersCard } from '@/components/wallet/CompletedOrdersCard';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 
 const WalletPage = () => {
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
-  const { data: transactions, isLoading: loadingTransactions, refetch: refetchTransactions } = useWalletTransactions(user?.id);
-  const { data: orders, isLoading: loadingOrders } = useUserOrders(user?.id);
-  const { data: markets } = useMarkets();
+  const { data: transactions, refetch: refetchTransactions } = useWalletTransactions(user?.id);
+  const { data: orders } = useUserOrders(user?.id);
   const { balance, fetchBalance } = useExchangeStore();
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showCancelBetModal, setShowCancelBetModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const transactionsPerPage = 5;
 
   useEffect(() => {
     if (user) {
@@ -50,27 +41,9 @@ const WalletPage = () => {
   }, [showDepositModal, showWithdrawModal, user, refetchProfile, refetchTransactions, fetchBalance]);
 
   // Calculate totals - Use profile balance as primary source
-  const totalCredits = transactions?.filter(t => t.tipo === 'credito').reduce((sum, t) => sum + t.valor, 0) || 0;
-  const totalDebits = transactions?.filter(t => t.tipo === 'debito').reduce((sum, t) => sum + t.valor, 0) || 0;
   const currentBalance = profile?.saldo_moeda || 0;
   const brlBalance = balance?.brl_balance || 0;
   const totalInOrders = orders?.filter(o => o.status === 'ativa').reduce((sum, o) => sum + o.quantidade_moeda, 0) || 0;
-
-  // Pagination for transactions
-  const totalPages = Math.ceil((transactions?.length || 0) / transactionsPerPage);
-  const startIndex = (currentPage - 1) * transactionsPerPage;
-  const endIndex = startIndex + transactionsPerPage;
-  const paginatedTransactions = transactions?.slice(startIndex, endIndex);
-
-  // Sort orders: active first, then by date
-  const allOrders = orders?.sort((a, b) => {
-    // Active orders first
-    if (a.status === 'ativa' && b.status !== 'ativa') return -1;
-    if (b.status === 'ativa' && a.status !== 'ativa') return 1;
-    
-    // Then by date (newest first)
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-  }) || [];
 
   if (!user) {
     return (
@@ -119,7 +92,7 @@ const WalletPage = () => {
           <BalanceDonutChart />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Order History - Active */}
           <OrderHistoryCard onRefresh={() => {
             refetchProfile();
@@ -130,134 +103,6 @@ const WalletPage = () => {
           {/* Order History - Completed */}
           <CompletedOrdersCard />
         </div>
-
-        {/* Transaction History */}
-        <Card className="bg-secondary-glass border-border/50">
-          <CardHeader className="md:hidden">
-            <Collapsible>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="w-full flex items-center justify-between p-0">
-                  <CardTitle>Histórico de Transações</CardTitle>
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <CardContent className="bg-card px-0 pt-4">
-                  {loadingTransactions ? (
-                    <div className="space-y-3">
-                      {[...Array(5)].map((_, i) => (
-                        <div key={i} className="h-16 bg-secondary-glass rounded animate-pulse" />
-                      ))}
-                    </div>
-                  ) : paginatedTransactions && paginatedTransactions.length > 0 ? (
-                    <>
-                      <div className="space-y-3">
-                        {paginatedTransactions.map((transaction) => (
-                          <TransactionItem key={transaction.id} transaction={transaction} />
-                        ))}
-                      </div>
-                      {totalPages > 1 && (
-                        <div className="mt-4">
-                          <Pagination>
-                            <PaginationContent>
-                              <PaginationItem>
-                                <PaginationPrevious 
-                                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                                />
-                              </PaginationItem>
-                              {[...Array(totalPages)].map((_, i) => (
-                                <PaginationItem key={i}>
-                                  <PaginationLink
-                                    onClick={() => setCurrentPage(i + 1)}
-                                    isActive={currentPage === i + 1}
-                                    className="cursor-pointer"
-                                  >
-                                    {i + 1}
-                                  </PaginationLink>
-                                </PaginationItem>
-                              ))}
-                              <PaginationItem>
-                                <PaginationNext 
-                                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                                />
-                              </PaginationItem>
-                            </PaginationContent>
-                          </Pagination>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <Wallet className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p>Nenhuma transação encontrada</p>
-                    </div>
-                  )}
-                </CardContent>
-              </CollapsibleContent>
-            </Collapsible>
-          </CardHeader>
-          
-          <div className="hidden md:block">
-            <CardHeader>
-              <CardTitle>Histórico de Transações</CardTitle>
-            </CardHeader>
-            <CardContent className="bg-card">
-              {loadingTransactions ? (
-                <div className="space-y-3">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-16 bg-secondary-glass rounded animate-pulse" />
-                  ))}
-                </div>
-              ) : paginatedTransactions && paginatedTransactions.length > 0 ? (
-                <>
-                  <div className="space-y-3">
-                    {paginatedTransactions.map((transaction) => (
-                      <TransactionItem key={transaction.id} transaction={transaction} />
-                    ))}
-                  </div>
-                  {totalPages > 1 && (
-                    <div className="mt-4">
-                      <Pagination>
-                        <PaginationContent>
-                          <PaginationItem>
-                            <PaginationPrevious 
-                              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                              className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                            />
-                          </PaginationItem>
-                          {[...Array(totalPages)].map((_, i) => (
-                            <PaginationItem key={i}>
-                              <PaginationLink
-                                onClick={() => setCurrentPage(i + 1)}
-                                isActive={currentPage === i + 1}
-                                className="cursor-pointer"
-                              >
-                                {i + 1}
-                              </PaginationLink>
-                            </PaginationItem>
-                          ))}
-                          <PaginationItem>
-                            <PaginationNext 
-                              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                              className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                            />
-                          </PaginationItem>
-                        </PaginationContent>
-                      </Pagination>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Wallet className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>Nenhuma transação encontrada</p>
-                </div>
-              )}
-            </CardContent>
-          </div>
-        </Card>
 
         {/* Modals */}
         <AddBrlModal

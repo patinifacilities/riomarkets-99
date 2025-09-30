@@ -61,21 +61,21 @@ const Fast = () => {
   const { toast } = useToast();
   const { resolvedTheme } = useTheme();
 
-  // Category options for fast pools with styling
+  // Category options for fast pools with styling - Crypto first, then Commodities
   const categoryOptions = [
-    { 
-      value: 'commodities', 
-      label: window.innerWidth <= 768 ? 'Commod' : 'Commodities', 
-      bgColor: '#FFD800',
-      icon: '🛢️',
-      textColor: '#000'
-    },
     { 
       value: 'crypto', 
       label: 'Cripto', 
       bgColor: '#FF6101',
       icon: '₿',
       textColor: '#fff'
+    },
+    { 
+      value: 'commodities', 
+      label: window.innerWidth <= 768 ? 'Commod' : 'Commodities', 
+      bgColor: '#FFD800',
+      icon: '🛢️',
+      textColor: '#000'
     },
     { 
       value: 'forex', 
@@ -151,14 +151,18 @@ const Fast = () => {
       if (error) throw error;
       
       if (data?.pools && Array.isArray(data.pools)) {
-        // Remove duplicates based on pool id using a Set
+        // Remove duplicates and filter out paused pools
         const poolMap = new Map<string, FastPool>();
         (data.pools as FastPool[]).forEach((pool: FastPool) => {
-          if (!poolMap.has(pool.id)) {
+          // Only add active (non-paused) pools
+          if (!pool.paused && !poolMap.has(pool.id)) {
             poolMap.set(pool.id, pool);
           }
         });
-        const uniquePools = Array.from(poolMap.values());
+        // Sort by asset_symbol to maintain consistent order
+        const uniquePools = Array.from(poolMap.values()).sort((a, b) => 
+          a.asset_symbol.localeCompare(b.asset_symbol)
+        );
         
         setCurrentPools(uniquePools);
         if (uniquePools.length > 0) {
@@ -519,8 +523,19 @@ const Fast = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Carregando Fast Markets...</p>
+          <div className="relative inline-block">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <Zap className="w-6 h-6 text-[#ff2389] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" style={{
+              animation: 'blink-118bpm 0.508s infinite'
+            }} />
+          </div>
+          <p className="text-muted-foreground mt-4">Carregando Fast Markets...</p>
+          <style>{`
+            @keyframes blink-118bpm {
+              0%, 100% { opacity: 1; }
+              50% { opacity: 0.3; }
+            }
+          `}</style>
         </div>
       </div>
     );
@@ -909,21 +924,19 @@ const Fast = () => {
           </div>
         </div>
 
-        {/* Recent Results - All Categories */}
-        {Object.values(poolHistory).flat().length > 0 && (
+        {/* Recent Results - Category Specific */}
+        {currentCategoryHistory.length > 0 && (
           <div className="max-w-4xl mx-auto">
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
                <CardHeader>
                  <CardTitle className="flex items-center gap-2">
                    <ArrowUpDown className="w-5 h-5" />
-                   Últimos Resultados
+                   Últimos Resultados - {categoryOptions.find(c => c.value === selectedCategory)?.label}
                  </CardTitle>
                </CardHeader>
                <CardContent>
                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                    {Object.values(poolHistory).flat().sort((a, b) => 
-                      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-                    ).slice(0, 10).map((result, index) => {
+                    {currentCategoryHistory.slice(0, 10).map((result, index) => {
                       const isRecent = index < 3;
                       const highlightColor = result.result === 'subiu' 
                         ? 'bg-[#00ff90]/10 border-[#00ff90]/30 ring-1 ring-[#00ff90]/20' 
@@ -1044,8 +1057,8 @@ const Fast = () => {
         </div>
       </div>
 
-      {/* Opinion Notifications Stack - Below header ticker */}
-      <div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-30 space-y-2 max-w-md w-full px-4">
+      {/* Opinion Notifications Stack - Right side */}
+      <div className="fixed top-24 right-4 z-30 space-y-2 max-w-xs">
         {opinionNotifications.map((notification, index) => (
           <div 
             key={notification.id}

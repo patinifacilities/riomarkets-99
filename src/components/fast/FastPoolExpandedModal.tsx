@@ -109,8 +109,15 @@ export const FastPoolExpandedModal = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <button
+          onClick={() => onOpenChange(false)}
+          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-50"
+        >
+          <X className="h-6 w-6" />
+          <span className="sr-only">Close</span>
+        </button>
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
+          <DialogTitle className="flex items-center justify-between pr-8">
             <div className="flex items-center gap-3">
               <span className="text-2xl">{pool.asset_symbol === 'BTC' ? '₿' : pool.asset_symbol === 'ETH' ? 'Ξ' : '📈'}</span>
               <div>
@@ -268,32 +275,33 @@ export const FastPoolExpandedModal = ({
           
           {/* Last 10 Results for this Pool with scrolling */}
           {poolHistory.length > 0 && (
-            <Card className="bg-muted/20 border-border/50">
+            <Card className="bg-muted/20 border-border/50 relative">
               <CardContent className="pt-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-sm font-semibold">Últimos Resultados deste Pool</h4>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() => setHistoryIndex(Math.max(0, historyIndex - 4))}
-                      disabled={!canScrollLeft}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() => setHistoryIndex(Math.min(poolHistory.length - 4, historyIndex + 4))}
-                      disabled={!canScrollRight}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
+                <h4 className="text-sm font-semibold mb-3">Últimos Resultados deste Pool</h4>
+                
+                {/* Left Arrow */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-0 top-1/2 transform -translate-y-1/2 h-12 w-8 rounded-r-lg z-10"
+                  onClick={() => setHistoryIndex(Math.max(0, historyIndex - 4))}
+                  disabled={!canScrollLeft}
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
+                
+                {/* Right Arrow */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-1/2 transform -translate-y-1/2 h-12 w-8 rounded-l-lg z-10"
+                  onClick={() => setHistoryIndex(Math.min(poolHistory.length - 4, historyIndex + 4))}
+                  disabled={!canScrollRight}
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </Button>
+                
+                <div className="grid grid-cols-4 gap-2 px-8">
                   {displayedResults.map((result) => (
                     <div
                       key={result.id}
