@@ -60,7 +60,7 @@ const Fast = () => {
   const categoryOptions = [
     { 
       value: 'commodities', 
-      label: 'Commodities', 
+      label: window.innerWidth <= 768 ? 'Commod' : 'Commodities', 
       bgColor: '#FFD800',
       icon: '🛢️',
       textColor: '#000'
@@ -468,7 +468,9 @@ const Fast = () => {
         @media (max-width: 768px) {
           .riana-chat-button,
           .dark-mode-toggle-duplicate,
-          .header-dark-toggle {
+          .header-dark-toggle,
+          [data-testid="dark-mode-toggle"],
+          .fixed-dark-mode-toggle {
             display: none !important;
           }
         }
@@ -495,7 +497,7 @@ const Fast = () => {
           
           {/* Category Selector - Horizontal with themed styling */}
           <div className="flex justify-center mb-6">
-            <div className="flex gap-2 p-1 bg-muted rounded-lg">
+            <div className="flex gap-2 p-1 bg-muted rounded-xl">
               {categoryOptions.map((category) => (
                 <Button
                   key={category.value}
@@ -503,7 +505,7 @@ const Fast = () => {
                   size="sm"
                   onClick={() => setSelectedCategory(category.value)}
                   className={cn(
-                    "transition-all duration-200 font-medium",
+                    "transition-all duration-200 font-medium rounded-lg",
                     selectedCategory === category.value 
                       ? "shadow-sm border" 
                       : "hover:bg-muted-foreground/10"
@@ -559,50 +561,47 @@ const Fast = () => {
                 </CardHeader>
 
                 <CardContent className="relative z-10 space-y-4">
-                  {/* Countdown - shared across all pools */}
-                  {index === 0 && (
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-[#ff2389] mb-2">
-                        {countdown}s
-                      </div>
-                      <div className="w-full bg-muted/20 rounded-full h-2 overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 transition-all duration-[100ms] ease-linear"
-                          style={{ 
-                            width: `${(countdown / 60) * 100}%`,
-                            transition: 'width 100ms linear'
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
 
-                  {/* Bet Amount Slider - only on first pool */}
-                  {index === 0 && (
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium">
-                        Opinar {betAmount} RZ
-                      </label>
-                      <div className="px-3 py-2 bg-muted/20 rounded-lg">
-                        <input
-                          type="range"
-                          min="1"
-                          max="1000"
-                          step="1"
-                          value={betAmount}
-                          onChange={(e) => setBetAmount(Number(e.target.value))}
-                          className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer slider"
-                          style={{
-                            background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) 100%)`
-                          }}
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                          <span>1 RZ</span>
-                          <span>1.000 RZ</span>
-                        </div>
+                  {/* Bet Amount Slider and Countdown - shared across all pools */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium">
+                      Opinar {betAmount} RZ
+                    </label>
+                    <div className="px-3 py-2 bg-muted/20 rounded-lg">
+                      <input
+                        type="range"
+                        min="1"
+                        max="1000"
+                        step="1"
+                        value={betAmount}
+                        onChange={(e) => setBetAmount(Number(e.target.value))}
+                        className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer slider"
+                        style={{
+                          background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) 100%)`
+                        }}
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                        <span>1 RZ</span>
+                        <span>1.000 RZ</span>
                       </div>
                     </div>
-                  )}
+                  </div>
+
+                  {/* Countdown Timer */}
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-[#ff2389] mb-2 animate-pulse">
+                      {countdown}s
+                    </div>
+                    <div className="w-full bg-muted/20 rounded-full h-2 overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80"
+                        style={{ 
+                          width: `${(countdown / 60) * 100}%`,
+                          transition: 'width 0.1s linear'
+                        }}
+                      />
+                    </div>
+                  </div>
 
                   {/* Opinion Buttons */}
                   <div className="grid grid-cols-2 gap-2">
@@ -618,7 +617,7 @@ const Fast = () => {
                       <div className="flex items-center justify-between w-full px-1">
                         <ArrowUp className="w-4 h-4" />
                         <span>Subir</span>
-                        <span className="text-xs opacity-80">
+                        <span className="text-xs opacity-80 animate-pulse">
                           x{getOdds().toFixed(2)}
                         </span>
                       </div>
@@ -636,7 +635,7 @@ const Fast = () => {
                       <div className="flex items-center justify-between w-full px-1">
                         <ArrowDown className="w-4 h-4" />
                         <span>Descer</span>
-                        <span className="text-xs opacity-80">
+                        <span className="text-xs opacity-80 animate-pulse">
                           x{getOdds().toFixed(2)}
                         </span>
                       </div>
@@ -669,7 +668,11 @@ const Fast = () => {
                   {currentCategoryHistory.slice(0, 10).map((result, index) => (
                     <div
                       key={result.id}
-                      className="flex flex-col items-center p-3 rounded-lg bg-muted/20 border"
+                      className={`flex flex-col items-center p-3 rounded-lg border transition-all duration-200 ${
+                        index < 3 
+                          ? 'bg-primary/10 border-primary/30 shadow-sm ring-1 ring-primary/20' 
+                          : 'bg-muted/20 border-border'
+                      }`}
                     >
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
                         result.result === 'subiu' 
