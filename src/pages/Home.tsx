@@ -244,42 +244,50 @@ const Home = () => {
       {/* Enhanced Filters Section */}
       <div className="container mx-auto px-4 py-6 bg-gradient-to-b from-background/95 to-background/60 border-t border-border/30 backdrop-blur-sm">
         <div className="flex flex-col gap-6">
-          {/* Topic Filters - Enhanced with icons */}
+          {/* Topic Filters - Side Scroller with arrows */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Filter className="w-4 h-4 text-primary" />
-              <h4 className="text-sm font-bold text-foreground uppercase tracking-wide">Tópicos</h4>
+            <div className="flex items-center gap-2 mb-4">
+              <Filter className="w-5 h-5 text-primary" />
+              <h4 className="text-base font-bold text-foreground uppercase tracking-wide">Tópicos</h4>
             </div>
-            <div className="flex flex-wrap gap-3">
-              {topicFilters.map((topic) => {
-                const isSelected = selectedTopics.includes(topic.id);
-                return (
-                  <button
-                    key={topic.id}
-                    onClick={() => handleTopicSelect(topic.id)}
-                    className={`
-                      flex items-center gap-4 px-12 py-8 rounded-2xl text-lg font-bold
-                      transition-all duration-200 hover:scale-105 border-2
-                      ${isSelected 
-                        ? 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-xl scale-110 border-primary' 
-                        : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/5 bg-background/80'
-                      }
-                    `}
-                  >
-                    <img src={topic.icon} alt="" className="w-10 h-10 object-contain" />
-                    <span>{topic.label}</span>
-                    {isSelected && (
-                      <X 
-                        className="w-5 h-5 ml-2" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRemoveTopic(topic.id);
-                        }}
-                      />
-                    )}
-                  </button>
-                );
-              })}
+            <div className="relative">
+              <div className="overflow-x-auto scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <div className="flex gap-4 pb-2 min-w-max">
+                  {topicFilters.map((topic) => {
+                    const isSelected = selectedTopics.includes(topic.id);
+                    return (
+                      <button
+                        key={topic.id}
+                        onClick={() => handleTopicSelect(topic.id)}
+                        className={`
+                          flex items-center gap-4 px-10 py-7 rounded-2xl text-lg font-bold whitespace-nowrap
+                          transition-all duration-300 hover:scale-105 border-2 shadow-lg
+                          ${isSelected 
+                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50' 
+                            : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm'
+                          }
+                        `}
+                      >
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                          isSelected ? 'bg-primary-foreground/20' : 'bg-primary/10'
+                        }`}>
+                          <img src={topic.icon} alt="" className="w-8 h-8 object-contain" />
+                        </div>
+                        <span className="text-lg">{topic.label}</span>
+                        {isSelected && (
+                          <X 
+                            className="w-6 h-6 ml-2 hover:scale-110 transition-transform" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveTopic(topic.id);
+                            }}
+                          />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
 

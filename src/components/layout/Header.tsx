@@ -212,9 +212,10 @@ const Header = () => {
                   {isLoggedIn ? (
                     <div className="border-t border-border pt-4 mt-4">
                       <Button 
-                        onClick={() => {
-                          signOut();
+                        onClick={async () => {
+                          await signOut();
                           handleMobileNavClick();
+                          navigate('/auth');
                         }}
                         variant="ghost"
                         className="w-full justify-start gap-3 h-12 text-red-400 hover:text-red-300 hover:bg-red-950/20"
@@ -238,6 +239,19 @@ const Header = () => {
             </Sheet>
           )}
 
+          {/* Logo - Mobile (left side when not logged in) and Desktop */}
+          {isMobile && !isLoggedIn && (
+            <div className="flex items-center flex-1">
+              <Link to="/">
+                <img 
+                  src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
+                  alt="Rio Markets" 
+                  className="h-7 w-auto" 
+                />
+              </Link>
+            </div>
+          )}
+          
           {/* Desktop Logo */}
           <div className="hidden md:flex items-center mr-6">
             <Link to="/">
@@ -305,8 +319,8 @@ const Header = () => {
 
         {/* Desktop User Menu */}
           <div className="flex items-center gap-3">
-            {/* Mobile Logo when not logged in */}
-            {isMobile && !isLoggedIn ? (
+            {/* Mobile wallet view logo or user menu */}
+            {isMobile && location.pathname === '/wallet' && isLoggedIn ? (
               <div className="flex items-center">
                 <img 
                   src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
@@ -314,14 +328,13 @@ const Header = () => {
                   className="h-7 w-auto" 
                 />
               </div>
-            ) : isMobile && location.pathname === '/wallet' ? (
-              <div className="flex items-center">
-                <img 
-                  src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
-                  alt="Rio Markets" 
-                  className="h-7 w-auto" 
-                />
-              </div>
+            ) : isMobile && !isLoggedIn ? (
+              <Link to="/auth">
+                <Button size="sm">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Entrar
+                </Button>
+              </Link>
             ) : isLoggedIn ? (
               <>
                 {/* Wallet Balance */}

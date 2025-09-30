@@ -77,8 +77,7 @@ const ExchangeNew = () => {
 
   const handleSwapDirection = () => {
     setSwapDirection(prev => prev === 'brl-to-rioz' ? 'rioz-to-brl' : 'brl-to-rioz');
-    setFromAmount('');
-    setToAmount('');
+    // Keep the amounts when swapping direction
   };
 
   const handleMaxAmount = () => {
@@ -300,7 +299,7 @@ const ExchangeNew = () => {
                   placeholder="0"
                   value={formatNumber(fromAmount)}
                   onChange={(e) => handleAmountChange(e.target.value)}
-                  className="pl-32 pr-4 h-32 text-right text-7xl font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
+                  className="pl-32 pr-4 h-40 text-right text-9xl font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
                 />
                 {fromAmount && parseFloat(fromAmount.replace(/[^\d.]/g, '')) > fromBalance && (
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-red-500 font-medium bg-red-500/10 px-3 py-1 rounded-lg border border-red-500/20">
@@ -372,7 +371,7 @@ const ExchangeNew = () => {
                   placeholder="0"
                   value={formatNumber(toAmount)}
                   readOnly
-                  className="pl-32 pr-4 h-32 text-right text-7xl font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
+                  className="pl-32 pr-4 h-40 text-right text-9xl font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
                 />
               </div>
             </div>
