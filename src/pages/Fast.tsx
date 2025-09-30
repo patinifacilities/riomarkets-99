@@ -236,7 +236,7 @@ const Fast = () => {
     
     const timer = setInterval(() => {
       calculateCountdown(currentPools[0]); // All pools have same timing
-    }, 20); // Update every 20ms for truly continuous animation
+    }, 16); // Update every 16ms for 60fps smooth animation
 
     return () => clearInterval(timer);
   }, [currentPools, countdown, calculateCountdown]);
@@ -392,10 +392,22 @@ const Fast = () => {
       };
       setOpinionNotifications(prev => [...prev, newNotification]);
       
-      // Remove notification after 3 seconds
+      // Remove notification after exactly 3 seconds with fadeout
       setTimeout(() => {
         setOpinionNotifications(prev => prev.filter(n => n.id !== newNotification.id));
       }, 3000);
+
+      // Register transaction in wallet_transactions
+      await supabase
+        .from('wallet_transactions')
+        .insert({
+          id: `fast_bet_${Date.now()}_${user.id}`,
+          user_id: user.id,
+          tipo: 'debito',
+          valor: betAmount,
+          descricao: `Fast Market - ${side === 'subiu' ? 'Subiu' : 'Desceu'} - ${pool.asset_name}`,
+          market_id: poolId
+        });
 
       // Refresh profile and check for winnings after a delay
       refetchProfile();
@@ -492,10 +504,20 @@ const Fast = () => {
           100% { border-color: transparent; }
         }
         
-        @keyframes outline-animation-commodities {
-          0% { border-color: transparent; }
-          50% { border-color: #FFD800; box-shadow: 0 0 10px #FFD800; }
-          100% { border-color: transparent; }
+        @keyframes rearrange-in {
+          0% { 
+            transform: translateY(-20px) scale(0.95); 
+            opacity: 0; 
+          }
+          100% { 
+            transform: translateY(0) scale(1); 
+            opacity: 1; 
+          }
+        }
+        
+        @keyframes fadeout {
+          0% { opacity: 1; }
+          100% { opacity: 0; }
         }
         
         @keyframes outline-animation-crypto {
@@ -634,18 +656,21 @@ const Fast = () => {
                   {/* Countdown Timer */}
                    <div className="text-center">
                      <div className="text-2xl font-bold text-[#ff2389] mb-2">
-                       {countdown}s
-                     </div>
-                     <div className="w-full bg-muted/20 rounded-full h-2 overflow-hidden">
-                       <div 
-                         className={`h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 ${countdown <= 15 ? 'animate-pulse' : ''}`}
-                         style={{ 
-                           width: `${(countdown / 60) * 100}%`,
-                           transition: 'width 0.05s linear',
-                           animationDuration: countdown <= 5 ? '0.2s' : countdown <= 10 ? '0.5s' : '1s'
-                         }}
-                       />
-                     </div>
+                        {countdown}s
+                      </div>
+                      <div className="w-full bg-muted/20 rounded-full h-2 overflow-hidden">
+                        <div 
+                          className={cn(
+                            "h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80",
+                            countdown <= 15 && countdown > 5 && "animate-pulse duration-1000",
+                            countdown <= 5 && "animate-pulse duration-300"
+                          )}
+                          style={{ 
+                            width: `${(countdown / 60) * 100}%`,
+                            transition: 'width 50ms linear'
+                          }}
+                        />
+                      </div>
                    </div>
 
                   {/* Opinion Buttons */}
@@ -662,9 +687,9 @@ const Fast = () => {
                       <div className="flex items-center justify-between w-full px-1">
                         <ArrowUp className="w-4 h-4" />
                         <span>Subir</span>
-                         <span className="text-xs opacity-80">
-                           x{getOdds().toFixed(2)}
-                         </span>
+                           <span className="text-xs opacity-80">
+                            x{getOdds().toFixed(2)}
+                          </span>
                       </div>
                     </Button>
                     

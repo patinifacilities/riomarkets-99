@@ -242,8 +242,8 @@ async function finalizePool(supabase: any, poolId: string) {
   const winningBets = (bets || []).filter((bet: any) => bet.side === result);
   
   if (winningBets.length > 0) {
-    // Call the payout processing function
-    const { error: payoutError } = await supabase.functions.invoke('process-fast-pool-payout', {
+    // Call the comprehensive result processing function
+    const { error: payoutError } = await supabase.functions.invoke('process-fast-pool-result', {
       body: {
         poolId: poolId,
         result: result,
@@ -252,7 +252,7 @@ async function finalizePool(supabase: any, poolId: string) {
     });
     
     if (payoutError) {
-      console.error('Error processing payouts:', payoutError);
+      console.error('Error processing result and payouts:', payoutError);
     } else {
       console.log(`Processed ${winningBets.length} winning bets for pool ${poolId}`);
     }
