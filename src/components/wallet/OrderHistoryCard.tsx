@@ -62,14 +62,13 @@ export const OrderHistoryCard = ({ onRefresh }: OrderHistoryCardProps) => {
               </Button>
               <Button 
                 size="sm"
-                variant="outline"
+                variant="destructive"
                 onClick={() => {
                   const activeOrder = allOrders.find(o => o.status === 'ativa');
                   if (activeOrder) handleCancel(activeOrder);
                 }}
                 disabled={!allOrders.some(o => o.status === 'ativa')}
-                style={{ backgroundColor: '#ff2389', color: 'white', borderColor: '#ff2389' }}
-                className="hover:bg-[#ff2389]/90 text-xs px-2 py-1"
+                className="text-xs px-3 py-1.5 bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-0 font-medium"
               >
                 Cancelar
               </Button>

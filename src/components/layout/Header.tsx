@@ -55,12 +55,12 @@ const Header = () => {
 
   const navItems = [
     { href: '/fast', icon: Zap, label: 'Fast', special: 'pulse' },
-    { href: '/wallet', icon: Wallet, label: 'Carteira', authRequired: true },
     { href: '/', icon: TrendingUp, label: 'Mercados' },
+    { href: '/wallet', icon: Wallet, label: 'Carteira', authRequired: true },
+    { href: '/transactions', icon: Receipt, label: 'Transações', authRequired: true },
     { href: '/exchange', icon: ArrowRightLeft, label: 'Exchange', authRequired: true },
     { href: '/ranking', icon: Trophy, label: 'Ranking' },
     { href: '/press', icon: Newspaper, label: 'Na mídia' },
-    { href: '/transactions', icon: Receipt, label: 'Transações', authRequired: true },
     { href: '/admin', icon: Settings, label: 'Admin', adminRequired: true }
   ];
 
@@ -88,12 +88,12 @@ const Header = () => {
           {isMobile && (
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="md:hidden mr-2">
-                  <Menu className="h-5 w-5 text-white" />
+                <Button variant="ghost" size="sm" className="md:hidden mr-2 hover:bg-muted/20">
+                  <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-80 bg-black dark:bg-black border-border">
-                <SheetHeader className="border-b border-border pb-4">
+              <SheetContent side="left" className="w-80 bg-background dark:bg-background border-border p-0">
+                <SheetHeader className="border-b border-border px-6 py-4">
                   <div className="text-left">
                     <img 
                       src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
@@ -103,18 +103,18 @@ const Header = () => {
                   </div>
                 </SheetHeader>
                 
-                <div className="flex flex-col mt-6 space-y-1">
+                <div className="flex flex-col px-6 py-4 space-y-1">
                       {/* User Info Section */}
                   {isLoggedIn && profile && (
                     <div className="border-b border-border pb-4 mb-4">
-                      <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg">
-                        <Avatar className="h-12 w-12">
+                      <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-primary/20">
+                        <Avatar className="h-12 w-12 ring-2 ring-primary/20">
                           <AvatarFallback className="bg-primary text-primary-foreground">
                             {profile.nome ? profile.nome.charAt(0).toUpperCase() : 'U'}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="text-sm font-medium text-white">{profile.nome || 'Usuário'}</p>
+                          <p className="text-sm font-medium">{profile.nome || 'Usuário'}</p>
                           <p className="text-sm text-muted-foreground capitalize">{profile.nivel || 'iniciante'}</p>
                           <div className="text-xs text-primary font-medium mt-1">
                             {profile.saldo_moeda >= 1000 
@@ -147,11 +147,11 @@ const Header = () => {
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="w-full justify-start gap-3 h-12 text-muted-foreground hover:text-foreground hover:bg-muted/10 opacity-60"
+                            className="w-full justify-start gap-3 h-12 text-muted-foreground hover:text-foreground hover:bg-muted/10 opacity-60 transition-all duration-200"
                           >
                             <item.icon className="w-5 h-5" />
                             {item.label}
-                            <span className="text-xs ml-auto">Login</span>
+                            <span className="text-xs ml-auto bg-primary/20 px-2 py-1 rounded">Login</span>
                           </Button>
                         </Link>
                       );
@@ -167,30 +167,30 @@ const Header = () => {
                         <Button 
                           variant={isActive ? "secondary" : "ghost"} 
                           size="sm" 
-                          className={`w-full justify-start gap-3 h-12 transition-all duration-200 ${
+                          className={`w-full justify-start gap-3 h-12 transition-all duration-200 group ${
                              isActive 
                                ? (item.href === '/fast' 
-                                   ? 'bg-[#32162C] text-white hover:bg-[#32162C]/90 outline-none' 
-                                   : 'bg-[#00ff90] text-black hover:bg-[#00ff90]/90')
-                               : 'text-white hover:text-foreground hover:bg-muted/10'
-                           } ${item.special === 'pulse' && isActive ? '' : item.special === 'pulse' ? '' : ''}`}
+                                   ? 'bg-[#ff2389]/10 text-[#ff2389] hover:bg-[#ff2389]/20 border border-[#ff2389]/20' 
+                                   : 'bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20')
+                               : 'text-foreground/80 hover:text-foreground hover:bg-muted/10'
+                           } ${item.special === 'pulse' && !isActive ? 'hover:bg-[#ff2389]/10' : ''}`}
                          >
-                           <item.icon className={`w-5 h-5 transition-all duration-200 ${
+                           <item.icon className={`w-5 h-5 transition-all duration-200 group-hover:scale-110 ${
                              isActive && item.href === '/fast' 
-                               ? 'text-white' 
+                               ? 'text-[#ff2389]' 
                                : item.special === 'pulse' && isActive 
-                                 ? 'text-white animate-[pulse_1s_ease-in-out_infinite]' 
+                                 ? 'text-primary' 
                                  : item.special === 'pulse' 
                                    ? 'text-[#ff2389] animate-[pulse_1s_ease-in-out_infinite]' 
                                    : ''
                            }`} />
                            <span className={`transition-all duration-200 ${
                              isActive && item.href === '/fast' 
-                               ? 'text-white' 
+                               ? 'text-[#ff2389] font-medium' 
                                : item.special === 'pulse' && isActive 
-                                 ? 'text-white animate-[pulse_1s_ease-in-out_infinite]' 
+                                 ? 'text-primary font-medium' 
                                  : item.special === 'pulse' 
-                                   ? 'text-[#ff2389] animate-[pulse_1s_ease-in-out_infinite]' 
+                                   ? 'text-[#ff2389] animate-[pulse_1s_ease-in-out_infinite] font-medium' 
                                    : ''
                            }`}>
                              {item.label}

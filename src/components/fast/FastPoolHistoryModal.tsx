@@ -17,11 +17,11 @@ import { useToast } from '@/hooks/use-toast';
 interface FastPoolHistoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  poolId: string;
+  assetSymbol: string;
   timeLeft: number;
 }
 
-export const FastPoolHistoryModal = ({ open, onOpenChange, poolId, timeLeft }: FastPoolHistoryModalProps) => {
+export const FastPoolHistoryModal = ({ open, onOpenChange, assetSymbol, timeLeft }: FastPoolHistoryModalProps) => {
   const { user } = useAuth();
   const { data: profile } = useProfile(user?.id);
   const { toast } = useToast();
@@ -101,7 +101,7 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, poolId, timeLeft }: F
     // Simulate bet placement
     toast({
       title: "Ordem enviada!",
-      description: `Opinião ${side.toUpperCase()} registrada com ${betAmount} RZ no Pool ${poolId}.`,
+      description: `Opinião ${side.toUpperCase()} registrada com ${betAmount} RZ no Pool ${assetSymbol}.`,
     });
 
     onOpenChange(false);
@@ -135,7 +135,7 @@ export const FastPoolHistoryModal = ({ open, onOpenChange, poolId, timeLeft }: F
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-center">
             <ArrowUpDown className="w-5 h-5" />
-            Pool {poolId} - Histórico
+            Pool {assetSymbol} - Histórico
           </DialogTitle>
           <DialogDescription className="text-center">
             <div className="text-sm text-muted-foreground mb-2">

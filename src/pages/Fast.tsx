@@ -772,7 +772,7 @@ const Fast = () => {
       <FastPoolHistoryModal
         open={poolHistoryOpen}
         onOpenChange={setPoolHistoryOpen}
-        poolId={selectedPool || ''}
+        assetSymbol={selectedPool || ''}
         timeLeft={countdown}
       />
     </div>
