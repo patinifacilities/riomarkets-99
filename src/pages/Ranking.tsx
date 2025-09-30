@@ -25,6 +25,8 @@ const Ranking = () => {
 
   const getLevelBadge = (nivel: string) => {
     switch (nivel) {
+      case 'mestre':
+        return <Badge className="bg-danger/20 text-danger border-danger/30">Mestre</Badge>;
       case 'guru':
         return <Badge className="bg-primary/20 text-primary border-primary/30">Guru</Badge>;
       case 'analista':

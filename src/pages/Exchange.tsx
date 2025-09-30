@@ -58,9 +58,21 @@ const ExchangeNew = () => {
   };
 
   const handleAmountChange = (value: string) => {
-    setFromAmount(value);
+    // Remove all non-numeric characters except dot and comma
+    const cleanValue = value.replace(/[^\d.,]/g, '');
+    setFromAmount(cleanValue);
     // 1:1 conversion rate
-    setToAmount(value);
+    setToAmount(cleanValue);
+  };
+
+  const formatNumber = (value: string) => {
+    if (!value) return '';
+    const numValue = parseFloat(value.replace(/[^\d.]/g, ''));
+    if (isNaN(numValue)) return '';
+    return numValue.toLocaleString('pt-BR', {
+      minimumFractionDigits: swapDirection === 'brl-to-rioz' ? 2 : 0,
+      maximumFractionDigits: swapDirection === 'brl-to-rioz' ? 2 : 0
+    });
   };
 
   const handleSwapDirection = () => {
@@ -76,7 +88,7 @@ const ExchangeNew = () => {
   };
 
   const handleSwap = async () => {
-    if (!user?.id || !fromAmount || parseFloat(fromAmount) <= 0) {
+    if (!user?.id || !fromAmount) {
       toast({
         title: "Erro",
         description: "Digite um valor válido",
@@ -85,7 +97,17 @@ const ExchangeNew = () => {
       return;
     }
 
-    const amountNum = parseFloat(fromAmount);
+    const amountNum = parseFloat(fromAmount.replace(/[^\d.]/g, ''));
+    
+    if (isNaN(amountNum) || amountNum <= 0) {
+      toast({
+        title: "Erro",
+        description: "Digite um valor válido",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const maxAmount = swapDirection === 'brl-to-rioz' ? brlBalance : riozBalance;
     
     if (amountNum > maxAmount) {
@@ -274,13 +296,17 @@ const ExchangeNew = () => {
                   </div>
                 </div>
                 <Input
-                  type="number"
+                  type="text"
                   placeholder="0"
-                  value={fromAmount}
+                  value={formatNumber(fromAmount)}
                   onChange={(e) => handleAmountChange(e.target.value)}
-                  className="pl-32 pr-4 h-24 text-right text-5xl font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  step={fromCurrency === 'BRL' ? '0.01' : '1'}
+                  className="pl-32 pr-4 h-32 text-right text-7xl font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
                 />
+                {fromAmount && parseFloat(fromAmount.replace(/[^\d.]/g, '')) > fromBalance && (
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-red-500 font-medium bg-red-500/10 px-3 py-1 rounded-lg border border-red-500/20">
+                    ⚠️ Saldo insuficiente
+                  </div>
+                )}
               </div>
             </div>
 
@@ -342,11 +368,11 @@ const ExchangeNew = () => {
                   </span>
                 </div>
                 <Input
-                  type="number"
+                  type="text"
                   placeholder="0"
-                  value={toAmount}
+                  value={formatNumber(toAmount)}
                   readOnly
-                  className="pl-32 pr-4 h-24 text-right text-5xl font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="pl-32 pr-4 h-32 text-right text-7xl font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
                 />
               </div>
             </div>
@@ -368,7 +394,7 @@ const ExchangeNew = () => {
             {/* Convert Button */}
             <Button
               onClick={handleSwap}
-              disabled={loading || !fromAmount || parseFloat(fromAmount) <= 0}
+              disabled={loading || !fromAmount || parseFloat(fromAmount.replace(/[^\d.]/g, '')) <= 0 || parseFloat(fromAmount.replace(/[^\d.]/g, '')) > fromBalance}
               className="w-full h-14 text-lg font-semibold"
               size="lg"
             >

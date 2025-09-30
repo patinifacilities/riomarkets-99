@@ -531,12 +531,11 @@ const Fast = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
         <div className="text-center">
-          <div className="relative inline-block">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <Zap className="w-6 h-6 text-[#ff2389] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" style={{
-              animation: 'blink-118bpm 0.508s infinite'
-            }} />
-          </div>
+            <div className="w-32 h-32 rounded-full bg-[#ff2389]/5 flex items-center justify-center">
+              <Zap className="w-16 h-16 text-[#ff2389]" style={{
+                animation: 'blink-118bpm 0.508s infinite'
+              }} />
+            </div>
           <p className="text-muted-foreground mt-4">Carregando Fast Markets...</p>
           <style>{`
             @keyframes blink-118bpm {

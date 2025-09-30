@@ -23,6 +23,10 @@ export function OnboardingStep({ step, className = "" }: OnboardingStepProps) {
           <div className="flex items-center justify-center">
             <img src={logoWhite} alt="Rio Markets" className="h-8 w-auto" />
           </div>
+        ) : content.id === 3 ? (
+          <div className="w-16 h-16 rounded-full bg-[#ff2389]/10 flex items-center justify-center animate-pulse">
+            <IconComponent className="w-8 h-8 text-[#ff2389]" />
+          </div>
         ) : (
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
             <IconComponent className="w-8 h-8 text-primary" />
@@ -31,7 +35,7 @@ export function OnboardingStep({ step, className = "" }: OnboardingStepProps) {
       </div>
       
       <div className="space-y-3">
-        <h3 className="text-xl font-semibold text-foreground">
+        <h3 className={`text-xl font-semibold ${content.id === 3 ? 'text-[#ff2389]' : 'text-foreground'}`}>
           {content.title}
         </h3>
         
@@ -40,8 +44,14 @@ export function OnboardingStep({ step, className = "" }: OnboardingStepProps) {
         </p>
         
         {content.tip && (
-          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 mt-4">
-            <p className="text-sm text-primary font-medium">
+          <div className={`border rounded-lg p-3 mt-4 ${
+            content.id === 3 
+              ? 'bg-[#ff2389]/5 border-[#ff2389]/20' 
+              : 'bg-primary/5 border-primary/20'
+          }`}>
+            <p className={`text-sm font-medium ${
+              content.id === 3 ? 'text-[#ff2389]' : 'text-primary'
+            }`}>
               💡 {content.tip}
             </p>
           </div>
