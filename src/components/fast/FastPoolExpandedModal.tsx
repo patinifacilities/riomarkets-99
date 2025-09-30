@@ -106,22 +106,27 @@ export const FastPoolExpandedModal = ({
   const canScrollLeft = historyIndex > 0;
   const canScrollRight = historyIndex + 4 < poolHistory.length;
 
+  const onClose = () => onOpenChange(false);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" hideCloseButton>
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between pr-2">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{pool.asset_symbol === 'BTC' ? '₿' : pool.asset_symbol === 'ETH' ? 'Ξ' : '📈'}</span>
-              <div>
-                <div className="text-xl font-bold">{pool.asset_name}</div>
-                <div className="text-sm text-muted-foreground font-normal">
-                  Pool #{pool.round_number} • ${pool.opening_price.toLocaleString()}
-                </div>
-              </div>
-            </div>
+      <DialogContent 
+        className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border-border"
+        hideCloseButton={true}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <DialogTitle className="text-2xl font-bold">
+            {pool.asset_name}
           </DialogTitle>
-        </DialogHeader>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onClose()}
+            className="h-12 w-12"
+          >
+            <X className="h-8 w-8" />
+          </Button>
+        </div>
 
         <div className="space-y-6 py-4">
           {/* Countdown */}

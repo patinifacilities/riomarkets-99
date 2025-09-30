@@ -258,19 +258,19 @@ const Home = () => {
                     key={topic.id}
                     onClick={() => handleTopicSelect(topic.id)}
                     className={`
-                      flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium
+                      flex items-center gap-4 px-12 py-8 rounded-2xl text-lg font-bold
                       transition-all duration-200 hover:scale-105 border-2
                       ${isSelected 
-                        ? 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg border-primary' 
+                        ? 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-xl scale-110 border-primary' 
                         : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/5 bg-background/80'
                       }
                     `}
                   >
-                    <img src={topic.icon} alt="" className="w-5 h-5 object-contain" />
+                    <img src={topic.icon} alt="" className="w-10 h-10 object-contain" />
                     <span>{topic.label}</span>
                     {isSelected && (
                       <X 
-                        className="w-4 h-4 ml-1" 
+                        className="w-5 h-5 ml-2" 
                         onClick={(e) => {
                           e.stopPropagation();
                           handleRemoveTopic(topic.id);

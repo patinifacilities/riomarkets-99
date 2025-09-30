@@ -52,7 +52,7 @@ export function OnboardingStep({ step, className = "" }: OnboardingStepProps) {
             <p className={`text-sm font-medium ${
               content.id === 3 ? 'text-[#ff2389]' : 'text-primary'
             }`}>
-              💡 {content.tip}
+              {content.id === 3 ? '' : '💡 '}{content.tip}
             </p>
           </div>
         )}

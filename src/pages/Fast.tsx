@@ -681,12 +681,12 @@ const Fast = () => {
                 <Button
                   key={category.value}
                   variant="ghost"
-                  size="sm"
+                  size="lg"
                   onClick={() => setSelectedCategory(category.value)}
                   className={cn(
-                    "transition-all duration-75 font-medium rounded-xl",
+                    "transition-all duration-75 font-bold rounded-xl px-10 py-6 text-base",
                     selectedCategory === category.value 
-                      ? "shadow-sm border" 
+                      ? "shadow-lg border-2 scale-105" 
                       : "hover:bg-muted-foreground/10"
                   )}
                   style={selectedCategory === category.value ? {
@@ -745,6 +745,8 @@ const Fast = () => {
                   <CardTitle className="text-lg mb-2">
                     {pool.asset_name}
                   </CardTitle>
+                  
+                  <p className="text-sm text-muted-foreground mb-2">{pool.question}</p>
                   
                   <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                     <span className="bg-muted/50 px-2 py-1 rounded">{pool.asset_symbol}</span>

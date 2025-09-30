@@ -401,8 +401,17 @@ const Auth = () => {
                       onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                       className="pl-10"
                       aria-label="Digite seu endereço de email"
+                      list="email-suggestions"
                       required
                     />
+                    {formData.email.includes('@') && !formData.email.includes('@gmail') && !formData.email.includes('@hotmail') && !formData.email.includes('@outlook') && !formData.email.includes('@yahoo') && (
+                      <datalist id="email-suggestions">
+                        <option value={formData.email.split('@')[0] + '@gmail.com'} />
+                        <option value={formData.email.split('@')[0] + '@hotmail.com'} />
+                        <option value={formData.email.split('@')[0] + '@outlook.com'} />
+                        <option value={formData.email.split('@')[0] + '@yahoo.com.br'} />
+                      </datalist>
+                    )}
                   </div>
                 </div>
 
