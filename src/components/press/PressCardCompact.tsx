@@ -43,7 +43,7 @@ export function PressCardCompact({ article }: PressCardCompactProps) {
     const mediumPriority = ['Valor Econômico', 'InfoMoney', 'Exame', 'IstoÉ Dinheiro'];
     
     if (highPriority.some(v => vehicle.toLowerCase().includes(v.toLowerCase()))) {
-      return 'bg-red-500/20 text-red-400 border-red-500/30';
+      return 'bg-[#ff2389]/20 text-[#ff2389] border-[#ff2389]/30';
     } else if (mediumPriority.some(v => vehicle.toLowerCase().includes(v.toLowerCase()))) {
       return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
     }

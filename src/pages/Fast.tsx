@@ -51,7 +51,7 @@ const Fast = () => {
   const [poolHistoryOpen, setPoolHistoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('commodities');
   const [lastPoolIds, setLastPoolIds] = useState<string[]>([]);
-  const [opinionNotifications, setOpinionNotifications] = useState<{id: string, text: string}[]>([]);
+  const [opinionNotifications, setOpinionNotifications] = useState<{id: string, text: string, side?: 'subiu' | 'desceu'}[]>([]);
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
@@ -262,11 +262,9 @@ const Fast = () => {
         )
       );
       
-      // Immediately load new pools after finalization
-      setTimeout(() => {
-        loadCurrentPools();
-        loadPoolHistory();
-      }, 500);
+      // Immediately load new pools and history
+      loadCurrentPools();
+      loadPoolHistory();
       
     } catch (error) {
       console.error('Error finalizing pools:', error);
@@ -298,33 +296,35 @@ const Fast = () => {
     audio.play().catch(console.error);
   };
 
-  // Check for user winnings across all pools
-  const checkForWinnings = useCallback(async () => {
-    if (!user || !currentPools.length) return;
+  // Check for user winnings for the recently completed pool
+  const checkForWinnings = useCallback(async (poolId: string, betSide: 'subiu' | 'desceu') => {
+    if (!user) return;
     
     try {
-      const poolIds = currentPools.map(pool => pool.id);
-      const { data: winningBets } = await supabase
+      // Wait for pool to be processed
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const { data: bet } = await supabase
         .from('fast_pool_bets')
-        .select('*')
+        .select('*, fast_pool_results(*)')
         .eq('user_id', user.id)
-        .in('pool_id', poolIds)
-        .eq('processed', true)
-        .gt('payout_amount', 0);
+        .eq('pool_id', poolId)
+        .single();
         
-      if (winningBets && winningBets.length > 0) {
-        const totalWinnings = winningBets.reduce((sum, bet) => sum + bet.payout_amount, 0);
-        playCoinSound(); // Play coin sound for profit
+      if (bet && bet.processed && bet.payout_amount > 0) {
+        playCoinSound();
+        const winAmount = bet.payout_amount - bet.amount_rioz;
         toast({
           title: "🎉 Você ganhou!",
-          description: `Parabéns! Você recebeu ${totalWinnings.toFixed(0)} RZ`,
+          description: `Parabéns! Você ganhou ${winAmount.toFixed(0)} RZ`,
           duration: 6000,
+          className: 'bg-[#00ff90]/10 border-[#00ff90]'
         });
       }
     } catch (error) {
       console.error('Error checking winnings:', error);
     }
-  }, [user, currentPools, toast]);
+  }, [user, toast]);
 
   const handleBet = async (poolId: string, side: 'subiu' | 'desceu') => {
     if (!user || !currentPools.length) {
@@ -383,10 +383,11 @@ const Fast = () => {
       setClickedPool({ id: poolId, side });
       setTimeout(() => setClickedPool(null), 400);
 
-      // Add new opinion notification to stack
+      // Add new opinion notification with button color
       const newNotification = {
         id: Date.now().toString(),
-        text: 'Opinião registrada'
+        text: 'Opinião registrada',
+        side: side
       };
       setOpinionNotifications(prev => [...prev, newNotification]);
       
@@ -407,12 +408,12 @@ const Fast = () => {
           market_id: poolId
         });
 
-      // Refresh profile and check for winnings after a delay
+      // Refresh profile and check for winnings after pool finishes
       refetchProfile();
       
       // Check for winnings after pool finishes (65 seconds + processing time)
       setTimeout(() => {
-        checkForWinnings();
+        checkForWinnings(poolId, side);
       }, 65000);
 
     } catch (error) {
@@ -660,27 +661,15 @@ const Fast = () => {
                     </div>
                   </div>
 
-                  {/* Countdown Timer */}
-                   <div className="text-center">
-                     <div className={`text-2xl font-bold mb-2 ${
-                       countdown <= 0 && pool.result 
-                         ? pool.result === 'subiu' 
-                           ? 'text-[#00ff90]' 
-                           : pool.result === 'desceu' 
-                             ? 'text-[#ff2389]' 
-                             : 'text-[#FFD800]'
-                         : 'text-[#ff2389]'
-                     }`}>
-                        {countdown > 0 
-                          ? `${countdown.toFixed(2)}s` 
-                          : pool.result 
-                            ? pool.result === 'subiu' 
-                              ? 'Subiu!' 
-                              : pool.result === 'desceu' 
-                                ? 'Desceu!' 
-                                : 'Manteve!'
-                            : 'Finalizando...'}
-                      </div>
+                   {/* Countdown Timer */}
+                    <div className="text-center">
+                      <div className={`text-2xl font-bold mb-2 ${
+                        countdown <= 0 
+                          ? 'text-muted-foreground animate-pulse' 
+                          : 'text-[#ff2389]'
+                      }`}>
+                         {countdown > 0 ? `${countdown.toFixed(2)}s` : 'Aguarde...'}
+                       </div>
                       <div className="w-full bg-muted/20 rounded-full h-2 overflow-hidden">
                         <div 
                           className={cn(
@@ -886,7 +875,11 @@ const Fast = () => {
         {opinionNotifications.map((notification, index) => (
           <div 
             key={notification.id}
-            className="bg-white text-black px-6 py-3 rounded-xl shadow-lg border border-gray-200 animate-fade-in transition-opacity duration-300"
+            className={`px-6 py-3 rounded-xl shadow-lg border animate-fade-in transition-opacity duration-300 ${
+              notification.side === 'subiu' 
+                ? 'bg-[#00ff90] text-black border-[#00ff90]' 
+                : 'bg-[#ff2389] text-white border-[#ff2389]'
+            }`}
             style={{ 
               marginBottom: '8px',
               zIndex: 50 - index 

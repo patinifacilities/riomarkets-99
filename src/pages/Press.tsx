@@ -81,7 +81,7 @@ export default function Press() {
             Na mídia
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            O que a imprensa está falando sobre o Rio Markets
+            O que está acontecendo no mundo
           </p>
         </header>
 

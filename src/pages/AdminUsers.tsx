@@ -81,30 +81,31 @@ const AdminUsers = () => {
                 {filteredUsers.map((user) => (
                   <div
                     key={user.id}
-                    className="flex items-center justify-between p-4 rounded-lg bg-card border border-border hover:border-primary/30 transition-colors"
+                    onClick={() => setEditingUser(user)}
+                    className="flex items-center justify-between p-4 rounded-lg bg-card border border-border hover:border-primary/30 transition-colors cursor-pointer md:cursor-default"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center">
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center flex-shrink-0">
                         <span className="text-sm font-bold text-primary-foreground">
                           {user.nome.split(' ').map(n => n[0]).join('').toUpperCase()}
                         </span>
                       </div>
                       
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold">{user.nome}</h3>
+                          <h3 className="font-semibold truncate">{user.nome}</h3>
                           {user.is_admin && (
-                            <Badge variant="destructive" className="text-xs">Admin</Badge>
+                            <Badge variant="destructive" className="text-xs flex-shrink-0">Admin</Badge>
                           )}
                         </div>
-                        <p className="text-sm text-muted-foreground mb-1">{user.email}</p>
+                        <p className="text-sm text-muted-foreground mb-1 truncate">{user.email}</p>
                         <Badge className={getLevelColor(user.nivel)} variant="secondary">
                           {user.nivel}
                         </Badge>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 flex-shrink-0">
                       <div className="text-right">
                         <p className="text-lg font-bold text-primary">
                           {user.saldo_moeda.toLocaleString()}
@@ -112,11 +113,14 @@ const AdminUsers = () => {
                         <p className="text-sm text-muted-foreground">Rioz Coin</p>
                       </div>
 
-                      <div className="flex gap-2">
+                      <div className="hidden md:flex gap-2">
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setEditingUser(user)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingUser(user);
+                          }}
                         >
                           <Edit className="w-4 h-4 mr-1" />
                           Editar
