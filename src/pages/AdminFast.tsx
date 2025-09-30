@@ -321,9 +321,9 @@ const AdminFast = () => {
               ) : (
                 pools
                   .sort((a, b) => {
-                    // Paused pools go to the end
-                    if (a.paused && !b.paused) return 1;
-                    if (!a.paused && b.paused) return -1;
+                    // Paused pools go to the top
+                    if (a.paused && !b.paused) return -1;
+                    if (!a.paused && b.paused) return 1;
                     return 0;
                   })
                   .map(pool => (

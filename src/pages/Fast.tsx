@@ -51,7 +51,7 @@ const Fast = () => {
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [selectedPool, setSelectedPool] = useState<string | null>(null);
   const [poolHistoryOpen, setPoolHistoryOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('commodities');
+  const [selectedCategory, setSelectedCategory] = useState<string>('crypto');
   const [lastPoolIds, setLastPoolIds] = useState<string[]>([]);
   const [opinionNotifications, setOpinionNotifications] = useState<{id: string, text: string, side?: 'subiu' | 'desceu', timestamp: number}[]>([]);
   const [userPoolBets, setUserPoolBets] = useState<Record<string, number>>({});
@@ -64,18 +64,18 @@ const Fast = () => {
   // Category options for fast pools with styling
   const categoryOptions = [
     { 
-      value: 'commodities', 
-      label: window.innerWidth <= 768 ? 'Commod' : 'Commodities', 
-      bgColor: '#FFD800',
-      icon: '🛢️',
-      textColor: '#000'
-    },
-    { 
       value: 'crypto', 
       label: 'Cripto', 
       bgColor: '#FF6101',
       icon: '₿',
       textColor: '#fff'
+    },
+    { 
+      value: 'commodities', 
+      label: window.innerWidth <= 768 ? 'Commod' : 'Commodities', 
+      bgColor: '#FFD800',
+      icon: '🛢️',
+      textColor: '#000'
     },
     { 
       value: 'forex', 
@@ -1061,6 +1061,8 @@ const Fast = () => {
         getOdds={getOdds}
         userPoolBet={expandedPool ? userPoolBets[expandedPool.id] : 0}
         poolResult={expandedPool ? poolResults[selectedCategory] : null}
+        opinionNotifications={opinionNotifications}
+        poolSpecificHistory={expandedPool ? currentCategoryHistory.filter(r => r.asset_symbol === expandedPool.asset_symbol) : []}
       />
     </div>
   );

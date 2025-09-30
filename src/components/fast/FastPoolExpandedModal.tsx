@@ -22,6 +22,16 @@ interface FastPool {
   paused?: boolean;
 }
 
+interface FastPoolResult {
+  id: string;
+  result: 'subiu' | 'desceu' | 'manteve';
+  opening_price: number;
+  closing_price: number;
+  price_change_percent: number;
+  created_at: string;
+  asset_symbol: string;
+}
+
 interface FastPoolExpandedModalProps {
   pool: FastPool | null;
   open: boolean;
@@ -34,6 +44,8 @@ interface FastPoolExpandedModalProps {
   getOdds: () => number;
   userPoolBet?: number;
   poolResult?: 'subiu' | 'desceu' | 'manteve' | null;
+  opinionNotifications?: {id: string, text: string, side?: 'subiu' | 'desceu', timestamp: number}[];
+  poolSpecificHistory?: FastPoolResult[];
 }
 
 export const FastPoolExpandedModal = ({ 
@@ -47,11 +59,16 @@ export const FastPoolExpandedModal = ({
   clickedPool,
   getOdds,
   userPoolBet = 0,
-  poolResult
+  poolResult,
+  opinionNotifications = [],
+  poolSpecificHistory = []
 }: FastPoolExpandedModalProps) => {
   if (!pool) return null;
 
   const currentOdds = getOdds();
+  
+  // Get last 4 results for this specific pool
+  const last4Results = poolSpecificHistory.slice(0, 4);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -110,11 +127,10 @@ export const FastPoolExpandedModal = ({
                   }}
                 />
               </div>
-              {userPoolBet > 0 && (
-                <div className="mt-4 text-sm">
-                  Seu total: <span className="text-[#00ff90] font-semibold">{userPoolBet} RZ</span>
-                </div>
-              )}
+              <div className="mt-4 pt-3 border-t border-border/50 flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Total RIOZ Investido:</span>
+                <span className="text-[#00ff90] font-semibold text-lg">{userPoolBet} RZ</span>
+              </div>
             </CardContent>
           </Card>
 
@@ -210,9 +226,70 @@ export const FastPoolExpandedModal = ({
 
           {countdown <= 10 && countdown > 0 && (
             <div className="text-center text-sm text-muted-foreground bg-warning/10 p-3 rounded-lg">
-              ⚠️ Apostas bloqueadas nos últimos 10 segundos
+              ⚠️ Opiniões bloqueadas nos últimos 10 segundos
             </div>
           )}
+          
+          {/* Last 4 Results for this Pool */}
+          {last4Results.length > 0 && (
+            <Card className="bg-muted/20 border-border/50">
+              <CardContent className="pt-4">
+                <h4 className="text-sm font-semibold mb-3">Últimos 4 Resultados deste Pool</h4>
+                <div className="grid grid-cols-4 gap-2">
+                  {last4Results.map((result) => (
+                    <div
+                      key={result.id}
+                      className={`flex flex-col items-center p-2 rounded-lg border ${
+                        result.result === 'subiu'
+                          ? 'bg-[#00ff90]/10 border-[#00ff90]/30'
+                          : result.result === 'desceu'
+                          ? 'bg-[#ff2389]/10 border-[#ff2389]/30'
+                          : 'bg-muted/30 border-muted-foreground/30'
+                      }`}
+                    >
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center mb-1 ${
+                        result.result === 'subiu'
+                          ? 'bg-green-100 dark:bg-green-900/30'
+                          : result.result === 'desceu'
+                          ? 'bg-red-100 dark:bg-red-900/30'
+                          : 'bg-gray-100 dark:bg-gray-900/30'
+                      }`}>
+                        {result.result === 'subiu' ? (
+                          <TrendingUp className="w-3 h-3 text-green-600 dark:text-green-400" />
+                        ) : result.result === 'desceu' ? (
+                          <TrendingDown className="w-3 h-3 text-red-600 dark:text-red-400" />
+                        ) : (
+                          <span className="text-[10px] font-bold text-gray-600 dark:text-gray-400">=</span>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-muted-foreground">
+                        {result.price_change_percent > 0 ? '+' : ''}{result.price_change_percent.toFixed(2)}%
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+        
+        {/* Opinion Notifications in Modal */}
+        <div className="fixed top-20 right-4 z-50 space-y-2 max-w-xs">
+          {opinionNotifications.map((notification, index) => (
+            <div 
+              key={notification.id}
+              className={`px-4 py-2 rounded-lg shadow-lg border animate-scale-in ${
+                notification.side === 'subiu' 
+                  ? 'bg-[#00ff90] text-black border-[#00ff90]' 
+                  : 'bg-[#ff2389] text-white border-[#ff2389]'
+              }`}
+              style={{ 
+                zIndex: 50 - index 
+              }}
+            >
+              <p className="font-medium text-sm">{notification.text}</p>
+            </div>
+          ))}
         </div>
       </DialogContent>
     </Dialog>
