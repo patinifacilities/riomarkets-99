@@ -122,7 +122,10 @@ const Fast = () => {
   const loadCurrentPool = useCallback(async () => {
     try {
       const { data, error } = await supabase.functions.invoke('manage-fast-pools', {
-        body: { action: 'get_current_pool' }
+        body: { 
+          action: 'get_current_pool',
+          category: selectedCategory 
+        }
       });
       
       if (error) throw error;
@@ -134,7 +137,7 @@ const Fast = () => {
     } catch (error) {
       console.error('Error loading pool:', error);
     }
-  }, []);
+  }, [selectedCategory]);
 
   // Load pool history and check for new results
   const loadPoolHistory = useCallback(async () => {
@@ -203,11 +206,11 @@ const Fast = () => {
     }
   }, [lastPoolId, poolHistory, toast]);
 
-  // Initialize
+  // Initialize and reload when category changes
   useEffect(() => {
     loadCurrentPool();
     loadPoolHistory();
-  }, [loadCurrentPool, loadPoolHistory]);
+  }, [loadCurrentPool, loadPoolHistory, selectedCategory]);
 
   // Countdown timer with smooth updates
   useEffect(() => {
@@ -446,20 +449,26 @@ const Fast = () => {
             Opine se o ativo vai subir ou descer nos próximos 60 segundos. Odds dinâmicas baseadas em dados reais de mercado.
           </p>
           
-          {/* Category Selector */}
-          <div className="flex justify-center mb-4">
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Selecione uma categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                {categoryOptions.map((category) => (
-                  <SelectItem key={category.value} value={category.value}>
-                    {category.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* Category Selector - Horizontal */}
+          <div className="flex justify-center mb-6">
+            <div className="flex gap-2 p-1 bg-muted rounded-lg">
+              {categoryOptions.map((category) => (
+                <Button
+                  key={category.value}
+                  variant={selectedCategory === category.value ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setSelectedCategory(category.value)}
+                  className={cn(
+                    "transition-all duration-200",
+                    selectedCategory === category.value 
+                      ? "bg-primary text-primary-foreground shadow-sm" 
+                      : "hover:bg-muted-foreground/10"
+                  )}
+                >
+                  {category.label}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
 

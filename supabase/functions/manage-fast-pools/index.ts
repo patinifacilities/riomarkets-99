@@ -20,15 +20,18 @@ serve(async (req) => {
       }
     );
 
-    const { action } = await req.json();
+    const requestBody = await req.json();
+    const { action } = requestBody;
 
     switch (action) {
       case 'get_current_pool':
-        return await getCurrentPool(supabase);
+        const { category: getCategory } = requestBody;
+        return await getCurrentPool(supabase, getCategory);
       case 'create_new_pool':
-        return await createNewPool(supabase);
+        const { category: createCategory } = requestBody;
+        return await createNewPool(supabase, createCategory);
       case 'finalize_pool':
-        const { poolId } = await req.json();
+        const { poolId } = requestBody;
         return await finalizePool(supabase, poolId);
       default:
         throw new Error('Invalid action');
@@ -51,12 +54,13 @@ serve(async (req) => {
   }
 });
 
-async function getCurrentPool(supabase: any) {
-  // Get the most recent active pool
+async function getCurrentPool(supabase: any, category = 'crypto') {
+  // Get the most recent active pool for selected category
   const { data: pools, error } = await supabase
     .from('fast_pools')
     .select('*')
     .eq('status', 'active')
+    .eq('category', category)
     .order('created_at', { ascending: false })
     .limit(1);
 
@@ -66,7 +70,7 @@ async function getCurrentPool(supabase: any) {
 
   // If no active pool exists or current pool is expired, create a new one
   if (!currentPool || new Date(currentPool.round_end_time) <= new Date()) {
-    currentPool = await createPool(supabase);
+    currentPool = await createPool(supabase, category);
   }
 
   return new Response(
@@ -80,8 +84,8 @@ async function getCurrentPool(supabase: any) {
   );
 }
 
-async function createNewPool(supabase: any) {
-  const newPool = await createPool(supabase);
+async function createNewPool(supabase: any, category = 'crypto') {
+  const newPool = await createPool(supabase, category);
   
   return new Response(
     JSON.stringify({ pool: newPool }),
@@ -94,7 +98,7 @@ async function createNewPool(supabase: any) {
   );
 }
 
-async function createPool(supabase: any) {
+async function createPool(supabase: any, category = 'crypto') {
   const now = new Date();
   const endTime = new Date(now.getTime() + 60000); // 60 seconds from now
 
@@ -107,23 +111,49 @@ async function createPool(supabase: any) {
 
   const nextRoundNumber = (lastPool?.[0]?.round_number || 0) + 1;
 
-  // Get current BTC price
-  const priceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
-  const priceData = await priceResponse.json();
-  const currentPrice = priceData.bitcoin?.usd || 43000;
+  // Get pool template based on category
+  const { data: demoPool } = await supabase
+    .from('fast_pools')
+    .select('*')
+    .eq('category', category)
+    .eq('status', 'demo')
+    .limit(1)
+    .single();
 
-  const poolData = {
-    round_number: nextRoundNumber,
-    asset_symbol: 'BTC',
-    asset_name: 'Bitcoin',
-    question: 'O Bitcoin vai subir nos próximos 60 segundos?',
-    category: 'crypto',
-    opening_price: currentPrice,
-    round_start_time: now.toISOString(),
-    round_end_time: endTime.toISOString(),
-    base_odds: 1.65,
-    status: 'active'
-  };
+  let poolData;
+  if (demoPool) {
+    // Use demo pool template
+    poolData = {
+      round_number: nextRoundNumber,
+      asset_symbol: demoPool.asset_symbol,
+      asset_name: demoPool.asset_name,
+      question: demoPool.question,
+      category: demoPool.category,
+      opening_price: demoPool.opening_price + (Math.random() * 20 - 10), // Add some price variation
+      round_start_time: now.toISOString(),
+      round_end_time: endTime.toISOString(),
+      base_odds: 1.65,
+      status: 'active'
+    };
+  } else {
+    // Fallback to Bitcoin
+    const priceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+    const priceData = await priceResponse.json();
+    const currentPrice = priceData.bitcoin?.usd || 67500;
+
+    poolData = {
+      round_number: nextRoundNumber,
+      asset_symbol: 'BTC',
+      asset_name: 'Bitcoin',
+      question: 'O Bitcoin vai subir nos próximos 60 segundos?',
+      category: 'crypto',
+      opening_price: currentPrice,
+      round_start_time: now.toISOString(),
+      round_end_time: endTime.toISOString(),
+      base_odds: 1.65,
+      status: 'active'
+    };
+  }
 
   const { data: pool, error } = await supabase
     .from('fast_pools')
@@ -213,6 +243,18 @@ async function finalizePool(supabase: any, poolId: string) {
       console.error('Error processing payouts:', payoutError);
     } else {
       console.log(`Processed ${winningBets.length} winning bets for pool ${poolId}`);
+    }
+  } else if (result === 'manteve') {
+    // If price maintained, refund all bets
+    for (const bet of bets || []) {
+      const { error: refundError } = await supabase.rpc('increment_balance', {
+        user_id: bet.user_id,
+        amount: bet.amount_rioz
+      });
+      
+      if (refundError) {
+        console.error('Error processing refund for user:', bet.user_id, refundError);
+      }
     }
   }
 

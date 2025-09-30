@@ -29,7 +29,7 @@ serve(async (req) => {
 
     // Process each winning bet
     for (const bet of winningBets) {
-      const payoutAmount = bet.amount_rioz * bet.odds;
+      const payoutAmount = Math.floor(bet.amount_rioz * bet.odds);
       
       // Update user balance
       const { error: balanceError } = await supabaseClient.rpc('increment_balance', {
