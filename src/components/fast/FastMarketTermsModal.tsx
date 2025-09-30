@@ -19,10 +19,11 @@ interface FastMarketTermsModalProps {
 }
 
 export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarketTermsModalProps) => {
+  const [hasAcceptedNonCancellable, setHasAcceptedNonCancellable] = useState(false);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
 
   const handleAccept = () => {
-    if (hasAcceptedTerms) {
+    if (hasAcceptedNonCancellable && hasAcceptedTerms) {
       localStorage.setItem('fastMarketsTermsAccepted', 'true');
       onAccept();
       onOpenChange(false);
@@ -92,8 +93,8 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
           <div className="flex items-center space-x-2 p-4 bg-muted/20 rounded-lg">
             <Checkbox 
               id="non-cancellable" 
-              checked={hasAcceptedTerms}
-              onCheckedChange={(checked) => setHasAcceptedTerms(checked === true)}
+              checked={hasAcceptedNonCancellable}
+              onCheckedChange={(checked) => setHasAcceptedNonCancellable(checked === true)}
             />
             <label
               htmlFor="non-cancellable"
@@ -127,7 +128,7 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
           </Button>
           <Button
             onClick={handleAccept}
-            disabled={!hasAcceptedTerms}
+            disabled={!hasAcceptedNonCancellable || !hasAcceptedTerms}
             className="bg-[#00ff90] hover:bg-[#00ff90]/90 text-black"
           >
             Aceitar e Continuar

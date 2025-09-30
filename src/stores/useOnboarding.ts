@@ -3,7 +3,7 @@ import { create } from 'zustand';
 const STORAGE_KEY = 'rio:onb:v1';
 const ONBOARDING_VERSION = '2025-09-01';
 
-type OnboardingStep = 1 | 2 | 3;
+type OnboardingStep = 1 | 2 | 3 | 4;
 
 type OnboardingState = {
   open: boolean;
@@ -59,7 +59,7 @@ export const useOnboarding = create<OnboardingState>((set, get) => ({
 
   next: () => {
     const { step } = get();
-    if (step < 3) {
+    if (step < 4) {
       set({ step: (step + 1) as OnboardingStep });
     }
   },

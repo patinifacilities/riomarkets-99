@@ -76,7 +76,7 @@ export function OnboardingModal() {
 
   const handleExplore = () => {
     track('onboarding_complete', { 
-      total_steps: 3,
+      total_steps: 4,
       final_action: 'explore_markets' 
     });
     skip();
@@ -108,7 +108,7 @@ export function OnboardingModal() {
 
         <OnboardingStepper 
           currentStep={step} 
-          totalSteps={3} 
+          totalSteps={4} 
           className="mb-6" 
         />
 
@@ -133,7 +133,7 @@ export function OnboardingModal() {
               {ONBOARDING_MESSAGES.buttons.skip}
             </Button>
             
-            {step < 3 ? (
+            {step < 4 ? (
               <Button 
                 onClick={handleNext}
                 className="bg-primary text-primary-foreground hover:bg-primary/90"

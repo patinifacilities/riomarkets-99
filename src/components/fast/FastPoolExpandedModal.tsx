@@ -108,17 +108,9 @@ export const FastPoolExpandedModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        {/* Single Close Button - Larger */}
-        <button
-          onClick={() => onOpenChange(false)}
-          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-50"
-        >
-          <X className="h-8 w-8" />
-          <span className="sr-only">Close</span>
-        </button>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" hideCloseButton>
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between pr-12">
+          <DialogTitle className="flex items-center justify-between pr-2">
             <div className="flex items-center gap-3">
               <span className="text-2xl">{pool.asset_symbol === 'BTC' ? '₿' : pool.asset_symbol === 'ETH' ? 'Ξ' : '📈'}</span>
               <div>

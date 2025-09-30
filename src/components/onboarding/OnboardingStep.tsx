@@ -21,11 +21,7 @@ export function OnboardingStep({ step, className = "" }: OnboardingStepProps) {
       <div className="flex justify-center">
         {content.id === 1 ? (
           <div className="flex items-center justify-center">
-            {resolvedTheme === 'light' ? (
-              <img src={logoWhite} alt="Rio Markets" className="h-12" />
-            ) : (
-              <IconComponent />
-            )}
+            <img src={logoWhite} alt="Rio Markets" className="h-8 w-auto" />
           </div>
         ) : (
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
