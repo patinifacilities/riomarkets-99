@@ -395,7 +395,10 @@ const Fast = () => {
   }, [user, toast]);
 
   const handleBet = async (poolId: string, side: 'subiu' | 'desceu') => {
+    console.log('🎯 handleBet called', { poolId, side, countdown, betAmount, userBalance: profile?.saldo_moeda });
+    
     if (!user || !currentPools.length) {
+      console.log('❌ Blocked: no user or no pools');
       toast({
         title: "Erro",
         description: "Você precisa estar logado e ter pools ativos.",
@@ -459,6 +462,11 @@ const Fast = () => {
         });
 
       if (betError) throw betError;
+
+      console.log('✅ Bet placed successfully!');
+      
+      // Close the modal
+      setExpandedPool(null);
 
       // Add click animation
       setClickedPool({ id: poolId, side });
@@ -926,14 +934,9 @@ const Fast = () => {
           </div>
         </div>
 
-        {/* TradingView Info */}
+        {/* TradingView Info - No background */}
         <div className="max-w-4xl mx-auto mb-6">
-          <div className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-primary/5 via-primary/[0.02] to-[#ff2389]/5 rounded-xl border border-border/50">
-            <img 
-              src="/assets/tradingview-logo.svg" 
-              alt="TradingView" 
-              className="h-6 w-auto"
-            />
+          <div className="flex items-center justify-center gap-3 p-4 rounded-xl border border-border/50">
             <p className="text-sm text-muted-foreground">
               Cotações em <span className="font-semibold text-foreground">tempo real</span> diretamente do <span className="font-semibold text-foreground">TradingView</span>
             </p>
@@ -1073,8 +1076,8 @@ const Fast = () => {
         </div>
       </div>
 
-      {/* Opinion Notifications Stack - Right side */}
-      <div className="fixed top-24 right-4 z-30 space-y-2 max-w-xs">
+      {/* Opinion Notifications Stack - Bottom right, above Riana */}
+      <div className="fixed bottom-24 right-4 z-30 space-y-2 max-w-xs">
         {opinionNotifications.map((notification, index) => (
           <div 
             key={notification.id}

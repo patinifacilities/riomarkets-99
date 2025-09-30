@@ -18,7 +18,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const isMobile = useIsMobile();
   
   const isAuthPage = location.pathname === '/auth';
-  const shouldHideHeaderFooter = isMobile && isAuthPage;
+  const shouldHideHeaderFooter = isAuthPage; // Hide on Auth page for both mobile and desktop
 
   // Initialize onboarding after hydration
   useEffect(() => {

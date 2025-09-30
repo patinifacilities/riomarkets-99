@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { ArrowUpDown, Wallet, Loader2, ArrowDown, ArrowUp, Bitcoin, Coins, CheckCircle2, Zap } from 'lucide-react';
 import btcLogo from '@/assets/btc-logo.png';
 import usdtLogo from '@/assets/usdt-logo.png';
@@ -201,7 +202,7 @@ const ExchangeNew = () => {
                 </div>
               </div>
               
-              <div className="relative bg-muted/30 rounded-lg border-2 border-border hover:border-primary/50 transition-colors">
+              <div className="relative bg-muted/30 rounded-2xl border-2 border-border hover:border-primary/50 transition-colors">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -215,18 +216,46 @@ const ExchangeNew = () => {
                         )}
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bg-card border-border">
-                      <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">
-                        <img src={btcLogo} alt="BTC" className="w-5 h-5 mr-2" />
-                        <span>BTC - Em breve</span>
+                    <DropdownMenuContent className="bg-card border-border shadow-xl rounded-xl p-2 min-w-[280px] z-[100]">
+                      <div className="p-3 border-b border-border mb-2">
+                        <p className="text-sm font-semibold text-foreground mb-1">Ativos Disponíveis em Breve</p>
+                        <p className="text-xs text-muted-foreground">Novos pares de negociação em desenvolvimento</p>
+                      </div>
+                      <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center gap-3 w-full">
+                          <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
+                            <img src={btcLogo} alt="BTC" className="w-6 h-6" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium text-foreground">Bitcoin</p>
+                            <p className="text-xs text-muted-foreground">BTC</p>
+                          </div>
+                          <Badge variant="outline" className="text-xs">Em breve</Badge>
+                        </div>
                       </DropdownMenuItem>
-                      <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">
-                        <img src={usdtLogo} alt="USDT" className="w-5 h-5 mr-2" />
-                        <span>USDT - Em breve</span>
+                      <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center gap-3 w-full">
+                          <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
+                            <img src={usdtLogo} alt="USDT" className="w-6 h-6" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium text-foreground">Tether</p>
+                            <p className="text-xs text-muted-foreground">USDT</p>
+                          </div>
+                          <Badge variant="outline" className="text-xs">Em breve</Badge>
+                        </div>
                       </DropdownMenuItem>
-                      <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">
-                        <img src={usdcLogo} alt="USDC" className="w-5 h-5 mr-2" />
-                        <span>USDC - Em breve</span>
+                      <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center gap-3 w-full">
+                          <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                            <img src={usdcLogo} alt="USDC" className="w-6 h-6" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium text-foreground">USD Coin</p>
+                            <p className="text-xs text-muted-foreground">USDC</p>
+                          </div>
+                          <Badge variant="outline" className="text-xs">Em breve</Badge>
+                        </div>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -279,7 +308,7 @@ const ExchangeNew = () => {
                 </div>
               </div>
               
-              <div className="relative bg-muted/30 rounded-lg border-2 border-border hover:border-primary/50 transition-colors">
+              <div className="relative bg-muted/30 rounded-2xl border-2 border-border hover:border-primary/50 transition-colors">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

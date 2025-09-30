@@ -109,15 +109,16 @@ export const FastPoolExpandedModal = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        {/* Single Close Button - Larger */}
         <button
           onClick={() => onOpenChange(false)}
           className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-50"
         >
-          <X className="h-6 w-6" />
+          <X className="h-8 w-8" />
           <span className="sr-only">Close</span>
         </button>
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between pr-8">
+          <DialogTitle className="flex items-center justify-between pr-12">
             <div className="flex items-center gap-3">
               <span className="text-2xl">{pool.asset_symbol === 'BTC' ? '₿' : pool.asset_symbol === 'ETH' ? 'Ξ' : '📈'}</span>
               <div>
@@ -235,7 +236,10 @@ export const FastPoolExpandedModal = ({
           {/* Bet Buttons */}
           <div className="grid grid-cols-2 gap-4">
             <Button
-              onClick={() => onBet(pool.id, 'subiu')}
+              onClick={() => {
+                console.log('Subiu button clicked');
+                onBet(pool.id, 'subiu');
+              }}
               disabled={countdown <= 10 || countdown <= 0 || pool.paused}
               className={cn(
                 "h-24 text-lg font-bold transition-all duration-200",
@@ -251,7 +255,10 @@ export const FastPoolExpandedModal = ({
             </Button>
 
             <Button
-              onClick={() => onBet(pool.id, 'desceu')}
+              onClick={() => {
+                console.log('Desceu button clicked');
+                onBet(pool.id, 'desceu');
+              }}
               disabled={countdown <= 10 || countdown <= 0 || pool.paused}
               className={cn(
                 "h-24 text-lg font-bold transition-all duration-200",
