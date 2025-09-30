@@ -173,7 +173,7 @@ const Home = () => {
             {/* Logo above mercados preditivos on mobile */}
             <div className="md:hidden mb-6 flex justify-center">
               <img 
-                src="/src/assets/rio-white-logo-mobile.png" 
+                src="/public/assets/rio-white-logo.png" 
                 alt="Rio Markets Logo" 
                 className="h-8 w-auto"
               />
@@ -240,19 +240,6 @@ const Home = () => {
 
       {/* Compact Filters Section */}
       <div className="container mx-auto px-4 py-4 bg-gradient-to-b from-background/95 to-background/60 border-t border-border/30 backdrop-blur-sm">
-        {/* Search Bar - Compact */}
-        <div className="mb-4">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Buscar mercados..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-10 bg-background/80 border-border/50 text-foreground placeholder:text-muted-foreground rounded-lg shadow-sm focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-        </div>
-        
         <div className="flex flex-col sm:flex-row gap-4">
           {/* Topic Filters - Compact */}
           <div className="flex-1">
@@ -281,6 +268,19 @@ const Home = () => {
               onRemoveChip={handleRemoveStatus}
               chipClassName="px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200"
               className="flex flex-wrap gap-2"
+            />
+          </div>
+        </div>
+
+        {/* Search Bar - Below Status Filters */}
+        <div className="mt-4">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Buscar mercados..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 h-10 bg-background/80 border-border/50 text-foreground placeholder:text-muted-foreground rounded-lg shadow-sm focus:ring-2 focus:ring-primary/20"
             />
           </div>
         </div>

@@ -220,13 +220,11 @@ const MarketDetail = () => {
                   <div className="p-4 space-y-4">
                     <div className="text-center text-sm text-muted-foreground">Quantidade para opinar</div>
                     
-                    <div className="lg:hidden">
-                      <BetSlider 
-                        balance={userProfile?.saldo_moeda || 0}
-                        onAmountChange={(amount) => setBetAmount(amount)}
-                        estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
-                      />
-                    </div>
+                    <BetSlider 
+                      balance={userProfile?.saldo_moeda || 0}
+                      onAmountChange={(amount) => setBetAmount(amount)}
+                      estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
+                    />
 
                     {(userProfile?.saldo_moeda || 0) === 0 ? (
                       <div className="p-4 bg-warning/10 border border-warning rounded-lg text-center">
@@ -309,15 +307,6 @@ const MarketDetail = () => {
                       )}
                       </div>
                       
-                      <div className="text-center text-sm text-muted-foreground">ou use o slider</div>
-                       
-                      <div className="lg:hidden">
-                        <BetSlider 
-                          balance={userProfile?.saldo_moeda || 0}
-                          onAmountChange={(amount) => setBetAmount(amount)}
-                          estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
-                        />
-                      </div>
                       
                       <div className="space-y-4">
                     

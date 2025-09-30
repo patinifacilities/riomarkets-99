@@ -199,7 +199,7 @@ const Fast = () => {
   const calculateCountdown = useCallback((pool: FastPool) => {
     const now = new Date().getTime();
     const endTime = new Date(pool.round_end_time).getTime();
-    const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
+    const timeLeft = Math.max(0, (endTime - now) / 1000); // Keep decimals for smooth animation
     setCountdown(timeLeft);
     
     // Check if this is a new set of pools (first second)
@@ -540,10 +540,6 @@ const Fast = () => {
       `}</style>
       
       <div className="container mx-auto px-4 pt-8 pb-20">
-        {/* Theme toggle */}
-        <div className="absolute top-4 right-4">
-          <DarkModeToggle />
-        </div>
         
         {/* Header */}
         <div className="text-center mb-8">
@@ -641,7 +637,7 @@ const Fast = () => {
                         step="1"
                         value={betAmount}
                         onChange={(e) => setBetAmount(Number(e.target.value))}
-                        className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer slider"
+                        className="w-full h-6 bg-muted rounded-lg appearance-none cursor-pointer slider"
                         style={{
                           background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) 100%)`
                         }}
@@ -665,10 +661,10 @@ const Fast = () => {
                             countdown <= 15 && countdown > 5 && "animate-pulse duration-1000",
                             countdown <= 5 && "animate-pulse duration-300"
                           )}
-                          style={{ 
-                            width: `${(countdown / 60) * 100}%`,
-                            transition: 'width 50ms linear'
-                          }}
+                           style={{ 
+                             width: `${(countdown / 60) * 100}%`,
+                             transition: 'width 16ms linear'
+                           }}
                         />
                       </div>
                    </div>
@@ -850,8 +846,11 @@ const Fast = () => {
         {opinionNotifications.map((notification, index) => (
           <div 
             key={notification.id}
-            className="bg-white text-black px-6 py-3 rounded-xl shadow-lg border border-gray-200 animate-fade-in"
-            style={{ transform: `translateY(${index * -60}px)` }}
+            className="bg-white text-black px-6 py-3 rounded-xl shadow-lg border border-gray-200 animate-fade-in transition-opacity duration-300"
+            style={{ 
+              marginBottom: '8px',
+              zIndex: 50 - index 
+            }}
           >
             <p className="font-medium">{notification.text}</p>
           </div>
