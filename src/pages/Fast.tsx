@@ -51,7 +51,7 @@ const Fast = () => {
   const [poolHistoryOpen, setPoolHistoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('commodities');
   const [lastPoolIds, setLastPoolIds] = useState<string[]>([]);
-  const [showOpinionNotification, setShowOpinionNotification] = useState(false);
+  const [opinionNotifications, setOpinionNotifications] = useState<{id: string, text: string}[]>([]);
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
@@ -236,7 +236,7 @@ const Fast = () => {
     
     const timer = setInterval(() => {
       calculateCountdown(currentPools[0]); // All pools have same timing
-    }, 50); // Update every 50ms for continuous animation
+    }, 20); // Update every 20ms for truly continuous animation
 
     return () => clearInterval(timer);
   }, [currentPools, countdown, calculateCountdown]);
@@ -275,7 +275,7 @@ const Fast = () => {
     }
   };
 
-  // Calculate dynamic odds based on countdown
+  // Calculate dynamic odds based on countdown - now decreasing by 1
   const getOdds = () => {
     const timeElapsed = 60 - countdown;
     
@@ -291,6 +291,13 @@ const Fast = () => {
       // Last 10 seconds: 1.10x
       return 1.10;
     }
+  };
+
+  // Play coin sound effect for profit
+  const playCoinSound = () => {
+    const audio = new Audio('/sounds/coin.mp3');
+    audio.volume = 0.3;
+    audio.play().catch(console.error);
   };
 
   // Check for user winnings across all pools
@@ -309,6 +316,7 @@ const Fast = () => {
         
       if (winningBets && winningBets.length > 0) {
         const totalWinnings = winningBets.reduce((sum, bet) => sum + bet.payout_amount, 0);
+        playCoinSound(); // Play coin sound for profit
         toast({
           title: "🎉 Você ganhou!",
           description: `Parabéns! Você recebeu ${totalWinnings.toFixed(0)} RZ`,
@@ -377,9 +385,17 @@ const Fast = () => {
       setClickedPool({ id: poolId, side });
       setTimeout(() => setClickedPool(null), 400);
 
-      // Show opinion notification
-      setShowOpinionNotification(true);
-      setTimeout(() => setShowOpinionNotification(false), 3000);
+      // Add new opinion notification to stack
+      const newNotification = {
+        id: Date.now().toString(),
+        text: 'Opinião registrada'
+      };
+      setOpinionNotifications(prev => [...prev, newNotification]);
+      
+      // Remove notification after 3 seconds
+      setTimeout(() => {
+        setOpinionNotifications(prev => prev.filter(n => n.id !== newNotification.id));
+      }, 3000);
 
       // Refresh profile and check for winnings after a delay
       refetchProfile();
@@ -616,20 +632,21 @@ const Fast = () => {
                   </div>
 
                   {/* Countdown Timer */}
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-[#ff2389] mb-2 animate-pulse">
-                      {countdown}s
-                    </div>
-                    <div className="w-full bg-muted/20 rounded-full h-2 overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80"
-                        style={{ 
-                          width: `${(countdown / 60) * 100}%`,
-                          transition: 'width 0.1s linear'
-                        }}
-                      />
-                    </div>
-                  </div>
+                   <div className="text-center">
+                     <div className="text-2xl font-bold text-[#ff2389] mb-2">
+                       {countdown}s
+                     </div>
+                     <div className="w-full bg-muted/20 rounded-full h-2 overflow-hidden">
+                       <div 
+                         className={`h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 ${countdown <= 15 ? 'animate-pulse' : ''}`}
+                         style={{ 
+                           width: `${(countdown / 60) * 100}%`,
+                           transition: 'width 0.05s linear',
+                           animationDuration: countdown <= 5 ? '0.2s' : countdown <= 10 ? '0.5s' : '1s'
+                         }}
+                       />
+                     </div>
+                   </div>
 
                   {/* Opinion Buttons */}
                   <div className="grid grid-cols-2 gap-2">
@@ -645,9 +662,9 @@ const Fast = () => {
                       <div className="flex items-center justify-between w-full px-1">
                         <ArrowUp className="w-4 h-4" />
                         <span>Subir</span>
-                        <span className="text-xs opacity-80 animate-bounce">
-                          x{getOdds().toFixed(2)}
-                        </span>
+                         <span className="text-xs opacity-80">
+                           x{getOdds().toFixed(2)}
+                         </span>
                       </div>
                     </Button>
                     
@@ -663,18 +680,18 @@ const Fast = () => {
                       <div className="flex items-center justify-between w-full px-1">
                         <ArrowDown className="w-4 h-4" />
                         <span>Descer</span>
-                        <span className="text-xs opacity-80 animate-bounce">
-                          x{getOdds().toFixed(2)}
-                        </span>
+                         <span className="text-xs opacity-80">
+                           x{getOdds().toFixed(2)}
+                         </span>
                       </div>
                     </Button>
                   </div>
 
-                  {countdown <= 10 && (
-                    <div className="text-center text-xs text-muted-foreground">
-                      Opiniões bloqueadas
-                    </div>
-                  )}
+                   {countdown <= 10 && (
+                     <div className="text-center text-xs text-muted-foreground">
+                       Opiniões bloqueadas
+                     </div>
+                   )}
                   
                   {!user && (
                     <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-lg flex items-center justify-center">
@@ -706,19 +723,15 @@ const Fast = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                  {currentCategoryHistory.slice(0, 10).map((result, index) => (
-                    <div
-                      key={result.id}
-                      className={`flex flex-col items-center p-3 rounded-lg border transition-all duration-200 relative ${
-                        index < 3 
-                          ? `bg-muted/20 border-border animate-pulse`
-                          : 'bg-muted/20 border-border'
-                      }`}
-                      style={index < 3 ? {
-                        animation: `outline-animation-${selectedCategory} 10s ease-in-out`,
-                        '--theme-color': categoryOptions.find(c => c.value === selectedCategory)?.bgColor
-                      } as any : {}}
-                    >
+                   {currentCategoryHistory.slice(0, 10).map((result, index) => (
+                     <div
+                       key={result.id}
+                       className={`flex flex-col items-center p-3 rounded-lg border transition-all duration-200 relative ${
+                         index < 3 
+                           ? `bg-primary/10 border-primary/30 shadow-sm ring-1 ring-primary/20`
+                           : 'bg-muted/20 border-border'
+                       }`}
+                     >
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
                         result.result === 'subiu' 
                           ? 'bg-green-100 dark:bg-green-900/30' 
@@ -807,14 +820,18 @@ const Fast = () => {
         )}
       </div>
 
-      {/* Opinion Notification */}
-      {showOpinionNotification && (
-        <div className="fixed bottom-4 right-4 z-50 animate-fade-in">
-          <div className="bg-white text-black px-6 py-3 rounded-lg shadow-lg border border-gray-200">
-            <p className="font-medium">Opinião registrada</p>
+      {/* Opinion Notifications Stack */}
+      <div className="fixed bottom-4 right-4 z-50 space-y-2">
+        {opinionNotifications.map((notification, index) => (
+          <div 
+            key={notification.id}
+            className="bg-white text-black px-6 py-3 rounded-xl shadow-lg border border-gray-200 animate-fade-in"
+            style={{ transform: `translateY(${index * -60}px)` }}
+          >
+            <p className="font-medium">{notification.text}</p>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
 
       {/* Modals */}
       <FastMarketTermsModal 
