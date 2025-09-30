@@ -115,8 +115,14 @@ const TransactionsToolbar = ({ onExport, className }: TransactionsToolbarProps) 
               >
                 Últimos 30 dias
               </Button>
-              
-              {/* Remove custom period button */}
+              <Button
+                variant={filters.from && !dateRange.from ? "secondary" : "outline"}
+                size="sm"
+                onClick={() => handleQuickDateFilter(90)}
+                className="whitespace-nowrap bg-card-secondary"
+              >
+                Últimos 90 dias
+              </Button>
             </div>
 
             {/* Type Filter */}

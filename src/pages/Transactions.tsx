@@ -254,26 +254,22 @@ const Transactions = () => {
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Recebido</p>
-                  <p className="text-2xl font-bold text-success tabular-nums">
-                    +{stats.totalCredits.toLocaleString('pt-BR')}
+                  <p className="text-sm text-muted-foreground">Total Pago</p>
+                  <p className="text-2xl font-bold text-destructive tabular-nums">
+                    -{stats.totalDebits.toLocaleString('pt-BR')}
                   </p>
                 </div>
-                <div className="p-2 rounded-full bg-success/10">
-                  <TrendingUp className="w-5 h-5 text-white" />
+                <div className="p-2 rounded-full bg-destructive/10">
+                  <TrendingDown className="w-5 h-5 text-white" />
                 </div>
               </div>
             </Card>
-
-            {/* Remove total opinado card */}
           </div>
         </div>
       </div>
 
-      {/* Non-fixed Toolbar with filters */}
-      <div className="bg-background/95 backdrop-blur-sm border-b border-border">
-        <TransactionsToolbar onExport={async () => {}} />
-      </div>
+          {/* Toolbar with filters */}
+          <TransactionsToolbar onExport={async () => {}} />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 pb-[env(safe-area-inset-bottom)] max-w-6xl">
