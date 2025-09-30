@@ -91,16 +91,6 @@ const MarketDetail = () => {
     setBetAmount(0);
   };
 
-  const handleSimulateReward = () => {
-    // Calculate market probability from pool percentages
-    const pMkt = pool?.percent_sim ? pool.percent_sim / 100 : null;
-    
-    openCalculator({
-      marketId: market.id,
-      suggestedValue: 100, // Default suggested value
-      pMkt: pMkt,
-    });
-  };
 
   const daysLeft = getDaysUntilEnd(market.end_date);
 
@@ -311,10 +301,11 @@ const MarketDetail = () => {
 
                              if (orderBookError) throw orderBookError;
 
-                             toast({
-                               title: "Opinião registrada!",
-                               description: `Você opinou ${selectedOption.toUpperCase()} com ${betAmount} RIOZ`,
-                             });
+                              toast({
+                                title: "Opinião registrada!",
+                                description: `Você opinou ${selectedOption.toUpperCase()} com ${betAmount} RIOZ`,
+                                className: "fixed bottom-4 right-4 rounded-2xl"
+                              });
 
                              setSelectedOption('');
                              setBetAmount(0);
@@ -662,17 +653,6 @@ const MarketDetail = () => {
                       className="mt-4 w-full"
                     />
                   )}
-
-                   {/* Calculator button */}
-                   <Button
-                     variant="outline"
-                     onClick={handleSimulateReward}
-                     className="w-full gap-2 border-primary/40 text-primary hover:bg-primary/10 min-h-[44px] rounded-xl"
-                     aria-label="Simular recompensas"
-                   >
-                     <Calculator className="w-4 h-4" />
-                     Simular recompensas
-                   </Button>
 
                   {market.status !== 'aberto' && (
                     <div className="text-center text-sm text-muted-foreground">

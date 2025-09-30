@@ -128,10 +128,11 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   return (
     <>
       <div className={cn(
-        "bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-200 dark:bg-card",
+        "bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-200 dark:bg-card bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm relative",
         className
       )}>
-        <Link to={`/market/${market.id}`} className="block">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5 pointer-events-none"></div>
+        <Link to={`/market/${market.id}`} className="block relative z-10">
           {/* Header */}
           <div className="p-4 pb-3">
             <div className="flex items-start justify-between mb-3">

@@ -53,6 +53,7 @@ const Fast = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('commodities');
   const [lastPoolIds, setLastPoolIds] = useState<string[]>([]);
   const [opinionNotifications, setOpinionNotifications] = useState<{id: string, text: string, side?: 'subiu' | 'desceu', timestamp: number}[]>([]);
+  const [userPoolBets, setUserPoolBets] = useState<Record<string, number>>({});
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
@@ -194,6 +195,38 @@ const Fast = () => {
     }
   }, []);
 
+  // State for pool results
+  const [poolResults, setPoolResults] = useState<Record<string, 'subiu' | 'desceu' | 'manteve' | null>>({});
+
+  // Load user bets for current pools
+  const loadUserBets = useCallback(async () => {
+    if (!user?.id || !currentPools.length) return;
+    
+    try {
+      const poolIds = currentPools.map(p => p.id);
+      const { data, error } = await supabase
+        .from('fast_pool_bets')
+        .select('pool_id, amount_rioz')
+        .eq('user_id', user.id)
+        .in('pool_id', poolIds);
+        
+      if (error) throw error;
+      
+      const betsByPool: Record<string, number> = {};
+      (data || []).forEach(bet => {
+        betsByPool[bet.pool_id] = (betsByPool[bet.pool_id] || 0) + bet.amount_rioz;
+      });
+      
+      setUserPoolBets(betsByPool);
+    } catch (error) {
+      console.error('Error loading user bets:', error);
+    }
+  }, [user?.id, currentPools]);
+
+  useEffect(() => {
+    loadUserBets();
+  }, [loadUserBets]);
+
   // Calculate countdown based on pool end time
   const calculateCountdown = useCallback((pool: FastPool) => {
     const now = new Date().getTime();
@@ -209,6 +242,13 @@ const Fast = () => {
       const categoryHistory = poolHistory[selectedCategory];
       if (categoryHistory && categoryHistory.length > 0) {
         const lastResult = categoryHistory[0];
+        
+        // Store the result
+        setPoolResults(prev => ({
+          ...prev,
+          [selectedCategory]: lastResult.result
+        }));
+        
         setTimeout(() => {
           toast({
             title: lastResult.result === 'subiu' ? "Subiu! 📈" : lastResult.result === 'desceu' ? "Desceu! 📉" : "Manteve! ➡️",
@@ -219,6 +259,14 @@ const Fast = () => {
                       'border-gray-500 bg-gray-50 dark:bg-gray-900/20'
           });
         }, 500);
+        
+        // Clear result after 3 seconds
+        setTimeout(() => {
+          setPoolResults(prev => ({
+            ...prev,
+            [selectedCategory]: null
+          }));
+        }, 3000);
       }
     }
   }, [lastPoolIds, poolHistory, selectedCategory, toast]);
@@ -262,6 +310,9 @@ const Fast = () => {
           })
         )
       );
+      
+      // Reset user bets for current pools
+      setUserPoolBets({});
       
       // Immediately load new pools and history
       loadCurrentPools();
@@ -369,6 +420,9 @@ const Fast = () => {
     }
 
     try {
+      const currentOdds = getOdds();
+      const potentialWinnings = Math.floor(betAmount * currentOdds);
+      
       // Deduct bet amount from user balance
       const { error: deductError } = await supabase.rpc('increment_balance', {
         user_id: user.id,
@@ -377,7 +431,7 @@ const Fast = () => {
 
       if (deductError) throw deductError;
 
-      // Place bet
+      // Place bet with all details
       const { error: betError } = await supabase
         .from('fast_pool_bets')
         .insert({
@@ -385,7 +439,7 @@ const Fast = () => {
           pool_id: poolId,
           side: side,
           amount_rioz: betAmount,
-          odds: getOdds()
+          odds: currentOdds
         });
 
       if (betError) throw betError;
@@ -422,6 +476,12 @@ const Fast = () => {
 
       // Refresh profile and check for winnings after pool finishes
       refetchProfile();
+      
+      // Update user pool bets
+      setUserPoolBets(prev => ({
+        ...prev,
+        [poolId]: (prev[poolId] || 0) + betAmount
+      }));
       
       // Check for winnings after pool finishes (65 seconds + processing time)
       setTimeout(() => {
@@ -489,6 +549,14 @@ const Fast = () => {
           .fixed-dark-mode-toggle {
             display: none !important;
           }
+        }
+        
+        @keyframes heartbeat {
+          0% { transform: scale(1); }
+          14% { transform: scale(1.05); }
+          28% { transform: scale(1); }
+          42% { transform: scale(1.05); }
+          70% { transform: scale(1); }
         }
         
         @keyframes outline-animation-commodities {
@@ -623,15 +691,9 @@ const Fast = () => {
                       </Badge>
                     </div>
                     {index === 0 && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={openHistoryModal}
-                        className="text-muted-foreground hover:text-foreground text-xs"
-                      >
-                        <BarChart3 className="w-3 h-3 mr-1" />
-                        Histórico
-                      </Button>
+                      <div className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-lg">
+                        Seu total: {userPoolBets[pool.id] || 0} RZ
+                      </div>
                     )}
                   </div>
                   
@@ -649,38 +711,82 @@ const Fast = () => {
                 <CardContent className="relative z-10 space-y-4">
 
                   {/* Bet Amount Slider and Countdown - shared across all pools */}
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium">
-                      Opinar {betAmount} RZ
-                    </label>
-                    <div className="px-3 py-2 bg-muted/20 rounded-lg">
-                      <input
-                        type="range"
-                        min="1"
-                        max="1000"
-                        step="1"
-                        value={betAmount}
-                        onChange={(e) => setBetAmount(Number(e.target.value))}
-                        className="w-full h-6 bg-muted rounded-lg appearance-none cursor-pointer slider"
-                        style={{
-                          background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) 100%)`
-                        }}
-                      />
-                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                        <span>1 RZ</span>
-                        <span>1.000 RZ</span>
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium">
+                        Opinar {betAmount} RZ
+                      </label>
+                      <div className="px-3 py-2 bg-muted/20 rounded-lg">
+                        <input
+                          type="range"
+                          min="1"
+                          max="1000"
+                          step="1"
+                          value={betAmount}
+                          onChange={(e) => setBetAmount(Number(e.target.value))}
+                          className="w-full h-6 bg-muted rounded-lg appearance-none cursor-pointer slider"
+                          style={{
+                            background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) 100%)`
+                          }}
+                        />
+                        <style>{`
+                          input[type="range"]::-webkit-slider-thumb {
+                            appearance: none;
+                            width: 24px;
+                            height: 24px;
+                            border-radius: 50%;
+                            background: #00ff90;
+                            cursor: pointer;
+                            border: 3px solid white;
+                            box-shadow: 0 2px 8px rgba(0, 255, 144, 0.4);
+                          }
+                          input[type="range"]::-moz-range-thumb {
+                            width: 24px;
+                            height: 24px;
+                            border-radius: 50%;
+                            background: #00ff90;
+                            cursor: pointer;
+                            border: 3px solid white;
+                            box-shadow: 0 2px 8px rgba(0, 255, 144, 0.4);
+                          }
+                        `}</style>
+                        <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                          <span>1 RZ</span>
+                          <span>1.000 RZ</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
                    {/* Countdown Timer */}
                     <div className="text-center">
                       <div className={`text-2xl font-bold mb-2 ${
                         countdown <= 0 
-                          ? 'text-muted-foreground animate-pulse' 
+                          ? poolResults[selectedCategory] === 'subiu' 
+                            ? 'text-[#00ff90]' 
+                            : poolResults[selectedCategory] === 'desceu' 
+                            ? 'text-[#ff2389]' 
+                            : poolResults[selectedCategory] === 'manteve'
+                            ? 'text-muted-foreground'
+                            : 'text-muted-foreground animate-pulse'
+                          : countdown <= 37 && countdown > 23
+                          ? 'text-[#ff2389] animate-pulse'
+                          : countdown <= 23
+                          ? 'text-[#ff2389]'
                           : 'text-[#ff2389]'
-                      }`}>
-                         {countdown > 0 ? `${countdown.toFixed(2)}s` : 'Aguarde...'}
+                      }`}
+                      style={countdown <= 23 && countdown > 0 ? {
+                        animation: `heartbeat ${Math.max(0.3, countdown / 60)}s ease-in-out infinite`
+                      } : undefined}
+                      >
+                         {countdown > 0 
+                           ? `${countdown.toFixed(2)}s` 
+                           : poolResults[selectedCategory] === 'subiu'
+                           ? 'Subiu! 📈'
+                           : poolResults[selectedCategory] === 'desceu'
+                           ? 'Desceu! 📉'
+                           : poolResults[selectedCategory] === 'manteve'
+                           ? 'Manteve! ➡️'
+                           : 'Aguarde...'
+                         }
                        </div>
                       <div className="w-full bg-muted/20 rounded-full h-2 overflow-hidden">
                         <div 
