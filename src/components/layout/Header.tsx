@@ -326,7 +326,7 @@ const Header = () => {
                 </Button>
                 
                  {/* Dark Mode Toggle */}
-                 <DarkModeToggle />
+                 {!isMobile && <DarkModeToggle />}
                 
                  {/* Profile Dropdown */}
                  <DropdownMenu>

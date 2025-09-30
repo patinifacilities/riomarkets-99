@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wallet, TrendingUp, TrendingDown, Users, Plus, ArrowRightLeft, DollarSign, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Users, Plus, ArrowRightLeft, DollarSign, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useWalletTransactions, useUserOrders } from '@/hooks/useWallet';
@@ -14,7 +14,6 @@ import { OrderHistoryCard } from '@/components/wallet/OrderHistoryCard';
 import TransactionItem from '@/components/wallet/TransactionItem';
 import OrderItem from '@/components/wallet/OrderItem';
 import ExportCSVButton from '@/components/ui/export-csv-button';
-import { ExpandableRiozCard } from '@/components/wallet/ExpandableRiozCard';
 
 const WalletPage = () => {
   const { user } = useAuth();
@@ -86,23 +85,56 @@ const WalletPage = () => {
           {/* No action buttons */}
         </div>
 
-        {/* Expandable RIOZ Balance Card */}
-        <div className="mb-8">
-          <ExpandableRiozCard 
-            currentBalance={currentBalance}
-            totalInOrders={totalInOrders}
-            brlBalance={brlBalance}
-          />
+        {/* Balance Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+           <Card className="bg-secondary-glass border-primary/20">
+             <CardContent className="p-6">
+               <div className="flex items-center justify-between">
+                 <div>
+                   <p className="text-sm text-muted-foreground">Saldo RIOZ Coin</p>
+                   <div className="flex items-center gap-2">
+                     <p className="text-2xl font-bold text-white">
+                       {(profile?.saldo_moeda || 0).toLocaleString('pt-BR')} RZ
+                     </p>
+                     {/* Balance change arrows - you can implement logic to track changes */}
+                     <TrendingUp className="w-5 h-5" style={{ color: '#00ff90' }} />
+                   </div>
+                 </div>
+                 <Wallet className="w-8 h-8 text-white" />
+               </div>
+             </CardContent>
+           </Card>
+
+          <Card className="bg-secondary-glass border-accent/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Em Ordens Ativas</p>
+                  <p className="text-2xl font-bold text-white">
+                    {(totalInOrders || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RZ
+                  </p>
+                </div>
+                <TrendingUp className="w-8 h-8 text-white" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-secondary-glass border-success/20">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Saldo em R$/BRL</p>
+                  <p className="text-2xl font-bold text-white">
+                    R$ {(brlBalance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                </div>
+                <DollarSign className="w-8 h-8 text-white" />
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Order History */}
-          <OrderHistoryCard onRefresh={() => {
-            refetchProfile();
-            refetchTransactions();
-            fetchBalance();
-          }} />
-
           {/* Transaction History */}
           <Card className="bg-secondary-glass border-border/50">
             <CardHeader>
@@ -131,6 +163,13 @@ const WalletPage = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Order History */}
+          <OrderHistoryCard onRefresh={() => {
+            refetchProfile();
+            refetchTransactions();
+            fetchBalance();
+          }} />
         </div>
 
         {/* Modals */}
