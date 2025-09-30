@@ -749,11 +749,12 @@ const Fast = () => {
                 <CardContent className="relative z-10 space-y-4">
 
                    {/* Bet Amount Slider and Countdown - shared across all pools */}
-                    <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
-                      <label className="text-xs font-medium">
-                        Opinar {betAmount} RZ
+                   <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
+                      <label className="text-xs font-semibold flex items-center justify-between">
+                        <span>Opinar</span>
+                        <span className="text-base text-primary font-bold">{betAmount} RZ</span>
                       </label>
-                      <div className="relative px-3 py-3 bg-gradient-to-r from-muted/30 to-muted/20 rounded-xl border border-border/50">
+                      <div className="relative px-4 py-4 bg-gradient-to-br from-muted/40 via-muted/30 to-muted/20 rounded-2xl border-2 border-border/60 shadow-inner">
                         <input
                            type="range"
                            min="1"
@@ -761,53 +762,54 @@ const Fast = () => {
                            step="1"
                            value={betAmount}
                            onChange={(e) => setBetAmount(Number(e.target.value))}
-                           className="w-full h-2 rounded-full appearance-none cursor-pointer slider relative z-10"
+                           className="w-full h-3 rounded-full appearance-none cursor-pointer slider relative z-10"
                            style={{
-                             background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 1) / 999) * 100}%, hsl(var(--border)) ${((betAmount - 1) / 999) * 100}%, hsl(var(--border)) 100%)`
+                             background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 1) / 999) * 100}%, rgba(255,255,255,0.1) ${((betAmount - 1) / 999) * 100}%, rgba(255,255,255,0.1) 100%)`
                            }}
                          />
                          <style>{`
                            input[type="range"].slider::-webkit-slider-thumb {
                              appearance: none;
-                             width: 24px;
-                             height: 24px;
+                             width: 28px;
+                             height: 28px;
                              border-radius: 50%;
-                             background: linear-gradient(135deg, #00ff90 0%, #00dd80 100%);
+                             background: linear-gradient(135deg, #00ff90 0%, #00dd80 50%, #00cc70 100%);
                              cursor: grab;
-                             border: 3px solid white;
-                             box-shadow: 0 2px 8px rgba(0, 255, 144, 0.4), 0 0 0 1px rgba(0, 255, 144, 0.2);
-                             transition: all 0.2s ease;
+                             border: 4px solid white;
+                             box-shadow: 0 3px 12px rgba(0, 255, 144, 0.5), 0 0 0 2px rgba(0, 255, 144, 0.2), inset 0 1px 3px rgba(255,255,255,0.3);
+                             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
                            }
                            input[type="range"].slider::-webkit-slider-thumb:hover {
-                             transform: scale(1.1);
-                             box-shadow: 0 4px 12px rgba(0, 255, 144, 0.6), 0 0 0 2px rgba(0, 255, 144, 0.3);
+                             transform: scale(1.15);
+                             box-shadow: 0 5px 16px rgba(0, 255, 144, 0.7), 0 0 0 3px rgba(0, 255, 144, 0.3), inset 0 1px 3px rgba(255,255,255,0.4);
                            }
                            input[type="range"].slider::-webkit-slider-thumb:active {
                              cursor: grabbing;
-                             transform: scale(0.98);
+                             transform: scale(1.05);
+                             box-shadow: 0 2px 8px rgba(0, 255, 144, 0.6), 0 0 0 2px rgba(0, 255, 144, 0.25);
                            }
                            input[type="range"].slider::-moz-range-thumb {
-                             width: 24px;
-                             height: 24px;
+                             width: 28px;
+                             height: 28px;
                              border-radius: 50%;
-                             background: linear-gradient(135deg, #00ff90 0%, #00dd80 100%);
+                             background: linear-gradient(135deg, #00ff90 0%, #00dd80 50%, #00cc70 100%);
                              cursor: grab;
-                             border: 3px solid white;
-                             box-shadow: 0 2px 8px rgba(0, 255, 144, 0.4), 0 0 0 1px rgba(0, 255, 144, 0.2);
-                             transition: all 0.2s ease;
+                             border: 4px solid white;
+                             box-shadow: 0 3px 12px rgba(0, 255, 144, 0.5), 0 0 0 2px rgba(0, 255, 144, 0.2);
+                             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
                            }
                            input[type="range"].slider::-moz-range-thumb:hover {
-                             transform: scale(1.1);
-                             box-shadow: 0 4px 12px rgba(0, 255, 144, 0.6), 0 0 0 2px rgba(0, 255, 144, 0.3);
+                             transform: scale(1.15);
+                             box-shadow: 0 5px 16px rgba(0, 255, 144, 0.7), 0 0 0 3px rgba(0, 255, 144, 0.3);
                            }
                            input[type="range"].slider::-moz-range-thumb:active {
                              cursor: grabbing;
-                             transform: scale(0.98);
+                             transform: scale(1.05);
                            }
                          `}</style>
-                        <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                          <span className="font-medium">1 RZ</span>
-                          <span className="font-medium">1.000 RZ</span>
+                        <div className="flex justify-between text-[10px] font-semibold text-muted-foreground/70 mt-2.5 px-1">
+                          <span>1 RZ</span>
+                          <span>1.000 RZ</span>
                         </div>
                       </div>
                     </div>
@@ -921,6 +923,20 @@ const Fast = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+
+        {/* TradingView Info */}
+        <div className="max-w-4xl mx-auto mb-6">
+          <div className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-primary/5 via-primary/[0.02] to-[#ff2389]/5 rounded-xl border border-border/50">
+            <img 
+              src="/assets/tradingview-logo.svg" 
+              alt="TradingView" 
+              className="h-6 w-auto"
+            />
+            <p className="text-sm text-muted-foreground">
+              Cotações em <span className="font-semibold text-foreground">tempo real</span> diretamente do <span className="font-semibold text-foreground">TradingView</span>
+            </p>
           </div>
         </div>
 

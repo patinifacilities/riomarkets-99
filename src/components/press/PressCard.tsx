@@ -38,53 +38,65 @@ export function PressCard({ article }: PressCardProps) {
 
   return (
     <>
-      <article className="bg-secondary-glass rounded-xl border border-border hover:border-primary/40 transition-all duration-200 group cursor-pointer" onClick={handleReadMore}>
-        {/* Relevance Tag */}
-        <div className="p-4 pb-0">
-          <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-            Alta Relevância
-          </div>
-        </div>
-
-        {/* Vehicle Logo */}
-        <div className="p-4 pb-0">
-          {article.logo_url ? (
-            <div className="h-8 flex items-center">
-              <LazyImage
-                src={article.logo_url}
-                alt={`Logo do ${article.vehicle}`}
-                className="h-full w-auto object-contain bg-white rounded px-2 py-1"
-                placeholder={
-                  <div className="h-8 w-16 bg-muted rounded flex items-center justify-center">
-                    <span className="text-xs text-muted-foreground">{article.vehicle}</span>
-                  </div>
-                }
-              />
+      <article className="relative bg-gradient-to-br from-card via-card to-card/80 rounded-2xl border border-border/50 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group cursor-pointer overflow-hidden" onClick={handleReadMore}>
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-[#ff2389]/[0.02] pointer-events-none" />
+        
+        <div className="relative">
+          {/* Header with Relevance and Vehicle */}
+          <div className="p-5 pb-3 flex items-start justify-between">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-primary/10 to-primary/5 text-primary border border-primary/20 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              Alta Relevância
             </div>
-          ) : (
-            <div className="h-8 flex items-center">
-              <div className="bg-white rounded px-2 py-1 text-black text-xs font-medium">
+            
+            {article.logo_url ? (
+              <div className="h-7 flex items-center">
+                <LazyImage
+                  src={article.logo_url}
+                  alt={`Logo do ${article.vehicle}`}
+                  className="h-full w-auto object-contain bg-white/95 rounded-md px-2.5 py-1 shadow-sm"
+                  placeholder={
+                    <div className="h-7 w-16 bg-muted rounded-md flex items-center justify-center">
+                      <span className="text-xs text-muted-foreground">{article.vehicle}</span>
+                    </div>
+                  }
+                />
+              </div>
+            ) : (
+              <div className="h-7 flex items-center">
+                <div className="bg-white/95 rounded-md px-2.5 py-1 text-black text-xs font-semibold shadow-sm">
+                  {article.vehicle}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="px-5 pb-5 space-y-3">
+            <h3 className="text-lg font-bold leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+              {article.title}
+            </h3>
+            
+            {article.summary && (
+              <p className="text-sm text-muted-foreground/90 line-clamp-3 leading-relaxed">
+                {article.summary}
+              </p>
+            )}
+            
+            <div className="flex items-center justify-between pt-3 border-t border-border/30">
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
                 {article.vehicle}
               </div>
+              <span className="text-xs text-muted-foreground/80">{formatDate(article.published_at)}</span>
             </div>
-          )}
-        </div>
-
-        {/* Content */}
-        <div className="p-4 space-y-3">
-          <h3 className="text-foreground font-semibold leading-tight line-clamp-2 group-hover:text-primary transition-colors">
-            {article.title}
-          </h3>
-          
-          {article.summary && (
-            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-              {article.summary}
-            </p>
-          )}
-          
-          <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
-            <span className="font-medium">{article.vehicle}</span>
-            <span>{formatDate(article.published_at)}</span>
+            
+            {/* Read More Indicator */}
+            <div className="flex items-center gap-2 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+              <span>Ler mais</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </div>
           </div>
         </div>
       </article>

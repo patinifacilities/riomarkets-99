@@ -256,6 +256,10 @@ const AdminFast = () => {
                 Gerenciar pools rápidos e configurações gerais
               </p>
             </div>
+            <Button onClick={() => navigate('/admin/fast/config')} className="gap-2">
+              <Settings className="w-4 h-4" />
+              Configuração Central
+            </Button>
           </div>
 
           {/* Stats Cards */}
