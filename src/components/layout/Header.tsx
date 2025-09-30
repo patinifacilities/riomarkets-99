@@ -232,7 +232,23 @@ const Header = () => {
             </Sheet>
           )}
 
-          {/* Remove logo from header for mobile */}
+          {isMobile && location.pathname === '/wallet' ? (
+            <div className="flex items-center space-x-3">
+              <img 
+                src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
+                alt="Rio Markets" 
+                className="h-8 w-auto" 
+              />
+            </div>
+          ) : (
+            <Link to="/" className="flex items-center space-x-3">
+              <img 
+                src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
+                alt="Rio Markets" 
+                className="h-8 w-auto" 
+              />
+            </Link>
+          )}
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
