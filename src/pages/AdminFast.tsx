@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings, TrendingUp, Clock, DollarSign, History } from 'lucide-react';
+import { ArrowLeft, Settings, TrendingUp, Clock, DollarSign, History, Pause } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -298,7 +298,14 @@ const AdminFast = () => {
                   Nenhum pool encontrado
                 </div>
               ) : (
-                pools.map(pool => (
+                pools
+                  .sort((a, b) => {
+                    // Paused pools go to the end
+                    if (a.paused && !b.paused) return 1;
+                    if (!a.paused && b.paused) return -1;
+                    return 0;
+                  })
+                  .map(pool => (
                   <div key={`${pool.category}-${pool.asset_symbol}`} className="p-4 rounded-lg border border-border bg-card/50 hover:border-primary/50 transition-colors">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
@@ -348,9 +355,10 @@ const AdminFast = () => {
                       <Button 
                         variant={pool.paused ? "default" : "outline"}
                         size="sm" 
-                        className="gap-2"
+                        className={`gap-2 ${!pool.paused ? 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-[#ff2389]' : ''}`}
                         onClick={() => handleTogglePause(pool)}
                       >
+                        <Pause className="w-4 h-4" />
                         {pool.paused ? 'Retomar' : 'Pausar'}
                       </Button>
                     </div>

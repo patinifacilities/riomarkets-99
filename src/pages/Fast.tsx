@@ -28,6 +28,7 @@ interface FastPool {
   base_odds: number;
   status: string;
   result?: string;
+  paused?: boolean;
 }
 
 interface FastPoolResult {
@@ -338,6 +339,16 @@ const Fast = () => {
 
     const pool = currentPools.find(p => p.id === poolId);
     if (!pool) return;
+
+    // Check if pool is paused
+    if (pool.paused) {
+      toast({
+        title: "Pool pausado",
+        description: "Este pool está temporariamente pausado. Aguarde o retorno.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     if (countdown <= 15) {
       toast({

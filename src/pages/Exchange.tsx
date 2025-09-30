@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { ArrowUpDown, Wallet, Loader2, ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowUpDown, Wallet, Loader2, ArrowDown, ArrowUp, Bitcoin, Coins, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 const ExchangeNew = () => {
   const { user } = useAuth();
@@ -186,7 +187,7 @@ const ExchangeNew = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* From Section */}
-            <div className="space-y-3">
+              <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <Label className="text-sm font-medium">De</Label>
                 <div className="text-sm text-white">
@@ -198,7 +199,7 @@ const ExchangeNew = () => {
               </div>
               
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                     fromCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
                   }`}>
@@ -222,14 +223,22 @@ const ExchangeNew = () => {
                     </Button>
                   </div>
                 </div>
-                <Input
-                  type="number"
-                  placeholder="0"
-                  value={fromAmount}
-                  onChange={(e) => handleAmountChange(e.target.value)}
-                  className="pl-32 pr-4 h-20 text-right text-3xl font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  step={fromCurrency === 'BRL' ? '0.01' : '1'}
-                />
+                <div className="relative">
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={fromAmount}
+                    onChange={(e) => handleAmountChange(e.target.value)}
+                    className="opacity-0 absolute inset-0 pl-32 pr-4 h-24 text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    step={fromCurrency === 'BRL' ? '0.01' : '1'}
+                  />
+                  <div className="h-24 flex items-center justify-end pr-4 pointer-events-none text-5xl font-bold">
+                    {fromAmount ? parseFloat(fromAmount).toLocaleString('pt-BR', { 
+                      minimumFractionDigits: fromCurrency === 'BRL' ? 2 : 0,
+                      maximumFractionDigits: fromCurrency === 'BRL' ? 2 : 0
+                    }) : '0'}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -246,7 +255,7 @@ const ExchangeNew = () => {
             </div>
 
             {/* To Section */}
-            <div className="space-y-3">
+              <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <Label className="text-sm font-medium">Para</Label>
                 <div className="text-sm text-white">
@@ -258,27 +267,53 @@ const ExchangeNew = () => {
               </div>
               
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    toCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
-                  }`}>
-                    {toCurrency === 'BRL' ? (
-                      <span className="text-sm font-bold text-gray-700">R$</span>
-                    ) : (
-                      <span className="text-lg font-bold text-black">R</span>
-                    )}
-                  </div>
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity ${
+                        toCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
+                      }`}>
+                        {toCurrency === 'BRL' ? (
+                          <span className="text-sm font-bold text-gray-700">R$</span>
+                        ) : (
+                          <span className="text-lg font-bold text-black">R</span>
+                        )}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem disabled className="opacity-50">
+                        <Bitcoin className="w-4 h-4 mr-2" />
+                        BTC - Em breve
+                      </DropdownMenuItem>
+                      <DropdownMenuItem disabled className="opacity-50">
+                        <Coins className="w-4 h-4 mr-2" />
+                        USDT - Em breve
+                      </DropdownMenuItem>
+                      <DropdownMenuItem disabled className="opacity-50">
+                        <Coins className="w-4 h-4 mr-2" />
+                        USDC - Em breve
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   <span className="text-sm font-medium ml-2">
                     {toCurrency}
                   </span>
                 </div>
-                <Input
-                  type="number"
-                  placeholder="0"
-                  value={toAmount}
-                  readOnly
-                  className="pl-32 pr-4 h-20 text-right text-3xl font-bold bg-muted/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                />
+                <div className="relative">
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={toAmount}
+                    readOnly
+                    className="opacity-0 absolute inset-0 pl-32 pr-4 h-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <div className="h-24 flex items-center justify-end pr-4 pointer-events-none text-5xl font-bold bg-muted/50 rounded-md">
+                    {toAmount ? parseFloat(toAmount).toLocaleString('pt-BR', { 
+                      minimumFractionDigits: toCurrency === 'BRL' ? 2 : 0,
+                      maximumFractionDigits: toCurrency === 'BRL' ? 2 : 0
+                    }) : '0'}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -314,9 +349,12 @@ const ExchangeNew = () => {
             </Button>
             
             {showSuccessNotification && (
-              <div className="bg-success/10 border border-success text-success px-4 py-3 rounded-lg text-sm font-medium animate-scale-in flex items-center gap-2">
-                <span className="text-success">✓</span>
-                Conversão realizada com sucesso!
+              <div className="bg-gradient-to-r from-[#00ff90]/20 to-[#00ff90]/10 border-2 border-[#00ff90] px-6 py-4 rounded-xl text-sm font-medium animate-scale-in flex items-center gap-3 shadow-lg">
+                <CheckCircle2 className="w-6 h-6 text-[#00ff90]" />
+                <div>
+                  <div className="text-[#00ff90] font-bold text-base">Conversão realizada!</div>
+                  <div className="text-muted-foreground text-xs mt-0.5">Seus saldos foram atualizados</div>
+                </div>
               </div>
             )}
           </CardContent>

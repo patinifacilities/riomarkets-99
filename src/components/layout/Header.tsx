@@ -1,4 +1,4 @@
-import { TrendingUp, Wallet, Trophy, Settings, LogOut, User, LogIn, Receipt, Newspaper, ArrowRightLeft, Menu, Plus, UserCircle, Zap, ArrowLeft } from 'lucide-react';
+import { TrendingUp, Wallet, Trophy, Settings, LogOut, User, LogIn, Receipt, Newspaper, ArrowRightLeft, Menu, Plus, UserCircle, Zap, ArrowLeft, HelpCircle } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
@@ -15,6 +15,12 @@ import {
   SheetHeader,
   SheetTitle
 } from '@/components/ui/sheet';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -302,26 +308,60 @@ const Header = () => {
             {isLoggedIn ? (
               <>
                 {/* Wallet Balance */}
-                <div className="relative">
-                  <Link to="/wallet">
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-xl"
-                    >
-                      <Wallet className="w-4 h-4" />
-                      {profile?.saldo_moeda >= 1000 
-                        ? Math.floor(profile.saldo_moeda).toLocaleString('pt-BR') 
-                        : (profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                      } RZ
-                    </Button>
-                  </Link>
-                  
-                  {/* Winner Balance Animation for Fast Markets */}
-                  {location.pathname === '/fast' && (
-                    <div id="fast-winner-animation-target" className="absolute -top-8 left-1/2 transform -translate-x-1/2 pointer-events-none z-50"></div>
-                  )}
-                </div>
+                {location.pathname === '/wallet' && isMobile ? (
+                  <div className="flex items-center">
+                    <img 
+                      src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
+                      alt="Rio Markets" 
+                      className="h-7 w-auto" 
+                    />
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Link to="/wallet">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-xl"
+                            >
+                              <Wallet className="w-4 h-4" />
+                              {profile?.saldo_moeda >= 1000 
+                                ? Math.floor(profile.saldo_moeda).toLocaleString('pt-BR') 
+                                : (profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                              } RZ
+                            </Button>
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="bg-card border-border p-4">
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between gap-4">
+                              <span className="text-sm text-muted-foreground">Saldo RZ:</span>
+                              <span className="font-semibold">{(profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })} RZ</span>
+                            </div>
+                            <div className="flex items-center justify-between gap-4">
+                              <span className="text-sm text-muted-foreground">Saldo R$:</span>
+                              <span className="font-semibold">R$ {((profile?.saldo_moeda || 0) * 1).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                            </div>
+                            <div className="pt-2 border-t border-border">
+                              <div className="flex items-center justify-between gap-4">
+                                <span className="text-sm font-medium">Total:</span>
+                                <span className="font-bold text-primary">R$ {((profile?.saldo_moeda || 0) * 1).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    
+                    {/* Winner Balance Animation for Fast Markets */}
+                    {location.pathname === '/fast' && (
+                      <div id="fast-winner-animation-target" className="absolute -top-8 left-1/2 transform -translate-x-1/2 pointer-events-none z-50"></div>
+                    )}
+                  </div>
+                )}
                 
                   {/* Deposit Button */}
                 <Button 

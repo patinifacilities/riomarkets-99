@@ -177,7 +177,7 @@ const MarketDetail = () => {
                   </div>
                    <div className="flex items-center gap-1">
                      <Users className="w-4 h-4" />
-                     {(pool?.total_pool || 0).toLocaleString('pt-BR')} Rioz Coin total
+                     {(pool?.total_pool || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Rioz Coin total
                    </div>
                    <div className="flex items-center gap-1">
                      <TrendingUp className="w-4 h-4" />
