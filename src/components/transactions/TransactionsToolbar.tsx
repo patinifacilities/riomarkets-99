@@ -116,49 +116,7 @@ const TransactionsToolbar = ({ onExport, className }: TransactionsToolbarProps) 
                 Últimos 30 dias
               </Button>
               
-              <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className={cn(
-                      "whitespace-nowrap bg-card-secondary",
-                      (dateRange.from || dateRange.to) && "border-primary"
-                    )}
-                  >
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Período personalizado
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    initialFocus
-                    mode="range"
-                    defaultMonth={dateRange.from}
-                    selected={{ from: dateRange.from, to: dateRange.to }}
-                    onSelect={(range) => {
-                      handleCustomDateRange(range?.from, range?.to);
-                      if (range?.from && range?.to) {
-                        setIsDateOpen(false);
-                      }
-                    }}
-                    numberOfMonths={2}
-                    locale={ptBR}
-                  />
-                  <div className="p-3 border-t flex justify-end">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        handleQuickDateFilter(null);
-                        setIsDateOpen(false);
-                      }}
-                    >
-                      Limpar
-                    </Button>
-                  </div>
-                </PopoverContent>
-              </Popover>
+              {/* Remove custom period button */}
             </div>
 
             {/* Type Filter */}

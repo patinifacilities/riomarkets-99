@@ -17,6 +17,7 @@ import { ComplianceBanner } from '@/components/compliance/ComplianceBanner';
 import { OnboardingTrigger } from '@/components/onboarding/OnboardingTrigger';
 import { track } from '@/lib/analytics';
 import { Search, TrendingUp } from 'lucide-react';
+import rioLogo from '@/assets/rio-white-logo-new.png';
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -173,7 +174,7 @@ const Home = () => {
             {/* Logo above mercados preditivos on mobile */}
             <div className="md:hidden mb-6 flex justify-center">
               <img 
-                src="/public/assets/rio-white-logo.png" 
+                src={rioLogo} 
                 alt="Rio Markets Logo" 
                 className="h-8 w-auto"
               />
@@ -280,7 +281,7 @@ const Home = () => {
               placeholder="Buscar mercados..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-10 bg-background/80 border-border/50 text-foreground placeholder:text-muted-foreground rounded-lg shadow-sm focus:ring-2 focus:ring-primary/20"
+              className="pl-10 h-10 bg-background/80 border-border/50 text-foreground placeholder:text-muted-foreground rounded-xl shadow-sm focus:ring-2 focus:ring-primary/20"
             />
           </div>
         </div>
@@ -340,8 +341,12 @@ const Home = () => {
                   Ver todos os mercados
                 </Button>
               )}
-              <Button variant="outline" className="border-[#00FF91]/40 text-[#00FF91]">
-                Salvar busca
+              <Button 
+                onClick={() => navigate('/fast')}
+                className="bg-[#ff2389] text-white hover:bg-[#ff2389]/90 animate-pulse"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Fast Markets
               </Button>
             </div>
           </div>
