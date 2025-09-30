@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, Zap, Clock, BarChart3, Wallet, Plus, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, Zap, Clock, BarChart3, Wallet, Plus, ArrowUpDown, ArrowUp, ArrowDown, Bitcoin, DollarSign, Coins, TrendingUpIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
@@ -51,6 +51,7 @@ const Fast = () => {
   const [poolHistoryOpen, setPoolHistoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('commodities');
   const [lastPoolIds, setLastPoolIds] = useState<string[]>([]);
+  const [showOpinionNotification, setShowOpinionNotification] = useState(false);
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
@@ -125,22 +126,15 @@ const Fast = () => {
     };
   }, []);
 
-  // Check if user has already accepted terms and is logged in
+  // Check if user has already accepted terms (only for logged in users)
   useEffect(() => {
-    if (!user) {
-      toast({
-        title: "Login necessário",
-        description: "Você precisa estar logado para acessar os Fast Markets.",
-        variant: "destructive"
-      });
-      return;
+    if (user) {
+      const hasAcceptedTerms = localStorage.getItem('fastMarketsTermsAccepted');
+      if (!hasAcceptedTerms) {
+        setShowTermsModal(true);
+      }
     }
-    
-    const hasAcceptedTerms = localStorage.getItem('fastMarketsTermsAccepted');
-    if (!hasAcceptedTerms) {
-      setShowTermsModal(true);
-    }
-  }, [user, toast]);
+  }, [user]);
 
   // Load current pools and history
   const loadCurrentPools = useCallback(async () => {
@@ -242,7 +236,7 @@ const Fast = () => {
     
     const timer = setInterval(() => {
       calculateCountdown(currentPools[0]); // All pools have same timing
-    }, 100); // Update every 100ms for smooth animation
+    }, 50); // Update every 50ms for continuous animation
 
     return () => clearInterval(timer);
   }, [currentPools, countdown, calculateCountdown]);
@@ -383,10 +377,9 @@ const Fast = () => {
       setClickedPool({ id: poolId, side });
       setTimeout(() => setClickedPool(null), 400);
 
-      toast({
-        title: "Opinião enviada!",
-        description: `Opinião de ${betAmount} RZ em "${side === 'subiu' ? 'Subir' : 'Descer'}" confirmada.`,
-      });
+      // Show opinion notification
+      setShowOpinionNotification(true);
+      setTimeout(() => setShowOpinionNotification(false), 3000);
 
       // Refresh profile and check for winnings after a delay
       refetchProfile();
@@ -422,48 +415,32 @@ const Fast = () => {
     );
   }
 
-  // Show login warning for unauthenticated users
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-        <div className="container mx-auto px-4 pt-8 pb-20">
-          {/* Theme toggle */}
-          <div className="absolute top-4 right-4">
-            <DarkModeToggle />
-          </div>
-          
-          {/* Login warning */}
-          <div className="flex items-center justify-center min-h-[60vh]">
-            <Card className="max-w-md mx-auto text-center">
-              <CardHeader>
-                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ff2389]/10 to-[#ff2389]/5 px-6 py-3 rounded-full border border-[#ff2389]/20 mb-4 mx-auto w-fit">
-                  <Zap className="w-5 h-5 text-[#ff2389] animate-pulse" />
-                  <span className="text-[#ff2389] font-semibold tracking-wide">FAST MARKETS</span>
-                </div>
-                <CardTitle className="text-2xl mb-2">Login Necessário</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-6">
-                  Você precisa estar logado para acessar os Fast Markets e enviar suas opiniões.
-                </p>
-                <Link to="/auth">
-                  <Button className="w-full">
-                    Fazer Login
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Get pool icon based on asset symbol
+  const getPoolIcon = (assetSymbol: string) => {
+    const iconMap: Record<string, any> = {
+      'BTC': Bitcoin,
+      'ETH': Coins,
+      'SOL': Coins,
+      'OIL': () => <span className="text-lg">🛢️</span>,
+      'GOLD': () => <span className="text-lg">🏆</span>,
+      'SILVER': () => <span className="text-lg">🥈</span>,
+      'BRL/USD': DollarSign,
+      'EUR/USD': DollarSign,
+      'JPY/USD': DollarSign,
+      'TSLA': TrendingUpIcon,
+      'AAPL': TrendingUpIcon,
+      'AMZN': TrendingUpIcon
+    };
+    
+    const IconComponent = iconMap[assetSymbol];
+    return IconComponent ? (typeof IconComponent === 'function' && IconComponent.name === '' ? <IconComponent /> : <IconComponent className="w-5 h-5" />) : <BarChart3 className="w-5 h-5" />;
+  };
 
   const currentCategoryHistory = poolHistory[selectedCategory] || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Hide elements on mobile */}
+      {/* Hide elements on mobile and add animations */}
       <style>{`
         @media (max-width: 768px) {
           .riana-chat-button,
@@ -473,6 +450,54 @@ const Fast = () => {
           .fixed-dark-mode-toggle {
             display: none !important;
           }
+        }
+        
+        @keyframes outline-animation-commodities {
+          0% { border-color: transparent; }
+          50% { border-color: #FFD800; box-shadow: 0 0 10px #FFD800; }
+          100% { border-color: transparent; }
+        }
+        
+        @keyframes outline-animation-crypto {
+          0% { border-color: transparent; }
+          50% { border-color: #FF6101; box-shadow: 0 0 10px #FF6101; }
+          100% { border-color: transparent; }
+        }
+        
+        @keyframes outline-animation-forex {
+          0% { border-color: transparent; }
+          50% { border-color: #ff2389; box-shadow: 0 0 10px #ff2389; }
+          100% { border-color: transparent; }
+        }
+        
+        @keyframes outline-animation-stocks {
+          0% { border-color: transparent; }
+          50% { border-color: #00ff90; box-shadow: 0 0 10px #00ff90; }
+          100% { border-color: transparent; }
+        }
+        
+        @keyframes outline-animation-commodities {
+          0% { border-color: transparent; }
+          50% { border-color: #FFD800; box-shadow: 0 0 10px #FFD800; }
+          100% { border-color: transparent; }
+        }
+        
+        @keyframes outline-animation-crypto {
+          0% { border-color: transparent; }
+          50% { border-color: #FF6101; box-shadow: 0 0 10px #FF6101; }
+          100% { border-color: transparent; }
+        }
+        
+        @keyframes outline-animation-forex {
+          0% { border-color: transparent; }
+          50% { border-color: #ff2389; box-shadow: 0 0 10px #ff2389; }
+          100% { border-color: transparent; }
+        }
+        
+        @keyframes outline-animation-stocks {
+          0% { border-color: transparent; }
+          50% { border-color: #00ff90; box-shadow: 0 0 10px #00ff90; }
+          100% { border-color: transparent; }
         }
       `}</style>
       
@@ -505,7 +530,7 @@ const Fast = () => {
                   size="sm"
                   onClick={() => setSelectedCategory(category.value)}
                   className={cn(
-                    "transition-all duration-200 font-medium rounded-lg",
+                    "transition-all duration-200 font-medium rounded-xl",
                     selectedCategory === category.value 
                       ? "shadow-sm border" 
                       : "hover:bg-muted-foreground/10"
@@ -533,9 +558,12 @@ const Fast = () => {
                 
                 <CardHeader className="relative z-10 text-center pb-3">
                   <div className="flex items-center justify-between mb-2">
-                    <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">
-                      Pool #{pool.round_number}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      {getPoolIcon(pool.asset_symbol)}
+                      <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">
+                        Pool #{pool.round_number}
+                      </Badge>
+                    </div>
                     {index === 0 && (
                       <Button
                         variant="ghost"
@@ -617,7 +645,7 @@ const Fast = () => {
                       <div className="flex items-center justify-between w-full px-1">
                         <ArrowUp className="w-4 h-4" />
                         <span>Subir</span>
-                        <span className="text-xs opacity-80 animate-pulse">
+                        <span className="text-xs opacity-80 animate-bounce">
                           x{getOdds().toFixed(2)}
                         </span>
                       </div>
@@ -635,7 +663,7 @@ const Fast = () => {
                       <div className="flex items-center justify-between w-full px-1">
                         <ArrowDown className="w-4 h-4" />
                         <span>Descer</span>
-                        <span className="text-xs opacity-80 animate-pulse">
+                        <span className="text-xs opacity-80 animate-bounce">
                           x{getOdds().toFixed(2)}
                         </span>
                       </div>
@@ -644,7 +672,20 @@ const Fast = () => {
 
                   {countdown <= 10 && (
                     <div className="text-center text-xs text-muted-foreground">
-                      ⏰ Opiniões bloqueadas
+                      Opiniões bloqueadas
+                    </div>
+                  )}
+                  
+                  {!user && (
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                      <div className="text-center">
+                        <p className="text-white text-sm font-medium mb-2">Login necessário</p>
+                        <Link to="/auth">
+                          <Button size="sm" className="bg-white text-black hover:bg-white/90">
+                            Entrar
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   )}
                 </CardContent>
@@ -668,11 +709,15 @@ const Fast = () => {
                   {currentCategoryHistory.slice(0, 10).map((result, index) => (
                     <div
                       key={result.id}
-                      className={`flex flex-col items-center p-3 rounded-lg border transition-all duration-200 ${
+                      className={`flex flex-col items-center p-3 rounded-lg border transition-all duration-200 relative ${
                         index < 3 
-                          ? 'bg-primary/10 border-primary/30 shadow-sm ring-1 ring-primary/20' 
+                          ? `bg-muted/20 border-border animate-pulse`
                           : 'bg-muted/20 border-border'
                       }`}
+                      style={index < 3 ? {
+                        animation: `outline-animation-${selectedCategory} 10s ease-in-out`,
+                        '--theme-color': categoryOptions.find(c => c.value === selectedCategory)?.bgColor
+                      } as any : {}}
                     >
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
                         result.result === 'subiu' 
@@ -740,7 +785,36 @@ const Fast = () => {
             </CardContent>
           </Card>
         </div>
+        
+        {!user && (
+          <div className="max-w-4xl mx-auto mt-8">
+            <Card className="border-orange-200 bg-orange-50 dark:bg-orange-900/20 dark:border-orange-800">
+              <CardContent className="p-6 text-center">
+                <h3 className="text-lg font-semibold text-orange-800 dark:text-orange-200 mb-2">
+                  Login Necessário para Opinar
+                </h3>
+                <p className="text-orange-600 dark:text-orange-300 mb-4">
+                  Você pode visualizar os Fast Markets, mas precisa estar logado para enviar suas opiniões e participar dos pools.
+                </p>
+                <Link to="/auth">
+                  <Button className="bg-orange-600 hover:bg-orange-700 text-white">
+                    Fazer Login
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
+
+      {/* Opinion Notification */}
+      {showOpinionNotification && (
+        <div className="fixed bottom-4 right-4 z-50 animate-fade-in">
+          <div className="bg-white text-black px-6 py-3 rounded-lg shadow-lg border border-gray-200">
+            <p className="font-medium">Opinião registrada</p>
+          </div>
+        </div>
+      )}
 
       {/* Modals */}
       <FastMarketTermsModal 
