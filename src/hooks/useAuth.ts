@@ -9,25 +9,30 @@ export const useAuth = () => {
 
   useEffect(() => {
     let mounted = true;
+    let initialSessionChecked = false;
 
-    // Set up auth state listener FIRST to catch events
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!mounted) return;
         
-        console.log('Auth state changed:', event, session ? 'User logged in' : 'User logged out');
+        // Only log for actual auth events, not initial session
+        if (event !== 'INITIAL_SESSION') {
+          console.log('Auth state changed:', event, session ? 'User logged in' : 'User logged out');
+        }
+        
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        initialSessionChecked = true;
       }
     );
 
-    // THEN get initial session
+    // Get initial session only if listener hasn't handled it yet
     const getSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (mounted) {
-          console.log('Initial session:', session ? 'User logged in' : 'No session');
+        if (mounted && !initialSessionChecked) {
           setSession(session);
           setUser(session?.user ?? null);
           setLoading(false);
