@@ -151,9 +151,13 @@ const Fast = () => {
       if (error) throw error;
       
       if (data?.pools) {
-        setCurrentPools(data.pools);
-        if (data.pools.length > 0) {
-          calculateCountdown(data.pools[0]); // All pools have same timing
+        // Remove duplicates based on pool id
+        const uniquePools = Array.from(
+          new Map((data.pools as FastPool[]).map((pool: FastPool) => [pool.id, pool])).values()
+        ) as FastPool[];
+        setCurrentPools(uniquePools);
+        if (uniquePools.length > 0) {
+          calculateCountdown(uniquePools[0]); // All pools have same timing
         }
       }
     } catch (error) {
@@ -161,18 +165,18 @@ const Fast = () => {
     }
   }, [selectedCategory]);
 
-  // Load pool history by category and check for new results
+  // Load pool history by category and check for new results - always load 10 per category
   const loadPoolHistory = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('fast_pool_results')
         .select('*, fast_pools!inner(category)')
         .order('created_at', { ascending: false })
-        .limit(30);
+        .limit(100); // Get more to ensure 10 per category
       
       if (error) throw error;
       
-      // Group results by category
+      // Group results by category - always keep last 10
       const resultsByCategory: Record<string, FastPoolResult[]> = {};
       
       (data || []).forEach((item: any) => {
@@ -186,6 +190,7 @@ const Fast = () => {
           resultsByCategory[category] = [];
         }
         
+        // Keep only the last 10 results per category
         if (resultsByCategory[category].length < 10) {
           resultsByCategory[category].push(result);
         }

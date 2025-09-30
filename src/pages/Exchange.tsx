@@ -189,8 +189,8 @@ const ExchangeNew = () => {
             {/* From Section */}
               <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">De</Label>
-                <div className="text-sm text-white">
+                <Label className="text-base font-semibold text-foreground">De</Label>
+                <div className="text-sm font-medium text-foreground bg-muted/50 px-3 py-1 rounded-md">
                   Saldo: {fromBalance.toLocaleString('pt-BR', { 
                     minimumFractionDigits: fromCurrency === 'BRL' ? 2 : 0,
                     maximumFractionDigits: fromCurrency === 'BRL' ? 2 : 0
@@ -198,8 +198,8 @@ const ExchangeNew = () => {
                 </div>
               </div>
               
-              <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
+              <div className="relative bg-muted/30 rounded-lg border-2 border-border hover:border-primary/50 transition-colors">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10 pointer-events-none">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                     fromCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
                   }`}>
@@ -210,35 +210,27 @@ const ExchangeNew = () => {
                     )}
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-medium text-foreground">
                       {fromCurrency}
                     </span>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={handleMaxAmount}
-                      className="text-xs text-primary hover:text-primary/80 h-auto p-0 justify-start"
+                      className="text-xs text-primary hover:text-primary/80 h-auto p-0 justify-start pointer-events-auto"
                     >
                       Max
                     </Button>
                   </div>
                 </div>
-                <div className="relative">
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    value={fromAmount}
-                    onChange={(e) => handleAmountChange(e.target.value)}
-                    className="opacity-0 absolute inset-0 pl-32 pr-4 h-24 text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    step={fromCurrency === 'BRL' ? '0.01' : '1'}
-                  />
-                  <div className="h-24 flex items-center justify-end pr-4 pointer-events-none text-5xl font-bold">
-                    {fromAmount ? parseFloat(fromAmount).toLocaleString('pt-BR', { 
-                      minimumFractionDigits: fromCurrency === 'BRL' ? 2 : 0,
-                      maximumFractionDigits: fromCurrency === 'BRL' ? 2 : 0
-                    }) : '0'}
-                  </div>
-                </div>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={fromAmount}
+                  onChange={(e) => handleAmountChange(e.target.value)}
+                  className="pl-32 pr-4 h-24 text-right text-5xl font-bold bg-transparent border-0 focus-visible:ring-0 cursor-text [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  step={fromCurrency === 'BRL' ? '0.01' : '1'}
+                />
               </div>
             </div>
 

@@ -65,6 +65,27 @@ const AdminFast = () => {
       fetchGeneralPoolConfigs();
       fetchPoolHistory();
       fetchStats();
+      
+      // Realtime subscription for pool results - always update history
+      const channel = supabase
+        .channel('admin-pool-results')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'fast_pool_results'
+          },
+          () => {
+            fetchPoolHistory();
+            fetchStats();
+          }
+        )
+        .subscribe();
+      
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [user]);
 

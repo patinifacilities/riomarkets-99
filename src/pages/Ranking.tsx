@@ -29,6 +29,8 @@ const Ranking = () => {
         return <Badge className="bg-primary/20 text-primary border-primary/30">Guru</Badge>;
       case 'analista':
         return <Badge className="bg-accent/20 text-accent border-accent/30">Analista</Badge>;
+      case 'twitch':
+        return <Badge className="bg-[#9146FF]/20 text-[#9146FF] border-[#9146FF]/30">Twitch</Badge>;
       case 'iniciante':
         return <Badge className="bg-muted text-muted-foreground">Iniciante</Badge>;
       default:
@@ -219,6 +221,16 @@ const Ranking = () => {
                 <p className="text-sm text-muted-foreground font-medium">1.5K - 100K Rioz Coin</p>
                 <p className="text-xs text-muted-foreground/70 mt-2">Análises consistentes</p>
               </div>
+              <div className="p-6 rounded-xl bg-gradient-to-br from-[#9146FF]/10 to-[#9146FF]/5 border border-[#9146FF]/20 shadow-lg">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-[#9146FF]/20 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-[#9146FF]" />
+                  </div>
+                  <Badge className="bg-[#9146FF]/20 text-[#9146FF] px-3 py-1 text-sm font-semibold">Twitch</Badge>
+                </div>
+                <p className="text-sm text-muted-foreground font-medium">50K - 150K Rioz Coin</p>
+                <p className="text-xs text-muted-foreground/70 mt-2">Streamer de predições</p>
+              </div>
               <div className="p-6 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 shadow-lg">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
@@ -226,7 +238,7 @@ const Ranking = () => {
                   </div>
                   <Badge className="bg-primary/20 text-primary px-3 py-1 text-sm font-semibold">Guru</Badge>
                 </div>
-                <p className="text-sm text-muted-foreground font-medium">100K+ Rioz Coin</p>
+                <p className="text-sm text-muted-foreground font-medium">100K - 500K Rioz Coin</p>
                 <p className="text-xs text-muted-foreground/70 mt-2">Expert em predições</p>
               </div>
               <div className="p-6 rounded-xl bg-gradient-to-br from-danger/10 to-danger/5 border border-danger/20 shadow-lg">

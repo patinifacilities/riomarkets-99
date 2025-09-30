@@ -268,20 +268,21 @@ const MarketDetail = () => {
                          </Button>
                        </div>
                      )}
-                   
-                     {selectedOption && betAmount && betAmount > 0 && (
-                       <SliderConfirm
-                         selectedOption={selectedOption}
-                         disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
-                        onConfirm={async () => {
-                          if (!authUser?.id) {
-                            toast({
-                              title: "Erro",
-                              description: "Você precisa estar logado para opinar",
-                              variant: "destructive",
-                            });
-                            return;
-                          }
+                     
+                      {selectedOption && betAmount && betAmount > 0 && (
+                        <div className="w-full mt-4">
+                          <SliderConfirm
+                            selectedOption={selectedOption}
+                            disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
+                           onConfirm={async () => {
+                             if (!authUser?.id) {
+                               toast({
+                                 title: "Erro",
+                                 description: "Você precisa estar logado para opinar",
+                                 variant: "destructive",
+                               });
+                               return;
+                             }
 
                            try {
                              const recompensa = market.odds?.[selectedOption] || 1.5;
@@ -319,10 +320,12 @@ const MarketDetail = () => {
                                variant: "destructive",
                              });
                            }
-                        }}
-                        className="w-full"
-                      />
-                     )}
+                           }}
+                           text="Deslize para confirmar opinião"
+                           className="w-full"
+                         />
+                        </div>
+                      )}
                    </div>
                 </CardContent>
               </Card>
