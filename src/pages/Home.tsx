@@ -170,6 +170,15 @@ const Home = () => {
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
           
           <div className="text-center mb-6 md:mb-8">
+            {/* Logo above mercados preditivos on mobile */}
+            <div className="md:hidden mb-6 flex justify-center">
+              <img 
+                src="/src/assets/rio-white-logo-mobile.png" 
+                alt="Rio Markets Logo" 
+                className="h-8 w-auto"
+              />
+            </div>
+            
             <h1 className="font-extrabold text-[34px] md:text-[44px] lg:text-[56px] leading-[1.05] mb-4 text-foreground [text-wrap:balance]">
               <TypewriterText 
                 baseText="Mercados Preditivos"

@@ -12,7 +12,7 @@ import { useUser } from '@/hooks/useUsers';
 import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/hooks/useAuth';
 import { useRewardCalculator } from '@/store/useRewardCalculator';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import BetModal from '@/components/markets/BetModal';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,6 +40,11 @@ const MarketDetail = () => {
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [betAmount, setBetAmount] = useState<number>(0);
   const [showBetModal, setShowBetModal] = useState(false);
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   if (isLoading) {
     return (
@@ -196,18 +201,70 @@ const MarketDetail = () => {
                       size="sm" 
                       className="text-muted-foreground hover:text-foreground"
                       onClick={() => {
-                        const content = document.getElementById('wallet-content');
+                        const content = document.getElementById('wallet-content') as HTMLElement;
+                        const arrow = document.querySelector('#wallet-expand-arrow') as HTMLElement;
                         if (content) {
                           const isHidden = content.style.display === 'none';
                           content.style.display = isHidden ? 'block' : 'none';
+                          if (arrow) {
+                            arrow.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
+                          }
                         }
                       }}
                     >
-                      <ArrowLeft className="w-4 h-4 transition-transform" />
+                      <ArrowLeft id="wallet-expand-arrow" className="w-4 h-4 transition-transform" />
                     </Button>
                   </div>
-                  <div id="wallet-content" className="p-4" style={{ display: 'none' }}>
-                  
+
+                  {/* Always visible opinion buttons and slider */}
+                  <div className="p-4 space-y-4">
+                    <div className="text-center text-sm text-muted-foreground">Quantidade para opinar</div>
+                    
+                    <div className="lg:hidden">
+                      <BetSlider 
+                        balance={userProfile?.saldo_moeda || 0}
+                        onAmountChange={(amount) => setBetAmount(amount)}
+                        estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
+                      />
+                    </div>
+
+                    {(userProfile?.saldo_moeda || 0) === 0 ? (
+                      <div className="p-4 bg-warning/10 border border-warning rounded-lg text-center">
+                        <p className="text-sm text-warning mb-2">Saldo insuficiente para opinar</p>
+                        <p className="text-xs text-muted-foreground">Deposite R$ ou troque R$ por RIOZ para começar a opinar</p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                         <Button 
+                           onClick={() => setSelectedOption('sim')}
+                           variant={selectedOption === 'sim' ? 'default' : 'outline'}
+                           className={`flex-1 ${selectedOption === 'sim' ? 'bg-success hover:bg-success/90 text-white' : 'border-success/30 text-success hover:bg-success/10'}`}
+                           disabled={!betAmount || betAmount <= 0 || betAmount > (userProfile?.saldo_moeda || 0)}
+                         >
+                           SIM
+                         </Button>
+                         <Button 
+                           onClick={() => setSelectedOption('nao')}
+                           variant={selectedOption === 'nao' ? 'default' : 'outline'}
+                           className={`flex-1 ${selectedOption === 'nao' ? 'bg-destructive hover:bg-destructive/90 text-white' : 'border-destructive/30 text-destructive hover:bg-destructive/10'}`}
+                           disabled={!betAmount || betAmount <= 0 || betAmount > (userProfile?.saldo_moeda || 0)}
+                         >
+                           NÃO
+                         </Button>
+                       </div>
+                    )}
+
+                    {selectedOption && (
+                      <SliderConfirm
+                        onConfirm={() => handleOpenBetModal(selectedOption)}
+                        disabled={!betAmount || betAmount <= 0 || betAmount > (userProfile?.saldo_moeda || 0)}
+                        className="w-full"
+                      />
+                    )}
+                  </div>
+
+                  {/* Collapsible content */}
+                  <div id="wallet-content" className="px-4 pb-4" style={{ display: 'none' }}>
                    <div className="space-y-4">
                       {(userProfile?.saldo_moeda || 0) > 0 ? (
                         <>

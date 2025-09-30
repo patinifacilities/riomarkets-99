@@ -697,10 +697,12 @@ const Fast = () => {
         timeLeft={countdown}
       />
       
-      {/* Remove Riana Chat Button on Mobile - handled by CSS */}
+      {/* Remove Riana Chat Button and duplicate dark mode on Mobile - handled by CSS */}
       <style>{`
         @media (max-width: 768px) {
           .riana-chat-button { display: none !important; }
+          .dark-mode-toggle-duplicate { display: none !important; }
+          .header-dark-toggle { display: none !important; }
         }
       `}</style>
     </div>
