@@ -126,15 +126,13 @@ const Fast = () => {
     };
   }, []);
 
-  // Check if user has already accepted terms (only for logged in users)
+  // Check if user has already accepted terms on mount
   useEffect(() => {
-    if (user) {
-      const hasAcceptedTerms = localStorage.getItem('fastMarketsTermsAccepted');
-      if (!hasAcceptedTerms) {
-        setShowTermsModal(true);
-      }
+    const hasAcceptedTerms = localStorage.getItem('fastMarketsTermsAccepted');
+    if (!hasAcceptedTerms) {
+      setShowTermsModal(true);
     }
-  }, [user]);
+  }, []);
 
   // Load current pools and history
   const loadCurrentPools = useCallback(async () => {
@@ -341,10 +339,10 @@ const Fast = () => {
     const pool = currentPools.find(p => p.id === poolId);
     if (!pool) return;
 
-    if (countdown <= 10) {
+    if (countdown <= 15) {
       toast({
         title: "Tempo esgotado",
-        description: "Não é possível opinar nos últimos 10 segundos.",
+        description: "Não é possível opinar nos últimos 15 segundos.",
         variant: "destructive"
       });
       return;
@@ -564,7 +562,7 @@ const Fast = () => {
                   size="sm"
                   onClick={() => setSelectedCategory(category.value)}
                   className={cn(
-                    "transition-all duration-200 font-medium rounded-xl",
+                    "transition-all duration-75 font-medium rounded-xl",
                     selectedCategory === category.value 
                       ? "shadow-sm border" 
                       : "hover:bg-muted-foreground/10"
@@ -712,7 +710,7 @@ const Fast = () => {
                   <div className="grid grid-cols-2 gap-2">
                     <Button
                       onClick={() => handleBet(pool.id, 'subiu')}
-                      disabled={countdown <= 10}
+                      disabled={countdown <= 15}
                       className={`h-12 text-sm font-semibold transition-all duration-300 ${
                         clickedPool?.id === pool.id && clickedPool?.side === 'subiu'
                           ? 'scale-[1.02] shadow-lg shadow-[#00ff90]/30 ring-2 ring-[#00ff90]/50 animate-pulse'
@@ -730,7 +728,7 @@ const Fast = () => {
                     
                     <Button
                       onClick={() => handleBet(pool.id, 'desceu')}
-                      disabled={countdown <= 10}
+                      disabled={countdown <= 15}
                       className={`h-12 text-sm font-semibold transition-all duration-300 ${
                         clickedPool?.id === pool.id && clickedPool?.side === 'desceu'
                           ? 'scale-[1.02] shadow-lg shadow-[#ff2389]/30 ring-2 ring-[#ff2389]/50 animate-pulse'
@@ -747,19 +745,19 @@ const Fast = () => {
                     </Button>
                   </div>
 
-                   {countdown <= 10 && (
+                   {countdown <= 15 && (
                      <div className="text-center text-xs text-muted-foreground">
                        Opiniões bloqueadas
                      </div>
                    )}
                   
                   {!user && (
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                    <div className="absolute inset-0 top-10 bg-black/60 backdrop-blur-md rounded-lg flex items-center justify-center">
                       <div className="text-center">
-                        <p className="text-white text-sm font-medium mb-2">Login necessário</p>
+                        <p className="text-white text-sm font-medium mb-3">Login necessário</p>
                         <Link to="/auth">
-                          <Button size="sm" className="bg-white text-black hover:bg-white/90">
-                            Entrar
+                          <Button size="sm" className="bg-[#00ff90] text-black hover:bg-[#00ff90]/90 font-semibold">
+                            Fazer Login
                           </Button>
                         </Link>
                       </div>

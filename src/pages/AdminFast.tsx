@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings, TrendingUp, Clock, DollarSign } from 'lucide-react';
+import { ArrowLeft, Settings, TrendingUp, Clock, DollarSign, History } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +26,22 @@ interface FastPool {
   api_url?: string;
   last_api_sync?: string;
   created_at: string;
+  paused?: boolean;
+}
+
+interface PoolResult {
+  id: string;
+  pool_id: string;
+  result: 'subiu' | 'desceu' | 'manteve';
+  opening_price: number;
+  closing_price: number;
+  created_at: string;
+  fast_pools: {
+    asset_name: string;
+    asset_symbol: string;
+    round_start_time: string;
+    round_end_time: string;
+  };
 }
 
 const AdminFast = () => {
@@ -35,6 +51,7 @@ const AdminFast = () => {
   const { toast } = useToast();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [pools, setPools] = useState<FastPool[]>([]);
+  const [poolHistory, setPoolHistory] = useState<PoolResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     total_pools: 0,
@@ -45,24 +62,57 @@ const AdminFast = () => {
 
   useEffect(() => {
     if (user) {
-      fetchPools();
+      fetchGeneralPoolConfigs();
+      fetchPoolHistory();
       fetchStats();
     }
   }, [user]);
 
-  const fetchPools = async () => {
+  const fetchGeneralPoolConfigs = async () => {
     try {
+      // Get one pool per category for general configuration display
       const { data, error } = await supabase
         .from('fast_pools')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPools(data || []);
+      
+      // Group by category and asset_symbol, get only unique configurations
+      const uniqueConfigs = new Map();
+      data?.forEach((pool: any) => {
+        const key = `${pool.category}-${pool.asset_symbol}`;
+        if (!uniqueConfigs.has(key)) {
+          uniqueConfigs.set(key, pool);
+        }
+      });
+      
+      setPools(Array.from(uniqueConfigs.values()));
     } catch (error) {
       console.error('Error fetching pools:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPoolHistory = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('fast_pool_results')
+        .select('*, fast_pools!inner(asset_name, asset_symbol, round_start_time, round_end_time)')
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      
+      const typedData = (data || []).map((item: any) => ({
+        ...item,
+        result: item.result as 'subiu' | 'desceu' | 'manteve'
+      }));
+      
+      setPoolHistory(typedData);
+    } catch (error) {
+      console.error('Error fetching pool history:', error);
     }
   };
 
@@ -92,6 +142,32 @@ const AdminFast = () => {
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
+    }
+  };
+
+  const handleTogglePause = async (pool: FastPool) => {
+    try {
+      const { error } = await supabase
+        .from('fast_pools')
+        .update({ paused: !pool.paused })
+        .eq('asset_symbol', pool.asset_symbol)
+        .eq('category', pool.category);
+      
+      if (error) throw error;
+      
+      toast({
+        title: pool.paused ? "Pool retomado" : "Pool pausado",
+        description: `${pool.asset_name} foi ${pool.paused ? 'retomado' : 'pausado'}`,
+      });
+      
+      fetchGeneralPoolConfigs();
+    } catch (error) {
+      console.error('Error toggling pause:', error);
+      toast({
+        title: "Erro",
+        description: "Falha ao pausar/retomar pool",
+        variant: "destructive"
+      });
     }
   };
 
@@ -129,6 +205,19 @@ const AdminFast = () => {
     return colors[category] || 'bg-muted text-muted-foreground';
   };
 
+  const getResultColor = (result: string) => {
+    switch (result) {
+      case 'subiu':
+        return 'text-[#00ff90]';
+      case 'desceu':
+        return 'text-[#ff2389]';
+      case 'manteve':
+        return 'text-[#FFD800]';
+      default:
+        return 'text-muted-foreground';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex overflow-x-hidden">
       <AdminSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
@@ -143,7 +232,7 @@ const AdminFast = () => {
               </Link>
               <h1 className="text-3xl font-bold mb-2">Fast Pools</h1>
               <p className="text-muted-foreground">
-                Gerenciar pools rápidos e configurações de API
+                Gerenciar pools rápidos e configurações gerais
               </p>
             </div>
           </div>
@@ -191,10 +280,13 @@ const AdminFast = () => {
             </Card>
           </div>
 
-          {/* Pools List */}
-          <Card className="bg-card-secondary border-border-secondary">
+          {/* General Pool Configurations */}
+          <Card className="bg-card-secondary border-border-secondary mb-8">
             <CardHeader>
-              <CardTitle>Pools Disponíveis</CardTitle>
+              <CardTitle>Configurações Gerais dos Pools</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Configurações aplicadas a todos os próximos rounds de cada pool
+              </p>
             </CardHeader>
             <CardContent className="space-y-4">
               {loading ? (
@@ -207,14 +299,11 @@ const AdminFast = () => {
                 </div>
               ) : (
                 pools.map(pool => (
-                  <div key={pool.id} className="p-4 rounded-lg border border-border bg-card/50 hover:border-primary/50 transition-colors">
+                  <div key={`${pool.category}-${pool.asset_symbol}`} className="p-4 rounded-lg border border-border bg-card/50 hover:border-primary/50 transition-colors">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2 flex-wrap">
                           <h3 className="font-semibold">{pool.asset_name}</h3>
-                          <Badge className={getStatusColor(pool.status)}>
-                            {pool.status}
-                          </Badge>
                           <Badge className={getCategoryColor(pool.category)}>
                             {pool.category}
                           </Badge>
@@ -223,13 +312,13 @@ const AdminFast = () => {
                               API Conectada
                             </Badge>
                           )}
-                          {(pool as any).paused && (
+                          {pool.paused && (
                             <Badge className="bg-yellow-500/10 text-yellow-600">
                               Pausado
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm font-medium mb-1">Configuração de API (Geral)</p>
+                        <p className="text-sm font-medium mb-1">Configuração Geral de API</p>
                         <p className="text-sm text-muted-foreground mb-2">
                           {pool.api_connected 
                             ? `API: ${pool.api_url?.substring(0, 50)}...` 
@@ -257,40 +346,80 @@ const AdminFast = () => {
                       </Button>
                       
                       <Button 
-                        variant={(pool as any).paused ? "default" : "outline"}
+                        variant={pool.paused ? "default" : "outline"}
                         size="sm" 
                         className="gap-2"
-                        onClick={async () => {
-                          try {
-                            const { error } = await supabase
-                              .from('fast_pools')
-                              .update({ paused: !(pool as any).paused })
-                              .eq('asset_symbol', pool.asset_symbol)
-                              .eq('category', pool.category);
-                            
-                            if (error) throw error;
-                            
-                            toast({
-                              title: (pool as any).paused ? "Pool retomado" : "Pool pausado",
-                              description: `${pool.asset_name} foi ${(pool as any).paused ? 'retomado' : 'pausado'}`,
-                            });
-                            
-                            fetchPools();
-                          } catch (error) {
-                            console.error('Error toggling pause:', error);
-                            toast({
-                              title: "Erro",
-                              description: "Falha ao pausar/retomar pool",
-                              variant: "destructive"
-                            });
-                          }
-                        }}
+                        onClick={() => handleTogglePause(pool)}
                       >
-                        {(pool as any).paused ? 'Retomar' : 'Pausar'}
+                        {pool.paused ? 'Retomar' : 'Pausar'}
                       </Button>
                     </div>
                   </div>
                 ))
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Pool History */}
+          <Card className="bg-card-secondary border-border-secondary">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <History className="w-5 h-5" />
+                <CardTitle>Histórico de Pools</CardTitle>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Últimos 20 pools finalizados com resultados
+              </p>
+            </CardHeader>
+            <CardContent>
+              {poolHistory.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Nenhum resultado disponível
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {poolHistory.map((result) => (
+                    <div 
+                      key={result.id} 
+                      className="p-4 rounded-lg border border-border bg-card/30 hover:bg-card/50 transition-colors"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold">{result.fast_pools.asset_name}</h4>
+                          <Badge variant="outline" className="text-xs">
+                            {result.fast_pools.asset_symbol}
+                          </Badge>
+                        </div>
+                        <Badge className={getResultColor(result.result)}>
+                          {result.result === 'subiu' ? 'Subiu!' : result.result === 'desceu' ? 'Desceu!' : 'Manteve!'}
+                        </Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                        <div>
+                          <p className="text-muted-foreground text-xs mb-1">Início</p>
+                          <p className="font-medium">
+                            {new Date(result.fast_pools.round_start_time).toLocaleTimeString('pt-BR')}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground text-xs mb-1">Fim</p>
+                          <p className="font-medium">
+                            {new Date(result.fast_pools.round_end_time).toLocaleTimeString('pt-BR')}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground text-xs mb-1">Preço Inicial</p>
+                          <p className="font-medium">${result.opening_price.toLocaleString()}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground text-xs mb-1">Preço Final</p>
+                          <p className="font-medium">${result.closing_price.toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </CardContent>
           </Card>

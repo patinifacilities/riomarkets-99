@@ -186,12 +186,14 @@ const Home = () => {
                 texts={["Inteligentes", "Lucrativos", "Rápidos"]}
                 className="text-foreground md:hidden"
                 mobileBreak={true}
+                customColors={{ "Rápidos": "#ff2389" }}
               />
               <span className="hidden md:inline text-foreground">Mercados Preditivos </span>
               <TypewriterText 
                 baseText=""
                 texts={["Inteligentes", "Lucrativos", "Rápidos"]}
                 className="text-primary hidden md:inline"
+                customColors={{ "Rápidos": "#ff2389" }}
               />
             </h1>
             <p className="text-base md:text-lg max-w-[60ch] mx-auto text-[color:var(--text-secondary)]">

@@ -8,6 +8,7 @@ interface TypewriterTextProps {
   pauseDuration?: number;
   className?: string;
   mobileBreak?: boolean;
+  customColors?: Record<string, string>;
 }
 
 export const TypewriterText = ({ 
@@ -17,7 +18,8 @@ export const TypewriterText = ({
   deletingSpeed = 50, 
   pauseDuration = 2000,
   className = "",
-  mobileBreak = false
+  mobileBreak = false,
+  customColors = {}
 }: TypewriterTextProps) => {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [currentText, setCurrentText] = useState('');
@@ -58,16 +60,20 @@ export const TypewriterText = ({
     return () => clearTimeout(timer);
   }, [currentText, isDeleting, isPaused, currentTextIndex, texts, typingSpeed, deletingSpeed, pauseDuration]);
 
+  const currentColor = customColors[texts[currentTextIndex]] || '';
+  
   return (
     <span className={className}>
       {mobileBreak ? (
         <>
           <span className="block">{baseText}</span>
-          <span className="block">{currentText}<span className="animate-pulse">|</span></span>
+          <span className="block" style={currentColor ? { color: currentColor } : {}}>
+            {currentText}<span className="animate-pulse">|</span>
+          </span>
         </>
       ) : (
         <>
-          {baseText} {currentText}
+          {baseText} <span style={currentColor ? { color: currentColor } : {}}>{currentText}</span>
           <span className="animate-pulse">|</span>
         </>
       )}
