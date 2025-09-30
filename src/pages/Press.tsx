@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Newspaper } from "lucide-react";
 import { usePressStore } from "@/store/usePressStore";
-import { PressCardCompact } from "@/components/press/PressCardCompact";
+import { PressCard } from "@/components/press/PressCard";
 import { PressFilter } from "@/components/press/PressFilter";
 import { Skeleton } from "@/components/ui/loading-skeleton";
 import { track } from "@/lib/analytics";
@@ -99,11 +99,11 @@ export default function Press() {
           {!loading && !error && articles.length === 0 && renderEmptyState()}
           
           {!loading && !error && articles.length > 0 && (
-            <div className="space-y-4">
-              {articles.map((article) => (
-                <PressCardCompact key={article.id} article={article} />
-              ))}
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {articles.map((article) => (
+            <PressCard key={article.id} article={article} />
+          ))}
+        </div>
           )}
         </main>
 

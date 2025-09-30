@@ -37,58 +37,37 @@ const Ranking = () => {
   };
 
   const getUserLevelProgress = (balance: number) => {
-    // Updated logic: progress bar shows progress towards "mestre" level (100%)
-    const levels = [
-      { name: 'iniciante', min: 0, max: 1500 },
-      { name: 'analista', min: 1500, max: 100000 },
-      { name: 'guru', min: 100000, max: 500000 },
-      { name: 'mestre', min: 500000, max: 500000 }
-    ];
-
-    let currentLevel = levels[0];
-    let progressTowardsMax = 0;
-
-    // Find current level
-    for (const level of levels) {
-      if (balance >= level.min && (balance < level.max || level.name === 'mestre')) {
-        currentLevel = level;
-        break;
-      }
-    }
-
-    // Calculate progress towards mestre (500K)
-    const maxLevel = 500000;
-    progressTowardsMax = Math.min((balance / maxLevel) * 100, 100);
-
-    if (balance >= maxLevel) {
+    if (balance <= 1500) {
+      return {
+        current: 'iniciante',
+        progress: (balance / 1500) * 100,
+        nextLevel: 'analista',
+        nextLevelRequirement: 1500,
+        currentBalance: balance
+      };
+    } else if (balance <= 100000) {
+      return {
+        current: 'analista',
+        progress: ((balance - 1500) / (100000 - 1500)) * 100,
+        nextLevel: 'guru',
+        nextLevelRequirement: 100000,
+        currentBalance: balance
+      };
+    } else if (balance <= 500000) {
+      return {
+        current: 'guru',
+        progress: ((balance - 100000) / (500000 - 100000)) * 100,
+        nextLevel: 'mestre',
+        nextLevelRequirement: 500000,
+        currentBalance: balance
+      };
+    } else {
       return {
         current: 'mestre',
         progress: 100,
         nextLevel: null,
         nextLevelRequirement: null,
-        currentBalance: balance,
-        progressTowardsMax: 100
-      };
-    } else {
-      // Find the next level for display purposes
-      let nextLevel = null;
-      let nextLevelRequirement = null;
-      
-      for (const level of levels) {
-        if (balance < level.min) {
-          nextLevel = level.name;
-          nextLevelRequirement = level.min;
-          break;
-        }
-      }
-
-      return {
-        current: currentLevel.name,
-        progress: progressTowardsMax,
-        nextLevel,
-        nextLevelRequirement,
-        currentBalance: balance,
-        progressTowardsMax
+        currentBalance: balance
       };
     }
   };
@@ -100,7 +79,7 @@ const Ranking = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Trophy className="w-8 h-8 text-primary" />
-            <h1 className="text-4xl font-bold">Ranking</h1>
+            <h1 className="text-4xl font-bold">Ranking de Analistas</h1>
           </div>
           <p className="text-muted-foreground max-w-[65ch] mx-auto">
             Conheça os melhores analistas da plataforma e suas estatísticas de desempenho
@@ -145,7 +124,7 @@ const Ranking = () => {
                     
                     <div className="space-y-1">
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>Progresso para Mestre (500K)</span>
+                        <span>Progresso para {getUserLevelProgress(profile.saldo_moeda).nextLevel || 'Guru'}</span>
                         <span>{Math.round(getUserLevelProgress(profile.saldo_moeda).progress)}%</span>
                       </div>
                       <Progress 
@@ -181,18 +160,18 @@ const Ranking = () => {
                   </div>
                   
                   {getUserLevelProgress(profile.saldo_moeda).nextLevel && (
-                     <>
-                       <div className="flex items-center justify-between text-sm text-muted-foreground">
-                         <span>Progresso para Mestre (500K)</span>
-                         <span>{Math.round(getUserLevelProgress(profile.saldo_moeda).progress)}%</span>
-                       </div>
+                    <>
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <span>Próximo nível: {getUserLevelProgress(profile.saldo_moeda).nextLevel}</span>
+                        <span>{Math.round(getUserLevelProgress(profile.saldo_moeda).progress)}%</span>
+                      </div>
                       <Progress 
                         value={getUserLevelProgress(profile.saldo_moeda).progress} 
                         className="h-3"
                       />
-                       <div className="text-xs text-muted-foreground">
-                         Faltam {(500000 - profile.saldo_moeda).toLocaleString()} RZ para atingir Mestre
-                       </div>
+                      <div className="text-xs text-muted-foreground">
+                        Faltam {(getUserLevelProgress(profile.saldo_moeda).nextLevelRequirement! - profile.saldo_moeda).toLocaleString()} RZ para o próximo nível
+                      </div>
                     </>
                   )}
                 </div>

@@ -126,11 +126,11 @@ const AdminMarkets = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex overflow-x-hidden">
+    <div className="min-h-screen bg-background flex">
       <AdminSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       
-      <div className="flex-1 lg:ml-0 min-w-0">
-        <div className="max-w-full mx-auto px-4 py-8 overflow-x-hidden">
+      <div className="flex-1 lg:ml-0">
+        <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between mb-8">
             <div>
               <Link to="/admin" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-2">
@@ -142,14 +142,19 @@ const AdminMarkets = () => {
                 Criar, editar e gerenciar mercados de análise
               </p>
             </div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <Button 
-                onClick={() => setShowCreateForm(!showCreateForm)}
-                className="gap-2 shadow-success min-h-[44px]"
-              >
-                <Plus className="w-4 h-4" />
-                Criar Mercado
-              </Button>
+            <div className="flex items-center gap-3">
+              <Badge variant="destructive" className="text-xs">
+                ADMIN
+              </Badge>
+              <div className="hidden md:block">
+                <Button 
+                  onClick={() => setShowCreateForm(!showCreateForm)}
+                  className="gap-2 shadow-success min-h-[44px]"
+                >
+                  <Plus className="w-4 h-4" />
+                  Criar Mercado
+                </Button>
+              </div>
             </div>
           </div>
 

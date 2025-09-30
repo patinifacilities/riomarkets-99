@@ -138,6 +138,14 @@ const Admin = () => {
                 </p>
               </div>
             </div>
+            <Button 
+              onClick={() => setShowCreateForm(!showCreateForm)}
+              className="gap-2 shadow-success min-h-[44px]"
+              aria-label="Criar novo mercado de análise"
+            >
+              <Plus className="w-4 h-4" />
+              Criar Mercado
+            </Button>
           </div>
 
           {/* Test E2E Section */}

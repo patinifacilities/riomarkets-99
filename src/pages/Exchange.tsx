@@ -6,38 +6,47 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { ArrowUpDown, Wallet, Loader2, ArrowDown, ArrowUp } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Slider } from '@/components/ui/slider';
+import { Badge } from '@/components/ui/badge';
+import { ArrowRightLeft, Wallet, Loader2, TrendingUp, Flame, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useMarkets } from '@/hooks/useMarkets';
 
-const ExchangeNew = () => {
+const Exchange = () => {
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
+  const { data: markets } = useMarkets();
   const { toast } = useToast();
   
   const [brlBalance, setBrlBalance] = useState(0);
   const [riozBalance, setRiozBalance] = useState(0);
-  const [fromAmount, setFromAmount] = useState('');
-  const [toAmount, setToAmount] = useState('');
-  const [swapDirection, setSwapDirection] = useState<'brl-to-rioz' | 'rioz-to-brl'>('brl-to-rioz');
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [amount, setAmount] = useState('');
+  const [sliderPercent, setSliderPercent] = useState([0]);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'buy' | 'sell'>('buy');
+  const [showNotification, setShowNotification] = useState(false);
 
+  // Buscar saldos ao carregar e quando refreshKey muda
   useEffect(() => {
     if (user?.id) {
       fetchBalances();
     }
-  }, [user?.id]);
+  }, [user?.id, refreshKey]);
 
   const fetchBalances = async () => {
     if (!user?.id) return;
     
     try {
+      // Buscar saldo BRL
       const { data: balanceData } = await supabase
         .from('balances')
         .select('brl_balance')
         .eq('user_id', user.id)
         .single();
 
+      // Buscar saldo RIOZ
       const { data: profileData } = await supabase
         .from('profiles')
         .select('saldo_moeda')
@@ -51,26 +60,8 @@ const ExchangeNew = () => {
     }
   };
 
-  const handleAmountChange = (value: string) => {
-    setFromAmount(value);
-    // 1:1 conversion rate
-    setToAmount(value);
-  };
-
-  const handleSwapDirection = () => {
-    setSwapDirection(prev => prev === 'brl-to-rioz' ? 'rioz-to-brl' : 'brl-to-rioz');
-    setFromAmount('');
-    setToAmount('');
-  };
-
-  const handleMaxAmount = () => {
-    const maxAmount = swapDirection === 'brl-to-rioz' ? brlBalance : riozBalance;
-    setFromAmount(maxAmount.toString());
-    setToAmount(maxAmount.toString());
-  };
-
-  const handleSwap = async () => {
-    if (!user?.id || !fromAmount || parseFloat(fromAmount) <= 0) {
+  const handleExchange = async () => {
+    if (!user?.id || !amount || parseFloat(amount) <= 0) {
       toast({
         title: "Erro",
         description: "Digite um valor válido",
@@ -79,24 +70,36 @@ const ExchangeNew = () => {
       return;
     }
 
-    const amountNum = parseFloat(fromAmount);
-    const maxAmount = swapDirection === 'brl-to-rioz' ? brlBalance : riozBalance;
+    const amountNum = parseFloat(amount);
     
-    if (amountNum > maxAmount) {
-      toast({
-        title: "Erro",
-        description: `Saldo insuficiente. Máximo: ${maxAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-        variant: "destructive",
-      });
-      return;
+    // Simple validation for 1:1 conversion
+    if (activeTab === 'buy') {
+      if (brlBalance < amountNum) {
+        toast({
+          title: "Erro",
+          description: "Saldo BRL insuficiente",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else {
+      if (riozBalance < amountNum) {
+        toast({
+          title: "Erro", 
+          description: "Saldo RIOZ insuficiente",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setLoading(true);
     
     try {
+      // Call the simplified edge function
       const { data, error } = await supabase.functions.invoke('exchange-convert', {
         body: {
-          operation: swapDirection === 'brl-to-rioz' ? 'buy_rioz' : 'sell_rioz',
+          operation: activeTab === 'buy' ? 'buy_rioz' : 'sell_rioz',
           amount: amountNum
         }
       });
@@ -105,28 +108,37 @@ const ExchangeNew = () => {
         throw new Error(data?.error || 'Erro na conversão');
       }
 
+      // Update local states with response
       setBrlBalance(data.new_brl_balance);
       setRiozBalance(data.new_rioz_balance);
       
       toast({
-        title: "Conversão realizada!",
-        description: swapDirection === 'brl-to-rioz' 
-          ? `Você converteu R$ ${amountNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} para ${amountNum.toLocaleString('pt-BR')} RIOZ`
-          : `Você converteu ${amountNum.toLocaleString('pt-BR')} RIOZ para R$ ${amountNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        title: activeTab === 'buy' ? "Compra realizada!" : "Venda realizada!",
+        description: activeTab === 'buy' 
+          ? `Você comprou ${amountNum} RIOZ por R$ ${amountNum}`
+          : `Você vendeu ${amountNum} RIOZ por R$ ${amountNum}`,
       });
       
-      setFromAmount('');
-      setToAmount('');
+      // Clear form
+      setAmount('');
+      setSliderPercent([0]);
       
+      // Show success notification
+      setShowNotification(true);
+      setTimeout(() => setShowNotification(false), 3000);
+      
+      // Force refresh all balances
       await Promise.all([
         fetchBalances(),
         refetchProfile()
       ]);
       
+      // Trigger refresh in other components
+      setRefreshKey(prev => prev + 1);
       window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
       
     } catch (error) {
-      console.error('Erro na conversão:', error);
+      console.error('Erro na troca:', error);
       toast({
         title: "Erro na operação",
         description: error instanceof Error ? error.message : "Tente novamente",
@@ -137,196 +149,353 @@ const ExchangeNew = () => {
     }
   };
 
-  const fromCurrency = swapDirection === 'brl-to-rioz' ? 'BRL' : 'RIOZ';
-  const toCurrency = swapDirection === 'brl-to-rioz' ? 'RIOZ' : 'BRL';
-  const fromBalance = swapDirection === 'brl-to-rioz' ? brlBalance : riozBalance;
-  const toBalance = swapDirection === 'brl-to-rioz' ? riozBalance : brlBalance;
+  const getMaxAmount = () => {
+    // Simple max amount calculation for 1:1 conversion
+    if (activeTab === 'buy') {
+      return brlBalance; // Can convert all BRL to RIOZ
+    } else {
+      return riozBalance; // Can convert all RIOZ to BRL
+    }
+  };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-6 text-center">
-            <Wallet className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-xl font-semibold mb-2">Acesso necessário</h2>
-            <p className="text-muted-foreground">Faça login para acessar o Exchange</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const handleSliderChange = (value: number[]) => {
+    setSliderPercent(value);
+    const maxAmount = getMaxAmount();
+    const selectedAmount = (maxAmount * value[0]) / 100;
+    setAmount(selectedAmount.toString());
+  };
+
+  const setPercentage = (percent: number) => {
+    setSliderPercent([percent]);
+    const maxAmount = getMaxAmount();
+    const selectedAmount = (maxAmount * percent) / 100;
+    setAmount(selectedAmount.toString());
+  };
+
+  // Get top volume markets for hot markets card - use static data to avoid changing when slider moves
+  const topMarkets = markets 
+    ? markets
+        .filter(m => m.status === 'aberto')
+        .map((market, index) => ({
+          ...market,
+          volume24h: [8500, 7200, 6300][index] || 5000 // Static values to prevent changes
+        }))
+        .slice(0, 3)
+    : [];
 
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
+
+      <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
+          <div className="inline-flex items-center gap-3 mb-4">
             <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30">
-              <ArrowUpDown className="h-8 w-8 text-primary" />
+              <ArrowRightLeft className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-4xl font-bold text-foreground">Exchange</h1>
+                <h1 className="text-4xl font-bold text-foreground">
+                  Exchange RIOZ
+                </h1>
           </div>
           <p className="text-muted-foreground text-lg">
-            Converta entre BRL e RIOZ com taxa fixa 1:1
+            Converta entre RIOZ e Reais brasileiros com conversão 1:1 instantânea
           </p>
+          <div className="flex justify-center gap-4 mt-4">
+            <div className="flex items-center gap-2 text-sm text-success">
+              <div className="w-2 h-2 rounded-full bg-success"></div>
+              Taxa fixa 1:1
+            </div>
+            <div className="flex items-center gap-2 text-sm text-primary">
+              <div className="w-2 h-2 rounded-full bg-primary"></div>
+              Conversão instantânea
+            </div>
+          </div>
         </div>
 
-        {/* Swap Interface */}
-        <Card className="bg-gradient-to-br from-card/95 to-card-secondary/95 border border-primary/30 shadow-xl">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-center gap-2">
-              <ArrowUpDown className="h-5 w-5" />
-              Conversão Instantânea
-            </CardTitle>
+        {/* Success Notification - Inside Card */}
+        {showNotification && (
+          <div className="max-w-4xl mx-auto mb-2">
+            <div className="text-foreground text-center py-2 rounded-lg flex items-center justify-center gap-2">
+              <CheckCircle2 className="h-4 w-4" />
+              <span className="text-sm">Conversão realizada com sucesso!</span>
+            </div>
+          </div>
+        )}
+
+        {/* Interface de Troca Modernizada */}
+        <Card className="max-w-4xl mx-auto mb-8 bg-gradient-to-br from-card/95 to-card-secondary/95 border border-primary/30 shadow-2xl backdrop-blur-sm">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-primary/20">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-3 text-2xl">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30">
+                  <ArrowRightLeft className="h-6 w-6 text-primary" />
+                </div>
+                <span className="text-foreground">
+                  Exchange Central
+                </span>
+              </CardTitle>
+              <div className="flex gap-2">
+                <Badge variant="outline" className="border-success/50 text-success">
+                  Taxa 1:1
+                </Badge>
+                <Badge variant="outline" className="border-primary/50 text-primary">
+                  Instantâneo
+                </Badge>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {/* From Section */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">Você paga</Label>
-                <div className="text-sm text-muted-foreground">
-                  Saldo: {fromBalance.toLocaleString('pt-BR', { 
-                    minimumFractionDigits: fromCurrency === 'BRL' ? 2 : 0,
-                    maximumFractionDigits: fromCurrency === 'BRL' ? 2 : 0
-                  })} {fromCurrency}
+          <CardContent>
+            {/* Saldos Modernizados */}
+            <div className="grid grid-cols-2 gap-2 mb-6">
+              <div className="text-center p-2 bg-gradient-to-br from-muted/10 to-muted/5 rounded-md border border-border/10">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">BRL</span>
+                </div>
+                <div className="text-sm font-bold text-foreground">
+                  R$ {brlBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </div>
               </div>
+              <div className="text-center p-2 bg-gradient-to-br from-primary/10 to-primary/5 rounded-md border border-primary/10">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <span className="text-xs text-primary uppercase tracking-wide font-medium">RIOZ</span>
+                </div>
+                <div className="text-sm font-bold text-primary">
+                  {riozBalance.toLocaleString('pt-BR')} RZ
+                </div>
+              </div>
+            </div>
+            <Tabs value={activeTab} onValueChange={(value: any) => setActiveTab(value)}>
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="buy" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  Comprar RIOZ
+                </TabsTrigger>
+                <TabsTrigger value="sell" className="data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground">
+                  Vender RIOZ
+                </TabsTrigger>
+              </TabsList>
               
-              <div className="relative">
-                <Input
-                  type="number"
-                  placeholder="0"
-                  value={fromAmount}
-                  onChange={(e) => handleAmountChange(e.target.value)}
-                  className="pr-20 text-right text-lg font-medium"
-                  step={fromCurrency === 'BRL' ? '0.01' : '1'}
-                />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleMaxAmount}
-                    className="text-xs px-2 py-1 h-6"
+              <TabsContent value="buy" className="space-y-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Valor a converter (máximo: R$ {getMaxAmount().toLocaleString('pt-BR', { minimumFractionDigits: 2 })})</Label>
+                    <Input
+                      type="number"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      placeholder="0"
+                      max={getMaxAmount()}
+                      step="1"
+                      min="0"
+                    />
+                  </div>
+
+                  {/* Slider Percentage */}
+                  <div className="space-y-3">
+                    <Label>Selecionar percentual do saldo</Label>
+                    <Slider
+                      value={sliderPercent}
+                      onValueChange={handleSliderChange}
+                      max={100}
+                      step={1}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between gap-2 text-sm text-muted-foreground">
+                      {[0, 25, 50, 75, 100].map((percent) => (
+                        <span
+                          key={percent}
+                          className="cursor-pointer hover:text-foreground transition-colors"
+                          onClick={() => setPercentage(percent)}
+                        >
+                          {percent}%
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Calculation Display - only show when amount > 0 */}
+                  {(parseFloat(amount) > 0) && (
+                    <div className="bg-success/10 border border-success/20 rounded-lg p-4 space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Valor:</span>
+                        <span className="font-medium">R$ {(parseFloat(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="flex justify-between text-sm border-t pt-2">
+                        <span>Você recebe:</span>
+                        <span className="font-medium text-success">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <Button 
+                    onClick={handleExchange}
+                    disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > getMaxAmount()}
+                    className="w-full"
                   >
-                    MAX
+                    {loading ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <ArrowRightLeft className="h-4 w-4 mr-2" />
+                    )}
+                    Comprar RIOZ
                   </Button>
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {fromCurrency}
-                  </span>
                 </div>
-              </div>
-            </div>
-
-            {/* Swap Button */}
-            <div className="flex justify-center">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSwapDirection}
-                className="rounded-full p-3 border-2 hover:border-primary/50"
-              >
-                <ArrowUpDown className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* To Section */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">Você recebe</Label>
-                <div className="text-sm text-muted-foreground">
-                  Saldo: {toBalance.toLocaleString('pt-BR', { 
-                    minimumFractionDigits: toCurrency === 'BRL' ? 2 : 0,
-                    maximumFractionDigits: toCurrency === 'BRL' ? 2 : 0
-                  })} {toCurrency}
-                </div>
-              </div>
+              </TabsContent>
               
-              <div className="relative">
-                <Input
-                  type="number"
-                  placeholder="0"
-                  value={toAmount}
-                  readOnly
-                  className="pr-16 text-right text-lg font-medium bg-muted/50"
-                />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {toCurrency}
-                  </span>
+              <TabsContent value="sell" className="space-y-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Quantidade RIOZ a vender (máximo: {getMaxAmount().toLocaleString('pt-BR')} RZ)</Label>
+                    <Input
+                      type="number"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      placeholder="0"
+                      max={getMaxAmount()}
+                      step="1"
+                      min="0"
+                    />
+                  </div>
+
+                  {/* Slider Percentage */}
+                  <div className="space-y-3">
+                    <Label>Selecionar percentual do saldo</Label>
+                    <Slider
+                      value={sliderPercent}
+                      onValueChange={handleSliderChange}
+                      max={100}
+                      step={1}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between gap-2 text-sm text-muted-foreground">
+                      {[0, 25, 50, 75, 100].map((percent) => (
+                        <span
+                          key={percent}
+                          className="cursor-pointer hover:text-foreground transition-colors"
+                          onClick={() => setPercentage(percent)}
+                        >
+                          {percent}%
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Calculation Display - only show when amount > 0 */}
+                  {(parseFloat(amount) > 0) && (
+                    <div className="bg-success/10 border border-success/20 rounded-lg p-4 space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Você vende:</span>
+                        <span className="font-medium">{(parseFloat(amount) || 0).toLocaleString('pt-BR')} RZ</span>
+                      </div>
+                      <div className="flex justify-between text-sm border-t pt-2">
+                        <span>Você recebe:</span>
+                        <span className="font-medium text-success">R$ {(parseFloat(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <Button 
+                    onClick={handleExchange}
+                    disabled={loading || !amount || parseFloat(amount) <= 0 || parseFloat(amount) > getMaxAmount()}
+                    variant="destructive"
+                    className="w-full"
+                  >
+                    {loading ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <ArrowRightLeft className="h-4 w-4 mr-2" />
+                    )}
+                    Vender RIOZ
+                  </Button>
                 </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Exchange Rate */}
-            <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Taxa de conversão</span>
-                <span className="font-medium">1:1</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Taxa de serviço</span>
-                <span className="font-medium text-success">Gratuito</span>
-              </div>
-            </div>
-
-            {/* Swap Button */}
-            <Button
-              onClick={handleSwap}
-              disabled={loading || !fromAmount || parseFloat(fromAmount) <= 0}
-              className="w-full h-12 text-lg font-semibold"
-              size="lg"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                  Convertendo...
-                </>
-              ) : (
-                <>
-                  <ArrowUpDown className="h-5 w-5 mr-2" />
-                  Converter {fromCurrency} → {toCurrency}
-                </>
-              )}
-            </Button>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
 
-        {/* Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-          <Card className="bg-card/50">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-success/10">
-                  <ArrowDown className="h-4 w-4 text-success" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-sm">Taxa Fixa</h3>
-                  <p className="text-xs text-muted-foreground">Conversão 1:1 garantida</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Hot Markets - Modern Grid Layout */}
+        <div className="mt-8">
+          <div className="flex items-center gap-2 mb-6">
+            <Flame className="h-5 w-5 text-orange-500" />
+            <h2 className="text-2xl font-semibold">Mercados Hot</h2>
+            <Badge variant="destructive" className="text-xs">
+              Alta demanda
+            </Badge>
+          </div>
           
-          <Card className="bg-card/50">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <ArrowUp className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-sm">Instantâneo</h3>
-                  <p className="text-xs text-muted-foreground">Conversão em tempo real</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {topMarkets.slice(0, 6).map((market, index) => (
+              <Card 
+                key={market.id} 
+                className="cursor-pointer hover:border-primary/50 transition-all hover:shadow-lg group bg-gradient-card border-primary/20"
+                onClick={() => window.location.href = `/market/${market.id}`}
+              >
+                <CardContent className="p-4">
+                  {/* Thumbnail Image with 16:7 aspect ratio */}
+                  {market.thumbnail_url && (
+                    <div className="w-full mb-3 rounded-lg overflow-hidden">
+                      <img 
+                        src={market.thumbnail_url} 
+                        alt={market.titulo}
+                        className="w-full h-full object-cover"
+                        style={{ aspectRatio: '16/7' }}
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="destructive" className="text-xs">
+                          #{index + 1} HOT
+                        </Badge>
+                        <TrendingUp className="h-3 w-3 text-success" />
+                      </div>
+                      <h4 className="font-semibold text-xs leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                        {market.titulo}
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {market.categoria}
+                      </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        size="sm" 
+                        className="bg-[#00ff90] hover:bg-[#00ff90]/90 text-black text-xs font-medium h-8"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.location.href = `/market/${market.id}`;
+                        }}
+                      >
+                        SIM {market.odds?.sim?.toFixed(1) || '1.8'}x
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white text-xs font-medium h-8"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.location.href = `/market/${market.id}`;
+                        }}
+                      >
+                        NÃO {market.odds?.nao?.toFixed(1) || '2.1'}x
+                      </Button>
+                    </div>
+                    
+                    <div className="pt-2 border-t border-border/30">
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Volume 24h:</span>
+                        <span className="font-medium">R$ {market.volume24h?.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default ExchangeNew;
+export default Exchange;

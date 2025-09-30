@@ -34,11 +34,11 @@ const AdminUsers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex overflow-x-hidden">
+    <div className="min-h-screen bg-background flex">
       <AdminSidebar isOpen={false} onToggle={() => {}} />
       
-      <div className="flex-1 lg:ml-0 min-w-0">
-        <div className="max-w-full mx-auto px-4 py-8 overflow-x-hidden">
+      <div className="flex-1 lg:ml-0">
+        <div className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8">
           <Button
             variant="ghost"
