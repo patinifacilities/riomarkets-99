@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, TrendingUp, TrendingDown, X, DollarSign } from 'lucide-react';
+import { Clock, TrendingUp, TrendingDown, X, DollarSign, Zap } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserOrders } from '@/hooks/useWallet';
 import { useMarkets } from '@/hooks/useMarkets';
 import CashoutModal from '@/components/wallet/CashoutModal';
 import { CancelBetModal } from '@/components/wallet/CancelBetModal';
+import { Link } from 'react-router-dom';
 
 interface OrderHistoryCardProps {
   onRefresh?: () => void;
@@ -143,7 +144,13 @@ export const OrderHistoryCard = ({ onRefresh }: OrderHistoryCardProps) => {
             <div className="text-center py-8 text-muted-foreground">
               <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-50" />
               <p>Nenhuma opinião encontrada</p>
-              <p className="text-sm mt-1">Suas opiniões aparecerão aqui</p>
+              <p className="text-sm mt-1 mb-4">Suas opiniões aparecerão aqui</p>
+              <Link to="/fast">
+                <Button className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white">
+                  <Zap className="w-4 h-4 mr-2" />
+                  Ir para Fast Markets
+                </Button>
+              </Link>
             </div>
           )}
         </CardContent>
