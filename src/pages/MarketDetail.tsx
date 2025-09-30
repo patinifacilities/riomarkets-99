@@ -216,7 +216,10 @@ const MarketDetail = () => {
                     ) : (
                       <div className="grid grid-cols-2 gap-2">
                          <Button 
-                           onClick={() => setSelectedOption('sim')}
+                           onClick={() => {
+                             setSelectedOption('sim');
+                             handleOpenBetModal('sim');
+                           }}
                            variant={selectedOption === 'sim' ? 'default' : 'outline'}
                            className={`flex-1 ${selectedOption === 'sim' ? 'bg-success hover:bg-success/90 text-white' : 'border-success/30 text-success hover:bg-success/10'}`}
                            disabled={!betAmount || betAmount <= 0 || betAmount > (userProfile?.saldo_moeda || 0)}
@@ -224,7 +227,10 @@ const MarketDetail = () => {
                            SIM
                          </Button>
                          <Button 
-                           onClick={() => setSelectedOption('nao')}
+                           onClick={() => {
+                             setSelectedOption('nao');
+                             handleOpenBetModal('nao');
+                           }}
                            variant={selectedOption === 'nao' ? 'default' : 'outline'}
                            className={`flex-1 ${selectedOption === 'nao' ? 'bg-destructive hover:bg-destructive/90 text-white' : 'border-destructive/30 text-destructive hover:bg-destructive/10'}`}
                            disabled={!betAmount || betAmount <= 0 || betAmount > (userProfile?.saldo_moeda || 0)}

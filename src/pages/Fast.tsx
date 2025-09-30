@@ -651,8 +651,24 @@ const Fast = () => {
 
                   {/* Countdown Timer */}
                    <div className="text-center">
-                     <div className="text-2xl font-bold text-[#ff2389] mb-2">
-                        {countdown}s
+                     <div className={`text-2xl font-bold mb-2 ${
+                       countdown <= 0 && pool.result 
+                         ? pool.result === 'subiu' 
+                           ? 'text-[#00ff90]' 
+                           : pool.result === 'desceu' 
+                             ? 'text-[#ff2389]' 
+                             : 'text-[#FFD800]'
+                         : 'text-[#ff2389]'
+                     }`}>
+                        {countdown > 0 
+                          ? `${countdown.toFixed(2)}s` 
+                          : pool.result 
+                            ? pool.result === 'subiu' 
+                              ? 'Subiu!' 
+                              : pool.result === 'desceu' 
+                                ? 'Desceu!' 
+                                : 'Manteve!'
+                            : 'Finalizando...'}
                       </div>
                       <div className="w-full bg-muted/20 rounded-full h-2 overflow-hidden">
                         <div 
@@ -842,7 +858,7 @@ const Fast = () => {
       </div>
 
       {/* Opinion Notifications Stack */}
-      <div className="fixed bottom-4 right-4 z-50 space-y-2">
+      <div className="fixed bottom-4 right-4 z-40 space-y-2">
         {opinionNotifications.map((notification, index) => (
           <div 
             key={notification.id}

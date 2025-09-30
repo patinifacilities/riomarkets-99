@@ -232,7 +232,16 @@ const Header = () => {
             </Sheet>
           )}
 
-          {/* Remove logo from header for mobile */}
+          {/* Desktop Logo */}
+          <div className="hidden md:flex items-center mr-6">
+            <Link to="/">
+              <img 
+                src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
+                alt="Rio Markets" 
+                className="h-8 w-auto" 
+              />
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">

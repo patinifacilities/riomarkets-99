@@ -118,7 +118,7 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md rounded-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CreditCard className="w-5 h-5" />
@@ -157,7 +157,12 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
               className="space-y-3"
             >
               {paymentMethods.map((method) => (
-                <div key={method.id} className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors relative">
+                <label 
+                  key={method.id} 
+                  htmlFor={method.id}
+                  className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors relative cursor-pointer"
+                  onClick={() => setPaymentMethod(method.id)}
+                >
                   {method.id === 'pix' && (
                     <span className="absolute top-2 right-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white bg-[#ff2389]">
                       Mais usado
@@ -169,15 +174,15 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
                       {method.icon}
                     </div>
                     <div>
-                      <Label htmlFor={method.id} className="font-medium cursor-pointer">
+                      <span className="font-medium cursor-pointer">
                         {method.label}
-                      </Label>
+                      </span>
                       <p className="text-sm text-muted-foreground">
                         {method.description}
                       </p>
                     </div>
                   </div>
-                </div>
+                </label>
               ))}
             </RadioGroup>
           </div>
