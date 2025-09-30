@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TrendingUp, TrendingDown, Zap, Clock, BarChart3, Wallet, Plus, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -38,11 +37,12 @@ interface FastPoolResult {
   closing_price: number;
   price_change_percent: number;
   created_at: string;
+  asset_symbol: string;
 }
 
 const Fast = () => {
-  const [currentPool, setCurrentPool] = useState<FastPool | null>(null);
-  const [poolHistory, setPoolHistory] = useState<FastPoolResult[]>([]);
+  const [currentPools, setCurrentPools] = useState<FastPool[]>([]);
+  const [poolHistory, setPoolHistory] = useState<Record<string, FastPoolResult[]>>({});
   const [countdown, setCountdown] = useState(60);
   const [betAmount, setBetAmount] = useState(100);
   const [clickedPool, setClickedPool] = useState<{id: string, side: string} | null>(null);
@@ -50,18 +50,42 @@ const Fast = () => {
   const [selectedPool, setSelectedPool] = useState<string | null>(null);
   const [poolHistoryOpen, setPoolHistoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('commodities');
-  const [lastPoolId, setLastPoolId] = useState<string | null>(null);
+  const [lastPoolIds, setLastPoolIds] = useState<string[]>([]);
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
   const { resolvedTheme } = useTheme();
 
-  // Category options for fast pools
+  // Category options for fast pools with styling
   const categoryOptions = [
-    { value: 'commodities', label: 'Commodities' },
-    { value: 'crypto', label: 'Cripto' },
-    { value: 'forex', label: 'Forex' },
-    { value: 'stocks', label: 'Ações' }
+    { 
+      value: 'commodities', 
+      label: 'Commodities', 
+      bgColor: '#FFD800',
+      icon: '🛢️',
+      textColor: '#000'
+    },
+    { 
+      value: 'crypto', 
+      label: 'Cripto', 
+      bgColor: '#FF6101',
+      icon: '₿',
+      textColor: '#fff'
+    },
+    { 
+      value: 'forex', 
+      label: 'Forex', 
+      bgColor: '#ff2389',
+      icon: '$',
+      textColor: '#fff'
+    },
+    { 
+      value: 'stocks', 
+      label: 'Ações', 
+      bgColor: '#00ff90',
+      icon: '📈',
+      textColor: '#000'
+    }
   ];
 
   // Realtime subscription for pool updates
@@ -78,7 +102,7 @@ const Fast = () => {
         (payload) => {
           console.log('Pool update:', payload);
           if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
-            loadCurrentPool();
+            loadCurrentPools();
           }
         }
       )
@@ -118,8 +142,8 @@ const Fast = () => {
     }
   }, [user, toast]);
 
-  // Load current pool and history
-  const loadCurrentPool = useCallback(async () => {
+  // Load current pools and history
+  const loadCurrentPools = useCallback(async () => {
     try {
       const { data, error } = await supabase.functions.invoke('manage-fast-pools', {
         body: { 
@@ -130,53 +154,52 @@ const Fast = () => {
       
       if (error) throw error;
       
-      if (data?.pool) {
-        setCurrentPool(data.pool);
-        calculateCountdown(data.pool);
+      if (data?.pools) {
+        setCurrentPools(data.pools);
+        if (data.pools.length > 0) {
+          calculateCountdown(data.pools[0]); // All pools have same timing
+        }
       }
     } catch (error) {
-      console.error('Error loading pool:', error);
+      console.error('Error loading pools:', error);
     }
   }, [selectedCategory]);
 
-  // Load pool history and check for new results
+  // Load pool history by category and check for new results
   const loadPoolHistory = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('fast_pool_results')
-        .select('*')
+        .select('*, fast_pools!inner(category)')
         .order('created_at', { ascending: false })
-        .limit(10);
+        .limit(30);
       
       if (error) throw error;
       
-      const typedResults = (data || []).map(result => ({
-        ...result,
-        result: result.result as 'subiu' | 'desceu' | 'manteve'
-      }));
+      // Group results by category
+      const resultsByCategory: Record<string, FastPoolResult[]> = {};
       
-      // Check if there's a new result to show notification
-      const lastResult = typedResults[0];
-      const lastShownResult = localStorage.getItem('lastShownFastResult');
-      
-      if (lastResult && lastResult.id !== lastShownResult) {
-        // Show result notification
-        setTimeout(() => {
-          toast({
-            title: lastResult.result === 'subiu' ? "Subiu! 📈" : lastResult.result === 'desceu' ? "Desceu! 📉" : "Manteve! ➡️",
-            description: `Variação: ${lastResult.price_change_percent > 0 ? '+' : ''}${lastResult.price_change_percent.toFixed(2)}%`,
-            duration: 4000,
-          });
-        }, 1000);
+      (data || []).forEach((item: any) => {
+        const category = item.fast_pools.category;
+        const result = {
+          ...item,
+          result: item.result as 'subiu' | 'desceu' | 'manteve'
+        };
         
-        localStorage.setItem('lastShownFastResult', lastResult.id);
-      }
+        if (!resultsByCategory[category]) {
+          resultsByCategory[category] = [];
+        }
+        
+        if (resultsByCategory[category].length < 10) {
+          resultsByCategory[category].push(result);
+        }
+      });
       
-      setPoolHistory(typedResults);
+      setPoolHistory(resultsByCategory);
     } catch (error) {
       console.error('Error loading history:', error);
     }
-  }, [toast]);
+  }, []);
 
   // Calculate countdown based on pool end time
   const calculateCountdown = useCallback((pool: FastPool) => {
@@ -185,17 +208,18 @@ const Fast = () => {
     const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
     setCountdown(timeLeft);
     
-    // Check if this is a new pool (first second)
-    if (timeLeft === 59 && pool.id !== lastPoolId) {
-      setLastPoolId(pool.id);
+    // Check if this is a new set of pools (first second)
+    if (timeLeft === 59 && !lastPoolIds.includes(pool.id)) {
+      setLastPoolIds([pool.id]);
       
-      // Get the last result to show notification
-      if (poolHistory.length > 0) {
-        const lastResult = poolHistory[0];
+      // Show results for this category if available
+      const categoryHistory = poolHistory[selectedCategory];
+      if (categoryHistory && categoryHistory.length > 0) {
+        const lastResult = categoryHistory[0];
         setTimeout(() => {
           toast({
             title: lastResult.result === 'subiu' ? "Subiu! 📈" : lastResult.result === 'desceu' ? "Desceu! 📉" : "Manteve! ➡️",
-            description: `Variação: ${lastResult.price_change_percent > 0 ? '+' : ''}${lastResult.price_change_percent.toFixed(2)}%`,
+            description: `${lastResult.asset_symbol}: ${lastResult.price_change_percent > 0 ? '+' : ''}${lastResult.price_change_percent.toFixed(2)}%`,
             duration: 2000,
             className: lastResult.result === 'subiu' ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 
                       lastResult.result === 'desceu' ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 
@@ -204,51 +228,56 @@ const Fast = () => {
         }, 500);
       }
     }
-  }, [lastPoolId, poolHistory, toast]);
+  }, [lastPoolIds, poolHistory, selectedCategory, toast]);
 
   // Initialize and reload when category changes
   useEffect(() => {
-    loadCurrentPool();
+    loadCurrentPools();
     loadPoolHistory();
-  }, [loadCurrentPool, loadPoolHistory, selectedCategory]);
+  }, [loadCurrentPools, loadPoolHistory, selectedCategory]);
 
   // Countdown timer with smooth updates
   useEffect(() => {
-    if (!currentPool || countdown <= 0) return;
+    if (!currentPools.length || countdown <= 0) return;
     
     const timer = setInterval(() => {
-      calculateCountdown(currentPool);
+      calculateCountdown(currentPools[0]); // All pools have same timing
     }, 100); // Update every 100ms for smooth animation
 
     return () => clearInterval(timer);
-  }, [currentPool, countdown, calculateCountdown]);
+  }, [currentPools, countdown, calculateCountdown]);
 
   // Pool finalization and new pool creation
   useEffect(() => {
-    if (countdown <= 0 && currentPool) {
-      finalizePool();
+    if (countdown <= 0 && currentPools.length > 0) {
+      finalizePools();
     }
-  }, [countdown, currentPool]);
+  }, [countdown, currentPools]);
 
-  const finalizePool = async () => {
-    if (!currentPool) return;
+  const finalizePools = async () => {
+    if (!currentPools.length) return;
     
     try {
-      await supabase.functions.invoke('manage-fast-pools', {
-        body: { 
-          action: 'finalize_pool',
-          poolId: currentPool.id 
-        }
-      });
+      // Finalize all pools in parallel
+      await Promise.all(
+        currentPools.map(pool => 
+          supabase.functions.invoke('manage-fast-pools', {
+            body: { 
+              action: 'finalize_pool',
+              poolId: pool.id 
+            }
+          })
+        )
+      );
       
-      // Wait a moment then load new pool
+      // Wait a moment then load new pools
       setTimeout(() => {
-        loadCurrentPool();
+        loadCurrentPools();
         loadPoolHistory();
       }, 2000);
       
     } catch (error) {
-      console.error('Error finalizing pool:', error);
+      console.error('Error finalizing pools:', error);
     }
   };
 
@@ -270,16 +299,17 @@ const Fast = () => {
     }
   };
 
-  // Check for user winnings
+  // Check for user winnings across all pools
   const checkForWinnings = useCallback(async () => {
-    if (!user || !currentPool) return;
+    if (!user || !currentPools.length) return;
     
     try {
+      const poolIds = currentPools.map(pool => pool.id);
       const { data: winningBets } = await supabase
         .from('fast_pool_bets')
         .select('*')
         .eq('user_id', user.id)
-        .eq('pool_id', currentPool.id)
+        .in('pool_id', poolIds)
         .eq('processed', true)
         .gt('payout_amount', 0);
         
@@ -294,17 +324,20 @@ const Fast = () => {
     } catch (error) {
       console.error('Error checking winnings:', error);
     }
-  }, [user, currentPool, toast]);
+  }, [user, currentPools, toast]);
 
-  const handleBet = async (side: 'subiu' | 'desceu') => {
-    if (!user || !currentPool) {
+  const handleBet = async (poolId: string, side: 'subiu' | 'desceu') => {
+    if (!user || !currentPools.length) {
       toast({
         title: "Erro",
-        description: "Você precisa estar logado e ter um pool ativo.",
+        description: "Você precisa estar logado e ter pools ativos.",
         variant: "destructive"
       });
       return;
     }
+
+    const pool = currentPools.find(p => p.id === poolId);
+    if (!pool) return;
 
     if (countdown <= 10) {
       toast({
@@ -338,7 +371,7 @@ const Fast = () => {
         .from('fast_pool_bets')
         .insert({
           user_id: user.id,
-          pool_id: currentPool.id,
+          pool_id: poolId,
           side: side,
           amount_rioz: betAmount,
           odds: getOdds()
@@ -347,7 +380,7 @@ const Fast = () => {
       if (betError) throw betError;
 
       // Add click animation
-      setClickedPool({ id: currentPool.id, side });
+      setClickedPool({ id: poolId, side });
       setTimeout(() => setClickedPool(null), 400);
 
       toast({
@@ -374,13 +407,11 @@ const Fast = () => {
   };
 
   const openHistoryModal = () => {
-    if (currentPool) {
-      setSelectedPool(currentPool.asset_symbol);
-      setPoolHistoryOpen(true);
-    }
+    setSelectedPool(selectedCategory);
+    setPoolHistoryOpen(true);
   };
 
-  if (!currentPool) {
+  if (!currentPools.length) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
         <div className="text-center">
@@ -428,8 +459,21 @@ const Fast = () => {
     );
   }
 
+  const currentCategoryHistory = poolHistory[selectedCategory] || [];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Hide elements on mobile */}
+      <style>{`
+        @media (max-width: 768px) {
+          .riana-chat-button,
+          .dark-mode-toggle-duplicate,
+          .header-dark-toggle {
+            display: none !important;
+          }
+        }
+      `}</style>
+      
       <div className="container mx-auto px-4 pt-8 pb-20">
         {/* Theme toggle */}
         <div className="absolute top-4 right-4">
@@ -449,22 +493,28 @@ const Fast = () => {
             Opine se o ativo vai subir ou descer nos próximos 60 segundos. Odds dinâmicas baseadas em dados reais de mercado.
           </p>
           
-          {/* Category Selector - Horizontal */}
+          {/* Category Selector - Horizontal with themed styling */}
           <div className="flex justify-center mb-6">
             <div className="flex gap-2 p-1 bg-muted rounded-lg">
               {categoryOptions.map((category) => (
                 <Button
                   key={category.value}
-                  variant={selectedCategory === category.value ? "default" : "ghost"}
+                  variant="ghost"
                   size="sm"
                   onClick={() => setSelectedCategory(category.value)}
                   className={cn(
-                    "transition-all duration-200",
+                    "transition-all duration-200 font-medium",
                     selectedCategory === category.value 
-                      ? "bg-primary text-primary-foreground shadow-sm" 
+                      ? "shadow-sm border" 
                       : "hover:bg-muted-foreground/10"
                   )}
+                  style={selectedCategory === category.value ? {
+                    backgroundColor: category.bgColor,
+                    color: category.textColor,
+                    borderColor: category.bgColor
+                  } : {}}
                 >
+                  <span className="mr-1">{category.icon}</span>
                   {category.label}
                 </Button>
               ))}
@@ -472,144 +522,151 @@ const Fast = () => {
           </div>
         </div>
 
-        {/* Current Pool Card */}
-        <div className="max-w-2xl mx-auto mb-8">
-          <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5"></div>
-            
-            <CardHeader className="relative z-10 text-center pb-3">
-              <div className="flex items-center justify-between mb-2">
-                <Badge variant="secondary" className="bg-primary/10 text-primary">
-                  Pool #{currentPool.round_number}
-                </Badge>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={openHistoryModal}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <BarChart3 className="w-4 h-4 mr-1" />
-                  Histórico
-                </Button>
-              </div>
-              
-              <CardTitle className="text-xl md:text-2xl mb-2">
-                {currentPool.question}
-              </CardTitle>
-              
-              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                <span className="bg-muted/50 px-2 py-1 rounded">{currentPool.asset_name}</span>
-                <span>•</span>
-                <span>Preço atual: ${currentPool.opening_price.toLocaleString()}</span>
-              </div>
-            </CardHeader>
-
-            <CardContent className="relative z-10 space-y-6">
-              {/* Countdown */}
-              <div className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-[#ff2389] mb-2">
-                  {countdown}s
-                </div>
-                <div className="w-full bg-muted/20 rounded-full h-3 overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 transition-all duration-[100ms] ease-linear"
-                    style={{ 
-                      width: `${(countdown / 60) * 100}%`,
-                      transition: 'width 100ms linear'
-                    }}
-                  />
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Tempo restante para opinar
-                </p>
-              </div>
-
-              {/* Bet Amount Slider */}
-              <div className="space-y-3">
-                <label className="text-sm font-medium">
-                  Opinar {betAmount} RZ
-                </label>
-                <div className="px-4 py-3 bg-muted/20 rounded-lg">
-                  <input
-                    type="range"
-                    min="1"
-                    max="1000"
-                    step="1"
-                    value={betAmount}
-                    onChange={(e) => setBetAmount(Number(e.target.value))}
-                    className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer slider"
-                    style={{
-                      background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) 100%)`
-                    }}
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                    <span>1 RZ</span>
-                    <span>1.000 RZ</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Opinion Buttons */}
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  onClick={() => handleBet('subiu')}
-                  disabled={countdown <= 10}
-                  className={`h-16 text-lg font-semibold transition-all duration-300 ${
-                    clickedPool?.id === currentPool.id && clickedPool?.side === 'subiu'
-                      ? 'scale-[1.02] shadow-lg shadow-[#00ff90]/30 ring-2 ring-[#00ff90]/50 animate-pulse'
-                      : ''
-                  } bg-[#00ff90] hover:bg-[#00ff90]/90 text-black`}
-                >
-                  <div className="flex items-center justify-between w-full px-2">
-                    <ArrowUp className="w-6 h-6" />
-                    <span>Subir</span>
-                    <span className="text-sm opacity-80">
-                      x{getOdds().toFixed(2)}
-                    </span>
-                  </div>
-                </Button>
+        {/* Current Pools Grid */}
+        <div className="max-w-6xl mx-auto mb-8">
+          <div className="grid md:grid-cols-3 gap-6">
+            {currentPools.map((pool, index) => (
+              <Card key={pool.id} className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5"></div>
                 
-                <Button
-                  onClick={() => handleBet('desceu')}
-                  disabled={countdown <= 10}
-                  className={`h-16 text-lg font-semibold transition-all duration-300 ${
-                    clickedPool?.id === currentPool.id && clickedPool?.side === 'desceu'
-                      ? 'scale-[1.02] shadow-lg shadow-[#ff2389]/30 ring-2 ring-[#ff2389]/50 animate-pulse'
-                      : ''
-                  } bg-[#ff2389] hover:bg-[#ff2389]/90 text-white`}
-                >
-                  <div className="flex items-center justify-between w-full px-2">
-                    <ArrowDown className="w-6 h-6" />
-                    <span>Descer</span>
-                    <span className="text-sm opacity-80">
-                      x{getOdds().toFixed(2)}
-                    </span>
+                <CardHeader className="relative z-10 text-center pb-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">
+                      Pool #{pool.round_number}
+                    </Badge>
+                    {index === 0 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={openHistoryModal}
+                        className="text-muted-foreground hover:text-foreground text-xs"
+                      >
+                        <BarChart3 className="w-3 h-3 mr-1" />
+                        Histórico
+                      </Button>
+                    )}
                   </div>
-                </Button>
-              </div>
+                  
+                  <CardTitle className="text-lg mb-2">
+                    {pool.asset_name}
+                  </CardTitle>
+                  
+                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                    <span className="bg-muted/50 px-2 py-1 rounded">{pool.asset_symbol}</span>
+                    <span>•</span>
+                    <span>${pool.opening_price.toLocaleString()}</span>
+                  </div>
+                </CardHeader>
 
-              {countdown <= 10 && (
-                <div className="text-center text-sm text-muted-foreground">
-                  ⏰ Opiniões bloqueadas nos últimos 10 segundos
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                <CardContent className="relative z-10 space-y-4">
+                  {/* Countdown - shared across all pools */}
+                  {index === 0 && (
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-[#ff2389] mb-2">
+                        {countdown}s
+                      </div>
+                      <div className="w-full bg-muted/20 rounded-full h-2 overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 transition-all duration-[100ms] ease-linear"
+                          style={{ 
+                            width: `${(countdown / 60) * 100}%`,
+                            transition: 'width 100ms linear'
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Bet Amount Slider - only on first pool */}
+                  {index === 0 && (
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium">
+                        Opinar {betAmount} RZ
+                      </label>
+                      <div className="px-3 py-2 bg-muted/20 rounded-lg">
+                        <input
+                          type="range"
+                          min="1"
+                          max="1000"
+                          step="1"
+                          value={betAmount}
+                          onChange={(e) => setBetAmount(Number(e.target.value))}
+                          className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer slider"
+                          style={{
+                            background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) 100%)`
+                          }}
+                        />
+                        <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                          <span>1 RZ</span>
+                          <span>1.000 RZ</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Opinion Buttons */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      onClick={() => handleBet(pool.id, 'subiu')}
+                      disabled={countdown <= 10}
+                      className={`h-12 text-sm font-semibold transition-all duration-300 ${
+                        clickedPool?.id === pool.id && clickedPool?.side === 'subiu'
+                          ? 'scale-[1.02] shadow-lg shadow-[#00ff90]/30 ring-2 ring-[#00ff90]/50 animate-pulse'
+                          : ''
+                      } bg-[#00ff90] hover:bg-[#00ff90]/90 text-black`}
+                    >
+                      <div className="flex items-center justify-between w-full px-1">
+                        <ArrowUp className="w-4 h-4" />
+                        <span>Subir</span>
+                        <span className="text-xs opacity-80">
+                          x{getOdds().toFixed(2)}
+                        </span>
+                      </div>
+                    </Button>
+                    
+                    <Button
+                      onClick={() => handleBet(pool.id, 'desceu')}
+                      disabled={countdown <= 10}
+                      className={`h-12 text-sm font-semibold transition-all duration-300 ${
+                        clickedPool?.id === pool.id && clickedPool?.side === 'desceu'
+                          ? 'scale-[1.02] shadow-lg shadow-[#ff2389]/30 ring-2 ring-[#ff2389]/50 animate-pulse'
+                          : ''
+                      } bg-[#ff2389] hover:bg-[#ff2389]/90 text-white`}
+                    >
+                      <div className="flex items-center justify-between w-full px-1">
+                        <ArrowDown className="w-4 h-4" />
+                        <span>Descer</span>
+                        <span className="text-xs opacity-80">
+                          x{getOdds().toFixed(2)}
+                        </span>
+                      </div>
+                    </Button>
+                  </div>
+
+                  {countdown <= 10 && (
+                    <div className="text-center text-xs text-muted-foreground">
+                      ⏰ Opiniões bloqueadas
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
-        {/* Recent Results */}
-        {poolHistory.length > 0 && (
+        {/* Recent Results for Current Category */}
+        {currentCategoryHistory.length > 0 && (
           <div className="max-w-4xl mx-auto">
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ArrowUpDown className="w-5 h-5" />
-                  Últimos Resultados
+                  Últimos Resultados - {categoryOptions.find(c => c.value === selectedCategory)?.label}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                  {poolHistory.slice(0, 10).map((result, index) => (
+                  {currentCategoryHistory.slice(0, 10).map((result, index) => (
                     <div
                       key={result.id}
                       className="flex flex-col items-center p-3 rounded-lg bg-muted/20 border"
@@ -629,6 +686,7 @@ const Fast = () => {
                           <span className="text-xs font-bold text-gray-600 dark:text-gray-400">=</span>
                         )}
                       </div>
+                      <span className="text-xs font-medium">{result.asset_symbol}</span>
                       <span className="text-xs text-muted-foreground">
                         {result.price_change_percent > 0 ? '+' : ''}{result.price_change_percent.toFixed(2)}%
                       </span>
@@ -652,6 +710,7 @@ const Fast = () => {
             <CardContent className="space-y-3 text-sm">
               <div className="space-y-2">
                 <p>• Cada pool dura exatamente 60 segundos</p>
+                <p>• 3 pools simultâneos por categoria</p>
                 <p>• Opine se o ativo vai subir (SIM) ou descer (NÃO)</p>
                 <p>• Resultado baseado em dados reais de mercado</p>
                 <p>• Odds dinâmicas que diminuem com o tempo</p>
@@ -664,47 +723,38 @@ const Fast = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-[#ff2389]">
                 <BarChart3 className="w-5 h-5" />
-                Sistema de Odds
+                Categorias Disponíveis
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="space-y-2">
-                <p>• Odds iniciais baseadas no ativo</p>
-                <p>• Redução gradual conforme o tempo passa</p>
-                <p>• Odds mínimas de 1.0x nos últimos 25 segundos</p>
-                <p>• Lucro calculado no momento da aposta</p>
-                <p>• Pagamento automático para vencedores</p>
+                <p>• <strong>Commodities:</strong> Petróleo, Ouro, Prata</p>
+                <p>• <strong>Cripto:</strong> Bitcoin, Ethereum, Solana</p>
+                <p>• <strong>Forex:</strong> BRL/USD, EUR/USD, JPY/USD</p>
+                <p>• <strong>Ações:</strong> Tesla, Apple, Amazon</p>
+                <p>• Todos sincronizados em tempo real</p>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
-      
-      {/* Fast Markets Terms Modal */}
-      <FastMarketTermsModal
-        open={showTermsModal}
+
+      {/* Modals */}
+      <FastMarketTermsModal 
+        open={showTermsModal} 
         onOpenChange={setShowTermsModal}
         onAccept={() => {
+          localStorage.setItem('fastMarketsTermsAccepted', 'true');
           setShowTermsModal(false);
         }}
       />
-
-      {/* Pool History Modal */}
+      
       <FastPoolHistoryModal
         open={poolHistoryOpen}
         onOpenChange={setPoolHistoryOpen}
-        assetSymbol={selectedPool || ''}
+        assetSymbol={selectedPool || selectedCategory}
         timeLeft={countdown}
       />
-      
-      {/* Remove Riana Chat Button and duplicate dark mode on Mobile - handled by CSS */}
-      <style>{`
-        @media (max-width: 768px) {
-          .riana-chat-button { display: none !important; }
-          .dark-mode-toggle-duplicate { display: none !important; }
-          .header-dark-toggle { display: none !important; }
-        }
-      `}</style>
     </div>
   );
 };

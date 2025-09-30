@@ -55,26 +55,29 @@ serve(async (req) => {
 });
 
 async function getCurrentPool(supabase: any, category = 'crypto') {
-  // Get the most recent active pool for selected category
+  // Get all active pools for selected category
   const { data: pools, error } = await supabase
     .from('fast_pools')
     .select('*')
     .eq('status', 'active')
     .eq('category', category)
-    .order('created_at', { ascending: false })
-    .limit(1);
+    .order('created_at', { ascending: false });
 
   if (error) throw error;
 
-  let currentPool = pools?.[0];
+  // Check if we have all 3 pools active and not expired
+  const now = new Date();
+  const validPools = pools?.filter((pool: any) => new Date(pool.round_end_time) > now) || [];
 
-  // If no active pool exists or current pool is expired, create a new one
-  if (!currentPool || new Date(currentPool.round_end_time) <= new Date()) {
-    currentPool = await createPool(supabase, category);
+  let activePools = validPools;
+
+  // If we don't have 3 active pools, create new synchronized set
+  if (validPools.length < 3) {
+    activePools = await createSynchronizedPools(supabase, category);
   }
 
   return new Response(
-    JSON.stringify({ pool: currentPool }),
+    JSON.stringify({ pools: activePools }),
     { 
       headers: { 
         ...corsHeaders, 
@@ -85,10 +88,10 @@ async function getCurrentPool(supabase: any, category = 'crypto') {
 }
 
 async function createNewPool(supabase: any, category = 'crypto') {
-  const newPool = await createPool(supabase, category);
+  const newPools = await createSynchronizedPools(supabase, category);
   
   return new Response(
-    JSON.stringify({ pool: newPool }),
+    JSON.stringify({ pools: newPools }),
     { 
       headers: { 
         ...corsHeaders, 
@@ -98,7 +101,7 @@ async function createNewPool(supabase: any, category = 'crypto') {
   );
 }
 
-async function createPool(supabase: any, category = 'crypto') {
+async function createSynchronizedPools(supabase: any, category = 'crypto') {
   const now = new Date();
   const endTime = new Date(now.getTime() + 60000); // 60 seconds from now
 
@@ -111,59 +114,66 @@ async function createPool(supabase: any, category = 'crypto') {
 
   const nextRoundNumber = (lastPool?.[0]?.round_number || 0) + 1;
 
-  // Get pool template based on category
-  const { data: demoPool } = await supabase
+  // Define pool configurations for each category
+  const poolConfigs = getPoolConfigurations(category);
+  
+  // Get real market prices for all symbols
+  const symbols = poolConfigs.map(config => config.symbol);
+  const { data: marketData } = await supabase.functions.invoke('get-market-data', {
+    body: { symbols }
+  });
+
+  const prices = marketData?.prices || {};
+
+  // Create all 3 pools with synchronized timing
+  const poolsToInsert = poolConfigs.map((config, index) => ({
+    round_number: nextRoundNumber,
+    asset_symbol: config.symbol,
+    asset_name: config.name,
+    question: config.question,
+    category: category,
+    opening_price: prices[config.symbol] || config.fallbackPrice,
+    round_start_time: now.toISOString(),
+    round_end_time: endTime.toISOString(),
+    base_odds: 1.65,
+    status: 'active'
+  }));
+
+  const { data: pools, error } = await supabase
     .from('fast_pools')
-    .select('*')
-    .eq('category', category)
-    .eq('status', 'demo')
-    .limit(1)
-    .single();
-
-  let poolData;
-  if (demoPool) {
-    // Use demo pool template
-    poolData = {
-      round_number: nextRoundNumber,
-      asset_symbol: demoPool.asset_symbol,
-      asset_name: demoPool.asset_name,
-      question: demoPool.question,
-      category: demoPool.category,
-      opening_price: demoPool.opening_price + (Math.random() * 20 - 10), // Add some price variation
-      round_start_time: now.toISOString(),
-      round_end_time: endTime.toISOString(),
-      base_odds: 1.65,
-      status: 'active'
-    };
-  } else {
-    // Fallback to Bitcoin
-    const priceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
-    const priceData = await priceResponse.json();
-    const currentPrice = priceData.bitcoin?.usd || 67500;
-
-    poolData = {
-      round_number: nextRoundNumber,
-      asset_symbol: 'BTC',
-      asset_name: 'Bitcoin',
-      question: 'O Bitcoin vai subir nos próximos 60 segundos?',
-      category: 'crypto',
-      opening_price: currentPrice,
-      round_start_time: now.toISOString(),
-      round_end_time: endTime.toISOString(),
-      base_odds: 1.65,
-      status: 'active'
-    };
-  }
-
-  const { data: pool, error } = await supabase
-    .from('fast_pools')
-    .insert(poolData)
-    .select()
-    .single();
+    .insert(poolsToInsert)
+    .select();
 
   if (error) throw error;
 
-  return pool;
+  return pools;
+}
+
+function getPoolConfigurations(category: string) {
+  const configs = {
+    commodities: [
+      { symbol: 'OIL', name: 'Petróleo WTI', question: 'O petróleo vai subir nos próximos 60 segundos?', fallbackPrice: 75.50 },
+      { symbol: 'GOLD', name: 'Ouro', question: 'O ouro vai subir nos próximos 60 segundos?', fallbackPrice: 2650.00 },
+      { symbol: 'SILVER', name: 'Prata', question: 'A prata vai subir nos próximos 60 segundos?', fallbackPrice: 31.25 }
+    ],
+    crypto: [
+      { symbol: 'BTC', name: 'Bitcoin', question: 'O Bitcoin vai subir nos próximos 60 segundos?', fallbackPrice: 67500 },
+      { symbol: 'ETH', name: 'Ethereum', question: 'O Ethereum vai subir nos próximos 60 segundos?', fallbackPrice: 3250 },
+      { symbol: 'SOL', name: 'Solana', question: 'O Solana vai subir nos próximos 60 segundos?', fallbackPrice: 140 }
+    ],
+    forex: [
+      { symbol: 'BRLUSD', name: 'Real/Dólar', question: 'O Real vai subir contra o Dólar nos próximos 60 segundos?', fallbackPrice: 0.20 },
+      { symbol: 'EURUSD', name: 'Euro/Dólar', question: 'O Euro vai subir contra o Dólar nos próximos 60 segundos?', fallbackPrice: 1.09 },
+      { symbol: 'JPYUSD', name: 'Iene/Dólar', question: 'O Iene vai subir contra o Dólar nos próximos 60 segundos?', fallbackPrice: 0.0067 }
+    ],
+    stocks: [
+      { symbol: 'TSLA', name: 'Tesla', question: 'A Tesla vai subir nos próximos 60 segundos?', fallbackPrice: 248.50 },
+      { symbol: 'AAPL', name: 'Apple', question: 'A Apple vai subir nos próximos 60 segundos?', fallbackPrice: 225.75 },
+      { symbol: 'AMZN', name: 'Amazon', question: 'A Amazon vai subir nos próximos 60 segundos?', fallbackPrice: 185.25 }
+    ]
+  };
+
+  return configs[category as keyof typeof configs] || configs.crypto;
 }
 
 async function finalizePool(supabase: any, poolId: string) {
@@ -177,10 +187,12 @@ async function finalizePool(supabase: any, poolId: string) {
   if (poolError) throw poolError;
   if (!pool) throw new Error('Pool not found');
 
-  // Get current price
-  const priceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
-  const priceData = await priceResponse.json();
-  const closingPrice = priceData.bitcoin?.usd || 43000;
+  // Get current price for this specific asset
+  const { data: marketData } = await supabase.functions.invoke('get-market-data', {
+    body: { symbols: [pool.asset_symbol] }
+  });
+  
+  const closingPrice = marketData?.prices?.[pool.asset_symbol] || getFallbackPriceForSymbol(pool.asset_symbol);
 
   // Determine result
   const priceChange = ((closingPrice - pool.opening_price) / pool.opening_price) * 100;
@@ -322,4 +334,22 @@ async function updateUserBalance(supabase: any, userId: string, amount: number) 
   if (error) {
     console.error('Error updating user balance:', error);
   }
+}
+
+function getFallbackPriceForSymbol(symbol: string): number {
+  const fallbackPrices = {
+    'BTC': 67500,
+    'ETH': 3250,
+    'SOL': 140,
+    'OIL': 75.50,
+    'GOLD': 2650.00,
+    'SILVER': 31.25,
+    'BRLUSD': 0.20,
+    'EURUSD': 1.09,
+    'JPYUSD': 0.0067,
+    'TSLA': 248.50,
+    'AAPL': 225.75,
+    'AMZN': 185.25
+  };
+  return fallbackPrices[symbol as keyof typeof fallbackPrices] || 100;
 }
