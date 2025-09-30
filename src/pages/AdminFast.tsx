@@ -9,6 +9,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { AssetConfigCard } from '@/components/admin/AssetConfigCard';
 
 interface FastPool {
   id: string;
@@ -309,12 +310,12 @@ const AdminFast = () => {
             </Card>
           </div>
 
-          {/* General Pool Configurations */}
+          {/* Asset Configurations */}
           <Card className="bg-card-secondary border-border-secondary mb-8">
             <CardHeader>
-              <CardTitle>Configurações Gerais dos Pools</CardTitle>
+              <CardTitle>Configurações de Ativos</CardTitle>
               <p className="text-sm text-muted-foreground">
-                Configurações aplicadas a todos os próximos rounds de cada pool
+                Configure os ativos que serão usados como modelo para criar os próximos pools
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -324,74 +325,24 @@ const AdminFast = () => {
                 </div>
               ) : pools.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  Nenhum pool encontrado
+                  Nenhum ativo configurado
                 </div>
               ) : (
                 pools
                   .sort((a, b) => {
-                    // Paused pools go to the top
+                    // Paused assets go to the top
                     if (a.paused && !b.paused) return -1;
                     if (!a.paused && b.paused) return 1;
                     return 0;
                   })
-                  .map(pool => (
-                  <div key={pool.id} className="p-4 rounded-lg border border-border bg-card/50 hover:border-primary/50 transition-colors">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2 flex-wrap">
-                          <h3 className="font-semibold">{pool.asset_name}</h3>
-                          <Badge className={getCategoryColor(pool.category)}>
-                            {pool.category}
-                          </Badge>
-                          {pool.api_connected && (
-                            <Badge className="bg-success/10 text-success">
-                              API Conectada
-                            </Badge>
-                          )}
-                          {pool.paused && (
-                            <Badge className="bg-yellow-500/10 text-yellow-600">
-                              Pausado
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm font-medium mb-1">Configuração Geral de API</p>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {pool.api_connected 
-                            ? `API: ${pool.api_url?.substring(0, 50)}...` 
-                            : 'Usando API padrão de mercado'}
-                        </p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
-                          <span>Símbolo: {pool.asset_symbol}</span>
-                          <span>Categoria: {pool.category}</span>
-                          {pool.last_api_sync && (
-                            <span>Última Sync: {new Date(pool.last_api_sync).toLocaleString('pt-BR')}</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="gap-2"
-                        onClick={() => navigate(`/admin/fast/${pool.id}/config`)}
-                      >
-                        <Settings className="w-4 h-4" />
-                        Configurar API
-                      </Button>
-                      
-                      <Button 
-                        variant={pool.paused ? "default" : "outline"}
-                        size="sm" 
-                        className={`gap-2 ${!pool.paused ? 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-[#ff2389]' : 'bg-success hover:bg-success/90 text-white'}`}
-                        onClick={() => handleTogglePause(pool)}
-                      >
-                        {pool.paused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
-                        {pool.paused ? 'Retomar' : 'Pausar'}
-                      </Button>
-                    </div>
-                  </div>
+                  .map(asset => (
+                  <AssetConfigCard 
+                    key={asset.id} 
+                    asset={asset} 
+                    onUpdate={fetchGeneralPoolConfigs}
+                    onTogglePause={handleTogglePause}
+                    getCategoryColor={getCategoryColor}
+                  />
                 ))
               )}
             </CardContent>

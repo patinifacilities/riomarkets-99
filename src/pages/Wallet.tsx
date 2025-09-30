@@ -92,7 +92,7 @@ const WalletPage = () => {
           <BalanceDonutChart />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
           {/* Order History - Active */}
           <OrderHistoryCard onRefresh={() => {
             refetchProfile();

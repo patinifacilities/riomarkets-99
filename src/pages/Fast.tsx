@@ -530,13 +530,13 @@ const Fast = () => {
   if (!currentPools.length) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
-        <div className="text-center">
-            <div className="w-32 h-32 rounded-full bg-[#ff2389]/5 flex items-center justify-center">
+        <div className="text-center mx-auto">
+            <div className="w-32 h-32 rounded-full bg-[#ff2389]/5 flex items-center justify-center mx-auto mb-4">
               <Zap className="w-16 h-16 text-[#ff2389]" style={{
                 animation: 'blink-118bpm 0.508s infinite'
               }} />
             </div>
-          <p className="text-muted-foreground mt-4">Carregando Fast Markets...</p>
+          <p className="text-muted-foreground text-center">Carregando Fast Markets...</p>
           <style>{`
             @keyframes blink-118bpm {
               0%, 100% { opacity: 1; }
