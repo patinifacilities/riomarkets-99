@@ -320,6 +320,9 @@ export type Database = {
       }
       fast_pools: {
         Row: {
+          api_connected: boolean | null
+          api_key: string | null
+          api_url: string | null
           asset_name: string
           asset_symbol: string
           base_odds: number
@@ -327,6 +330,7 @@ export type Database = {
           closing_price: number | null
           created_at: string
           id: string
+          last_api_sync: string | null
           opening_price: number | null
           question: string
           result: string | null
@@ -335,8 +339,12 @@ export type Database = {
           round_start_time: string
           status: string
           updated_at: string
+          webhook_url: string | null
         }
         Insert: {
+          api_connected?: boolean | null
+          api_key?: string | null
+          api_url?: string | null
           asset_name: string
           asset_symbol: string
           base_odds?: number
@@ -344,6 +352,7 @@ export type Database = {
           closing_price?: number | null
           created_at?: string
           id?: string
+          last_api_sync?: string | null
           opening_price?: number | null
           question: string
           result?: string | null
@@ -352,8 +361,12 @@ export type Database = {
           round_start_time: string
           status?: string
           updated_at?: string
+          webhook_url?: string | null
         }
         Update: {
+          api_connected?: boolean | null
+          api_key?: string | null
+          api_url?: string | null
           asset_name?: string
           asset_symbol?: string
           base_odds?: number
@@ -361,6 +374,7 @@ export type Database = {
           closing_price?: number | null
           created_at?: string
           id?: string
+          last_api_sync?: string | null
           opening_price?: number | null
           question?: string
           result?: string | null
@@ -369,6 +383,7 @@ export type Database = {
           round_start_time?: string
           status?: string
           updated_at?: string
+          webhook_url?: string | null
         }
         Relationships: []
       }

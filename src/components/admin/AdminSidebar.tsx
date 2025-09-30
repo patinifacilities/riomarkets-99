@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, Settings, Users, FileText, Newspaper, DollarSign, Activity, 
-  CreditCard, Banknote, Wallet, Menu, LogOut 
+  CreditCard, Banknote, Wallet, Menu, LogOut, Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -43,6 +43,12 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
       title: 'Mercados', 
       icon: Settings, 
       path: '/admin/markets'
+    },
+    { 
+      title: 'Fast', 
+      icon: Zap, 
+      path: '/admin/fast',
+      color: 'text-[#ff2389] hover:text-[#ff2389]'
     },
     { 
       title: 'Usuários', 
@@ -137,7 +143,7 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2">
-          {menuItems.map((item) => {
+        {menuItems.map((item) => {
             const isActive = isActivePath(item.path, item.exact);
             return (
               <Link
@@ -147,7 +153,7 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
                   flex items-center gap-3 px-3 py-2 rounded-lg transition-colors
                   ${isActive 
                     ? 'bg-primary text-primary-foreground' 
-                    : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+                    : `hover:bg-muted text-muted-foreground hover:text-foreground ${item.color || ''}`
                   }
                 `}
                 onClick={() => {
@@ -155,7 +161,7 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
                   // Sidebar should remain persistent for navigation
                 }}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon className={`h-4 w-4 ${!isActive && item.color ? item.color : ''}`} />
                 <span className="text-sm font-medium">{item.title}</span>
               </Link>
             );
