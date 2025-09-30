@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Filter, LogIn, UserPlus, BarChart3, Zap, Target, Shield, Sparkles, X } from 'lucide-react';
+import { Filter, LogIn, UserPlus, BarChart3, Zap, Target, Shield, Sparkles, X, Landmark, Trophy, Rocket, Brain, Gamepad2, Globe } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,14 +29,14 @@ const Home = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Topic filters with icons
+  // Topic filters with modern Lucide icons
   const topicFilters = [
-    { id: 'politics', label: 'Política', value: 'politica', icon: '/assets/icons/politica.png' },
-    { id: 'economics', label: 'Economia', value: 'economia', icon: '/assets/icons/economia.png' },
-    { id: 'sports', label: 'Esportes', value: 'esportes', icon: '/assets/icons/esportes.png' },
-    { id: 'tech', label: 'Tecnologia', value: 'tecnologia', icon: '/assets/icons/tecnologia.png' },
-    { id: 'entertainment', label: 'Entretenimento', value: 'entretenimento', icon: '/assets/icons/entretenimento.png' },
-    { id: 'climate', label: 'Clima', value: 'clima', icon: '/assets/icons/clima.png' }
+    { id: 'politics', label: 'Política', value: 'politica', Icon: Landmark },
+    { id: 'economics', label: 'Economia', value: 'economia', Icon: Rocket },
+    { id: 'sports', label: 'Esportes', value: 'esportes', Icon: Trophy },
+    { id: 'tech', label: 'Tecnologia', value: 'tecnologia', Icon: Brain },
+    { id: 'entertainment', label: 'Entretenimento', value: 'entretenimento', Icon: Gamepad2 },
+    { id: 'climate', label: 'Clima', value: 'clima', Icon: Globe }
   ];
 
   // Status filters
@@ -244,24 +244,26 @@ const Home = () => {
       {/* Enhanced Filters Section */}
       <div className="container mx-auto px-4 py-6 bg-gradient-to-b from-background/95 to-background/60 border-t border-border/30 backdrop-blur-sm">
         <div className="flex flex-col gap-6">
-          {/* Topic Filters - Side Scroller with arrows */}
+          {/* Topic Filters - Infinite Loop Side Scroller */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Filter className="w-5 h-5 text-primary" />
               <h4 className="text-base font-bold text-foreground uppercase tracking-wide">Tópicos</h4>
             </div>
-            <div className="relative">
-              <div className="overflow-x-auto scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                <div className="flex gap-4 pb-2 min-w-max">
+            <div className="relative overflow-visible py-2">
+              <div className="overflow-x-auto scrollbar-hide scroll-smooth overflow-visible" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <div className="flex gap-4 pb-2 min-w-max animate-infinite-scroll hover:pause">
+                  {/* First set of topics */}
                   {topicFilters.map((topic) => {
                     const isSelected = selectedTopics.includes(topic.id);
+                    const IconComponent = topic.Icon;
                     return (
                       <button
                         key={topic.id}
                         onClick={() => handleTopicSelect(topic.id)}
                         className={`
                           flex items-center gap-4 px-10 py-7 rounded-2xl text-lg font-bold whitespace-nowrap
-                          transition-all duration-300 hover:scale-105 border-2 shadow-lg
+                          transition-all duration-300 hover:scale-110 border-2 shadow-lg
                           ${isSelected 
                             ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50' 
                             : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm'
@@ -271,7 +273,42 @@ const Home = () => {
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
                           isSelected ? 'bg-primary-foreground/20' : 'bg-primary/10'
                         }`}>
-                          <img src={topic.icon} alt="" className="w-8 h-8 object-contain" />
+                          <IconComponent className="w-8 h-8" />
+                        </div>
+                        <span className="text-lg">{topic.label}</span>
+                        {isSelected && (
+                          <X 
+                            className="w-6 h-6 ml-2 hover:scale-110 transition-transform" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveTopic(topic.id);
+                            }}
+                          />
+                        )}
+                      </button>
+                    );
+                  })}
+                  {/* Duplicate set for infinite loop effect */}
+                  {topicFilters.map((topic) => {
+                    const isSelected = selectedTopics.includes(topic.id);
+                    const IconComponent = topic.Icon;
+                    return (
+                      <button
+                        key={`${topic.id}-duplicate`}
+                        onClick={() => handleTopicSelect(topic.id)}
+                        className={`
+                          flex items-center gap-4 px-10 py-7 rounded-2xl text-lg font-bold whitespace-nowrap
+                          transition-all duration-300 hover:scale-110 border-2 shadow-lg
+                          ${isSelected 
+                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50' 
+                            : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm'
+                          }
+                        `}
+                      >
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                          isSelected ? 'bg-primary-foreground/20' : 'bg-primary/10'
+                        }`}>
+                          <IconComponent className="w-8 h-8" />
                         </div>
                         <span className="text-lg">{topic.label}</span>
                         {isSelected && (
@@ -291,20 +328,6 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Status Filters - Compact */}
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h4 className="text-xs font-semibold text-foreground uppercase tracking-wide">Status</h4>
-            </div>
-            <FilterChips
-              chips={statusFilters}
-              selectedChips={selectedStatus}
-              onChipSelect={handleStatusSelect}
-              onRemoveChip={handleRemoveStatus}
-              chipClassName="px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200"
-              className="flex flex-wrap gap-2"
-            />
-          </div>
         </div>
 
         {/* Search Bar - Below Status Filters */}
@@ -325,25 +348,26 @@ const Home = () => {
       {/* Markets Grid */}
       <div id="markets-section" className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-[color:var(--text-primary)] flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-[#00FF91]" />
-            Mercados ativos
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-[color:var(--text-primary)] flex items-center gap-2">
+              <TrendingUp className="w-6 h-6 text-[#00FF91]" />
+              Mercados ativos
+            </h2>
+          </div>
           
-          {/* Status Counters */}
-          <div className="flex flex-wrap gap-6 items-center mt-2 text-sm md:text-base">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#00FF91]"></div>
-              <span className="text-[#00FF91] font-medium">{ativos} ativos</span>
+          {/* Status Filters - Moved here */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">Status</h4>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#E8B100]"></div>
-              <span className="text-[#E8B100] font-medium">{encerrando} encerrando</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#6B7280]"></div>
-              <span className="text-[#6B7280] font-medium">{encerrados} encerrados</span>
-            </div>
+            <FilterChips
+              chips={statusFilters}
+              selectedChips={selectedStatus}
+              onChipSelect={handleStatusSelect}
+              onRemoveChip={handleRemoveStatus}
+              chipClassName="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200"
+              className="flex flex-wrap gap-2"
+            />
           </div>
         </div>
 
