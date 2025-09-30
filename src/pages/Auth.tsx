@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { Eye, EyeOff, Mail, Lock, UserPlus, LogIn, TrendingUp, KeyRound } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, UserPlus, LogIn, TrendingUp, KeyRound, Check, X, CreditCard, User as UserIcon } from 'lucide-react';
 import { TypewriterText } from '@/components/ui/TypewriterText';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from 'next-themes';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useOnboarding } from '@/stores/useOnboarding';
+import { validateCPF, formatCPF, validatePassword, validateUsername } from '@/utils/validation';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -29,11 +30,21 @@ const Auth = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    name: ''
+    confirmPassword: '',
+    name: '',
+    username: '',
+    cpf: ''
   });
   const [error, setError] = useState('');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [passwordRequirements, setPasswordRequirements] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false
+  });
 
   useEffect(() => {
     let mounted = true;
@@ -94,6 +105,13 @@ const Auth = () => {
     };
   }, [navigate, openOnFirstVisit]);
 
+  // Update password requirements in real-time
+  useEffect(() => {
+    if (formData.password) {
+      setPasswordRequirements(validatePassword(formData.password));
+    }
+  }, [formData.password]);
+
   const handleSignUp = async () => {
     console.log('Attempting sign up...');
     
@@ -102,7 +120,9 @@ const Auth = () => {
       password: formData.password,
       options: {
         data: {
-          name: formData.name
+          name: formData.name,
+          username: formData.username,
+          cpf: formData.cpf
         }
       }
     });
@@ -173,14 +193,39 @@ const Auth = () => {
       return;
     }
 
+    if (!isLogin && !formData.username) {
+      setError('Username é obrigatório para cadastro');
+      setLoading(false);
+      return;
+    }
+
+    if (!isLogin && !validateUsername(formData.username)) {
+      setError('Username deve ter 3-20 caracteres alfanuméricos ou underscore');
+      setLoading(false);
+      return;
+    }
+
+    if (!isLogin && formData.cpf && !validateCPF(formData.cpf)) {
+      setError('CPF inválido');
+      setLoading(false);
+      return;
+    }
+
+    if (!isLogin && formData.password !== formData.confirmPassword) {
+      setError('As senhas não coincidem');
+      setLoading(false);
+      return;
+    }
+
     if (!isLogin && !acceptedTerms) {
       setError('Você deve aceitar os Termos de Uso e Política de Privacidade');
       setLoading(false);
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Senha deve ter pelo menos 6 caracteres');
+    const passwordValidation = validatePassword(formData.password);
+    if (!isLogin && !Object.values(passwordValidation).every(Boolean)) {
+      setError('A senha não atende aos requisitos de segurança');
       setLoading(false);
       return;
     }
@@ -223,7 +268,7 @@ const Auth = () => {
             title: "Conta criada com sucesso!",
             description: "Verifique seu email para confirmar a conta.",
           });
-          setFormData({ email: '', password: '', name: '' });
+          setFormData({ email: '', password: '', confirmPassword: '', name: '', username: '', cpf: '' });
         } else {
           toast({
             title: "Conta criada e login realizado!",
@@ -290,22 +335,58 @@ const Auth = () => {
             <CardContent className="space-y-4">
               <form onSubmit={handleSubmit} className="space-y-4">
                 {!isLogin && (
-                  <div>
-                    <label htmlFor="name" className="text-sm font-medium mb-2 block">Nome completo</label>
-                    <div className="relative">
-                      <UserPlus className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                      <Input
-                        id="name"
-                        type="text"
-                        placeholder="Seu nome completo"
-                        value={formData.name}
-                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                        className="pl-10"
-                        aria-label="Digite seu nome completo"
-                        required={!isLogin}
-                      />
+                  <>
+                    <div>
+                      <label htmlFor="name" className="text-sm font-medium mb-2 block">Nome completo</label>
+                      <div className="relative">
+                        <UserPlus className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                        <Input
+                          id="name"
+                          type="text"
+                          placeholder="Seu nome completo"
+                          value={formData.name}
+                          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                          className="pl-10"
+                          aria-label="Digite seu nome completo"
+                          required={!isLogin}
+                        />
+                      </div>
                     </div>
-                  </div>
+
+                    <div>
+                      <label htmlFor="username" className="text-sm font-medium mb-2 block">Username</label>
+                      <div className="relative">
+                        <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                        <Input
+                          id="username"
+                          type="text"
+                          placeholder="seu_username"
+                          value={formData.username}
+                          onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                          className="pl-10"
+                          aria-label="Digite seu username"
+                          required={!isLogin}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label htmlFor="cpf" className="text-sm font-medium mb-2 block">CPF (opcional)</label>
+                      <div className="relative">
+                        <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                        <Input
+                          id="cpf"
+                          type="text"
+                          placeholder="000.000.000-00"
+                          value={formatCPF(formData.cpf)}
+                          onChange={(e) => setFormData(prev => ({ ...prev, cpf: e.target.value.replace(/\D/g, '') }))}
+                          className="pl-10"
+                          aria-label="Digite seu CPF"
+                          maxLength={14}
+                        />
+                      </div>
+                    </div>
+                  </>
                 )}
 
                 <div>
@@ -349,6 +430,62 @@ const Auth = () => {
                     </button>
                   </div>
                 </div>
+
+                {!isLogin && (
+                  <div>
+                    <label htmlFor="confirmPassword" className="text-sm font-medium mb-2 block">Confirmar senha</label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                      <Input
+                        id="confirmPassword"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Confirme sua senha"
+                        value={formData.confirmPassword}
+                        onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                        className="pl-10 pr-10"
+                        aria-label="Confirme sua senha"
+                        required={!isLogin}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Password Requirements */}
+                {!isLogin && formData.password && (
+                  <div className="space-y-2 p-3 rounded-lg border border-border bg-muted/20">
+                    <div className="text-sm font-medium text-foreground">Requisitos da senha:</div>
+                    <div className="grid grid-cols-1 gap-1">
+                      <div className={`flex items-center gap-2 text-xs ${passwordRequirements.length ? 'text-success' : 'text-muted-foreground'}`}>
+                        {passwordRequirements.length ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                        Pelo menos 8 caracteres
+                      </div>
+                      <div className={`flex items-center gap-2 text-xs ${passwordRequirements.uppercase ? 'text-success' : 'text-muted-foreground'}`}>
+                        {passwordRequirements.uppercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                        Uma letra maiúscula
+                      </div>
+                      <div className={`flex items-center gap-2 text-xs ${passwordRequirements.lowercase ? 'text-success' : 'text-muted-foreground'}`}>
+                        {passwordRequirements.lowercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                        Uma letra minúscula
+                      </div>
+                      <div className={`flex items-center gap-2 text-xs ${passwordRequirements.number ? 'text-success' : 'text-muted-foreground'}`}>
+                        {passwordRequirements.number ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                        Um número
+                      </div>
+                      <div className={`flex items-center gap-2 text-xs ${passwordRequirements.special ? 'text-success' : 'text-muted-foreground'}`}>
+                        {passwordRequirements.special ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                        Um caractere especial
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {isLogin && (
                   <div className="text-right">

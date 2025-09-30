@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, CheckCircle, XCircle, Settings, Play, ArrowLeft } from 'lucide-react';
+import { Plus, Edit, CheckCircle, XCircle, Settings, Play, ArrowLeft, Search } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useMarkets } from '@/hooks/useMarkets';
 import { useAuth } from '@/hooks/useAuth';
@@ -31,6 +32,7 @@ const AdminMarkets = () => {
     market: Market | null;
   }>({ isOpen: false, market: null });
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleCreateSuccess = () => {
     setShowCreateForm(false);
@@ -167,7 +169,18 @@ const AdminMarkets = () => {
           {/* Markets List */}
           <Card className="bg-card-secondary border-border-secondary">
             <CardHeader>
-              <CardTitle>Mercados da Plataforma</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Mercados da Plataforma</CardTitle>
+                <div className="relative w-64">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    placeholder="Buscar mercados..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               {isLoading ? (
@@ -175,7 +188,14 @@ const AdminMarkets = () => {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               ) : (
-                markets.map(market => (
+                markets
+                  .filter(market => 
+                    searchTerm === '' || 
+                    market.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    market.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    market.categoria.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
+                  .map(market => (
                   <div key={market.id} className="p-4 rounded-lg border border-border bg-card/50">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">

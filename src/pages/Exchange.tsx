@@ -193,9 +193,9 @@ const Exchange = () => {
             <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30">
               <ArrowRightLeft className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-4xl font-bold text-white">
-              Exchange RIOZ
-            </h1>
+                <h1 className="text-4xl font-bold text-foreground">
+                  Exchange RIOZ
+                </h1>
           </div>
           <p className="text-muted-foreground text-lg">
             Converta entre RIOZ e Reais brasileiros com conversão 1:1 instantânea
@@ -215,7 +215,7 @@ const Exchange = () => {
         {/* Success Notification - Inside Card */}
         {showNotification && (
           <div className="max-w-4xl mx-auto mb-2">
-            <div className="text-white text-center py-2 rounded-lg flex items-center justify-center gap-2">
+            <div className="text-foreground text-center py-2 rounded-lg flex items-center justify-center gap-2">
               <CheckCircle2 className="h-4 w-4" />
               <span className="text-sm">Conversão realizada com sucesso!</span>
             </div>
@@ -230,7 +230,7 @@ const Exchange = () => {
                 <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30">
                   <ArrowRightLeft className="h-6 w-6 text-primary" />
                 </div>
-                <span className="text-white">
+                <span className="text-foreground">
                   Exchange Central
                 </span>
               </CardTitle>
