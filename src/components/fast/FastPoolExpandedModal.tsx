@@ -1,9 +1,11 @@
+import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, TrendingDown, Clock, ArrowUp, ArrowDown, X } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clock, ArrowUp, ArrowDown, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface FastPool {
   id: string;
@@ -63,12 +65,44 @@ export const FastPoolExpandedModal = ({
   opinionNotifications = [],
   poolSpecificHistory = []
 }: FastPoolExpandedModalProps) => {
+  const [poolHistory, setPoolHistory] = React.useState<FastPoolResult[]>([]);
+  const [historyIndex, setHistoryIndex] = React.useState(0);
+  
   if (!pool) return null;
 
   const currentOdds = getOdds();
   
-  // Get last 4 results for this specific pool
-  const last4Results = poolSpecificHistory.slice(0, 4);
+  // Load pool-specific history from database
+  React.useEffect(() => {
+    if (!pool || !open) return;
+    
+    const loadPoolHistory = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('fast_pool_results')
+          .select('*')
+          .eq('asset_symbol', pool.asset_symbol)
+          .order('created_at', { ascending: false })
+          .limit(10);
+        
+        if (error) throw error;
+        
+        setPoolHistory((data || []).map(item => ({
+          ...item,
+          result: item.result as 'subiu' | 'desceu' | 'manteve'
+        })));
+      } catch (error) {
+        console.error('Error loading pool history:', error);
+      }
+    };
+    
+    loadPoolHistory();
+  }, [pool, open]);
+  
+  // Get 4 results to display based on current index
+  const displayedResults = poolHistory.slice(historyIndex, historyIndex + 4);
+  const canScrollLeft = historyIndex > 0;
+  const canScrollRight = historyIndex + 4 < poolHistory.length;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -230,13 +264,35 @@ export const FastPoolExpandedModal = ({
             </div>
           )}
           
-          {/* Last 4 Results for this Pool */}
-          {last4Results.length > 0 && (
+          {/* Last 10 Results for this Pool with scrolling */}
+          {poolHistory.length > 0 && (
             <Card className="bg-muted/20 border-border/50">
               <CardContent className="pt-4">
-                <h4 className="text-sm font-semibold mb-3">Últimos 4 Resultados deste Pool</h4>
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold">Últimos Resultados deste Pool</h4>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => setHistoryIndex(Math.max(0, historyIndex - 4))}
+                      disabled={!canScrollLeft}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => setHistoryIndex(Math.min(poolHistory.length - 4, historyIndex + 4))}
+                      disabled={!canScrollRight}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
                 <div className="grid grid-cols-4 gap-2">
-                  {last4Results.map((result) => (
+                  {displayedResults.map((result) => (
                     <div
                       key={result.id}
                       className={`flex flex-col items-center p-2 rounded-lg border ${

@@ -64,18 +64,18 @@ const Fast = () => {
   // Category options for fast pools with styling
   const categoryOptions = [
     { 
-      value: 'crypto', 
-      label: 'Cripto', 
-      bgColor: '#FF6101',
-      icon: '₿',
-      textColor: '#fff'
-    },
-    { 
       value: 'commodities', 
       label: window.innerWidth <= 768 ? 'Commod' : 'Commodities', 
       bgColor: '#FFD800',
       icon: '🛢️',
       textColor: '#000'
+    },
+    { 
+      value: 'crypto', 
+      label: 'Cripto', 
+      bgColor: '#FF6101',
+      icon: '₿',
+      textColor: '#fff'
     },
     { 
       value: 'forex', 
@@ -150,11 +150,16 @@ const Fast = () => {
       
       if (error) throw error;
       
-      if (data?.pools) {
-        // Remove duplicates based on pool id
-        const uniquePools = Array.from(
-          new Map((data.pools as FastPool[]).map((pool: FastPool) => [pool.id, pool])).values()
-        ) as FastPool[];
+      if (data?.pools && Array.isArray(data.pools)) {
+        // Remove duplicates based on pool id using a Set
+        const poolMap = new Map<string, FastPool>();
+        (data.pools as FastPool[]).forEach((pool: FastPool) => {
+          if (!poolMap.has(pool.id)) {
+            poolMap.set(pool.id, pool);
+          }
+        });
+        const uniquePools = Array.from(poolMap.values());
+        
         setCurrentPools(uniquePools);
         if (uniquePools.length > 0) {
           calculateCountdown(uniquePools[0]); // All pools have same timing

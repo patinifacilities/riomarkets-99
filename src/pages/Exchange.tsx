@@ -199,17 +199,35 @@ const ExchangeNew = () => {
               </div>
               
               <div className="relative bg-muted/30 rounded-lg border-2 border-border hover:border-primary/50 transition-colors">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10 pointer-events-none">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    fromCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
-                  }`}>
-                    {fromCurrency === 'BRL' ? (
-                      <span className="text-sm font-bold text-gray-700">R$</span>
-                    ) : (
-                      <span className="text-lg font-bold text-black">R</span>
-                    )}
-                  </div>
-                  <div className="flex flex-col">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity ${
+                        fromCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
+                      }`}>
+                        {fromCurrency === 'BRL' ? (
+                          <span className="text-sm font-bold text-gray-700">R$</span>
+                        ) : (
+                          <span className="text-lg font-bold text-black">R</span>
+                        )}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem disabled className="opacity-50">
+                        <Bitcoin className="w-4 h-4 mr-2" />
+                        BTC - Em breve
+                      </DropdownMenuItem>
+                      <DropdownMenuItem disabled className="opacity-50">
+                        <Coins className="w-4 h-4 mr-2" />
+                        USDT - Em breve
+                      </DropdownMenuItem>
+                      <DropdownMenuItem disabled className="opacity-50">
+                        <Coins className="w-4 h-4 mr-2" />
+                        USDC - Em breve
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <div className="flex flex-col pointer-events-none">
                     <span className="text-sm font-medium text-foreground">
                       {fromCurrency}
                     </span>
@@ -249,8 +267,8 @@ const ExchangeNew = () => {
             {/* To Section */}
               <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">Para</Label>
-                <div className="text-sm text-white">
+                <Label className="text-base font-semibold text-foreground">Para</Label>
+                <div className="text-sm font-medium text-foreground bg-muted/50 px-3 py-1 rounded-md">
                   Saldo: {toBalance.toLocaleString('pt-BR', { 
                     minimumFractionDigits: toCurrency === 'BRL' ? 2 : 0,
                     maximumFractionDigits: toCurrency === 'BRL' ? 2 : 0
@@ -258,7 +276,7 @@ const ExchangeNew = () => {
                 </div>
               </div>
               
-              <div className="relative">
+              <div className="relative bg-muted/30 rounded-lg border-2 border-border hover:border-primary/50 transition-colors">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -287,25 +305,17 @@ const ExchangeNew = () => {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  <span className="text-sm font-medium ml-2">
+                  <span className="text-sm font-medium text-foreground ml-2">
                     {toCurrency}
                   </span>
                 </div>
-                <div className="relative">
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    value={toAmount}
-                    readOnly
-                    className="opacity-0 absolute inset-0 pl-32 pr-4 h-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  />
-                  <div className="h-24 flex items-center justify-end pr-4 pointer-events-none text-5xl font-bold bg-muted/50 rounded-md">
-                    {toAmount ? parseFloat(toAmount).toLocaleString('pt-BR', { 
-                      minimumFractionDigits: toCurrency === 'BRL' ? 2 : 0,
-                      maximumFractionDigits: toCurrency === 'BRL' ? 2 : 0
-                    }) : '0'}
-                  </div>
-                </div>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={toAmount}
+                  readOnly
+                  className="pl-32 pr-4 h-24 text-right text-5xl font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
               </div>
             </div>
 
