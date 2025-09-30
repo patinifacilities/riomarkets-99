@@ -523,33 +523,34 @@ const MarketDetail = () => {
                        <p className="text-xs text-muted-foreground">Deposite R$ ou troque R$ por RIOZ para começar a opinar</p>
                      </div>
                    ) : (
-                     <div className="grid grid-cols-2 gap-2 mt-4">
-                       <Button 
-                         onClick={() => setSelectedOption('sim')}
-                         disabled={market.status !== 'aberto'}
-                         className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-[#00ff90] hover:bg-[#00ff90]/90 text-black font-semibold' : 'bg-[#00ff90] text-black border-2 hover:bg-[#00ff90]/90 font-semibold'}`}
-                         size="sm"
-                         aria-label="Opinar Sim"
-                       >
-                         Opinar Sim
-                       </Button>
-                       <Button 
-                         onClick={() => setSelectedOption('nao')}
-                         disabled={market.status !== 'aberto'}
-                         className={`min-h-[44px] ${selectedOption === 'nao' ? 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-semibold' : 'bg-[#ff2389] text-white border-2 hover:bg-[#ff2389]/90 font-semibold'}`}
-                         size="sm"
-                         aria-label="Opinar Não"
-                       >
-                         Opinar Não
-                       </Button>
-                     </div>
-                   )}
-                  
-                   {selectedOption && betAmount && betAmount > 0 && (
-                     <SliderConfirm
-                       selectedOption={selectedOption}
-                       disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
-                      onConfirm={async () => {
+                     <>
+                       <div className="grid grid-cols-2 gap-2 mt-4">
+                         <Button 
+                           onClick={() => setSelectedOption('sim')}
+                           disabled={market.status !== 'aberto'}
+                           className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-[#00ff90] hover:bg-[#00ff90]/90 text-black font-semibold' : 'bg-[#00ff90] text-black border-2 hover:bg-[#00ff90]/90 font-semibold'}`}
+                           size="sm"
+                           aria-label="Opinar Sim"
+                         >
+                           Opinar Sim
+                         </Button>
+                         <Button 
+                           onClick={() => setSelectedOption('nao')}
+                           disabled={market.status !== 'aberto'}
+                           className={`min-h-[44px] ${selectedOption === 'nao' ? 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-semibold' : 'bg-[#ff2389] text-white border-2 hover:bg-[#ff2389]/90 font-semibold'}`}
+                           size="sm"
+                           aria-label="Opinar Não"
+                         >
+                           Opinar Não
+                         </Button>
+                       </div>
+                       
+                       {selectedOption && betAmount && betAmount > 0 && (
+                         <div className="mt-4 w-full">
+                           <SliderConfirm
+                             selectedOption={selectedOption}
+                             disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
+                            onConfirm={async () => {
                         if (!authUser?.id) {
                           toast({
                             title: "Erro",
@@ -624,9 +625,9 @@ const MarketDetail = () => {
                             const backgroundColor = selectedOption === 'sim' ? '#00ff90' : '#ff2389';
                             const textColor = selectedOption === 'sim' ? '#374151' : '#ffffff';
                             
-                            // Custom toast with background color
+                            // Custom toast with background color - bottom right with rounded corners
                             const toastElement = document.createElement('div');
-                            toastElement.className = 'fixed top-4 right-4 z-50 p-4 rounded-lg font-medium shadow-lg animate-in fade-in slide-in-from-top-2';
+                            toastElement.className = 'fixed bottom-4 right-4 z-50 p-4 rounded-2xl font-medium shadow-lg animate-in fade-in slide-in-from-bottom-2';
                             toastElement.style.backgroundColor = backgroundColor;
                             toastElement.style.color = textColor;
                             toastElement.textContent = 'Opinião confirmada.';
@@ -647,14 +648,17 @@ const MarketDetail = () => {
                             description: error instanceof Error ? error.message : "Falha ao confirmar opinião. Tente novamente.",
                             variant: "destructive",
                           });
-                        }
-                      }}
-                      text="Deslize para confirmar opinião"
-                      className="mt-4 w-full"
-                    />
-                  )}
+                         }
+                       }}
+                       text="Deslize para confirmar opinião"
+                       className="mt-4 w-full"
+                     />
+                          </div>
+                       )}
+                     </>
+                   )}
 
-                  {market.status !== 'aberto' && (
+                   {market.status !== 'aberto' && (
                     <div className="text-center text-sm text-muted-foreground">
                       Este mercado está {market.status}
                     </div>

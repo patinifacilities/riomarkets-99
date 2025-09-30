@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTheme } from 'next-themes';
 import { FastMarketTermsModal } from '@/components/fast/FastMarketTermsModal';
 import { FastPoolHistoryModal } from '@/components/fast/FastPoolHistoryModal';
+import { FastPoolExpandedModal } from '@/components/fast/FastPoolExpandedModal';
 import { DarkModeToggle } from '@/components/layout/DarkModeToggle';
 import { Link } from 'react-router-dom';
 
@@ -54,6 +55,7 @@ const Fast = () => {
   const [lastPoolIds, setLastPoolIds] = useState<string[]>([]);
   const [opinionNotifications, setOpinionNotifications] = useState<{id: string, text: string, side?: 'subiu' | 'desceu', timestamp: number}[]>([]);
   const [userPoolBets, setUserPoolBets] = useState<Record<string, number>>({});
+  const [expandedPool, setExpandedPool] = useState<FastPool | null>(null);
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
@@ -583,6 +585,13 @@ const Fast = () => {
           100% { border-color: transparent; }
         }
         
+        @keyframes heartbeat {
+          0%, 100% { transform: scale(1); }
+          25% { transform: scale(1.08); }
+          50% { transform: scale(1); }
+          75% { transform: scale(1.08); }
+        }
+        
         @keyframes rearrange-in {
           0% { 
             transform: translateY(-20px) scale(0.95); 
@@ -666,10 +675,14 @@ const Fast = () => {
         <div className="max-w-6xl mx-auto mb-8">
           <div className="grid md:grid-cols-3 gap-6">
             {currentPools.map((pool, index) => (
-              <Card key={pool.id} className={cn(
-                "relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm",
-                (pool as any).paused && "opacity-50 grayscale"
-              )}>
+              <Card 
+                key={pool.id} 
+                className={cn(
+                  "relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm cursor-pointer transition-all hover:scale-[1.02] hover:shadow-lg",
+                  (pool as any).paused && "opacity-50 grayscale"
+                )}
+                onClick={() => setExpandedPool(pool)}
+              >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5"></div>
                 
                 {(pool as any).paused && (
@@ -683,19 +696,17 @@ const Fast = () => {
                 )}
                 
                 <CardHeader className="relative z-10 text-center pb-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      {getPoolIcon(pool.asset_symbol)}
-                      <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">
-                        Pool #{pool.round_number}
-                      </Badge>
-                    </div>
-                    {index === 0 && (
-                      <div className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-lg">
-                        Seu total: {userPoolBets[pool.id] || 0} RZ
-                      </div>
-                    )}
-                  </div>
+                   <div className="flex items-center justify-between mb-2">
+                     <div className="flex items-center gap-2">
+                       {getPoolIcon(pool.asset_symbol)}
+                       <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">
+                         Pool #{pool.round_number}
+                       </Badge>
+                     </div>
+                     <div className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-lg">
+                       Seu total: <span className="text-[#00ff90] font-semibold">{userPoolBets[pool.id] || 0} RZ</span>
+                     </div>
+                   </div>
                   
                   <CardTitle className="text-lg mb-2">
                     {pool.asset_name}
@@ -717,38 +728,38 @@ const Fast = () => {
                       </label>
                       <div className="px-3 py-2 bg-muted/20 rounded-lg">
                         <input
-                          type="range"
-                          min="1"
-                          max="1000"
-                          step="1"
-                          value={betAmount}
-                          onChange={(e) => setBetAmount(Number(e.target.value))}
-                          className="w-full h-6 bg-muted rounded-lg appearance-none cursor-pointer slider"
-                          style={{
-                            background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) 100%)`
-                          }}
-                        />
-                        <style>{`
-                          input[type="range"]::-webkit-slider-thumb {
-                            appearance: none;
-                            width: 24px;
-                            height: 24px;
-                            border-radius: 50%;
-                            background: #00ff90;
-                            cursor: pointer;
-                            border: 3px solid white;
-                            box-shadow: 0 2px 8px rgba(0, 255, 144, 0.4);
-                          }
-                          input[type="range"]::-moz-range-thumb {
-                            width: 24px;
-                            height: 24px;
-                            border-radius: 50%;
-                            background: #00ff90;
-                            cursor: pointer;
-                            border: 3px solid white;
-                            box-shadow: 0 2px 8px rgba(0, 255, 144, 0.4);
-                          }
-                        `}</style>
+                           type="range"
+                           min="1"
+                           max="1000"
+                           step="1"
+                           value={betAmount}
+                           onChange={(e) => setBetAmount(Number(e.target.value))}
+                           className="w-full h-6 bg-muted rounded-lg appearance-none cursor-pointer slider"
+                           style={{
+                             background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 1) / 999) * 100 - 1.2}%, hsl(var(--muted)) ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) 100%)`
+                           }}
+                         />
+                         <style>{`
+                           input[type="range"]::-webkit-slider-thumb {
+                             appearance: none;
+                             width: 28px;
+                             height: 28px;
+                             border-radius: 50%;
+                             background: #00ff90;
+                             cursor: pointer;
+                             border: 4px solid white;
+                             box-shadow: 0 2px 10px rgba(0, 255, 144, 0.5);
+                           }
+                           input[type="range"]::-moz-range-thumb {
+                             width: 28px;
+                             height: 28px;
+                             border-radius: 50%;
+                             background: #00ff90;
+                             cursor: pointer;
+                             border: 4px solid white;
+                             box-shadow: 0 2px 10px rgba(0, 255, 144, 0.5);
+                           }
+                         `}</style>
                         <div className="flex justify-between text-xs text-muted-foreground mt-1">
                           <span>1 RZ</span>
                           <span>1.000 RZ</span>
@@ -870,23 +881,26 @@ const Fast = () => {
         {currentCategoryHistory.length > 0 && (
           <div className="max-w-4xl mx-auto">
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowUpDown className="w-5 h-5" />
-                  Últimos Resultados - {categoryOptions.find(c => c.value === selectedCategory)?.label}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                   {currentCategoryHistory.slice(0, 10).map((result, index) => (
-                     <div
-                       key={result.id}
-                       className={`flex flex-col items-center p-3 rounded-lg border transition-all duration-200 relative ${
-                         index < 3 
-                           ? `bg-primary/10 border-primary/30 shadow-sm ring-1 ring-primary/20`
-                           : 'bg-muted/20 border-border'
-                       }`}
-                     >
+               <CardHeader>
+                 <CardTitle className="flex items-center gap-2">
+                   <ArrowUpDown className="w-5 h-5" />
+                   Últimos Resultados
+                 </CardTitle>
+               </CardHeader>
+               <CardContent>
+                 <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    {currentCategoryHistory.slice(0, 10).map((result, index) => (
+                      <div
+                        key={result.id}
+                        className={`flex flex-col items-center p-3 rounded-lg border transition-all duration-300 relative animate-fade-in ${
+                          index < 3 
+                            ? `bg-primary/10 border-primary/30 shadow-sm ring-1 ring-primary/20`
+                            : 'bg-muted/20 border-border'
+                        }`}
+                        style={{
+                          animationDelay: `${index * 50}ms`
+                        }}
+                      >
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
                         result.result === 'subiu' 
                           ? 'bg-green-100 dark:bg-green-900/30' 
@@ -1022,6 +1036,20 @@ const Fast = () => {
         onOpenChange={setPoolHistoryOpen}
         assetSymbol={selectedPool || selectedCategory}
         timeLeft={countdown}
+      />
+      
+      <FastPoolExpandedModal
+        pool={expandedPool}
+        open={!!expandedPool}
+        onOpenChange={(open) => !open && setExpandedPool(null)}
+        countdown={countdown}
+        betAmount={betAmount}
+        setBetAmount={setBetAmount}
+        onBet={handleBet}
+        clickedPool={clickedPool}
+        getOdds={getOdds}
+        userPoolBet={expandedPool ? userPoolBets[expandedPool.id] : 0}
+        poolResult={expandedPool ? poolResults[selectedCategory] : null}
       />
     </div>
   );
