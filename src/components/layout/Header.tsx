@@ -68,6 +68,8 @@ const Header = () => {
     return navItems.filter(item => {
       // Hide admin items if not admin
       if (item.adminRequired && !profile?.is_admin) return false;
+      // Hide Transactions and Wallet from desktop menu (keep in mobile)
+      if (!isMobile && (item.href === '/transactions' || item.href === '/wallet')) return false;
       return true;
     });
   };
