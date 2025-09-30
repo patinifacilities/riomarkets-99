@@ -7,7 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { ArrowUpDown, Wallet, Loader2, ArrowDown, ArrowUp, Bitcoin, Coins, CheckCircle2 } from 'lucide-react';
+import { ArrowUpDown, Wallet, Loader2, ArrowDown, ArrowUp, Bitcoin, Coins, CheckCircle2, Zap } from 'lucide-react';
+import btcLogo from '@/assets/btc-logo.png';
+import usdtLogo from '@/assets/usdt-logo.png';
+import usdcLogo from '@/assets/usdc-logo.png';
 import { supabase } from '@/integrations/supabase/client';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
@@ -212,18 +215,18 @@ const ExchangeNew = () => {
                         )}
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem disabled className="opacity-50">
-                        <Bitcoin className="w-4 h-4 mr-2" />
-                        BTC - Em breve
+                    <DropdownMenuContent className="bg-card border-border">
+                      <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">
+                        <img src={btcLogo} alt="BTC" className="w-5 h-5 mr-2" />
+                        <span>BTC - Em breve</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem disabled className="opacity-50">
-                        <Coins className="w-4 h-4 mr-2" />
-                        USDT - Em breve
+                      <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">
+                        <img src={usdtLogo} alt="USDT" className="w-5 h-5 mr-2" />
+                        <span>USDT - Em breve</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem disabled className="opacity-50">
-                        <Coins className="w-4 h-4 mr-2" />
-                        USDC - Em breve
+                      <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">
+                        <img src={usdcLogo} alt="USDC" className="w-5 h-5 mr-2" />
+                        <span>USDC - Em breve</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -290,18 +293,18 @@ const ExchangeNew = () => {
                         )}
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem disabled className="opacity-50">
-                        <Bitcoin className="w-4 h-4 mr-2" />
-                        BTC - Em breve
+                    <DropdownMenuContent className="bg-card border-border">
+                      <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">
+                        <img src={btcLogo} alt="BTC" className="w-5 h-5 mr-2" />
+                        <span>BTC - Em breve</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem disabled className="opacity-50">
-                        <Coins className="w-4 h-4 mr-2" />
-                        USDT - Em breve
+                      <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">
+                        <img src={usdtLogo} alt="USDT" className="w-5 h-5 mr-2" />
+                        <span>USDT - Em breve</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem disabled className="opacity-50">
-                        <Coins className="w-4 h-4 mr-2" />
-                        USDC - Em breve
+                      <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">
+                        <img src={usdcLogo} alt="USDC" className="w-5 h-5 mr-2" />
+                        <span>USDC - Em breve</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -351,13 +354,26 @@ const ExchangeNew = () => {
             </Button>
             
             {showSuccessNotification && (
-              <div className="bg-gradient-to-r from-[#00ff90]/20 to-[#00ff90]/10 border-2 border-[#00ff90] px-6 py-4 rounded-xl text-sm font-medium animate-scale-in flex items-center gap-3 shadow-lg">
-                <CheckCircle2 className="w-6 h-6 text-[#00ff90]" />
-                <div>
-                  <div className="text-[#00ff90] font-bold text-base">Conversão realizada!</div>
-                  <div className="text-muted-foreground text-xs mt-0.5">Seus saldos foram atualizados</div>
+              <>
+                <div className="bg-gradient-to-r from-[#00ff90]/20 to-[#00ff90]/10 border-2 border-[#00ff90] px-6 py-4 rounded-xl text-sm font-medium animate-scale-in flex items-center gap-3 shadow-lg">
+                  <CheckCircle2 className="w-6 h-6 text-[#00ff90]" />
+                  <div>
+                    <div className="text-[#00ff90] font-bold text-base">Conversão realizada!</div>
+                    <div className="text-muted-foreground text-xs mt-0.5">Seus saldos foram atualizados</div>
+                  </div>
                 </div>
-              </div>
+                
+                <Button
+                  asChild
+                  className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 hover:from-[#ff2389]/90 hover:to-[#ff2389]/70"
+                  size="lg"
+                >
+                  <a href="/fast" className="flex items-center gap-2">
+                    <Zap className="w-5 h-5" />
+                    Experimente Fast Markets
+                  </a>
+                </Button>
+              </>
             )}
           </CardContent>
         </Card>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings, TrendingUp, Clock, DollarSign, History, Pause } from 'lucide-react';
+import { ArrowLeft, Settings, TrendingUp, Clock, DollarSign, History, Pause, Play } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -376,10 +376,10 @@ const AdminFast = () => {
                       <Button 
                         variant={pool.paused ? "default" : "outline"}
                         size="sm" 
-                        className={`gap-2 ${!pool.paused ? 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-[#ff2389]' : ''}`}
+                        className={`gap-2 ${!pool.paused ? 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-[#ff2389]' : 'bg-success hover:bg-success/90 text-white'}`}
                         onClick={() => handleTogglePause(pool)}
                       >
-                        <Pause className="w-4 h-4" />
+                        {pool.paused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
                         {pool.paused ? 'Retomar' : 'Pausar'}
                       </Button>
                     </div>

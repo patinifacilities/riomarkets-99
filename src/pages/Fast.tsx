@@ -688,10 +688,9 @@ const Fast = () => {
               <Card 
                 key={pool.id} 
                 className={cn(
-                  "relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm cursor-pointer transition-all hover:scale-[1.02] hover:shadow-lg",
+                  "relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm transition-all hover:scale-[1.02] hover:shadow-lg",
                   (pool as any).paused && "opacity-50 grayscale"
                 )}
-                onClick={() => setExpandedPool(pool)}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5"></div>
                 
@@ -705,7 +704,10 @@ const Fast = () => {
                   </div>
                 )}
                 
-                <CardHeader className="relative z-10 text-center pb-3">
+                <CardHeader 
+                  className="relative z-10 text-center pb-3 cursor-pointer"
+                  onClick={() => setExpandedPool(pool)}
+                >
                    <div className="flex items-center justify-between mb-2">
                      <div className="flex items-center gap-2">
                        {getPoolIcon(pool.asset_symbol)}
@@ -731,12 +733,12 @@ const Fast = () => {
 
                 <CardContent className="relative z-10 space-y-4">
 
-                  {/* Bet Amount Slider and Countdown - shared across all pools */}
-                    <div className="space-y-2">
+                   {/* Bet Amount Slider and Countdown - shared across all pools */}
+                    <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
                       <label className="text-xs font-medium">
                         Opinar {betAmount} RZ
                       </label>
-                      <div className="px-3 py-2 bg-muted/20 rounded-lg">
+                      <div className="relative px-3 py-3 bg-gradient-to-r from-muted/30 to-muted/20 rounded-xl border border-border/50">
                         <input
                            type="range"
                            min="1"
@@ -744,35 +746,53 @@ const Fast = () => {
                            step="1"
                            value={betAmount}
                            onChange={(e) => setBetAmount(Number(e.target.value))}
-                           className="w-full h-6 bg-muted rounded-lg appearance-none cursor-pointer slider"
+                           className="w-full h-2 rounded-full appearance-none cursor-pointer slider relative z-10"
                            style={{
-                             background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 1) / 999) * 100 - 1.2}%, hsl(var(--muted)) ${((betAmount - 1) / 999) * 100}%, hsl(var(--muted)) 100%)`
+                             background: `linear-gradient(to right, #00ff90 0%, #00ff90 ${((betAmount - 1) / 999) * 100}%, hsl(var(--border)) ${((betAmount - 1) / 999) * 100}%, hsl(var(--border)) 100%)`
                            }}
                          />
                          <style>{`
-                           input[type="range"]::-webkit-slider-thumb {
+                           input[type="range"].slider::-webkit-slider-thumb {
                              appearance: none;
-                             width: 28px;
-                             height: 28px;
+                             width: 24px;
+                             height: 24px;
                              border-radius: 50%;
-                             background: #00ff90;
-                             cursor: pointer;
-                             border: 4px solid white;
-                             box-shadow: 0 2px 10px rgba(0, 255, 144, 0.5);
+                             background: linear-gradient(135deg, #00ff90 0%, #00dd80 100%);
+                             cursor: grab;
+                             border: 3px solid white;
+                             box-shadow: 0 2px 8px rgba(0, 255, 144, 0.4), 0 0 0 1px rgba(0, 255, 144, 0.2);
+                             transition: all 0.2s ease;
                            }
-                           input[type="range"]::-moz-range-thumb {
-                             width: 28px;
-                             height: 28px;
+                           input[type="range"].slider::-webkit-slider-thumb:hover {
+                             transform: scale(1.1);
+                             box-shadow: 0 4px 12px rgba(0, 255, 144, 0.6), 0 0 0 2px rgba(0, 255, 144, 0.3);
+                           }
+                           input[type="range"].slider::-webkit-slider-thumb:active {
+                             cursor: grabbing;
+                             transform: scale(0.98);
+                           }
+                           input[type="range"].slider::-moz-range-thumb {
+                             width: 24px;
+                             height: 24px;
                              border-radius: 50%;
-                             background: #00ff90;
-                             cursor: pointer;
-                             border: 4px solid white;
-                             box-shadow: 0 2px 10px rgba(0, 255, 144, 0.5);
+                             background: linear-gradient(135deg, #00ff90 0%, #00dd80 100%);
+                             cursor: grab;
+                             border: 3px solid white;
+                             box-shadow: 0 2px 8px rgba(0, 255, 144, 0.4), 0 0 0 1px rgba(0, 255, 144, 0.2);
+                             transition: all 0.2s ease;
+                           }
+                           input[type="range"].slider::-moz-range-thumb:hover {
+                             transform: scale(1.1);
+                             box-shadow: 0 4px 12px rgba(0, 255, 144, 0.6), 0 0 0 2px rgba(0, 255, 144, 0.3);
+                           }
+                           input[type="range"].slider::-moz-range-thumb:active {
+                             cursor: grabbing;
+                             transform: scale(0.98);
                            }
                          `}</style>
-                        <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                          <span>1 RZ</span>
-                          <span>1.000 RZ</span>
+                        <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                          <span className="font-medium">1 RZ</span>
+                          <span className="font-medium">1.000 RZ</span>
                         </div>
                       </div>
                     </div>
@@ -820,10 +840,13 @@ const Fast = () => {
                       </div>
                    </div>
 
-                  {/* Opinion Buttons */}
+                   {/* Opinion Buttons */}
                   <div className="grid grid-cols-2 gap-2">
                     <Button
-                      onClick={() => handleBet(pool.id, 'subiu')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleBet(pool.id, 'subiu');
+                      }}
                       disabled={countdown <= 15}
                       className={`h-12 text-sm font-semibold transition-all duration-300 ${
                         clickedPool?.id === pool.id && clickedPool?.side === 'subiu'
@@ -841,7 +864,10 @@ const Fast = () => {
                     </Button>
                     
                     <Button
-                      onClick={() => handleBet(pool.id, 'desceu')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleBet(pool.id, 'desceu');
+                      }}
                       disabled={countdown <= 15}
                       className={`h-12 text-sm font-semibold transition-all duration-300 ${
                         clickedPool?.id === pool.id && clickedPool?.side === 'desceu'
