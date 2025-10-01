@@ -18,16 +18,9 @@ const EMAIL_DOMAINS = [
 export function EmailSuggestions({ value, onSelect, inputRef }: EmailSuggestionsProps) {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [justSelected, setJustSelected] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Don't show suggestions if we just selected one
-    if (justSelected) {
-      setJustSelected(false);
-      return;
-    }
-
     const atIndex = value.indexOf('@');
     
     if (atIndex > 0 && atIndex === value.length - 1) {
@@ -47,7 +40,7 @@ export function EmailSuggestions({ value, onSelect, inputRef }: EmailSuggestions
     } else {
       setSuggestions([]);
     }
-  }, [value, justSelected]);
+  }, [value]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -61,9 +54,8 @@ export function EmailSuggestions({ value, onSelect, inputRef }: EmailSuggestions
         setSelectedIndex((prev) => (prev - 1 + suggestions.length) % suggestions.length);
       } else if (e.key === 'Enter' && suggestions.length > 0) {
         e.preventDefault();
-        setJustSelected(true);
-        setSuggestions([]); // Clear suggestions after selection
         onSelect(suggestions[selectedIndex]);
+        setSuggestions([]); // Clear suggestions after selection
       } else if (e.key === 'Escape') {
         setSuggestions([]);
       }
@@ -88,9 +80,8 @@ export function EmailSuggestions({ value, onSelect, inputRef }: EmailSuggestions
           key={suggestion}
           type="button"
           onClick={() => {
-            setJustSelected(true);
-            setSuggestions([]); // Clear suggestions after selection
             onSelect(suggestion);
+            setSuggestions([]); // Clear suggestions after selection
           }}
           className={`w-full px-4 py-2 text-left text-sm hover:bg-muted transition-colors ${
             index === selectedIndex ? 'bg-muted' : ''

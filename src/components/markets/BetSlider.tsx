@@ -29,10 +29,10 @@ export const BetSlider = ({ balance, onAmountChange, estimatedReward }: BetSlide
         
         <div className="px-3 py-2 bg-muted/20 rounded-lg">
           <div className="text-lg font-semibold">
-            {currentAmount.toLocaleString()} RIOZ
+            {currentAmount} RIOZ
           </div>
           <div className="text-sm text-muted-foreground">
-            Retorno estimado: {Math.floor(estimatedReward).toLocaleString()} RIOZ
+            Retorno estimado: {Math.floor(currentAmount * estimatedReward)} RIOZ
           </div>
         </div>
       </div>
@@ -64,7 +64,7 @@ export const BetSlider = ({ balance, onAmountChange, estimatedReward }: BetSlide
         </div>
         
         <div className="text-xs text-muted-foreground text-center">
-          Disponível: {balance.toLocaleString()} RIOZ
+          Disponível: {balance} RIOZ
         </div>
       </div>
     </div>

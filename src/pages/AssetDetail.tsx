@@ -8,7 +8,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { LivePriceChart } from '@/components/markets/LivePriceChart';
 
 interface FastPool {
   id: string;
@@ -386,14 +385,6 @@ const AssetDetail = () => {
               )}
             </CardContent>
           </Card>
-        </div>
-
-        {/* Live Price Chart */}
-        <div className="max-w-4xl mx-auto mt-8">
-          <LivePriceChart 
-            assetSymbol={currentPool.asset_symbol} 
-            assetName={currentPool.asset_name}
-          />
         </div>
 
         {/* History */}
