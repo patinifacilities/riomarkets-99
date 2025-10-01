@@ -114,6 +114,35 @@
     animation: scale-in 0.3s ease-out;
   }
 
+  /* Rainbow background animation for topic icons */
+  @keyframes rainbow-bg {
+    0% { background: linear-gradient(135deg, hsl(155, 100%, 45%) 0%, hsl(328, 100%, 54%) 100%); }
+    25% { background: linear-gradient(135deg, hsl(328, 100%, 54%) 0%, hsl(260, 100%, 50%) 100%); }
+    50% { background: linear-gradient(135deg, hsl(260, 100%, 50%) 0%, hsl(200, 100%, 50%) 100%); }
+    75% { background: linear-gradient(135deg, hsl(200, 100%, 50%) 0%, hsl(155, 100%, 45%) 100%); }
+    100% { background: linear-gradient(135deg, hsl(155, 100%, 45%) 0%, hsl(328, 100%, 54%) 100%); }
+  }
+
+  .animate-rainbow-bg {
+    animation: rainbow-bg 4s ease-in-out infinite;
+  }
+
+  /* 118 BPM pulse animation (0.508s per beat) */
+  @keyframes pulse-118bpm {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(255, 35, 137, 0.7);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px 10px rgba(255, 35, 137, 0);
+    }
+  }
+
+  .animate-pulse-118bpm {
+    animation: pulse-118bpm 0.508s ease-in-out infinite;
+  }
+
   /* Ticker animation */
   @keyframes scroll-right {
     0% {

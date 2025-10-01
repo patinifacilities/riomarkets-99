@@ -299,11 +299,11 @@ const ExchangeNew = () => {
                     placeholder="0"
                     value={formatNumber(fromAmount)}
                     onChange={(e) => handleAmountChange(e.target.value)}
-                    className="pl-32 pr-4 h-32 text-right text-[200px] leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
+                    className="pl-32 pr-4 h-32 text-right text-[600px] leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
                   />
                 </div>
                 {fromAmount && parseFloat(fromAmount.replace(/[^\d.]/g, '')) > fromBalance && (
-                  <div className="flex items-center justify-center gap-2 text-sm text-red-500 font-medium bg-red-500/10 px-4 py-2 rounded-lg border border-red-500/20">
+                  <div className="flex items-center justify-center gap-2 text-sm font-medium px-4 py-2 rounded-lg border-2" style={{ color: '#ff2389', backgroundColor: 'rgba(255, 35, 137, 0.1)', borderColor: 'rgba(255, 35, 137, 0.3)' }}>
                     <span className="text-lg">⚠️</span>
                     <span>Saldo insuficiente</span>
                   </div>
@@ -425,22 +425,10 @@ const ExchangeNew = () => {
               )}
             </Button>
             
-            {showSuccessNotification && (
-              <>
-                <div className="bg-gradient-to-r from-[#00ff90]/20 to-[#00ff90]/10 border-2 border-[#00ff90] px-6 py-4 rounded-xl text-sm font-medium animate-scale-in flex items-center gap-3 shadow-lg">
-                  <CheckCircle2 className="w-6 h-6 text-[#00ff90]" />
-                  <div>
-                    <div className="text-[#00ff90] font-bold text-base">Conversão realizada!</div>
-                    <div className="text-muted-foreground text-xs mt-0.5">Seus saldos foram atualizados</div>
-                  </div>
-                </div>
-              </>
-            )}
-            
             {fastMarketsButtonVisible && (
               <Button
                 asChild
-                className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 hover:from-[#ff2389]/90 hover:to-[#ff2389]/70 hover:shadow-[0_0_20px_rgba(255,35,137,0.5)] animate-pulse transition-all duration-300"
+                className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 hover:from-[#ff2389]/90 hover:to-[#ff2389]/70 hover:shadow-[0_0_30px_rgba(255,35,137,0.6)] transition-all duration-300 animate-pulse-118bpm"
                 size="lg"
               >
                 <a href="/fast" className="flex items-center gap-2">
@@ -448,6 +436,16 @@ const ExchangeNew = () => {
                   Experimente Fast Markets
                 </a>
               </Button>
+            )}
+            
+            {showSuccessNotification && (
+              <div className="bg-gradient-to-r from-[#00ff90]/20 to-[#00ff90]/10 border-2 border-[#00ff90] px-6 py-4 rounded-xl text-sm font-medium animate-scale-in flex items-center gap-3 shadow-lg">
+                <CheckCircle2 className="w-6 h-6 text-[#00ff90]" />
+                <div>
+                  <div className="text-[#00ff90] font-bold text-base">Conversão realizada!</div>
+                  <div className="text-muted-foreground text-xs mt-0.5">Seus saldos foram atualizados</div>
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>
