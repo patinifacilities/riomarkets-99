@@ -123,20 +123,23 @@ export const ProfileImageUpload = ({ userId, currentImageUrl, onImageUpdated }: 
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
+      // Get public URL with cache busting
+      const timestamp = Date.now();
       const { data: { publicUrl } } = supabase.storage
         .from('profile-pictures')
         .getPublicUrl(filePath);
+      
+      const cacheBustedUrl = `${publicUrl}?t=${timestamp}`;
 
       // Update profile
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ profile_pic_url: publicUrl })
+        .update({ profile_pic_url: cacheBustedUrl })
         .eq('id', userId);
 
       if (updateError) throw updateError;
 
-      onImageUpdated(publicUrl);
+      onImageUpdated(cacheBustedUrl);
       setIsOpen(false);
       setImageSrc(null);
       

@@ -215,24 +215,28 @@ const Profile = () => {
                   )}
                 </div>
                 
-                <div className="bg-gradient-primary p-6 rounded-xl text-primary-foreground shadow-lg">
-                  <div className="flex items-center justify-center gap-2 mb-2 opacity-90">
-                    <Wallet className="w-4 h-4" />
-                    <span className="text-sm font-medium">Saldo Total</span>
-                  </div>
-                  <div className="text-3xl font-bold">
-                    {profile.saldo_moeda.toLocaleString('pt-BR', { 
-                      minimumFractionDigits: 2, 
-                      maximumFractionDigits: 2 
-                    })} RZ
+                <div className="relative overflow-hidden rounded-2xl p-8 bg-gradient-to-br from-yellow-500 via-yellow-600 to-amber-600 shadow-2xl">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-center gap-2 mb-3 opacity-90">
+                      <Wallet className="w-5 h-5 text-white" />
+                      <span className="text-sm font-semibold text-white/90 tracking-wide">SALDO TOTAL</span>
+                    </div>
+                    <div className="text-5xl font-bold text-white text-center mb-1">
+                      {profile.saldo_moeda.toLocaleString('pt-BR', { 
+                        minimumFractionDigits: 2, 
+                        maximumFractionDigits: 2 
+                      })}
+                    </div>
+                    <div className="text-center text-white/80 text-lg font-medium tracking-wider">RZ</div>
                   </div>
                 </div>
 
                 <Button 
-                  className="w-full"
+                  className="w-full bg-gradient-to-r from-yellow-500 via-yellow-600 to-amber-600 hover:from-yellow-600 hover:via-yellow-700 hover:to-amber-700 text-white font-semibold py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-yellow-400/50"
                   onClick={() => navigate('/wallet')}
                 >
-                  Ver Carteira Completa
+                  <span className="relative z-10">⭐ Upgrade para Gold Pass</span>
                 </Button>
               </CardContent>
             </Card>
@@ -262,10 +266,10 @@ const Profile = () => {
                       size="sm" 
                       onClick={handleSave} 
                       disabled={isLoading2}
-                      className="bg-gradient-primary hover:opacity-90 text-primary-foreground"
+                      className="bg-gradient-to-r from-primary via-primary to-[#ff2389] hover:opacity-90 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200"
                     >
                       <Save className="w-4 h-4 mr-2" />
-                      {isLoading2 ? 'Salvando...' : 'Salvar alterações'}
+                      {isLoading2 ? 'Salvando...' : 'Salvar'}
                     </Button>
                   </div>
                 )}
