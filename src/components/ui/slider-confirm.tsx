@@ -7,10 +7,11 @@ interface SliderConfirmProps {
   disabled?: boolean;
   className?: string;
   text?: string;
-  selectedOption?: string; // Added to determine color
+  selectedOption?: string;
+  onProgressChange?: (progress: number) => void; // Callback to report progress
 }
 
-export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "Deslize para confirmar", selectedOption }: SliderConfirmProps) => {
+export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "Deslize para confirmar", selectedOption, onProgressChange }: SliderConfirmProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -34,6 +35,11 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
       
       setPosition(newPosition);
       
+      // Report progress to parent
+      if (onProgressChange && maxPosition > 0) {
+        onProgressChange(newPosition / maxPosition);
+      }
+      
       // Check if threshold is reached
       const progress = newPosition / maxPosition;
       if (progress >= THRESHOLD && !isCompleted) {
@@ -52,6 +58,9 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
     const handleMouseUp = () => {
       if (!isCompleted) {
         setPosition(0);
+        if (onProgressChange) {
+          onProgressChange(0);
+        }
       }
       setIsDragging(false);
     };
@@ -68,6 +77,11 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
       const newPosition = Math.max(0, Math.min(maxPosition, startPosition.current + deltaX));
       
       setPosition(newPosition);
+      
+      // Report progress to parent
+      if (onProgressChange && maxPosition > 0) {
+        onProgressChange(newPosition / maxPosition);
+      }
       
       // Check if threshold is reached
       const progress = newPosition / maxPosition;
@@ -87,6 +101,9 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
     const handleTouchEnd = () => {
       if (!isCompleted) {
         setPosition(0);
+        if (onProgressChange) {
+          onProgressChange(0);
+        }
       }
       setIsDragging(false);
     };

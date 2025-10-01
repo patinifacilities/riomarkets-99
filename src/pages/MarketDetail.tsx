@@ -41,6 +41,7 @@ const MarketDetail = () => {
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [betAmount, setBetAmount] = useState<number>(0);
   const [showBetModal, setShowBetModal] = useState(false);
+  const [sliderProgress, setSliderProgress] = useState<number>(0);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -252,6 +253,13 @@ const MarketDetail = () => {
                        <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
                        <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
                        <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
+                         {/* Gold fill based on slider progress */}
+                         <div 
+                           className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 transition-all duration-100"
+                           style={{
+                             width: `${sliderProgress * 100}%`,
+                           }}
+                         />
                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-shimmer"></div>
                          <div className="relative z-10 text-center">
                            <span className="text-xs font-semibold text-yellow-500/80 tracking-wide">LUCRO ESTIMADO</span>
@@ -297,11 +305,12 @@ const MarketDetail = () => {
                        </div>
                      )}
                      
-                      {selectedOption && betAmount && betAmount > 0 && (
-                        <div className="w-full mt-4">
-                          <SliderConfirm
-                            selectedOption={selectedOption}
-                            disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
+                        {selectedOption && betAmount && betAmount > 0 && (
+                          <div className="w-full mt-4">
+                            <SliderConfirm
+                              selectedOption={selectedOption}
+                              disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
+                              onProgressChange={(progress) => setSliderProgress(progress)}
                            onConfirm={async () => {
                              if (!authUser?.id) {
                                toast({
@@ -556,6 +565,13 @@ const MarketDetail = () => {
                        <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
                        <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
                        <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
+                         {/* Gold fill based on slider progress */}
+                         <div 
+                           className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 transition-all duration-100"
+                           style={{
+                             width: `${sliderProgress * 100}%`,
+                           }}
+                         />
                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-shimmer"></div>
                          <div className="relative z-10 text-center">
                            <span className="text-xs font-semibold text-yellow-500/80 tracking-wide">LUCRO ESTIMADO</span>
@@ -601,11 +617,12 @@ const MarketDetail = () => {
                          </Button>
                        </div>
                        
-                       {selectedOption && betAmount && betAmount > 0 && (
-                         <div className="mt-4 w-full">
-                           <SliderConfirm
-                             selectedOption={selectedOption}
-                             disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
+                        {selectedOption && betAmount && betAmount > 0 && (
+                          <div className="mt-4 w-full">
+                            <SliderConfirm
+                              selectedOption={selectedOption}
+                              disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
+                              onProgressChange={(progress) => setSliderProgress(progress)}
                             onConfirm={async () => {
                         if (!authUser?.id) {
                           toast({
