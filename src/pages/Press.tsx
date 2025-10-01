@@ -74,10 +74,6 @@ export default function Press() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <header className="text-center mb-12 relative">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary/20 via-[#ff2389]/20 to-primary/20 rounded-2xl mb-6 relative overflow-hidden animate-pulse-glow">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-[#ff2389]/10 animate-pulse"></div>
-            <Newspaper className="h-10 w-10 text-primary relative z-10" />
-          </div>
           <div className="flex items-center justify-center gap-4 mb-4">
             <h1 className="text-4xl md:text-5xl font-bold text-foreground bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text">
               Notícias

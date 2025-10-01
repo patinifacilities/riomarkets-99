@@ -97,7 +97,7 @@ const Header = () => {
     { href: '/transactions', icon: Receipt, label: 'Transações', authRequired: true },
     { href: '/exchange', icon: ArrowRightLeft, label: 'Exchange', authRequired: true },
     { href: '/ranking', icon: Trophy, label: 'Ranking' },
-    { href: '/press', icon: Newspaper, label: 'Na mídia' },
+    { href: '/press', icon: Newspaper, label: 'Notícias' },
     { href: '/admin', icon: Settings, label: 'Admin', adminRequired: true }
   ];
 

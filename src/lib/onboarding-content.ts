@@ -37,14 +37,14 @@ export const ONBOARDING_STEPS: OnboardingStepContent[] = [
   {
     id: 3,
     title: 'Fast Markets: Pools de 60 segundos',
-    description: 'Opine se ativos cripto, commodities, forex ou ações vão subir ou descer em 60 segundos. Odds dinâmicas e resultados instantâneos.',
+    description: 'Opine se ativos cripto, commodities, forex ou ações vão subir ou descer em <span style="color: white; font-weight: 600;">60 segundos</span>. Odds dinâmicas e resultados instantâneos.',
     tip: 'Perfeito para quem busca ação rápida e decisões ágeis.',
     icon: Zap,
   },
   {
     id: 4,
-    title: 'Clareza, compliance e controle de risco',
-    description: 'Terminologia educativa, políticas públicas, segurança Supabase/Auth. Comece pequeno e evolua com aprendizado.',
+    title: 'Segurança e controle de risco',
+    description: 'Ambiente seguro com autenticação robusta, políticas transparentes e terminologia educativa. Comece pequeno, aprenda e evolua com confiança.',
     icon: Shield,
   },
 ];

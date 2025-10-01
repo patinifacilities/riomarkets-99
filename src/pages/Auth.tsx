@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { Eye, EyeOff, Mail, Lock, UserPlus, LogIn, TrendingUp, KeyRound, Check, X, CreditCard, User as UserIcon } from 'lucide-react';
 import { TypewriterText } from '@/components/ui/TypewriterText';
@@ -15,6 +15,7 @@ import { useTheme } from 'next-themes';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useOnboarding } from '@/stores/useOnboarding';
 import { validateCPF, formatCPF, validatePassword, validateUsername } from '@/utils/validation';
+import { EmailSuggestions } from '@/components/ui/email-suggestions';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -49,6 +50,8 @@ const Auth = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [cpfError, setCpfError] = useState(false);
   const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const loginEmailInputRef = useRef<HTMLInputElement>(null);
   
   const totalSteps = 5; // Total registration steps
 
@@ -548,6 +551,7 @@ const Auth = () => {
                           <div className="relative">
                             <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                             <Input
+                              ref={emailInputRef}
                               id="email"
                               type="email"
                               placeholder="seu@email.com"
@@ -556,6 +560,11 @@ const Auth = () => {
                               className="pl-10"
                               aria-label="Digite seu endereço de email"
                               autoFocus
+                            />
+                            <EmailSuggestions 
+                              value={formData.email}
+                              onSelect={(email) => setFormData(prev => ({ ...prev, email }))}
+                              inputRef={emailInputRef}
                             />
                           </div>
                         </div>
@@ -724,6 +733,7 @@ const Auth = () => {
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                         <Input
+                          ref={loginEmailInputRef}
                           id="email"
                           type="email"
                           placeholder="seu@email.com"
@@ -731,6 +741,11 @@ const Auth = () => {
                           onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                           className="pl-10"
                           required
+                        />
+                        <EmailSuggestions 
+                          value={formData.email}
+                          onSelect={(email) => setFormData(prev => ({ ...prev, email }))}
+                          inputRef={loginEmailInputRef}
                         />
                       </div>
                     </div>

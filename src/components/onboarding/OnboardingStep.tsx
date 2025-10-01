@@ -39,9 +39,10 @@ export function OnboardingStep({ step, className = "" }: OnboardingStepProps) {
           {content.title}
         </h3>
         
-        <p className="text-muted-foreground leading-relaxed max-w-md mx-auto">
-          {content.description}
-        </p>
+        <p 
+          className="text-muted-foreground leading-relaxed max-w-md mx-auto"
+          dangerouslySetInnerHTML={{ __html: content.description }}
+        />
         
         {content.tip && (
           <div className={`border rounded-lg p-3 mt-4 ${
