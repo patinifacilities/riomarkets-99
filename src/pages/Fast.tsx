@@ -431,19 +431,19 @@ const Fast = () => {
       // Reset user bets for current pools
       setUserPoolBets({});
       
-      // Wait a bit for pools to be processed and created (1 second)
+      // Wait a bit for pools to be processed and created (700ms)
       setTimeout(() => {
         loadCurrentPools();
         loadPoolHistory();
-      }, 1000);
+      }, 700);
       
     } catch (error) {
       console.error('Error finalizing pools:', error);
-      // Still try to load new pools even if finalization fails (1 second)
+      // Still try to load new pools even if finalization fails (700ms)
       setTimeout(() => {
         loadCurrentPools();
         loadPoolHistory();
-      }, 1000);
+      }, 700);
     }
   };
 

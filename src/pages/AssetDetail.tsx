@@ -51,7 +51,6 @@ const AssetDetail = () => {
   const [countdown, setCountdown] = useState(60);
   const [loading, setLoading] = useState(true);
   const [betAmount, setBetAmount] = useState(100);
-  const [softLoading, setSoftLoading] = useState(false);
   const [selectedResult, setSelectedResult] = useState<FastPoolResult | null>(null);
   const [resultModalOpen, setResultModalOpen] = useState(false);
   const { user } = useAuth();
@@ -136,18 +135,24 @@ const AssetDetail = () => {
 
       if (error) throw error;
       
-      const typedData = (data || []).map((item: any) => ({
-        ...item,
-        result: item.result as 'subiu' | 'desceu' | 'manteve',
-        asset_symbol: assetSymbol,
-        fast_pools: {
-          round_start_time: item.fast_pools.round_start_time,
-          round_end_time: item.fast_pools.round_end_time,
-          asset_name: item.fast_pools.asset_name
+      // Remove duplicates by ID
+      const uniqueResults = new Map();
+      (data || []).forEach((item: any) => {
+        if (!uniqueResults.has(item.id)) {
+          uniqueResults.set(item.id, {
+            ...item,
+            result: item.result as 'subiu' | 'desceu' | 'manteve',
+            asset_symbol: assetSymbol,
+            fast_pools: {
+              round_start_time: item.fast_pools.round_start_time,
+              round_end_time: item.fast_pools.round_end_time,
+              asset_name: item.fast_pools.asset_name
+            }
+          });
         }
-      }));
+      });
       
-      setPoolHistory(typedData);
+      setPoolHistory(Array.from(uniqueResults.values()));
     } catch (error) {
       console.error('Error loading history:', error);
     }
@@ -165,12 +170,10 @@ const AssetDetail = () => {
       // When countdown reaches 0, trigger pool reload
       if (timeLeft === 0) {
         console.log('⏰ Pool ended, reloading...');
-        setSoftLoading(true);
         setTimeout(() => {
           loadPoolData();
           loadPoolHistory();
-          setSoftLoading(false);
-        }, 1500); // Wait 1.5 seconds for pool to finalize
+        }, 800); // Wait 800ms for pool to finalize
       }
     };
 
@@ -331,11 +334,12 @@ const AssetDetail = () => {
         description: `${side === 'subiu' ? '📈 SUBIR' : '📉 DESCER'} • ${betAmount} RZ • Odds: x${odds.toFixed(2)}`,
         duration: 3000,
         className: side === 'subiu' 
-          ? 'bg-[#00ff90]/10 border-[#00ff90]' 
-          : 'bg-[#ff2389]/10 border-[#ff2389]'
+          ? 'border-[#00ff90] bg-[#00ff90]/10' 
+          : 'border-[#ff2389] bg-[#ff2389]/10'
       });
       
       // Force profile refresh for instant balance update
+      console.log('🔄 Force refresh triggered for profile:', user.id);
       window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
       
     } catch (error) {
@@ -394,22 +398,6 @@ const AssetDetail = () => {
 
         <div className="max-w-2xl mx-auto">
           <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm">
-            {/* Loading overlay only for this card */}
-            {softLoading && (
-              <div className="absolute inset-0 z-50 bg-background/95 backdrop-blur-md flex items-center justify-center rounded-lg">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#ff2389]/20 to-[#00ff90]/20 rounded-full blur-xl animate-pulse"></div>
-                  <div className="relative flex flex-col items-center gap-3">
-                    <div className="relative">
-                      <div className="w-16 h-16 border-4 border-primary/20 rounded-full"></div>
-                      <div className="absolute inset-0 w-16 h-16 border-4 border-[#ff2389] border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                    <p className="text-sm font-semibold text-foreground">Carregando próximo pool...</p>
-                  </div>
-                </div>
-              </div>
-            )}
-            
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5"></div>
             
             {currentPool.paused && (
@@ -582,29 +570,11 @@ const AssetDetail = () => {
 
         {/* Live Price Chart */}
         <div className="max-w-4xl mx-auto mt-8">
-          <div className="relative">
-            {/* Loading overlay only for chart card */}
-            {softLoading && (
-              <div className="absolute inset-0 z-50 bg-background/95 backdrop-blur-md flex items-center justify-center rounded-lg">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#ff2389]/20 to-[#00ff90]/20 rounded-full blur-xl animate-pulse"></div>
-                  <div className="relative flex flex-col items-center gap-3">
-                    <div className="relative">
-                      <div className="w-16 h-16 border-4 border-primary/20 rounded-full"></div>
-                      <div className="absolute inset-0 w-16 h-16 border-4 border-[#ff2389] border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                    <p className="text-sm font-semibold text-foreground">Carregando próximo pool...</p>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            <LivePriceChart 
-              assetSymbol={currentPool.asset_symbol} 
-              assetName={currentPool.asset_name}
-              poolStartPrice={currentPool.opening_price}
-            />
-          </div>
+          <LivePriceChart 
+            assetSymbol={currentPool.asset_symbol} 
+            assetName={currentPool.asset_name}
+            poolStartPrice={currentPool.opening_price}
+          />
         </div>
 
         {/* History */}
