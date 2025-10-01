@@ -561,11 +561,6 @@ const Auth = () => {
                               aria-label="Digite seu endereço de email"
                               autoFocus
                             />
-                            <EmailSuggestions 
-                              value={formData.email}
-                              onSelect={(email) => setFormData(prev => ({ ...prev, email }))}
-                              inputRef={emailInputRef}
-                            />
                           </div>
                         </div>
                         <div className="flex gap-2">
@@ -741,11 +736,6 @@ const Auth = () => {
                           onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                           className="pl-10"
                           required
-                        />
-                        <EmailSuggestions 
-                          value={formData.email}
-                          onSelect={(email) => setFormData(prev => ({ ...prev, email }))}
-                          inputRef={loginEmailInputRef}
                         />
                       </div>
                     </div>

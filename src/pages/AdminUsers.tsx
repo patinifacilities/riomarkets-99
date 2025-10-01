@@ -11,10 +11,21 @@ import { useNavigate } from 'react-router-dom';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingUser, setEditingUser] = useState<any>(null);
+  const [userToBlock, setUserToBlock] = useState<any>(null);
   const { data: users = [], isLoading, refetch } = useProfiles();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -141,34 +152,11 @@ const AdminUsers = () => {
                           size="sm"
                           className={cn(
                             "rounded-full w-10 h-10 p-0",
-                            user.is_blocked && "bg-green-500 hover:bg-green-600"
+                            user.is_blocked ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"
                           )}
-                          onClick={async (e) => {
+                          onClick={(e) => {
                             e.stopPropagation();
-                            try {
-                              const { error } = await supabase
-                                .from('profiles')
-                                .update({ is_blocked: !user.is_blocked })
-                                .eq('id', user.id);
-                              
-                              if (error) throw error;
-                              
-                              toast({
-                                title: user.is_blocked ? "Usuário desbloqueado" : "Usuário bloqueado",
-                                description: user.is_blocked 
-                                  ? "O usuário pode agora opinar e sacar"
-                                  : "O usuário não pode mais opinar ou sacar",
-                              });
-                              
-                              refetch();
-                            } catch (error) {
-                              console.error('Error toggling block:', error);
-                              toast({
-                                title: "Erro",
-                                description: "Não foi possível alterar o status do usuário",
-                                variant: "destructive"
-                              });
-                            }
+                            setUserToBlock(user);
                           }}
                           title={user.is_blocked ? "Desbloquear usuário" : "Bloquear usuário"}
                         >
@@ -204,6 +192,63 @@ const AdminUsers = () => {
             setEditingUser(null);
           }}
         />
+
+        {/* Block Confirmation Dialog */}
+        <AlertDialog open={!!userToBlock} onOpenChange={(open) => !open && setUserToBlock(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {userToBlock?.is_blocked ? 'Desbloquear usuário?' : 'Bloquear usuário?'}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {userToBlock?.is_blocked ? (
+                  <>Você está prestes a <strong>desbloquear</strong> o usuário <strong>{userToBlock?.nome}</strong>. 
+                  O usuário poderá enviar opiniões e realizar saques novamente.</>
+                ) : (
+                  <>Você está prestes a <strong>bloquear</strong> o usuário <strong>{userToBlock?.nome}</strong>. 
+                  O usuário não poderá enviar opiniões nem realizar saques.</>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                className={userToBlock?.is_blocked ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"}
+                onClick={async () => {
+                  if (!userToBlock) return;
+                  
+                  try {
+                    const { error } = await supabase
+                      .from('profiles')
+                      .update({ is_blocked: !userToBlock.is_blocked })
+                      .eq('id', userToBlock.id);
+                    
+                    if (error) throw error;
+                    
+                    toast({
+                      title: userToBlock.is_blocked ? "Usuário desbloqueado" : "Usuário bloqueado",
+                      description: userToBlock.is_blocked 
+                        ? "O usuário pode agora opinar e sacar"
+                        : "O usuário não pode mais opinar ou sacar",
+                    });
+                    
+                    refetch();
+                    setUserToBlock(null);
+                  } catch (error) {
+                    console.error('Error toggling block:', error);
+                    toast({
+                      title: "Erro",
+                      description: "Não foi possível alterar o status do usuário",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+              >
+                {userToBlock?.is_blocked ? 'Desbloquear' : 'Bloquear'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
         </div>
       </div>
     </div>

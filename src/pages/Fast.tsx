@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -384,31 +385,77 @@ const Fast = () => {
       // Reset user bets for current pools
       setUserPoolBets({});
       
-      // Immediately load new pools and history
-      loadCurrentPools();
-      loadPoolHistory();
+      // Wait a bit for pools to be processed and created
+      setTimeout(() => {
+        loadCurrentPools();
+        loadPoolHistory();
+      }, 2000);
       
     } catch (error) {
       console.error('Error finalizing pools:', error);
+      // Still try to load new pools even if finalization fails
+      setTimeout(() => {
+        loadCurrentPools();
+        loadPoolHistory();
+      }, 2000);
     }
   };
 
-  // Calculate dynamic odds based on countdown - now decreasing by 1
-  const getOdds = () => {
-    const timeElapsed = 60 - countdown;
+  // Load algorithm config for dynamic odds calculation
+  const [algorithmConfig, setAlgorithmConfig] = React.useState({
+    pool_duration_seconds: 60,
+    lockout_time_seconds: 15,
+    odds_start: 1.80,
+    odds_end: 1.10
+  });
+
+  React.useEffect(() => {
+    const loadAlgorithmConfig = async () => {
+      try {
+        const { data } = await supabase
+          .from('fast_pool_algorithm_config')
+          .select('pool_duration_seconds, lockout_time_seconds, odds_start, odds_end')
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        if (data) {
+          setAlgorithmConfig({
+            pool_duration_seconds: data.pool_duration_seconds,
+            lockout_time_seconds: data.lockout_time_seconds,
+            odds_start: Number(data.odds_start),
+            odds_end: Number(data.odds_end)
+          });
+        }
+      } catch (error) {
+        console.error('Error loading algorithm config:', error);
+      }
+    };
     
-    if (timeElapsed <= 28) {
-      // First 28 seconds: 1.80x to 1.20x
-      const progress = timeElapsed / 28;
-      return Math.max(1.20, 1.80 - (progress * 0.60));
-    } else if (timeElapsed <= 50) {
-      // 28-50 seconds (22 seconds): 1.20x to 1.10x
-      const progress = (timeElapsed - 28) / 22;
-      return Math.max(1.10, 1.20 - (progress * 0.10));
-    } else {
-      // Last 10 seconds: 1.10x
-      return 1.10;
+    loadAlgorithmConfig();
+  }, []);
+
+  // Calculate dynamic odds based on countdown and algorithm config
+  const getOdds = () => {
+    const duration = algorithmConfig.pool_duration_seconds;
+    const lockout = algorithmConfig.lockout_time_seconds;
+    const oddsStart = algorithmConfig.odds_start;
+    const oddsEnd = algorithmConfig.odds_end;
+    
+    const timeElapsed = duration - countdown;
+    const effectiveTime = duration - lockout; // Time before lockout
+    
+    if (timeElapsed >= effectiveTime) {
+      // During lockout period
+      return oddsEnd;
     }
+    
+    // Calculate progress through the effective time
+    const progress = timeElapsed / effectiveTime;
+    const oddsDiff = oddsStart - oddsEnd;
+    
+    // Linear decrease from start to end odds
+    return Math.max(oddsEnd, oddsStart - (progress * oddsDiff));
   };
 
   // Play coin sound effect for profit
@@ -494,10 +541,10 @@ const Fast = () => {
       return;
     }
 
-    if (countdown <= 15) {
+    if (countdown <= algorithmConfig.lockout_time_seconds) {
       toast({
         title: "Tempo esgotado",
-        description: "Não é possível opinar nos últimos 15 segundos.",
+        description: `Não é possível opinar nos últimos ${algorithmConfig.lockout_time_seconds} segundos.`,
         variant: "destructive"
       });
       return;
@@ -603,22 +650,28 @@ const Fast = () => {
 
   if (!currentPools.length) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
-        <div className="text-center mx-auto">
-            <div className="w-32 h-32 rounded-full bg-[#ff2389]/5 flex items-center justify-center mx-auto mb-4">
-              <Zap className="w-16 h-16 text-[#ff2389]" style={{
-                animation: 'blink-118bpm 0.508s infinite'
-              }} />
-            </div>
-          <p className="text-muted-foreground text-center">Carregando Fast Markets...</p>
-          <style>{`
-            @keyframes blink-118bpm {
-              0%, 100% { opacity: 1; }
-              50% { opacity: 0.3; }
-            }
-          `}</style>
+      <>
+        {/* Hide footer on loading screen only */}
+        <style>{`
+          footer { display: none !important; }
+        `}</style>
+        <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
+          <div className="text-center mx-auto">
+              <div className="w-32 h-32 rounded-full bg-[#ff2389]/5 flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-16 h-16 text-[#ff2389]" style={{
+                  animation: 'blink-118bpm 0.508s infinite'
+                }} />
+              </div>
+            <p className="text-muted-foreground text-center">Carregando Fast Markets...</p>
+            <style>{`
+              @keyframes blink-118bpm {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.3; }
+              }
+            `}</style>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 

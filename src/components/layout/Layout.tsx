@@ -18,9 +18,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const isMobile = useIsMobile();
   
   const isAuthPage = location.pathname === '/auth';
-  const isFastPage = location.pathname === '/fast';
   const shouldHideHeaderFooter = isAuthPage; // Hide on Auth page for both mobile and desktop
-  const shouldHideFooter = shouldHideHeaderFooter || isFastPage; // Hide footer on Fast page too
+  const shouldHideFooter = shouldHideHeaderFooter; // Only hide footer on auth page
 
   // Initialize onboarding after hydration
   useEffect(() => {

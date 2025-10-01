@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { TrendingUp, TrendingDown, Clock, ArrowUp, ArrowDown, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import { LivePriceChart } from '@/components/markets/LivePriceChart';
 
 interface FastPool {
   id: string;
@@ -127,6 +128,16 @@ export const FastPoolExpandedModal = ({
         </DialogHeader>
 
         <div className="space-y-6 py-4">
+          {/* Live Price Chart */}
+          <Card>
+            <CardContent className="pt-6">
+              <LivePriceChart 
+                assetSymbol={pool.asset_symbol} 
+                assetName={pool.asset_name} 
+              />
+            </CardContent>
+          </Card>
+
           {/* Countdown */}
           <Card>
             <CardContent className="pt-6 text-center">
@@ -224,7 +235,7 @@ export const FastPoolExpandedModal = ({
 
               <div className="text-center p-4 bg-muted/20 rounded-lg">
                 <div className="text-sm text-muted-foreground mb-1">Multiplicador Atual</div>
-                <div className="text-3xl font-bold text-primary">{currentOdds.toFixed(2)}x</div>
+                <div className="text-3xl font-bold text-primary">{getOdds().toFixed(2)}x</div>
               </div>
             </CardContent>
           </Card>
@@ -236,7 +247,7 @@ export const FastPoolExpandedModal = ({
                 console.log('Subiu button clicked');
                 onBet(pool.id, 'subiu');
               }}
-              disabled={countdown <= 10 || countdown <= 0 || pool.paused}
+              disabled={countdown <= 15 || countdown <= 0 || pool.paused}
               className={cn(
                 "h-24 text-lg font-bold transition-all duration-200",
                 clickedPool?.id === pool.id && clickedPool?.side === 'subiu'
@@ -255,7 +266,7 @@ export const FastPoolExpandedModal = ({
                 console.log('Desceu button clicked');
                 onBet(pool.id, 'desceu');
               }}
-              disabled={countdown <= 10 || countdown <= 0 || pool.paused}
+              disabled={countdown <= 15 || countdown <= 0 || pool.paused}
               className={cn(
                 "h-24 text-lg font-bold transition-all duration-200",
                 clickedPool?.id === pool.id && clickedPool?.side === 'desceu'
@@ -270,9 +281,9 @@ export const FastPoolExpandedModal = ({
             </Button>
           </div>
 
-          {countdown <= 10 && countdown > 0 && (
+          {countdown <= 15 && countdown > 0 && (
             <div className="text-center text-sm text-muted-foreground bg-warning/10 p-3 rounded-lg">
-              ⚠️ Opiniões bloqueadas nos últimos 10 segundos
+              ⚠️ Opiniões bloqueadas nos últimos 15 segundos
             </div>
           )}
           

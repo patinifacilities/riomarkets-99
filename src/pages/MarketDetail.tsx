@@ -134,6 +134,13 @@ const MarketDetail = () => {
 
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
+      {/* Blocked User Warning */}
+      {userProfile?.is_blocked && (
+        <div className="bg-red-500 text-white px-4 py-3 text-center font-semibold">
+          ⚠️ Sua conta está temporariamente bloqueada. Você não pode enviar opiniões no momento. Entre em contato com o suporte.
+        </div>
+      )}
+      
       <div className="container mx-auto px-4 py-6">
         {/* Header */}
         <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6" aria-label="Voltar aos mercados">
