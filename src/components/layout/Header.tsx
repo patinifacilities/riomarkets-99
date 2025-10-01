@@ -369,7 +369,7 @@ const Header = () => {
             ) : isLoggedIn ? (
               <>
                 {/* Wallet Balance */}
-                <div className="relative">
+                <div className="relative overflow-visible">
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>

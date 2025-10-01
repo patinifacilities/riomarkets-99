@@ -140,6 +140,9 @@ export const ProfileImageUpload = ({ userId, currentImageUrl, onImageUpdated }: 
       setIsOpen(false);
       setImageSrc(null);
       
+      // Force profile refresh
+      window.dispatchEvent(new Event('forceProfileRefresh'));
+      
       toast({
         title: "Foto atualizada!",
         description: "Sua foto de perfil foi atualizada com sucesso.",
@@ -170,7 +173,7 @@ export const ProfileImageUpload = ({ userId, currentImageUrl, onImageUpdated }: 
         onClick={() => fileInputRef.current?.click()}
         variant="outline"
         size="sm"
-        className="gap-2"
+        className={`gap-2 ${currentImageUrl ? 'hover:bg-muted' : ''}`}
       >
         <Upload className="w-4 h-4" />
         {currentImageUrl ? 'Alterar foto' : 'Upload foto'}

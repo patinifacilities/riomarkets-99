@@ -250,7 +250,14 @@ const MarketDetail = () => {
                        <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
                        <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
                        <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
-                       <div className="text-lg font-bold text-success bg-gradient-to-r from-yellow-400/20 via-yellow-500/30 to-yellow-400/20 px-2 py-1 rounded animate-golden-fade">Lucro estimado: +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz</div>
+                       <div className="relative overflow-hidden text-lg font-bold text-white bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 px-4 py-2 rounded-lg shadow-lg">
+                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+                         <span className="relative z-10 flex items-center justify-center gap-2">
+                           <span className="text-2xl">✨</span>
+                           Lucro estimado: +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz
+                           <span className="text-2xl">✨</span>
+                         </span>
+                       </div>
                      </div>
                     )}
                     

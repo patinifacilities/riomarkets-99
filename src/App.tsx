@@ -7,6 +7,7 @@ import ProfilePage from '@/pages/Profile';
 import WalletPage from '@/pages/Wallet';
 import Exchange from '@/pages/Exchange';
 import Fast from '@/pages/Fast';
+import CardPayment from '@/pages/CardPayment';
 import Transactions from '@/pages/Transactions';
 import Ranking from '@/pages/Ranking';
 import Press from '@/pages/Press';
@@ -56,6 +57,7 @@ function App() {
           <Route path="/wallet" element={<WalletPage />} />
           <Route path="/fast" element={<Fast />} />
           <Route path="/exchange" element={<Exchange />} />
+          <Route path="/card-payment" element={<CardPayment />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/ranking" element={<Ranking />} />
           <Route path="/press" element={<Press />} />

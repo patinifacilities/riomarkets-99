@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,6 +28,7 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
   const [isLoading, setIsLoading] = useState(false);
   const [showPixModal, setShowPixModal] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const paymentMethods = [
     {
@@ -42,9 +44,15 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
       icon: <CreditCard className="w-5 h-5" />
     },
     {
+      id: 'debit',
+      label: 'Cartão de Débito',
+      description: 'Débito direto',
+      icon: <CreditCard className="w-5 h-5" />
+    },
+    {
       id: 'crypto',
       label: 'Cripto',
-      description: 'Bitcoin, USDT',
+      description: 'USDT, USDC',
       icon: <Bitcoin className="w-5 h-5" />
     }
   ];
@@ -80,15 +88,23 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
 
     if (numericAmount < 500) { // 5.00 in centavos
       toast({
-        title: "Valor mínimo",
+        title: "Valor mínimo não atingido",
         description: "O valor mínimo de depósito é R$ 5,00.",
         variant: "destructive",
+        className: "bg-warning/10 border-warning text-warning-foreground",
       });
       return;
     }
 
     if (paymentMethod === 'pix') {
       setShowPixModal(true);
+      return;
+    }
+
+    if (paymentMethod === 'card' || paymentMethod === 'debit') {
+      // Navigate to card payment page
+      onOpenChange(false);
+      navigate('/card-payment', { state: { amount, paymentMethod } });
       return;
     }
 

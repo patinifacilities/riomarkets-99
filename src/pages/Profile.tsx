@@ -255,10 +255,17 @@ const Profile = () => {
                 ) : (
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={handleCancel}>
-                      <X className="w-4 h-4" />
+                      <X className="w-4 h-4 mr-2" />
+                      Cancelar
                     </Button>
-                    <Button size="sm" onClick={handleSave} disabled={isLoading2}>
-                      <Save className="w-4 h-4" />
+                    <Button 
+                      size="sm" 
+                      onClick={handleSave} 
+                      disabled={isLoading2}
+                      className="bg-gradient-primary hover:opacity-90 text-primary-foreground"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      {isLoading2 ? 'Salvando...' : 'Salvar alterações'}
                     </Button>
                   </div>
                 )}
@@ -301,15 +308,15 @@ const Profile = () => {
                     </div>
                   </div>
                   
-                  {profile.cpf && (
-                    <div>
-                      <Label htmlFor="cpf">CPF</Label>
-                      <div className="flex items-center gap-2 mt-1">
-                        <CreditCard className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">{profile.cpf}</span>
-                      </div>
-                    </div>
-                  )}
+                  <div>
+                    <Label htmlFor="cpf">CPF</Label>
+                    <Input
+                      id="cpf"
+                      value={profile.cpf || 'Não informado'}
+                      disabled
+                      className="mt-1"
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -349,20 +356,6 @@ const Profile = () => {
               </CardContent>
             </Card>
 
-            {/* Account Actions */}
-            <Card className="border-2 bg-muted/30">
-              <CardContent className="p-6">
-                <Button 
-                  variant="destructive" 
-                  onClick={handleLogout}
-                  className="w-full"
-                  size="lg"
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Sair da conta
-                </Button>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>

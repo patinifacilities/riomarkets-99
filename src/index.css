@@ -197,6 +197,19 @@
     animation: pulse-118bpm 0.508s ease-in-out infinite;
   }
 
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
   /* Ticker animation */
   @keyframes scroll-right {
     0% {
