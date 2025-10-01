@@ -81,7 +81,7 @@ const WalletPage = () => {
         </div>
 
         {/* Balance Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
           {/* Expandable RIOZ Balance Card */}
           <ExpandableRiozCard 
             currentBalance={currentBalance}
@@ -94,7 +94,7 @@ const WalletPage = () => {
         </div>
 
         {/* Grid with Recent Wins and Order History */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
           <RecentWinsCard />
           <OrderHistoryCard onRefresh={() => {
             refetchProfile();
@@ -104,7 +104,7 @@ const WalletPage = () => {
         </div>
 
         {/* Completed Orders - Full Width */}
-        <div className="mb-6">
+        <div className="mb-4">
           <CompletedOrdersCard />
         </div>
 

@@ -21,7 +21,7 @@ export const RecentWinsCard = () => {
       if (!user?.id) return [];
       
       // Get winning orders (completed with profit)
-      const { data: winningOrders, error } = await supabase
+      const { data: winningOrders, error: ordersError } = await supabase
         .from('orders')
         .select(`
           id,
@@ -34,17 +34,44 @@ export const RecentWinsCard = () => {
         .eq('user_id', user.id)
         .eq('status', 'ganhou')
         .order('created_at', { ascending: false })
-        .limit(5);
+        .limit(10);
 
-      if (error) throw error;
+      if (ordersError) throw ordersError;
 
-      return (winningOrders || []).map(order => ({
+      const orderWins = (winningOrders || []).map(order => ({
         id: order.id,
         market_id: order.market_id,
         amount: (order.cashout_amount || 0) - order.quantidade_moeda,
         created_at: order.created_at,
         market_title: (order.markets as any)?.titulo || 'Mercado'
       }));
+
+      // Get Fast Markets winnings from wallet_transactions
+      const { data: fastWins, error: fastError } = await supabase
+        .from('wallet_transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('tipo', 'credito')
+        .like('descricao', 'Fast Market - Vitória%')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (fastError) throw fastError;
+
+      const fastWinRecords = (fastWins || []).map(tx => ({
+        id: tx.id,
+        market_id: tx.market_id || 'fast-market',
+        amount: tx.valor,
+        created_at: tx.created_at,
+        market_title: tx.descricao.replace('Fast Market - Vitória - ', '')
+      }));
+
+      // Combine and sort all wins
+      const allWins = [...orderWins, ...fastWinRecords]
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .slice(0, 5);
+
+      return allWins;
     },
     enabled: !!user?.id,
   });

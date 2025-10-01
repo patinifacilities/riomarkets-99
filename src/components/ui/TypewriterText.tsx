@@ -60,21 +60,22 @@ export const TypewriterText = ({
     return () => clearTimeout(timer);
   }, [currentText, isDeleting, isPaused, currentTextIndex, texts, typingSpeed, deletingSpeed, pauseDuration]);
 
-  const currentColor = customColors[texts[currentTextIndex]] || '';
+  // Get color for current text, default to #00ff90 if no custom color specified
+  const currentColor = customColors[texts[currentTextIndex]] || '#00ff90';
   
   return (
     <span className={className}>
       {mobileBreak ? (
         <>
           <span className="block">{baseText}</span>
-          <span className="block" style={currentColor ? { color: currentColor } : {}}>
-            {currentText}<span className="animate-pulse" style={currentColor ? { color: currentColor } : {}}>|</span>
+          <span className="block" style={{ color: currentColor }}>
+            {currentText}<span className="animate-pulse" style={{ color: currentColor }}>|</span>
           </span>
         </>
       ) : (
         <>
-          {baseText} <span style={currentColor ? { color: currentColor } : {}}>{currentText}</span>
-          <span className="animate-pulse" style={currentColor ? { color: currentColor } : {}}>|</span>
+          {baseText} <span style={{ color: currentColor }}>{currentText}</span>
+          <span className="animate-pulse" style={{ color: currentColor }}>|</span>
         </>
       )}
     </span>
