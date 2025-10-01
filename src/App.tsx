@@ -28,6 +28,7 @@ import AdminNews from '@/pages/AdminNews';
 import AdminMarkets from '@/pages/AdminMarkets';
 import AdminFast from '@/pages/AdminFast';
 import AdminFastPoolConfig from '@/pages/AdminFastPoolConfig';
+import AdminAlgorithm from '@/pages/AdminAlgorithm';
 import AdminGatewayConfig from '@/pages/AdminGatewayConfig';
 import AdminGatewayConfigPix from '@/pages/AdminGatewayConfigPix';
 import AdminGatewayConfigStripe from '@/pages/AdminGatewayConfigStripe';
@@ -79,6 +80,7 @@ function App() {
             <Route path="/admin/markets" element={<AdminMarkets />} />
             <Route path="/admin/fast" element={<AdminFast />} />
             <Route path="/admin/fast/pool/:assetId/config" element={<AdminFastPoolConfig />} />
+            <Route path="/admin/fast/algorithm" element={<AdminAlgorithm />} />
             <Route path="/admin/gateway-config/:gatewayId" element={<AdminGatewayConfig />} />
             <Route path="/admin/gateways-saque" element={<AdminGatewaysSaque />} />
           <Route path="/opinioes" element={<Opinioes />} />
