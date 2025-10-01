@@ -225,8 +225,10 @@ const AdminFastPoolConfig = () => {
                   Odds base para este ativo (entre 1.10 e 5.00)
                 </p>
               </div>
+            </CardContent>
+          </Card>
 
-              <div className="flex gap-3 pt-4">
+          <div className="mt-6 flex gap-3">
                 <Button
                   onClick={handleSave}
                   disabled={saving}
@@ -242,9 +244,7 @@ const AdminFastPoolConfig = () => {
                 >
                   Cancelar
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
+          </div>
         </div>
       </div>
     </div>
