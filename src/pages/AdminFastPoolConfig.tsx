@@ -244,9 +244,7 @@ const AdminFastPoolConfig = () => {
                 >
                   Cancelar
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
+          </div>
         </div>
       </div>
     </div>
