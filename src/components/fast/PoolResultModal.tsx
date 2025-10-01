@@ -120,6 +120,13 @@ export const PoolResultModal = ({ open, onOpenChange, result, pool }: PoolResult
               {formatTime(result.created_at)}
             </p>
           </div>
+
+          {/* TradingView Attribution */}
+          <div className="text-center pt-2 border-t">
+            <p className="text-xs text-muted-foreground">
+              Dados fornecidos por TradingView
+            </p>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

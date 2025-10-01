@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { LivePriceChart } from '@/components/markets/LivePriceChart';
+import { PoolResultModal } from '@/components/fast/PoolResultModal';
 
 interface FastPool {
   id: string;
@@ -33,6 +34,13 @@ interface FastPoolResult {
   closing_price: number;
   price_change_percent: number;
   created_at: string;
+  asset_symbol: string;
+  pool_id?: string;
+  fast_pools?: {
+    round_start_time: string;
+    round_end_time: string;
+    asset_name: string;
+  };
 }
 
 const AssetDetail = () => {
@@ -44,6 +52,8 @@ const AssetDetail = () => {
   const [loading, setLoading] = useState(true);
   const [betAmount, setBetAmount] = useState(100);
   const [softLoading, setSoftLoading] = useState(false);
+  const [selectedResult, setSelectedResult] = useState<FastPoolResult | null>(null);
+  const [resultModalOpen, setResultModalOpen] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -119,7 +129,7 @@ const AssetDetail = () => {
     try {
       const { data, error } = await supabase
         .from('fast_pool_results')
-        .select('*, fast_pools!inner(asset_symbol)')
+        .select('*, fast_pools!inner(asset_symbol, round_start_time, round_end_time, asset_name)')
         .eq('fast_pools.asset_symbol', assetSymbol)
         .order('created_at', { ascending: false })
         .limit(20);
@@ -128,7 +138,13 @@ const AssetDetail = () => {
       
       const typedData = (data || []).map((item: any) => ({
         ...item,
-        result: item.result as 'subiu' | 'desceu' | 'manteve'
+        result: item.result as 'subiu' | 'desceu' | 'manteve',
+        asset_symbol: assetSymbol,
+        fast_pools: {
+          round_start_time: item.fast_pools.round_start_time,
+          round_end_time: item.fast_pools.round_end_time,
+          asset_name: item.fast_pools.asset_name
+        }
       }));
       
       setPoolHistory(typedData);
@@ -605,13 +621,17 @@ const AssetDetail = () => {
                   {poolHistory.map((result, index) => (
                     <div
                       key={result.id}
+                      onClick={() => {
+                        setSelectedResult(result);
+                        setResultModalOpen(true);
+                      }}
                       className={cn(
-                        "flex flex-col items-center p-3 rounded-lg border transition-all duration-300",
+                        "flex flex-col items-center p-3 rounded-lg border transition-all duration-300 cursor-pointer hover:scale-105",
                         result.result === 'subiu' 
-                          ? 'bg-[#00ff90]/10 border-[#00ff90]/30' 
+                          ? 'bg-[#00ff90]/10 border-[#00ff90]/30 hover:bg-[#00ff90]/20' 
                           : result.result === 'desceu'
-                          ? 'bg-[#ff2389]/10 border-[#ff2389]/30'
-                          : 'bg-muted/20 border-border'
+                          ? 'bg-[#ff2389]/10 border-[#ff2389]/30 hover:bg-[#ff2389]/20'
+                          : 'bg-muted/20 border-border hover:bg-muted/30'
                       )}
                     >
                       <div className={cn(
@@ -644,6 +664,18 @@ const AssetDetail = () => {
           </Card>
         </div>
       </div>
+
+      {/* Result Details Modal */}
+      <PoolResultModal
+        open={resultModalOpen}
+        onOpenChange={setResultModalOpen}
+        result={selectedResult}
+        pool={selectedResult?.fast_pools ? {
+          round_start_time: selectedResult.fast_pools.round_start_time,
+          round_end_time: selectedResult.fast_pools.round_end_time,
+          asset_name: selectedResult.fast_pools.asset_name
+        } : null}
+      />
     </div>
   );
 };

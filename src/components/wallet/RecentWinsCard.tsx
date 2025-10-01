@@ -1,8 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy, TrendingUp, Zap } from 'lucide-react';
+import { Trophy, TrendingUp, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface WinRecord {
   id: string;
@@ -14,20 +17,22 @@ interface WinRecord {
 
 export const RecentWinsCard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const { data: recentWins = [], isLoading } = useQuery({
     queryKey: ['fast-markets-transactions', user?.id],
     queryFn: async (): Promise<WinRecord[]> => {
       if (!user?.id) return [];
       
-      // Get Fast Markets final results (victories and defeats)
+      // Get Fast Markets transactions (bets, victories and defeats)
       const { data: fastTransactions, error: fastError } = await supabase
         .from('wallet_transactions')
         .select('*')
         .eq('user_id', user.id)
-        .or('descricao.ilike.%Fast Market - Vitória%,descricao.ilike.%Fast Market - Derrota%')
-        .order('created_at', { ascending: false })
-        .limit(10);
+        .or('descricao.ilike.%Fast Market%')
+        .order('created_at', { ascending: false });
 
       if (fastError) throw fastError;
 
@@ -36,9 +41,9 @@ export const RecentWinsCard = () => {
         market_id: tx.market_id || 'fast-market',
         amount: tx.tipo === 'credito' ? tx.valor : -tx.valor,
         created_at: tx.created_at,
-        market_title: tx.descricao.includes('Vitória') 
-          ? tx.descricao.replace('Fast Market - Vitória - ', '') 
-          : tx.descricao.replace('Fast Market - Derrota - ', '')
+        market_title: tx.descricao.replace('Fast Market - Vitória - ', '')
+          .replace('Fast Market - Derrota - ', '')
+          .replace('Fast Market - Aposta - ', 'Aposta - ')
       }));
 
       return fastRecords;
@@ -46,17 +51,22 @@ export const RecentWinsCard = () => {
     enabled: !!user?.id,
   });
 
+  const totalPages = Math.ceil(recentWins.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = recentWins.slice(startIndex, endIndex);
+  
   const totalWins = recentWins.reduce((sum, win) => sum + win.amount, 0);
 
   return (
     <Card className="bg-gradient-to-br from-[#ff2389]/5 to-[#ff2389]/10 border-[#ff2389]/20">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between pb-4">
         <CardTitle className="flex items-center gap-2 text-[#ff2389]">
           <Zap className="w-5 h-5" />
           Fast Markets
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         {isLoading ? (
           <div className="space-y-2">
             {[1, 2, 3].map(i => (
@@ -75,7 +85,7 @@ export const RecentWinsCard = () => {
           </div>
         ) : (
           <>
-            <div className={`rounded-lg p-4 mb-4 ${totalWins >= 0 ? 'bg-[#00ff90]/10' : 'bg-[#ff2389]/10'}`}>
+            <div className={`rounded-lg p-4 ${totalWins >= 0 ? 'bg-[#00ff90]/10' : 'bg-[#ff2389]/10'}`}>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Resultado Líquido</span>
                 <div className="flex items-center gap-2">
@@ -88,7 +98,7 @@ export const RecentWinsCard = () => {
             </div>
 
             <div className="space-y-2">
-              {recentWins.map((win) => (
+              {currentItems.map((win) => (
                 <div
                   key={win.id}
                   className={`flex items-center justify-between p-3 rounded-lg bg-card/50 border transition-colors ${
@@ -119,6 +129,43 @@ export const RecentWinsCard = () => {
                 </div>
               ))}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between pt-2 border-t">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="gap-1"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Anterior
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  Página {currentPage} de {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="gap-1"
+                >
+                  Próxima
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+
+            {/* Gold Pass Button */}
+            <Button 
+              className="w-full bg-gradient-to-r from-yellow-500 via-yellow-600 to-amber-600 hover:from-yellow-600 hover:via-yellow-700 hover:to-amber-700 text-white font-semibold py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-yellow-400/50"
+              onClick={() => navigate('/profile')}
+            >
+              <span className="relative z-10">⭐ Upgrade para Gold Pass</span>
+            </Button>
           </>
         )}
       </CardContent>
