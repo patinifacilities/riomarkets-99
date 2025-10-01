@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Users, TrendingUp, Clock, Wallet, Calculator } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, TrendingUp, Clock, Wallet, Calculator, LogIn } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -534,6 +534,21 @@ const MarketDetail = () => {
                           />
                         </div>
                       </>
+                    ) : !authUser ? (
+                      <div className="p-4 bg-muted/50 rounded-lg text-center">
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Você precisa estar logado para opinar neste mercado
+                        </p>
+                        <Button 
+                          variant="default" 
+                          size="sm"
+                          onClick={() => navigate('/auth')}
+                          className="w-full bg-primary hover:bg-primary/90"
+                        >
+                          <LogIn className="w-4 h-4 mr-2" />
+                          Fazer Login
+                        </Button>
+                      </div>
                     ) : (
                       <div className="p-4 bg-muted/50 rounded-lg text-center">
                         <p className="text-sm text-muted-foreground mb-3">
@@ -566,12 +581,12 @@ const MarketDetail = () => {
                        <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
                        <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
                        <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
-                        <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
-                          {/* Gold fill based on slider progress */}
+                         <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
+                          {/* Gold fill based on slider progress - resets at 100% */}
                           <div 
                             className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 transition-all duration-100"
                             style={{
-                              width: `${sliderProgress * 100}%`,
+                              width: sliderProgress >= 1 ? '0%' : `${sliderProgress * 100}%`,
                             }}
                           />
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-shimmer"></div>
@@ -579,7 +594,7 @@ const MarketDetail = () => {
                             <span 
                               className="text-xs font-semibold tracking-wide transition-colors duration-300"
                               style={{
-                                color: sliderProgress > 0.3 ? '#374151' : 'rgba(234, 179, 8, 0.5)'
+                                color: (sliderProgress > 0.3 && sliderProgress < 1) ? '#374151' : 'rgba(234, 179, 8, 0.5)'
                               }}
                             >
                               LUCRO ESTIMADO
@@ -587,7 +602,7 @@ const MarketDetail = () => {
                             <div 
                               className="text-2xl font-bold mt-1 transition-colors duration-300"
                               style={{
-                                color: sliderProgress > 0.3 ? '#374151' : '#eab308'
+                                color: (sliderProgress > 0.3 && sliderProgress < 1) ? '#374151' : '#eab308'
                               }}
                             >
                               +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz

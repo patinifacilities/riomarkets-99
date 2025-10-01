@@ -43,7 +43,7 @@ export const BetSlider = ({ balance, onAmountChange, estimatedReward }: BetSlide
           onValueChange={setPercentage}
           max={100}
           step={1}
-          className="w-full [&>.relative]:h-6 [&_[role=slider]]:h-10 [&_[role=slider]]:w-10 [&_[role=slider]]:border-4 [&_[role=slider]]:border-white [&_[role=slider]]:shadow-lg [&_.bg-primary]:h-6"
+          className="w-full [&>.relative]:h-6 [&_[role=slider]]:h-7 [&_[role=slider]]:w-7 [&_[role=slider]]:border-3 [&_[role=slider]]:border-white [&_[role=slider]]:shadow-lg [&_.bg-primary]:h-6"
         />
         
         <div className="flex justify-between gap-2">
