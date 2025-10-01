@@ -266,7 +266,8 @@ const Profile = () => {
                       size="sm" 
                       onClick={handleSave} 
                       disabled={isLoading2}
-                      className="bg-gradient-to-r from-primary via-primary to-[#ff2389] hover:opacity-90 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+                      style={{ backgroundColor: '#ff2389' }}
+                      className="hover:opacity-90 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200"
                     >
                       <Save className="w-4 h-4 mr-2" />
                       {isLoading2 ? 'Salvando...' : 'Salvar'}
