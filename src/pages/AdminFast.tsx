@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings, TrendingUp, Clock, DollarSign, History, Pause, Play, Power } from 'lucide-react';
+import { ArrowLeft, Settings, TrendingUp, Clock, DollarSign, History, Pause, Play, Power, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -61,6 +61,8 @@ const AdminFast = () => {
   const [poolHistory, setPoolHistory] = useState<PoolResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [fastEnabled, setFastEnabled] = useState(true);
+  const [historyPage, setHistoryPage] = useState(1);
+  const historyPerPage = 10;
   const [stats, setStats] = useState({
     total_pools: 0,
     active_pools: 0,
@@ -431,13 +433,40 @@ const AdminFast = () => {
           {/* Pool History */}
           <Card className="bg-card-secondary border-border-secondary">
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <History className="w-5 h-5" />
-                <CardTitle>Histórico de Pools</CardTitle>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <History className="w-5 h-5" />
+                    <CardTitle>Histórico de Pools</CardTitle>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Pools finalizados com resultados
+                  </p>
+                </div>
+                {poolHistory.length > historyPerPage && (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setHistoryPage(prev => Math.max(1, prev - 1))}
+                      disabled={historyPage === 1}
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                    <span className="text-sm text-muted-foreground">
+                      Página {historyPage} de {Math.ceil(poolHistory.length / historyPerPage)}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setHistoryPage(prev => Math.min(Math.ceil(poolHistory.length / historyPerPage), prev + 1))}
+                      disabled={historyPage >= Math.ceil(poolHistory.length / historyPerPage)}
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
-              <p className="text-sm text-muted-foreground">
-                Últimos 20 pools finalizados com resultados
-              </p>
             </CardHeader>
             <CardContent>
               {poolHistory.length === 0 ? (
@@ -446,7 +475,9 @@ const AdminFast = () => {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {poolHistory.map((result) => (
+                  {poolHistory
+                    .slice((historyPage - 1) * historyPerPage, historyPage * historyPerPage)
+                    .map((result) => (
                     <div 
                       key={result.id} 
                       className="p-4 rounded-lg border border-border bg-card/30 hover:bg-card/50 transition-colors"

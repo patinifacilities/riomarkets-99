@@ -167,6 +167,19 @@ const Fast = () => {
           loadPoolHistory();
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'fast_pool_configs'
+        },
+        (payload) => {
+          console.log('Config update:', payload);
+          // Reload pools to reflect config changes (name, question, etc.)
+          loadCurrentPools();
+        }
+      )
       .subscribe();
 
     return () => {

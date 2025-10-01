@@ -62,6 +62,7 @@ const AssetDetail = () => {
         },
         () => {
           loadPoolData();
+          loadPoolHistory();
         }
       )
       .on(
@@ -73,6 +74,17 @@ const AssetDetail = () => {
         },
         () => {
           loadPoolHistory();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'fast_pool_configs'
+        },
+        () => {
+          loadPoolData();
         }
       )
       .subscribe();
@@ -131,14 +143,30 @@ const AssetDetail = () => {
       const now = new Date().getTime();
       const endTime = new Date(currentPool.round_end_time).getTime();
       const timeLeft = Math.max(0, (endTime - now) / 1000);
-      setCountdown(timeLeft);
+      
+      // Only update countdown if it changed significantly to avoid too many re-renders
+      if (Math.abs(countdown - timeLeft) > 0.01) {
+        setCountdown(timeLeft);
+      }
     };
 
     calculateCountdown();
     const timer = setInterval(calculateCountdown, 16);
 
     return () => clearInterval(timer);
-  }, [currentPool]);
+  }, [currentPool, countdown]);
+  
+  // Trigger reload when countdown reaches 0
+  useEffect(() => {
+    if (countdown <= 0 && currentPool) {
+      const reloadTimer = setTimeout(() => {
+        loadPoolData();
+        loadPoolHistory();
+      }, 2000);
+      
+      return () => clearTimeout(reloadTimer);
+    }
+  }, [countdown, currentPool]);
 
   const getOdds = () => {
     const timeElapsed = 60 - countdown;
