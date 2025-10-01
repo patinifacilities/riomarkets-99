@@ -658,11 +658,13 @@ export type Database = {
           descricao: string | null
           destaque: boolean | null
           end_date: string
+          icon_url: string | null
           id: string
           market_type: string
           odds: Json
           opcoes: Json
           periodicidade: string | null
+          photo_url: string | null
           status: string | null
           thumbnail_url: string | null
           titulo: string
@@ -673,11 +675,13 @@ export type Database = {
           descricao?: string | null
           destaque?: boolean | null
           end_date: string
+          icon_url?: string | null
           id: string
           market_type?: string
           odds: Json
           opcoes: Json
           periodicidade?: string | null
+          photo_url?: string | null
           status?: string | null
           thumbnail_url?: string | null
           titulo: string
@@ -688,11 +692,13 @@ export type Database = {
           descricao?: string | null
           destaque?: boolean | null
           end_date?: string
+          icon_url?: string | null
           id?: string
           market_type?: string
           odds?: Json
           opcoes?: Json
           periodicidade?: string | null
+          photo_url?: string | null
           status?: string | null
           thumbnail_url?: string | null
           titulo?: string

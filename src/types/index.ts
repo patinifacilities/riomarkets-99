@@ -24,6 +24,8 @@ export interface Market {
   periodicidade?: string;
   destaque?: boolean;
   market_type?: MarketType;
+  icon_url?: string;
+  photo_url?: string;
 }
 
 export interface MarketOption {

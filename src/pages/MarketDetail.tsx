@@ -130,8 +130,19 @@ const MarketDetail = () => {
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
+        {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Market Photo */}
+            {market.photo_url && (
+              <div className="w-full aspect-[21/9] rounded-2xl overflow-hidden bg-muted">
+                <img 
+                  src={market.photo_url} 
+                  alt={market.titulo}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
             {/* Market Header */}
             <Card className="bg-gradient-card border-border/50">
               <CardContent className="p-6">
@@ -225,11 +236,13 @@ const MarketDetail = () => {
                       
                       <div className="text-center text-sm text-muted-foreground">ou use o slider</div>
                       
-                      <BetSlider 
-                        balance={userProfile?.saldo_moeda || 0}
-                        onAmountChange={(amount) => setBetAmount(amount)}
-                        estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
-                      />
+                      <div className={!authUser || (userProfile?.saldo_moeda || 0) === 0 ? 'opacity-50 pointer-events-none' : ''}>
+                        <BetSlider 
+                          balance={userProfile?.saldo_moeda || 0}
+                          onAmountChange={(amount) => setBetAmount(amount)}
+                          estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
+                        />
+                      </div>
                     
                     {selectedOption && (
                      <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">

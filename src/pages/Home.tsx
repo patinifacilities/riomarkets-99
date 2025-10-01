@@ -273,9 +273,9 @@ const Home = () => {
                         onClick={() => handleTopicSelect(topic.id)}
                         className={cn(
                           "flex items-center gap-4 px-10 py-7 rounded-2xl text-lg font-bold whitespace-nowrap",
-                          "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg relative overflow-visible",
+                          "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg relative overflow-hidden",
                           "animate-fade-in",
-                          isSelected 
+                          isSelected
                             ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50' 
                             : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm'
                         )}
@@ -312,9 +312,9 @@ const Home = () => {
                         onClick={() => handleTopicSelect(topic.id)}
                         className={cn(
                           "flex items-center gap-4 px-10 py-7 rounded-2xl text-lg font-bold whitespace-nowrap",
-                          "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg relative overflow-visible",
+                          "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg relative overflow-hidden",
                           "animate-fade-in",
-                          isSelected 
+                          isSelected
                             ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50' 
                             : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm'
                         )}

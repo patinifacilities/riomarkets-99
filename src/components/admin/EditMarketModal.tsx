@@ -26,7 +26,9 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
     category: '',
     endDate: '',
     destaque: false,
-    periodicidade: ''
+    periodicidade: '',
+    iconUrl: '',
+    photoUrl: ''
   });
   const [editingOptions, setEditingOptions] = useState<string[]>([]);
 
@@ -38,7 +40,9 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
         category: market.categoria || '',
         endDate: market.end_date ? new Date(market.end_date).toISOString().slice(0, 16) : '',
         destaque: market.destaque || false,
-        periodicidade: market.periodicidade || ''
+        periodicidade: market.periodicidade || '',
+        iconUrl: market.icon_url || '',
+        photoUrl: market.photo_url || ''
       });
       setEditingOptions([...(market.opcoes || [])]);
     }
@@ -77,7 +81,9 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
           end_date: new Date(editMarket.endDate).toISOString(),
           destaque: editMarket.destaque,
           periodicidade: editMarket.periodicidade || null,
-          opcoes: editingOptions
+          opcoes: editingOptions,
+          icon_url: editMarket.iconUrl || null,
+          photo_url: editMarket.photoUrl || null
         })
         .eq('id', market.id)
         .select();
@@ -183,6 +189,34 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
                   <SelectItem value="mensal">Mensal</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">URL do Ícone do Pool</label>
+              <Input
+                type="url"
+                placeholder="https://example.com/icon.png"
+                value={editMarket.iconUrl}
+                onChange={(e) => setEditMarket({...editMarket, iconUrl: e.target.value})}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Recomendado: imagem quadrada pequena (ex: 64x64px)
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">URL da Foto do Pool</label>
+              <Input
+                type="url"
+                placeholder="https://example.com/photo.jpg"
+                value={editMarket.photoUrl}
+                onChange={(e) => setEditMarket({...editMarket, photoUrl: e.target.value})}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Recomendado: imagem em formato 21:9 (ex: 1920x823px)
+              </p>
             </div>
           </div>
 

@@ -337,7 +337,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
+    <div className={`min-h-screen bg-background ${currentStep > 0 ? 'overflow-hidden' : ''}`}>
       <div className="flex items-center justify-center p-4 min-h-screen">
         <div className="w-full max-w-md">
           {/* Logo/Branding */}
