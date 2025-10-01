@@ -164,15 +164,15 @@ const AdminMarkets = () => {
           {/* Markets List */}
           <Card className="bg-card-secondary border-border-secondary">
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <CardTitle>Mercados da Plataforma</CardTitle>
-                <div className="relative w-64">
+                <div className="relative w-full sm:w-80">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
                     placeholder="Buscar mercados..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-11 bg-background/50 border-border-secondary focus:border-primary transition-colors"
                   />
                 </div>
               </div>

@@ -320,16 +320,20 @@ const AdminFast = () => {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3 bg-card/50 px-4 py-2 rounded-lg border border-border">
-                <Power className={`w-5 h-5 ${fastEnabled ? 'text-success' : 'text-muted-foreground'}`} />
-                <Label htmlFor="fast-toggle" className="cursor-pointer font-medium">
-                  Sistema FAST {fastEnabled ? 'Ativo' : 'Desativado'}
+              <div className="flex items-center gap-4 bg-card/50 px-6 py-3 rounded-lg border border-border">
+                <TrendingUp className="w-6 h-6 text-primary" />
+                <Label htmlFor="fast-toggle" className="cursor-pointer font-bold text-lg">
+                  Fast
                 </Label>
-                <Switch
-                  id="fast-toggle"
-                  checked={fastEnabled}
-                  onCheckedChange={handleToggleFast}
-                />
+                <div className="flex items-center gap-2">
+                  <Power className={`w-5 h-5 transition-colors ${fastEnabled ? 'text-success' : 'text-muted-foreground'}`} />
+                  <Switch
+                    id="fast-toggle"
+                    checked={fastEnabled}
+                    onCheckedChange={handleToggleFast}
+                    className="data-[state=checked]:bg-success scale-125"
+                  />
+                </div>
               </div>
               <Button onClick={() => navigate('/admin/fast/config')} className="gap-2">
                 <Settings className="w-4 h-4" />
