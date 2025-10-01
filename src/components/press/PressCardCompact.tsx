@@ -64,53 +64,59 @@ export function PressCardCompact({ article }: PressCardCompactProps) {
 
   return (
     <>
-      <article className="bg-card rounded-lg border border-border hover:border-primary/40 transition-all duration-200 group cursor-pointer p-4" onClick={handleReadMore}>
-        <div className="flex items-start gap-4">
+      <article className="bg-gradient-to-br from-card via-card to-card/80 rounded-xl border border-border/50 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 group cursor-pointer p-5 relative overflow-hidden" onClick={handleReadMore}>
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-[#ff2389]/[0.02] pointer-events-none" />
+        
+        <div className="flex items-start gap-4 relative z-10">
           {/* Vehicle Logo */}
           <div className="flex-shrink-0">
             {article.logo_url ? (
-              <div className="w-12 h-8 flex items-center">
+              <div className="w-16 h-10 flex items-center bg-white rounded-lg shadow-sm p-1.5">
                 <LazyImage
                   src={article.logo_url}
                   alt={`Logo do ${article.vehicle}`}
-                  className="w-full h-full object-contain bg-white rounded px-1"
+                  className="w-full h-full object-contain"
                   placeholder={
-                    <div className="w-12 h-8 bg-muted rounded flex items-center justify-center">
-                      <span className="text-xs text-muted-foreground">{article.vehicle.slice(0, 3)}</span>
+                    <div className="w-16 h-10 bg-muted rounded-lg flex items-center justify-center">
+                      <span className="text-xs text-muted-foreground font-semibold">{article.vehicle.slice(0, 3)}</span>
                     </div>
                   }
                 />
               </div>
             ) : (
-              <div className="w-12 h-8 bg-white rounded flex items-center justify-center">
-                <span className="text-xs text-black font-medium">{article.vehicle.slice(0, 3)}</span>
+              <div className="w-16 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center">
+                <span className="text-xs text-black font-bold">{article.vehicle.slice(0, 3)}</span>
               </div>
             )}
           </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2 mb-2">
-              <h3 className="text-foreground font-semibold leading-tight line-clamp-2 group-hover:text-primary transition-colors text-sm">
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <h3 className="text-foreground font-bold leading-tight line-clamp-2 group-hover:text-primary transition-colors text-base">
                 {article.title}
               </h3>
-              <Badge className={`text-xs font-medium flex-shrink-0 ${getPriorityColor(article.vehicle)}`}>
+              <Badge className={`text-xs font-semibold flex-shrink-0 border ${getPriorityColor(article.vehicle)}`}>
                 {getPriorityLabel(article.vehicle)}
               </Badge>
             </div>
             
             {article.summary && (
-              <p className="text-xs text-muted-foreground line-clamp-1 leading-relaxed mb-2">
+              <p className="text-sm text-muted-foreground/90 line-clamp-2 leading-relaxed mb-3">
                 {article.summary}
               </p>
             )}
             
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span className="font-medium">{article.vehicle}</span>
-              <span>{formatDate(article.published_at)}</span>
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-foreground/80">{article.vehicle}</span>
+              <span className="text-muted-foreground">{formatDate(article.published_at)}</span>
             </div>
           </div>
         </div>
+        
+        {/* Hover indicator */}
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-[#ff2389] to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </article>
 
       {/* Reading Modal */}

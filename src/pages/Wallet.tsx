@@ -93,20 +93,18 @@ const WalletPage = () => {
           <BalanceDonutChart />
         </div>
 
-        {/* Recent Wins Card */}
-        <div className="mb-6">
+        {/* Grid with Recent Wins and Order History */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           <RecentWinsCard />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Order History - Active */}
           <OrderHistoryCard onRefresh={() => {
             refetchProfile();
             refetchTransactions();
             fetchBalance();
           }} />
+        </div>
 
-          {/* Order History - Completed */}
+        {/* Completed Orders - Full Width */}
+        <div className="mb-6">
           <CompletedOrdersCard />
         </div>
 

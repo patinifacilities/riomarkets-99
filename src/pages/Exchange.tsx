@@ -267,15 +267,15 @@ const ExchangeNew = () => {
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <div className="flex flex-col pointer-events-none">
-                      <span className="text-xl font-bold text-foreground">
+                  <div className="flex flex-col pointer-events-none">
+                      <span className="text-2xl font-bold text-foreground">
                         {fromCurrency}
                       </span>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={handleMaxAmount}
-                        className="text-sm font-semibold text-primary hover:text-primary/80 h-auto p-0 justify-start pointer-events-auto"
+                        className="text-lg font-bold text-primary hover:text-primary/80 h-auto p-0 justify-start pointer-events-auto"
                       >
                         MAX
                       </Button>
@@ -367,7 +367,7 @@ const ExchangeNew = () => {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  <span className="text-xl font-bold text-foreground ml-2">
+                  <span className="text-2xl font-bold text-foreground ml-2">
                     {toCurrency}
                   </span>
                 </div>
@@ -424,7 +424,7 @@ const ExchangeNew = () => {
                 
                 <Button
                   asChild
-                  className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 hover:from-[#ff2389]/90 hover:to-[#ff2389]/70 animate-pulse-gentle"
+                  className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 hover:from-[#ff2389]/90 hover:to-[#ff2389]/70 animate-pulse-continuous-60s"
                   size="lg"
                 >
                   <a href="/fast" className="flex items-center gap-2">

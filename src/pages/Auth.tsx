@@ -306,14 +306,18 @@ const Auth = () => {
               <div className="text-2xl font-bold text-foreground">
                 Mercados Preditivos
               </div>
-              <div style={{ color: '#00ff90' }}>
+              <div>
                 <TypewriterText
                   baseText=""
                   texts={[
+                    "Rápidos",
                     "para Análise Estratégica",
                     "baseados em Dados",
                     "com Transparência Total"
                   ]}
+                  customColors={{
+                    "Rápidos": "#ff2389"
+                  }}
                   className="text-2xl font-bold"
                   typingSpeed={100}
                   deletingSpeed={50}

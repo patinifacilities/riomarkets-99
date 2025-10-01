@@ -137,7 +137,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
           <div className="p-4 pb-3">
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-sm bg-gray-100 flex items-center justify-center flex-shrink-0 relative">
+                <div className="w-10 h-10 rounded-sm bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0 relative p-1">
                   {market.thumbnail_url ? (
                     <img 
                       src={market.thumbnail_url}
@@ -148,15 +148,15 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                     <img 
                       src={`/assets/icons/${market.categoria.toLowerCase()}.png`}
                       alt={market.categoria}
-                      className="w-6 h-6 object-contain"
+                      className="w-full h-full object-contain"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                       }}
                     />
                   )}
                   {showHotIcon && (
-                    <div className="absolute -top-1 -right-1 bg-gradient-to-r from-orange-500 to-red-500 rounded-full p-1 animate-pulse">
-                      <Flame className="w-3 h-3 text-white animate-bounce" />
+                    <div className="absolute -top-2 -right-2 bg-gradient-to-br from-orange-400 via-red-500 to-pink-600 rounded-full p-1.5 shadow-lg shadow-orange-500/50 animate-pulse-glow">
+                      <Flame className="w-4 h-4 text-white animate-fire-flicker" />
                     </div>
                   )}
                 </div>

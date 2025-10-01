@@ -165,9 +165,16 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-bg-app pt-[env(safe-area-inset-top)]">
+    <div className="min-h-screen bg-bg-app pt-[env(safe-area-inset-top)] relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#ff2389]/5 rounded-full blur-3xl animate-float-delayed" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/3 rounded-full blur-3xl animate-pulse-gentle" />
+      </div>
+      
       {/* Hero Section - Trading Aligned */}
-      <section className="relative min-h-[42vh] md:min-h-[52vh] flex flex-col items-center justify-center bg-[color:var(--bg-app)]">
+      <section className="relative min-h-[42vh] md:min-h-[52vh] flex flex-col items-center justify-center bg-[color:var(--bg-app)] z-10">
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
           
           <div className="text-center mb-6 md:mb-8">
@@ -246,7 +253,7 @@ const Home = () => {
         <div className="flex flex-col gap-6">
           {/* Topic Filters - Infinite Loop Side Scroller */}
           <div>
-            <div className="relative overflow-visible py-2">
+            <div className="relative overflow-hidden py-4">
               {/* Fade overlays */}
               <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none"></div>
               <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none"></div>
@@ -263,11 +270,11 @@ const Home = () => {
                         onClick={() => handleTopicSelect(topic.id)}
                         className={`
                           flex items-center gap-4 px-10 py-7 rounded-2xl text-lg font-bold whitespace-nowrap
-                          transition-all duration-300 hover:scale-110 hover:-translate-y-1 border-2 shadow-lg
-                          animate-fade-in
+                          transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg
+                          animate-fade-in animate-rainbow-border
                           ${isSelected 
                             ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50' 
-                            : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm'
+                            : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm animate-subtle-glow'
                           }
                         `}
                       >

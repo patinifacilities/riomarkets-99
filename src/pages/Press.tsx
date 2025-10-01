@@ -77,9 +77,15 @@ export default function Press() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-6">
             <Newspaper className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Na mídia
-          </h1>
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+              Na mídia
+            </h1>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-red-600 rounded-full animate-pulse-glow">
+              <div className="w-2 h-2 bg-white rounded-full animate-ping" />
+              <span className="text-xs font-bold text-white uppercase tracking-wider">LIVE</span>
+            </div>
+          </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             O que está acontecendo no mundo
           </p>
