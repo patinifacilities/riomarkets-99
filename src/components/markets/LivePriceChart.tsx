@@ -38,6 +38,13 @@ export const LivePriceChart = ({ assetSymbol, assetName, poolStartPrice }: LiveP
   const [initialPrice, setInitialPrice] = useState<number>(0);
   const [dataSource, setDataSource] = useState<'binance' | 'api'>('binance');
 
+  // Set initialPrice to poolStartPrice when it's provided (pool start reference)
+  useEffect(() => {
+    if (poolStartPrice && poolStartPrice > 0) {
+      setInitialPrice(poolStartPrice);
+    }
+  }, [poolStartPrice]);
+
   useEffect(() => {
     let ws: WebSocket | null = null;
     let reconnectTimeout: NodeJS.Timeout;
@@ -66,21 +73,13 @@ export const LivePriceChart = ({ assetSymbol, assetName, poolStartPrice }: LiveP
             if (price && !isNaN(price)) {
               const now = Date.now();
               
-              setCurrentPrice(prev => {
-                // Set initial price on first update
-                if (prev === 0) {
-                  setInitialPrice(price);
-                  return price;
-                }
-                return price;
-              });
+              setCurrentPrice(price);
               
-              // Calculate price change
-              setInitialPrice(initial => {
-                if (initial === 0) return price;
-                setPriceChange(((price - initial) / initial) * 100);
-                return initial;
-              });
+              // Calculate price change relative to pool start price or initial price
+              const referencePrice = poolStartPrice || initialPrice;
+              if (referencePrice > 0) {
+                setPriceChange(((price - referencePrice) / referencePrice) * 100);
+              }
               
               // Add to price data
               setPriceData(prevData => {
@@ -122,19 +121,13 @@ export const LivePriceChart = ({ assetSymbol, assetName, poolStartPrice }: LiveP
           if (price && !isNaN(price)) {
             const now = Date.now();
             
-            setCurrentPrice(prev => {
-              if (prev === 0) {
-                setInitialPrice(price);
-                return price;
-              }
-              return price;
-            });
+            setCurrentPrice(price);
             
-            setInitialPrice(initial => {
-              if (initial === 0) return price;
-              setPriceChange(((price - initial) / initial) * 100);
-              return initial;
-            });
+            // Calculate price change relative to pool start price or initial price
+            const referencePrice = poolStartPrice || initialPrice;
+            if (referencePrice > 0) {
+              setPriceChange(((price - referencePrice) / referencePrice) * 100);
+            }
             
             setPriceData(prevData => {
               const newData = [...prevData, { time: now, price }];
@@ -164,7 +157,7 @@ export const LivePriceChart = ({ assetSymbol, assetName, poolStartPrice }: LiveP
         clearInterval(pollInterval);
       }
     };
-  }, [assetSymbol]);
+  }, [assetSymbol, poolStartPrice, initialPrice]);
 
   // Calculate chart dimensions and scaling
   // Always include poolStartPrice and current price in the range

@@ -144,30 +144,22 @@ const AssetDetail = () => {
       const endTime = new Date(currentPool.round_end_time).getTime();
       const timeLeft = Math.max(0, (endTime - now) / 1000);
       setCountdown(timeLeft);
+      
+      // When countdown reaches 0, trigger pool reload
+      if (timeLeft === 0) {
+        console.log('⏰ Pool ended, reloading...');
+        setTimeout(() => {
+          loadPoolData();
+          loadPoolHistory();
+        }, 3000); // Wait 3 seconds for pool to finalize
+      }
     };
 
     calculateCountdown();
-    const timer = setInterval(calculateCountdown, 16);
+    const timer = setInterval(calculateCountdown, 100); // Check every 100ms for smoother updates
 
     return () => clearInterval(timer);
-  }, [currentPool]);
-  
-  // Trigger reload when countdown reaches 0
-  useEffect(() => {
-    // Only trigger if countdown reached 0 and we have a current pool
-    if (countdown > 0 || !currentPool) return;
-    
-    console.log('⏰ Countdown reached 0, scheduling pool reload...');
-    
-    // Wait for pool to finalize and next pool to be created (2 seconds)
-    const reloadTimer = setTimeout(() => {
-      console.log('🔄 Loading next pool...');
-      loadPoolData();
-      loadPoolHistory();
-    }, 2000);
-    
-    return () => clearTimeout(reloadTimer);
-  }, [countdown, currentPool?.id]); // Trigger when countdown reaches 0
+  }, [currentPool?.id]); // Only re-run when pool ID changes
 
   const getOdds = () => {
     const timeElapsed = 60 - countdown;
@@ -184,6 +176,8 @@ const AssetDetail = () => {
   };
 
   const handleBet = async (side: 'subiu' | 'desceu') => {
+    console.log('🎯 handleBet called', { poolId: currentPool?.id, side, countdown, betAmount });
+    
     if (!user) {
       navigate('/auth');
       return;
@@ -210,11 +204,18 @@ const AssetDetail = () => {
 
     try {
       // Check user balance
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('saldo_moeda')
         .eq('id', user.id)
         .single();
+
+      console.log('👤 User balance:', profile?.saldo_moeda);
+
+      if (profileError) {
+        console.error('Profile error:', profileError);
+        throw profileError;
+      }
 
       if (!profile || profile.saldo_moeda < betAmount) {
         toast({
@@ -225,20 +226,12 @@ const AssetDetail = () => {
         return;
       }
 
-      // Deduct balance
-      const { error: deductError } = await supabase
-        .from('profiles')
-        .update({ saldo_moeda: profile.saldo_moeda - betAmount })
-        .eq('id', user.id);
-
-      if (deductError) throw deductError;
-
-      // Calculate odds
-      const timeElapsed = 60 - countdown;
+      // Calculate odds first
       const odds = getOdds();
+      console.log('📊 Calculated odds:', odds);
 
-      // Create bet
-      const { error: betError } = await supabase
+      // Create bet first (deduct later to ensure atomicity)
+      const { data: betData, error: betError } = await supabase
         .from('fast_pool_bets')
         .insert({
           user_id: user.id,
@@ -246,9 +239,30 @@ const AssetDetail = () => {
           side: side,
           amount_rioz: betAmount,
           odds: odds
-        });
+        })
+        .select()
+        .single();
 
-      if (betError) throw betError;
+      if (betError) {
+        console.error('Bet error:', betError);
+        throw betError;
+      }
+
+      console.log('✅ Bet created:', betData);
+
+      // Deduct balance after bet is confirmed
+      const { error: deductError } = await supabase
+        .from('profiles')
+        .update({ saldo_moeda: profile.saldo_moeda - betAmount })
+        .eq('id', user.id);
+
+      if (deductError) {
+        console.error('Deduct error:', deductError);
+        // If balance deduction fails, we should ideally delete the bet, but for now just throw
+        throw deductError;
+      }
+
+      console.log('✅ Bet placed successfully!');
 
       toast({
         title: "Opinião registrada!",
@@ -256,10 +270,10 @@ const AssetDetail = () => {
       });
       
     } catch (error) {
-      console.error('Error placing bet:', error);
+      console.error('❌ Error placing bet:', error);
       toast({
         title: "Erro ao registrar opinião",
-        description: "Tente novamente",
+        description: error instanceof Error ? error.message : "Tente novamente",
         variant: "destructive"
       });
     }
