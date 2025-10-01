@@ -377,7 +377,7 @@ const Header = () => {
                           <Button 
                             variant="ghost" 
                             size="sm"
-                            className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-xl"
+                            className="gap-2 bg-primary/10 border border-primary/30 text-primary rounded-xl"
                           >
                             <Wallet className="w-4 h-4" />
                             {profile?.saldo_moeda >= 1000 

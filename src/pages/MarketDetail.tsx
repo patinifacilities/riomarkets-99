@@ -251,13 +251,14 @@ const MarketDetail = () => {
                        <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
                        <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
                        <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
-                       <div className="relative overflow-hidden text-lg font-bold text-white bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 px-4 py-2 rounded-lg shadow-lg">
-                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
-                         <span className="relative z-10 flex items-center justify-center gap-2">
-                           <span className="text-2xl">✨</span>
-                           Lucro estimado: +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz
-                           <span className="text-2xl">✨</span>
-                         </span>
+                       <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
+                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-shimmer"></div>
+                         <div className="relative z-10 text-center">
+                           <span className="text-xs font-semibold text-yellow-500/80 tracking-wide">LUCRO ESTIMADO</span>
+                           <div className="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent mt-1">
+                             +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz
+                           </div>
+                         </div>
                        </div>
                      </div>
                     )}
@@ -358,11 +359,13 @@ const MarketDetail = () => {
               </Card>
             </div>
 
-            {/* Live Price Chart */}
-            <LivePriceChart 
-              assetSymbol={market.id}
-              assetName={market.titulo}
-            />
+            {/* Live Price Chart - Only for cripto category */}
+            {market.categoria === 'cripto' && (
+              <LivePriceChart 
+                assetSymbol={market.id}
+                assetName={market.titulo}
+              />
+            )}
 
             {/* Pool Progress Bar */}
             <div>
@@ -552,7 +555,15 @@ const MarketDetail = () => {
                        <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
                        <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
                        <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
-                       <div className="text-lg font-bold text-success bg-gradient-to-r from-yellow-400/20 via-yellow-500/30 to-yellow-400/20 px-2 py-1 rounded animate-golden-fade">Lucro estimado: +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz</div>
+                       <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
+                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-shimmer"></div>
+                         <div className="relative z-10 text-center">
+                           <span className="text-xs font-semibold text-yellow-500/80 tracking-wide">LUCRO ESTIMADO</span>
+                           <div className="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent mt-1">
+                             +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz
+                           </div>
+                         </div>
+                       </div>
                      </div>
                    )}
                   
