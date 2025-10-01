@@ -48,6 +48,16 @@ const MarketDetail = () => {
     window.scrollTo(0, 0);
   }, [id]);
 
+  // Reset gold animation after 1.5s when it reaches 100%
+  useEffect(() => {
+    if (sliderProgress >= 1) {
+      const timer = setTimeout(() => {
+        setSliderProgress(0);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [sliderProgress]);
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[400px]">
@@ -243,6 +253,7 @@ const MarketDetail = () => {
                           balance={userProfile?.saldo_moeda || 0}
                           onAmountChange={(amount) => setBetAmount(amount)}
                           estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
+                          key={userProfile?.saldo_moeda}
                         />
                       </div>
                     
@@ -252,14 +263,15 @@ const MarketDetail = () => {
                        <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
                        <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
                        <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
-                       <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
-                         {/* Gold fill based on slider progress */}
-                         <div 
-                           className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 transition-all duration-100"
-                           style={{
-                             width: `${sliderProgress * 100}%`,
-                           }}
-                         />
+                        <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
+                          {/* Gold fill based on slider progress - resets at 100% after 1.5s */}
+                          <div 
+                            className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 transition-all"
+                            style={{
+                              width: `${sliderProgress * 100}%`,
+                              transitionDuration: sliderProgress >= 1 ? '1500ms' : '100ms',
+                            }}
+                          />
                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-shimmer"></div>
                          <div className="relative z-10 text-center">
                            <span className="text-xs font-semibold text-yellow-500/80 tracking-wide">LUCRO ESTIMADO</span>
@@ -573,6 +585,7 @@ const MarketDetail = () => {
                       balance={userProfile?.saldo_moeda || 0}
                       onAmountChange={(amount) => setBetAmount(amount)}
                       estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
+                      key={userProfile?.saldo_moeda}
                     />
                   
                    {selectedOption && (
@@ -581,14 +594,15 @@ const MarketDetail = () => {
                        <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
                        <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
                        <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
-                         <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
-                          {/* Gold fill based on slider progress - resets at 100% */}
-                          <div 
-                            className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 transition-all duration-100"
-                            style={{
-                              width: sliderProgress >= 1 ? '0%' : `${sliderProgress * 100}%`,
-                            }}
-                          />
+                          <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
+                           {/* Gold fill based on slider progress - resets at 100% after 1.5s */}
+                           <div 
+                             className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 transition-all"
+                             style={{
+                               width: `${sliderProgress * 100}%`,
+                               transitionDuration: sliderProgress >= 1 ? '1500ms' : '100ms',
+                             }}
+                           />
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-shimmer"></div>
                           <div className="relative z-10 text-center">
                             <span 
