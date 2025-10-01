@@ -198,7 +198,74 @@ const AssetDetail = () => {
       return;
     }
 
-    navigate('/fast');
+    // Check if countdown is in lockout period
+    if (countdown <= 15) {
+      toast({
+        title: "Opiniões bloqueadas",
+        description: "Não é possível opinar nos últimos 15 segundos",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Check user balance
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('saldo_moeda')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile || profile.saldo_moeda < betAmount) {
+        toast({
+          title: "Saldo insuficiente",
+          description: "Você não tem saldo suficiente para esta opinião",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Deduct balance
+      const { error: deductError } = await supabase
+        .from('profiles')
+        .update({ saldo_moeda: profile.saldo_moeda - betAmount })
+        .eq('id', user.id);
+
+      if (deductError) throw deductError;
+
+      // Calculate odds
+      const timeElapsed = 60 - countdown;
+      const odds = getOdds();
+
+      // Create bet
+      const { error: betError } = await supabase
+        .from('fast_pool_bets')
+        .insert({
+          user_id: user.id,
+          pool_id: currentPool.id,
+          side: side,
+          amount_rioz: betAmount,
+          odds: odds
+        });
+
+      if (betError) throw betError;
+
+      toast({
+        title: "Opinião registrada!",
+        description: `Você opinou que vai ${side === 'subiu' ? 'SUBIR' : 'DESCER'} com ${betAmount} RZ (x${odds.toFixed(2)})`,
+      });
+
+      // Reset bet amount
+      setBetAmount(100);
+      
+    } catch (error) {
+      console.error('Error placing bet:', error);
+      toast({
+        title: "Erro ao registrar opinião",
+        description: "Tente novamente",
+        variant: "destructive"
+      });
+    }
   };
 
   if (loading) {

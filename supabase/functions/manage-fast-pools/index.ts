@@ -272,12 +272,13 @@ async function finalizePool(supabase: any, poolId: string) {
   console.log(`Pool ${poolId} - Opening: ${pool.opening_price}, Closing: ${closingPrice}`);
 
   // Determine result based on price comparison
+  // "manteve" only if prices are exactly equal (to the cent)
   const priceChange = ((closingPrice - pool.opening_price) / pool.opening_price) * 100;
   let result: string;
   
-  if (Math.abs(priceChange) < 0.01) { // Less than 0.01% change
+  if (closingPrice === pool.opening_price) {
     result = 'manteve';
-  } else if (priceChange > 0) {
+  } else if (closingPrice > pool.opening_price) {
     result = 'subiu';
   } else {
     result = 'desceu';

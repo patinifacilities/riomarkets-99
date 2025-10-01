@@ -166,10 +166,21 @@ export const LivePriceChart = ({ assetSymbol, assetName, poolStartPrice }: LiveP
     };
   }, [assetSymbol]);
 
-  const maxPrice = Math.max(...priceData.map(p => p.price), currentPrice);
-  // Use pool start price as minimum if available, otherwise use actual minimum
-  const minPrice = poolStartPrice || Math.min(...priceData.map(p => p.price), currentPrice);
+  // Calculate chart dimensions and scaling
+  // Always include poolStartPrice and current price in the range
+  const prices = priceData.map(p => p.price);
+  if (poolStartPrice) prices.push(poolStartPrice);
+  if (currentPrice) prices.push(currentPrice);
+  
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
   const priceRange = maxPrice - minPrice || 1;
+  const padding = priceRange * 0.2; // Increased padding to ensure visibility
+  
+  // Adjust min/max with padding
+  const adjustedMin = minPrice - padding;
+  const adjustedMax = maxPrice + padding;
+  const adjustedRange = adjustedMax - adjustedMin;
 
   return (
     <Card className="bg-card/50 backdrop-blur-sm border-border/50">
@@ -198,13 +209,35 @@ export const LivePriceChart = ({ assetSymbol, assetName, poolStartPrice }: LiveP
                 </linearGradient>
               </defs>
               
+              {/* Pool start price indicator line (if available) */}
+              {poolStartPrice && (
+                <>
+                  <line
+                    x1="0"
+                    y1={256 - ((poolStartPrice - adjustedMin) / adjustedRange) * 240}
+                    x2="800"
+                    y2={256 - ((poolStartPrice - adjustedMin) / adjustedRange) * 240}
+                    stroke="#fbbf24"
+                    strokeWidth="2"
+                    strokeDasharray="5,5"
+                    opacity="0.6"
+                  />
+                  <circle
+                    cx="0"
+                    cy={256 - ((poolStartPrice - adjustedMin) / adjustedRange) * 240}
+                    r="5"
+                    fill="#fbbf24"
+                  />
+                </>
+              )}
+              
               {/* Area under the line */}
               <path
                 d={`
                   M 0 256
                   ${priceData.map((point, index) => {
                     const x = (index / (priceData.length - 1)) * 800;
-                    const y = 256 - ((point.price - minPrice) / priceRange) * 240;
+                    const y = 256 - ((point.price - adjustedMin) / adjustedRange) * 240;
                     return `L ${x} ${y}`;
                   }).join(' ')}
                   L 800 256
@@ -217,7 +250,7 @@ export const LivePriceChart = ({ assetSymbol, assetName, poolStartPrice }: LiveP
               <path
                 d={priceData.map((point, index) => {
                   const x = (index / (priceData.length - 1)) * 800;
-                  const y = 256 - ((point.price - minPrice) / priceRange) * 240;
+                  const y = 256 - ((point.price - adjustedMin) / adjustedRange) * 240;
                   return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
                 }).join(' ')}
                 fill="none"
@@ -232,14 +265,14 @@ export const LivePriceChart = ({ assetSymbol, assetName, poolStartPrice }: LiveP
                 <>
                   <circle
                     cx="800"
-                    cy={256 - ((priceData[priceData.length - 1].price - minPrice) / priceRange) * 240}
+                    cy={256 - ((priceData[priceData.length - 1].price - adjustedMin) / adjustedRange) * 240}
                     r="6"
                     fill={priceChange >= 0 ? '#00ff90' : '#ff2389'}
                     className="animate-pulse"
                   />
                   <circle
                     cx="800"
-                    cy={256 - ((priceData[priceData.length - 1].price - minPrice) / priceRange) * 240}
+                    cy={256 - ((priceData[priceData.length - 1].price - adjustedMin) / adjustedRange) * 240}
                     r="10"
                     fill={priceChange >= 0 ? '#00ff90' : '#ff2389'}
                     opacity="0.3"
