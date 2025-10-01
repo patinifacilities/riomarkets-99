@@ -155,15 +155,18 @@ const AssetDetail = () => {
   // Trigger reload when countdown reaches 0 - only once per pool
   useEffect(() => {
     if (countdown <= 0 && currentPool) {
-      // Wait 3 seconds for pool to finalize then reload
+      console.log('⏰ Countdown reached 0, reloading pool data...');
+      
+      // Wait for pool to finalize and next pool to be created
       const reloadTimer = setTimeout(() => {
+        console.log('🔄 Loading next pool...');
         loadPoolData();
         loadPoolHistory();
-      }, 3000);
+      }, 5000); // Increased to 5 seconds to ensure next pool is created
       
       return () => clearTimeout(reloadTimer);
     }
-  }, [countdown > 0, currentPool?.id]);
+  }, [countdown, currentPool?.id]); // Changed dependency to countdown (not countdown > 0)
 
   const getOdds = () => {
     const timeElapsed = 60 - countdown;

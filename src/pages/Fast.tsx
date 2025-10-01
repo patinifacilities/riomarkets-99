@@ -15,6 +15,7 @@ import { FastPoolHistoryModal } from '@/components/fast/FastPoolHistoryModal';
 import { FastPoolExpandedModal } from '@/components/fast/FastPoolExpandedModal';
 import { DarkModeToggle } from '@/components/layout/DarkModeToggle';
 import { Link, useNavigate } from 'react-router-dom';
+import { getNasdaqStatus, type MarketStatus } from '@/lib/market-hours';
 
 interface FastPool {
   id: string;
@@ -58,6 +59,7 @@ const Fast = () => {
   const [userPoolBets, setUserPoolBets] = useState<Record<string, number>>({});
   const [expandedPool, setExpandedPool] = useState<FastPool | null>(null);
   const [fastSystemEnabled, setFastSystemEnabled] = useState(true);
+  const [nasdaqStatus, setNasdaqStatus] = useState<MarketStatus>({ isOpen: true });
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
@@ -135,6 +137,19 @@ const Fast = () => {
     return () => {
       supabase.removeChannel(channel);
     };
+  }, []);
+
+  // Check Nasdaq trading hours for stock assets
+  useEffect(() => {
+    const checkNasdaqStatus = () => {
+      setNasdaqStatus(getNasdaqStatus());
+    };
+
+    checkNasdaqStatus();
+    // Update every minute
+    const interval = setInterval(checkNasdaqStatus, 60000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // Realtime subscription for pool updates
@@ -878,12 +893,16 @@ const Fast = () => {
         {/* Current Pools Grid */}
         <div className="max-w-6xl mx-auto mb-8">
           <div className="grid md:grid-cols-3 gap-6">
-            {currentPools.map((pool, index) => (
+            {currentPools.map((pool, index) => {
+              const isStockAsset = pool.category?.toLowerCase() === 'stocks' || pool.category?.toLowerCase() === 'ações';
+              const isMarketClosed = isStockAsset && !nasdaqStatus.isOpen;
+              
+              return (
               <Card 
                 key={pool.id} 
                 className={cn(
                   "relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm transition-all hover:scale-[1.02] hover:shadow-lg",
-                  (pool as any).paused && "opacity-50 grayscale"
+                  ((pool as any).paused || isMarketClosed) && "opacity-50 grayscale"
                 )}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5"></div>
@@ -894,6 +913,21 @@ const Fast = () => {
                       <div className="text-5xl mb-3">🚧</div>
                       <p className="text-white font-bold text-lg mb-1">Em Atualização</p>
                       <p className="text-white/70 text-sm">Pools temporariamente indisponíveis</p>
+                    </div>
+                  </div>
+                )}
+                
+                {isMarketClosed && !(pool as any).paused && (
+                  <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
+                    <div className="text-center px-4">
+                      <div className="text-5xl mb-3">🕐</div>
+                      <p className="text-white font-bold text-lg mb-1">Nasdaq Fechada</p>
+                      <p className="text-white/70 text-sm mb-2">{nasdaqStatus.message}</p>
+                      {nasdaqStatus.timeUntilOpen && (
+                        <p className="text-[#00ff90] text-xs font-semibold">
+                          Reabre em {nasdaqStatus.timeUntilOpen}
+                        </p>
+                      )}
                     </div>
                   </div>
                 )}
@@ -1091,10 +1125,11 @@ const Fast = () => {
                        Opiniões bloqueadas
                      </div>
                    )}
-                  
-                </CardContent>
-              </Card>
-            ))}
+                   
+                 </CardContent>
+               </Card>
+              );
+            })}
           </div>
         </div>
 

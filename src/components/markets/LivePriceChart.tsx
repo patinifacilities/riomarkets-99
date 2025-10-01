@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PricePoint {
   time: number;
@@ -12,15 +13,21 @@ interface LivePriceChartProps {
   assetName: string;
 }
 
-// Map asset symbols to Binance trading pairs
+// Map asset symbols to Binance trading pairs and real-time data sources
 const getBinanceSymbol = (assetSymbol: string): string => {
   const symbolMap: Record<string, string> = {
     'BTC': 'btcusdt',
     'ETH': 'ethusdt',
     'SOL': 'solusdt',
-    'OIL': 'btcusdt', // Fallback to BTC for commodities as Binance doesn't have oil
+    'GOLD': 'xauusdt', // Gold vs USDT on Binance
+    'SILVER': 'xagusdt', // Silver vs USDT on Binance
   };
   return symbolMap[assetSymbol] || 'btcusdt';
+};
+
+// Check if asset is supported by Binance WebSocket
+const isBinanceSupported = (assetSymbol: string): boolean => {
+  return ['BTC', 'ETH', 'SOL', 'GOLD', 'SILVER'].includes(assetSymbol);
 };
 
 export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) => {
@@ -28,31 +35,93 @@ export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) 
   const [currentPrice, setCurrentPrice] = useState<number>(0);
   const [priceChange, setPriceChange] = useState<number>(0);
   const [initialPrice, setInitialPrice] = useState<number>(0);
+  const [dataSource, setDataSource] = useState<'binance' | 'api'>('binance');
 
   useEffect(() => {
     let ws: WebSocket | null = null;
     let reconnectTimeout: NodeJS.Timeout;
+    let pollInterval: NodeJS.Timeout;
     
     const binanceSymbol = getBinanceSymbol(assetSymbol);
+    const useBinance = isBinanceSupported(assetSymbol);
     
-    const connectWebSocket = () => {
-      // Connect to Binance WebSocket for real-time price
-      ws = new WebSocket(`wss://stream.binance.com:9443/ws/${binanceSymbol}@ticker`);
+    if (useBinance) {
+      // Use Binance WebSocket for supported assets
+      setDataSource('binance');
       
-      ws.onopen = () => {
-        console.log('Connected to Binance WebSocket');
+      const connectWebSocket = () => {
+        // Connect to Binance WebSocket for real-time price
+        ws = new WebSocket(`wss://stream.binance.com:9443/ws/${binanceSymbol}@ticker`);
+        
+        ws.onopen = () => {
+          console.log('Connected to Binance WebSocket');
+        };
+        
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            const price = parseFloat(data.c); // 'c' is the last price
+            
+            if (price && !isNaN(price)) {
+              const now = Date.now();
+              
+              setCurrentPrice(prev => {
+                // Set initial price on first update
+                if (prev === 0) {
+                  setInitialPrice(price);
+                  return price;
+                }
+                return price;
+              });
+              
+              // Calculate price change
+              setInitialPrice(initial => {
+                if (initial === 0) return price;
+                setPriceChange(((price - initial) / initial) * 100);
+                return initial;
+              });
+              
+              // Add to price data
+              setPriceData(prevData => {
+                const newData = [...prevData, { time: now, price }];
+                // Keep only last 50 points
+                return newData.slice(-50);
+              });
+            }
+          } catch (error) {
+            console.error('Error parsing Binance data:', error);
+          }
+        };
+        
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+        };
+        
+        ws.onclose = () => {
+          console.log('Disconnected from Binance WebSocket, reconnecting...');
+          // Reconnect after 3 seconds
+          reconnectTimeout = setTimeout(connectWebSocket, 3000);
+        };
       };
       
-      ws.onmessage = (event) => {
+      connectWebSocket();
+    } else {
+      // Use polling for assets not supported by Binance (stocks, oil, etc.)
+      setDataSource('api');
+      
+      const fetchPrice = async () => {
         try {
-          const data = JSON.parse(event.data);
-          const price = parseFloat(data.c); // 'c' is the last price
+          const { data, error } = await supabase.functions.invoke('get-market-data', {
+            body: { symbols: [assetSymbol] }
+          });
           
+          if (error) throw error;
+          
+          const price = data?.prices?.[assetSymbol];
           if (price && !isNaN(price)) {
             const now = Date.now();
             
             setCurrentPrice(prev => {
-              // Set initial price on first update
               if (prev === 0) {
                 setInitialPrice(price);
                 return price;
@@ -60,37 +129,28 @@ export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) 
               return price;
             });
             
-            // Calculate price change
             setInitialPrice(initial => {
               if (initial === 0) return price;
               setPriceChange(((price - initial) / initial) * 100);
               return initial;
             });
             
-            // Add to price data
             setPriceData(prevData => {
               const newData = [...prevData, { time: now, price }];
-              // Keep only last 50 points
               return newData.slice(-50);
             });
           }
         } catch (error) {
-          console.error('Error parsing Binance data:', error);
+          console.error('Error fetching price:', error);
         }
       };
       
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
+      // Initial fetch
+      fetchPrice();
       
-      ws.onclose = () => {
-        console.log('Disconnected from Binance WebSocket, reconnecting...');
-        // Reconnect after 3 seconds
-        reconnectTimeout = setTimeout(connectWebSocket, 3000);
-      };
-    };
-    
-    connectWebSocket();
+      // Poll every 1 second
+      pollInterval = setInterval(fetchPrice, 1000);
+    }
     
     return () => {
       if (ws) {
@@ -98,6 +158,9 @@ export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) 
       }
       if (reconnectTimeout) {
         clearTimeout(reconnectTimeout);
+      }
+      if (pollInterval) {
+        clearInterval(pollInterval);
       }
     };
   }, [assetSymbol]);
@@ -196,7 +259,7 @@ export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) 
           <span>Mín: ${minPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-[#ff2389] animate-pulse" />
-            <span className="font-semibold">LIVE</span>
+            <span className="font-semibold">{dataSource === 'binance' ? 'BINANCE LIVE' : 'API LIVE'}</span>
           </div>
           <span>Máx: ${maxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
         </div>
