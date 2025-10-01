@@ -14,7 +14,7 @@ const Ranking = () => {
   const { user } = useAuth();
   const { data: profile } = useProfile(user?.id);
   const [showLevelsModal, setShowLevelsModal] = useState(false);
-  const sortedUsers = [...fakeUsers, ...fakeUsers].sort((a, b) => b.saldo_moeda - a.saldo_moeda).slice(0, 25);
+  const sortedUsers = [...fakeUsers].sort((a, b) => b.saldo_moeda - a.saldo_moeda).slice(0, 25);
   
   const stats = {
     totalUsers: fakeUsers.length,

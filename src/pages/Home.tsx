@@ -246,11 +246,7 @@ const Home = () => {
         <div className="flex flex-col gap-6">
           {/* Topic Filters - Infinite Loop Side Scroller */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Filter className="w-5 h-5 text-primary" />
-              <h4 className="text-base font-bold text-foreground uppercase tracking-wide">Tópicos</h4>
-            </div>
-            <div className="relative py-2">
+            <div className="relative overflow-visible py-2">
               {/* Fade overlays */}
               <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none"></div>
               <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none"></div>
@@ -354,24 +350,19 @@ const Home = () => {
       {/* Markets Grid */}
       <div id="markets-section" className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
             <h2 className="text-3xl md:text-4xl font-extrabold text-[color:var(--text-primary)] flex items-center gap-2">
               <TrendingUp className="w-6 h-6 text-[#00FF91]" />
-              Mercados ativos
+              Markets
             </h2>
-          </div>
-          
-          {/* Status Filters - Moved here */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">Status</h4>
-            </div>
+            
+            {/* Status Filters */}
             <FilterChips
               chips={statusFilters}
               selectedChips={selectedStatus}
               onChipSelect={handleStatusSelect}
               onRemoveChip={handleRemoveStatus}
-              chipClassName="px-4 py-2 text-sm font-medium rounded-full transition-all duration-200"
+              chipClassName="px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200"
               className="flex flex-wrap gap-2"
             />
           </div>

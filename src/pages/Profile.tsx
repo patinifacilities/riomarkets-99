@@ -39,9 +39,12 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    // Only redirect if authentication is definitively false (not loading)
-    if (!isAuthenticated && !isLoading) {
-      navigate('/auth');
+    // Wait for auth state to be determined before redirecting
+    if (isAuthenticated === false && !isLoading) {
+      const timer = setTimeout(() => {
+        navigate('/auth');
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [isAuthenticated, isLoading, navigate]);
 

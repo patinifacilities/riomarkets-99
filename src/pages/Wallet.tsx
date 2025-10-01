@@ -13,6 +13,7 @@ import { OrderHistoryCard } from '@/components/wallet/OrderHistoryCard';
 import { ExpandableRiozCard } from '@/components/wallet/ExpandableRiozCard';
 import { BalanceDonutChart } from '@/components/exchange/BalanceDonutChart';
 import { CompletedOrdersCard } from '@/components/wallet/CompletedOrdersCard';
+import { RecentWinsCard } from '@/components/wallet/RecentWinsCard';
 
 const WalletPage = () => {
   const { user } = useAuth();
@@ -92,7 +93,12 @@ const WalletPage = () => {
           <BalanceDonutChart />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+        {/* Recent Wins Card */}
+        <div className="mb-6">
+          <RecentWinsCard />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Order History - Active */}
           <OrderHistoryCard onRefresh={() => {
             refetchProfile();
