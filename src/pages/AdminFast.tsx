@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings, TrendingUp, Clock, DollarSign, History, Pause, Play } from 'lucide-react';
+import { ArrowLeft, Settings, TrendingUp, Clock, DollarSign, History, Pause, Play, Power } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useToast } from '@/hooks/use-toast';
@@ -58,6 +60,7 @@ const AdminFast = () => {
   const [pools, setPools] = useState<FastPool[]>([]);
   const [poolHistory, setPoolHistory] = useState<PoolResult[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fastEnabled, setFastEnabled] = useState(true);
   const [stats, setStats] = useState({
     total_pools: 0,
     active_pools: 0,
@@ -70,6 +73,7 @@ const AdminFast = () => {
       fetchGeneralPoolConfigs();
       fetchPoolHistory();
       fetchStats();
+      checkFastStatus();
       
       // Realtime subscription for pool results - always update history
       const channel = supabase
@@ -93,6 +97,60 @@ const AdminFast = () => {
       };
     }
   }, [user]);
+
+  const checkFastStatus = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('fast_pool_configs')
+        .select('paused')
+        .limit(1)
+        .single();
+      
+      if (!error && data) {
+        setFastEnabled(!data.paused);
+      }
+    } catch (error) {
+      console.error('Error checking FAST status:', error);
+    }
+  };
+
+  const handleToggleFast = async (enabled: boolean) => {
+    try {
+      // Update all configs
+      const { error: configError } = await supabase
+        .from('fast_pool_configs')
+        .update({ paused: !enabled })
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      if (configError) throw configError;
+      
+      // Update all active pools
+      const { error: poolsError } = await supabase
+        .from('fast_pools')
+        .update({ paused: !enabled })
+        .eq('status', 'active');
+      
+      if (poolsError) throw poolsError;
+      
+      setFastEnabled(enabled);
+      
+      toast({
+        title: enabled ? "FAST ativado" : "FAST desativado",
+        description: enabled 
+          ? "Os mercados FAST estão agora disponíveis para apostas"
+          : "Os mercados FAST foram pausados para atualização",
+      });
+      
+      fetchGeneralPoolConfigs();
+    } catch (error) {
+      console.error('Error toggling FAST:', error);
+      toast({
+        title: "Erro",
+        description: "Falha ao alterar status do FAST",
+        variant: "destructive"
+      });
+    }
+  };
 
   const fetchGeneralPoolConfigs = async () => {
     try {
@@ -261,10 +319,23 @@ const AdminFast = () => {
                 Gerenciar pools rápidos e configurações gerais
               </p>
             </div>
-            <Button onClick={() => navigate('/admin/fast/config')} className="gap-2">
-              <Settings className="w-4 h-4" />
-              Configuração Central
-            </Button>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 bg-card/50 px-4 py-2 rounded-lg border border-border">
+                <Power className={`w-5 h-5 ${fastEnabled ? 'text-success' : 'text-muted-foreground'}`} />
+                <Label htmlFor="fast-toggle" className="cursor-pointer font-medium">
+                  Sistema FAST {fastEnabled ? 'Ativo' : 'Desativado'}
+                </Label>
+                <Switch
+                  id="fast-toggle"
+                  checked={fastEnabled}
+                  onCheckedChange={handleToggleFast}
+                />
+              </div>
+              <Button onClick={() => navigate('/admin/fast/config')} className="gap-2">
+                <Settings className="w-4 h-4" />
+                Configuração Central
+              </Button>
+            </div>
           </div>
 
           {/* Stats Cards */}

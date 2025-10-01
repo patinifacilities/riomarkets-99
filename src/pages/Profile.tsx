@@ -215,20 +215,20 @@ const Profile = () => {
                   )}
                 </div>
                 
-                <div className="relative overflow-hidden rounded-2xl p-8 bg-gradient-to-br from-yellow-500 via-yellow-600 to-amber-600 shadow-2xl">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                <div className="relative overflow-hidden rounded-xl p-6 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-shimmer"></div>
                   <div className="relative z-10">
-                    <div className="flex items-center justify-center gap-2 mb-3 opacity-90">
-                      <Wallet className="w-5 h-5 text-white" />
-                      <span className="text-sm font-semibold text-white/90 tracking-wide">SALDO TOTAL</span>
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <Wallet className="w-4 h-4 text-yellow-500" />
+                      <span className="text-xs font-semibold text-yellow-500/80 tracking-wide">SALDO TOTAL</span>
                     </div>
-                    <div className="text-5xl font-bold text-white text-center mb-1">
+                    <div className="text-3xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent text-center">
                       {profile.saldo_moeda.toLocaleString('pt-BR', { 
                         minimumFractionDigits: 2, 
                         maximumFractionDigits: 2 
                       })}
                     </div>
-                    <div className="text-center text-white/80 text-lg font-medium tracking-wider">RZ</div>
+                    <div className="text-center text-yellow-500/70 text-sm font-medium tracking-wider">RZ</div>
                   </div>
                 </div>
 
@@ -306,10 +306,12 @@ const Profile = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="email">Email</Label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Mail className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">{profile.email}</span>
-                    </div>
+                    <Input
+                      id="email"
+                      value={profile.email}
+                      disabled
+                      className="mt-1"
+                    />
                   </div>
                   
                   <div>

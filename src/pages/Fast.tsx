@@ -56,6 +56,7 @@ const Fast = () => {
   const [opinionNotifications, setOpinionNotifications] = useState<{id: string, text: string, side?: 'subiu' | 'desceu', timestamp: number}[]>([]);
   const [userPoolBets, setUserPoolBets] = useState<Record<string, number>>({});
   const [expandedPool, setExpandedPool] = useState<FastPool | null>(null);
+  const [fastSystemEnabled, setFastSystemEnabled] = useState(true);
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
@@ -92,6 +93,47 @@ const Fast = () => {
       textColor: '#000'
     }
   ];
+
+  // Check if FAST system is enabled
+  useEffect(() => {
+    const checkFastStatus = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('fast_pool_configs')
+          .select('paused')
+          .limit(1)
+          .maybeSingle();
+        
+        if (!error && data) {
+          setFastSystemEnabled(!data.paused);
+        }
+      } catch (error) {
+        console.error('Error checking FAST status:', error);
+      }
+    };
+
+    checkFastStatus();
+
+    // Subscribe to config changes
+    const channel = supabase
+      .channel('fast-config-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'fast_pool_configs'
+        },
+        () => {
+          checkFastStatus();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   // Realtime subscription for pool updates
   useEffect(() => {
@@ -151,12 +193,17 @@ const Fast = () => {
       if (error) throw error;
       
       if (data?.pools && Array.isArray(data.pools)) {
-        // Remove duplicates by asset_symbol and filter out paused pools
+        // Remove duplicates by asset_symbol
         const poolMap = new Map<string, FastPool>();
         (data.pools as FastPool[]).forEach((pool: FastPool) => {
-          // Only add active (non-paused) pools, using asset_symbol as key to avoid duplicates
-          if (!pool.paused && !poolMap.has(pool.asset_symbol)) {
-            poolMap.set(pool.asset_symbol, pool);
+          // If FAST is disabled globally, mark all pools as paused
+          const effectivePool = {
+            ...pool,
+            paused: pool.paused || !fastSystemEnabled
+          };
+          // Only add the first occurrence of each asset_symbol
+          if (!poolMap.has(pool.asset_symbol)) {
+            poolMap.set(pool.asset_symbol, effectivePool);
           }
         });
         // Sort by asset_symbol to maintain consistent order
@@ -165,14 +212,14 @@ const Fast = () => {
         );
         
         setCurrentPools(uniquePools);
-        if (uniquePools.length > 0) {
+        if (uniquePools.length > 0 && fastSystemEnabled) {
           calculateCountdown(uniquePools[0]); // All pools have same timing
         }
       }
     } catch (error) {
       console.error('Error loading pools:', error);
     }
-  }, [selectedCategory]);
+  }, [selectedCategory, fastSystemEnabled]);
 
   // Load pool history by category and check for new results - always load 10 per category
   const loadPoolHistory = useCallback(async () => {
@@ -727,11 +774,11 @@ const Fast = () => {
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5"></div>
                 
                 {(pool as any).paused && (
-                  <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center rounded-lg">
-                    <div className="text-center">
-                      <div className="text-4xl mb-2">⏸️</div>
-                      <p className="text-white font-semibold">Pool Pausado</p>
-                      <p className="text-white/70 text-sm">Aguarde retorno</p>
+                  <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
+                    <div className="text-center px-4">
+                      <div className="text-5xl mb-3">🚧</div>
+                      <p className="text-white font-bold text-lg mb-1">Em Atualização</p>
+                      <p className="text-white/70 text-sm">Pools temporariamente indisponíveis</p>
                     </div>
                   </div>
                 )}

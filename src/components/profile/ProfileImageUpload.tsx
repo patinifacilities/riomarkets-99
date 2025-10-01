@@ -108,10 +108,10 @@ export const ProfileImageUpload = ({ userId, currentImageUrl, onImageUpdated }: 
       // Get cropped image blob
       const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
       
-      // Generate unique filename
+      // Generate unique filename with user folder structure for RLS
       const fileExt = 'jpg';
-      const fileName = `${userId}-${Date.now()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
+      const fileName = `avatar-${Date.now()}.${fileExt}`;
+      const filePath = `${userId}/${fileName}`;
 
       // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
