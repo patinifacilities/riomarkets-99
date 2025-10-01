@@ -19,30 +19,74 @@ export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) 
   const [initialPrice, setInitialPrice] = useState<number>(0);
 
   useEffect(() => {
-    // Simulate live price updates
-    const startPrice = 50000 + Math.random() * 10000;
-    setCurrentPrice(startPrice);
-    setInitialPrice(startPrice);
+    let ws: WebSocket | null = null;
+    let reconnectTimeout: NodeJS.Timeout;
     
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const change = (Math.random() - 0.5) * 100;
+    const connectWebSocket = () => {
+      // Connect to Binance WebSocket for real-time BTC price
+      ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
       
-      setCurrentPrice(prev => {
-        const newPrice = prev + change;
-        setPriceChange(((newPrice - startPrice) / startPrice) * 100);
-        
-        setPriceData(prevData => {
-          const newData = [...prevData, { time: now, price: newPrice }];
-          // Keep only last 50 points
-          return newData.slice(-50);
-        });
-        
-        return newPrice;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
+      ws.onopen = () => {
+        console.log('Connected to Binance WebSocket');
+      };
+      
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          const price = parseFloat(data.c); // 'c' is the last price
+          
+          if (price && !isNaN(price)) {
+            const now = Date.now();
+            
+            setCurrentPrice(prev => {
+              // Set initial price on first update
+              if (prev === 0) {
+                setInitialPrice(price);
+                return price;
+              }
+              return price;
+            });
+            
+            // Calculate price change
+            setInitialPrice(initial => {
+              if (initial === 0) return price;
+              setPriceChange(((price - initial) / initial) * 100);
+              return initial;
+            });
+            
+            // Add to price data
+            setPriceData(prevData => {
+              const newData = [...prevData, { time: now, price }];
+              // Keep only last 50 points
+              return newData.slice(-50);
+            });
+          }
+        } catch (error) {
+          console.error('Error parsing Binance data:', error);
+        }
+      };
+      
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+      
+      ws.onclose = () => {
+        console.log('Disconnected from Binance WebSocket, reconnecting...');
+        // Reconnect after 3 seconds
+        reconnectTimeout = setTimeout(connectWebSocket, 3000);
+      };
+    };
+    
+    connectWebSocket();
+    
+    return () => {
+      if (ws) {
+        ws.close();
+      }
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
+      }
+    };
   }, []);
 
   const maxPrice = Math.max(...priceData.map(p => p.price), currentPrice);

@@ -35,17 +35,76 @@ const AdminAlgorithm = () => {
   }, []);
 
   const loadAlgorithmConfig = async () => {
-    // Using default configuration for now
-    setLoading(false);
+    try {
+      const { data, error } = await supabase
+        .from('fast_pool_algorithm_config')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setAlgorithmConfig({
+          pool_duration_seconds: data.pool_duration_seconds,
+          odds_start: Number(data.odds_start),
+          odds_end: Number(data.odds_end),
+          odds_curve_intensity: Number(data.odds_curve_intensity),
+          lockout_time_seconds: data.lockout_time_seconds,
+          max_odds: Number(data.max_odds),
+          min_odds: Number(data.min_odds)
+        });
+      }
+    } catch (error) {
+      console.error('Error loading algorithm config:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSave = async () => {
     setSaving(true);
-    toast({
-      title: "Algoritmo atualizado",
-      description: "As configurações do algoritmo foram salvas com sucesso",
-    });
-    setSaving(false);
+    try {
+      // Get the existing config
+      const { data: existing } = await supabase
+        .from('fast_pool_algorithm_config')
+        .select('id')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (existing) {
+        // Update existing config
+        const { error } = await supabase
+          .from('fast_pool_algorithm_config')
+          .update(algorithmConfig)
+          .eq('id', existing.id);
+
+        if (error) throw error;
+      } else {
+        // Insert new config
+        const { error } = await supabase
+          .from('fast_pool_algorithm_config')
+          .insert([algorithmConfig]);
+
+        if (error) throw error;
+      }
+
+      toast({
+        title: "Algoritmo atualizado",
+        description: "As configurações serão aplicadas aos próximos pools",
+      });
+    } catch (error) {
+      console.error('Error saving algorithm config:', error);
+      toast({
+        title: "Erro ao salvar",
+        description: "Não foi possível salvar as configurações",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Security check

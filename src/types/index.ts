@@ -6,6 +6,7 @@ export interface User {
   nivel: 'iniciante' | 'analista' | 'guru' | 'root';
   is_admin: boolean;
   created_at: string;
+  profile_pic_url?: string;
 }
 
 export type MarketType = 'binary' | 'three_way' | 'multi';

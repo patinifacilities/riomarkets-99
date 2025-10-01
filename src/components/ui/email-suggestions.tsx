@@ -24,8 +24,9 @@ export function EmailSuggestions({ value, onSelect, inputRef }: EmailSuggestions
   useEffect(() => {
     // Don't show suggestions if we just selected one
     if (justSelected) {
-      setJustSelected(false);
-      return;
+      // Reset flag after a short delay
+      const timeout = setTimeout(() => setJustSelected(false), 100);
+      return () => clearTimeout(timeout);
     }
 
     const atIndex = value.indexOf('@');

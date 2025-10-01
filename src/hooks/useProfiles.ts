@@ -9,6 +9,7 @@ export interface Profile {
   nivel: string;
   is_admin: boolean;
   created_at: string;
+  profile_pic_url?: string;
 }
 
 export const useProfiles = () => {

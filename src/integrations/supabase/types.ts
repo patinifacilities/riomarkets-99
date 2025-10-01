@@ -221,6 +221,45 @@ export type Database = {
         }
         Relationships: []
       }
+      fast_pool_algorithm_config: {
+        Row: {
+          id: string
+          lockout_time_seconds: number
+          max_odds: number
+          min_odds: number
+          odds_curve_intensity: number
+          odds_end: number
+          odds_start: number
+          pool_duration_seconds: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          lockout_time_seconds?: number
+          max_odds?: number
+          min_odds?: number
+          odds_curve_intensity?: number
+          odds_end?: number
+          odds_start?: number
+          pool_duration_seconds?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          lockout_time_seconds?: number
+          max_odds?: number
+          min_odds?: number
+          odds_curve_intensity?: number
+          odds_end?: number
+          odds_start?: number
+          pool_duration_seconds?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       fast_pool_bets: {
         Row: {
           amount_rioz: number
