@@ -272,14 +272,17 @@ const Home = () => {
                         key={topic.id}
                         onClick={() => handleTopicSelect(topic.id)}
                         className={cn(
-                          "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap",
-                          "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg relative overflow-hidden",
+                          "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap relative z-20",
+                          "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg overflow-hidden",
                           "animate-fade-in",
                           isSelected
-                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50' 
+                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50 animate-pulse-gentle' 
                             : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm'
                         )}
                       >
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent animate-shimmer" />
+                        )}
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 hover:rotate-12 hover:scale-110 relative overflow-hidden ${
                           isSelected ? 'bg-primary-foreground/20' : ''
                         }`}>
@@ -288,10 +291,10 @@ const Home = () => {
                           )}
                           <IconComponent className="w-6 h-6 relative z-10" />
                         </div>
-                        <span className="text-base">{topic.label}</span>
+                        <span className="text-base relative z-10">{topic.label}</span>
                         {isSelected && (
                           <X 
-                            className="w-5 h-5 ml-2 hover:scale-110 transition-transform" 
+                            className="w-5 h-5 ml-2 hover:scale-110 transition-transform relative z-10" 
                             onClick={(e) => {
                               e.stopPropagation();
                               handleRemoveTopic(topic.id);

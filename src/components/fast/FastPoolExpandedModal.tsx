@@ -49,6 +49,8 @@ interface FastPoolExpandedModalProps {
   poolResult?: 'subiu' | 'desceu' | 'manteve' | null;
   opinionNotifications?: {id: string, text: string, side?: 'subiu' | 'desceu', timestamp: number}[];
   poolSpecificHistory?: FastPoolResult[];
+  poolDuration?: number;
+  lockoutTime?: number;
 }
 
 export const FastPoolExpandedModal = ({ 
@@ -64,7 +66,9 @@ export const FastPoolExpandedModal = ({
   userPoolBet = 0,
   poolResult,
   opinionNotifications = [],
-  poolSpecificHistory = []
+  poolSpecificHistory = [],
+  poolDuration = 60,
+  lockoutTime = 15
 }: FastPoolExpandedModalProps) => {
   // ALL HOOKS MUST BE CALLED BEFORE ANY EARLY RETURNS
   const [poolHistory, setPoolHistory] = React.useState<FastPoolResult[]>([]);
@@ -172,9 +176,9 @@ export const FastPoolExpandedModal = ({
                 <div 
                   className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80"
                   style={{ 
-                    width: `${(countdown / 60) * 100}%`,
+                    width: `${(countdown / poolDuration) * 100}%`,
                     transition: 'width 16ms linear',
-                    animation: countdown <= 23 && countdown > 0 ? `heartbeat ${Math.max(0.3, countdown / 60)}s ease-in-out infinite` : undefined
+                    animation: countdown <= lockoutTime && countdown > 0 ? `heartbeat ${Math.max(0.3, countdown / poolDuration)}s ease-in-out infinite` : undefined
                   }}
                 />
               </div>
@@ -247,7 +251,7 @@ export const FastPoolExpandedModal = ({
                 console.log('Subiu button clicked');
                 onBet(pool.id, 'subiu');
               }}
-              disabled={countdown <= 15 || countdown <= 0 || pool.paused}
+              disabled={countdown <= lockoutTime || countdown <= 0 || pool.paused}
               className={cn(
                 "h-24 text-lg font-bold transition-all duration-200",
                 clickedPool?.id === pool.id && clickedPool?.side === 'subiu'
@@ -266,7 +270,7 @@ export const FastPoolExpandedModal = ({
                 console.log('Desceu button clicked');
                 onBet(pool.id, 'desceu');
               }}
-              disabled={countdown <= 15 || countdown <= 0 || pool.paused}
+              disabled={countdown <= lockoutTime || countdown <= 0 || pool.paused}
               className={cn(
                 "h-24 text-lg font-bold transition-all duration-200",
                 clickedPool?.id === pool.id && clickedPool?.side === 'desceu'
@@ -281,9 +285,9 @@ export const FastPoolExpandedModal = ({
             </Button>
           </div>
 
-          {countdown <= 15 && countdown > 0 && (
+          {countdown <= lockoutTime && countdown > 0 && (
             <div className="text-center text-sm text-muted-foreground bg-warning/10 p-3 rounded-lg">
-              ⚠️ Opiniões bloqueadas nos últimos 15 segundos
+              ⚠️ Opiniões bloqueadas nos últimos {lockoutTime} segundos
             </div>
           )}
           

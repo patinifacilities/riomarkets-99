@@ -34,9 +34,11 @@ export const RecentWinsCard = () => {
       const fastRecords = (fastTransactions || []).map(tx => ({
         id: tx.id,
         market_id: tx.market_id || 'fast-market',
-        amount: tx.tipo === 'credito' ? tx.valor : -tx.valor, // Negative for losses
+        amount: tx.tipo === 'credito' ? tx.valor : -tx.valor,
         created_at: tx.created_at,
-        market_title: tx.descricao.replace('Fast Market - Vitória - ', '').replace('Fast Market - Derrota - ', '')
+        market_title: tx.descricao.includes('Vitória') 
+          ? tx.descricao.replace('Fast Market - Vitória - ', '') 
+          : tx.descricao.replace('Fast Market - Derrota - ', '')
       }));
 
       return fastRecords;

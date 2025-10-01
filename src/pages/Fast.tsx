@@ -984,15 +984,15 @@ const Fast = () => {
                            : 'Aguarde...'
                          }
                        </div>
-                      <div className="w-full bg-muted/20 rounded-full h-2 overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80"
-                           style={{ 
-                             width: `${(countdown / 60) * 100}%`,
-                             transition: 'width 16ms linear',
-                             animation: countdown <= 23 && countdown > 0 ? `pulse ${Math.max(0.2, (countdown - 23) / 37 * 2)}s cubic-bezier(0.4, 0, 0.6, 1) infinite` : undefined
-                           }}
-                        />
+                       <div className="w-full bg-muted/20 rounded-full h-2 overflow-hidden">
+                         <div 
+                           className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80"
+                            style={{ 
+                              width: `${(countdown / algorithmConfig.pool_duration_seconds) * 100}%`,
+                              transition: 'width 16ms linear',
+                              animation: countdown <= algorithmConfig.lockout_time_seconds && countdown > 0 ? `pulse ${Math.max(0.2, (countdown - algorithmConfig.lockout_time_seconds) / 37 * 2)}s cubic-bezier(0.4, 0, 0.6, 1) infinite` : undefined
+                            }}
+                         />
                       </div>
                    </div>
 
@@ -1226,6 +1226,8 @@ const Fast = () => {
         poolResult={expandedPool ? poolResults[selectedCategory] : null}
         opinionNotifications={opinionNotifications}
         poolSpecificHistory={expandedPool ? currentCategoryHistory.filter(r => r.asset_symbol === expandedPool.asset_symbol) : []}
+        poolDuration={algorithmConfig.pool_duration_seconds}
+        lockoutTime={algorithmConfig.lockout_time_seconds}
       />
     </div>
   );

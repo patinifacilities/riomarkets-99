@@ -164,10 +164,13 @@ const AdminAlgorithm = () => {
                     min="30"
                     max="300"
                     value={algorithmConfig.pool_duration_seconds}
-                    onChange={(e) => setAlgorithmConfig({ 
-                      ...algorithmConfig, 
-                      pool_duration_seconds: parseInt(e.target.value) || 60 
-                    })}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setAlgorithmConfig({ 
+                        ...algorithmConfig, 
+                        pool_duration_seconds: value === '' ? 60 : parseInt(value) 
+                      });
+                    }}
                   />
                   <p className="text-xs text-muted-foreground">
                     Tempo total de cada pool em segundos (padrão: 60s)
@@ -182,10 +185,13 @@ const AdminAlgorithm = () => {
                     min="5"
                     max="30"
                     value={algorithmConfig.lockout_time_seconds}
-                    onChange={(e) => setAlgorithmConfig({ 
-                      ...algorithmConfig, 
-                      lockout_time_seconds: parseInt(e.target.value) || 15 
-                    })}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setAlgorithmConfig({ 
+                        ...algorithmConfig, 
+                        lockout_time_seconds: value === '' ? 15 : parseInt(value) 
+                      });
+                    }}
                   />
                   <p className="text-xs text-muted-foreground">
                     Tempo antes do fim do pool onde apostas são bloqueadas (padrão: 15s)
