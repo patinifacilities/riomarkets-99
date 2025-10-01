@@ -142,8 +142,8 @@ async function createSynchronizedPools(supabase: any, category = 'crypto') {
   
   const poolDuration = algorithmConfig?.pool_duration_seconds || 60;
   
-  // Wait 1 second before fetching prices and creating pools
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Wait 500ms before fetching prices and creating pools
+  await new Promise(resolve => setTimeout(resolve, 500));
   
   const now = new Date();
   const endTime = new Date(now.getTime() + (poolDuration * 1000));
@@ -258,9 +258,9 @@ async function finalizePool(supabase: any, poolId: string) {
   if (poolError) throw poolError;
   if (!pool) throw new Error('Pool not found');
 
-  // Wait 1 second to fetch the closing price (1 second before pool officially ends)
-  // This matches the opening price timing (1 second after pool starts)
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Wait 500ms to fetch the closing price
+  // This matches the opening price timing (500ms after pool starts)
+  await new Promise(resolve => setTimeout(resolve, 500));
 
   // Get closing price for this specific asset (1 second before end)
   const { data: marketData } = await supabase.functions.invoke('get-market-data', {
@@ -445,8 +445,8 @@ async function createAllCategoriesPools(supabase: any) {
   
   const poolDuration = algorithmConfig?.pool_duration_seconds || 60;
   
-  // Wait 1 second before fetching prices and creating pools
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Wait 500ms before fetching prices and creating pools
+  await new Promise(resolve => setTimeout(resolve, 500));
   
   const now = new Date();
   const endTime = new Date(now.getTime() + (poolDuration * 1000));

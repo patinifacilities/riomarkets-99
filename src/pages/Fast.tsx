@@ -13,6 +13,7 @@ import { useTheme } from 'next-themes';
 import { FastMarketTermsModal } from '@/components/fast/FastMarketTermsModal';
 import { FastPoolHistoryModal } from '@/components/fast/FastPoolHistoryModal';
 import { FastPoolExpandedModal } from '@/components/fast/FastPoolExpandedModal';
+import { PoolResultModal } from '@/components/fast/PoolResultModal';
 import { DarkModeToggle } from '@/components/layout/DarkModeToggle';
 import { Link, useNavigate } from 'react-router-dom';
 import { getNasdaqStatus, type MarketStatus } from '@/lib/market-hours';
@@ -43,6 +44,12 @@ interface FastPoolResult {
   price_change_percent: number;
   created_at: string;
   asset_symbol: string;
+  pool_id?: string;
+  fast_pools?: {
+    round_start_time: string;
+    round_end_time: string;
+    asset_name: string;
+  };
 }
 
 const Fast = () => {
@@ -61,6 +68,8 @@ const Fast = () => {
   const [expandedPool, setExpandedPool] = useState<FastPool | null>(null);
   const [fastSystemEnabled, setFastSystemEnabled] = useState(true);
   const [nasdaqStatus, setNasdaqStatus] = useState<MarketStatus>({ isOpen: true });
+  const [selectedResult, setSelectedResult] = useState<FastPoolResult | null>(null);
+  const [resultModalOpen, setResultModalOpen] = useState(false);
   const { user } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
@@ -263,7 +272,7 @@ const Fast = () => {
     try {
       const { data, error } = await supabase
         .from('fast_pool_results')
-        .select('*, fast_pools!inner(category)')
+        .select('*, fast_pools!inner(category, round_start_time, round_end_time, asset_name)')
         .order('created_at', { ascending: false })
         .limit(100); // Get more to ensure 10 per category
       
@@ -276,7 +285,12 @@ const Fast = () => {
         const category = item.fast_pools.category;
         const result = {
           ...item,
-          result: item.result as 'subiu' | 'desceu' | 'manteve'
+          result: item.result as 'subiu' | 'desceu' | 'manteve',
+          fast_pools: {
+            round_start_time: item.fast_pools.round_start_time,
+            round_end_time: item.fast_pools.round_end_time,
+            asset_name: item.fast_pools.asset_name
+          }
         };
         
         if (!resultsByCategory[category]) {
@@ -417,19 +431,19 @@ const Fast = () => {
       // Reset user bets for current pools
       setUserPoolBets({});
       
-      // Wait a bit for pools to be processed and created (2 seconds)
+      // Wait a bit for pools to be processed and created (1.5 seconds)
       setTimeout(() => {
         loadCurrentPools();
         loadPoolHistory();
-      }, 2000);
+      }, 1500);
       
     } catch (error) {
       console.error('Error finalizing pools:', error);
-      // Still try to load new pools even if finalization fails (2 seconds)
+      // Still try to load new pools even if finalization fails (1.5 seconds)
       setTimeout(() => {
         loadCurrentPools();
         loadPoolHistory();
-      }, 2000);
+      }, 1500);
     }
   };
 
@@ -1157,7 +1171,11 @@ const Fast = () => {
                       return (
                         <div
                           key={result.id}
-                          className={`flex flex-col items-center p-3 rounded-lg border transition-all duration-300 relative animate-fade-in ${
+                          onClick={() => {
+                            setSelectedResult(result);
+                            setResultModalOpen(true);
+                          }}
+                          className={`flex flex-col items-center p-3 rounded-lg border transition-all duration-300 relative animate-fade-in cursor-pointer hover:scale-105 ${
                             isRecent 
                               ? highlightColor + ' shadow-sm'
                               : 'bg-muted/20 border-border'
@@ -1309,6 +1327,13 @@ const Fast = () => {
         poolSpecificHistory={expandedPool ? currentCategoryHistory.filter(r => r.asset_symbol === expandedPool.asset_symbol) : []}
         poolDuration={algorithmConfig.pool_duration_seconds}
         lockoutTime={algorithmConfig.lockout_time_seconds}
+      />
+      
+      <PoolResultModal
+        open={resultModalOpen}
+        onOpenChange={setResultModalOpen}
+        result={selectedResult}
+        pool={selectedResult?.fast_pools}
       />
     </div>
   );

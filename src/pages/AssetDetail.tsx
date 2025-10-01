@@ -43,6 +43,7 @@ const AssetDetail = () => {
   const [countdown, setCountdown] = useState(60);
   const [loading, setLoading] = useState(true);
   const [betAmount, setBetAmount] = useState(100);
+  const [softLoading, setSoftLoading] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -148,10 +149,12 @@ const AssetDetail = () => {
       // When countdown reaches 0, trigger pool reload
       if (timeLeft === 0) {
         console.log('⏰ Pool ended, reloading...');
+        setSoftLoading(true);
         setTimeout(() => {
           loadPoolData();
           loadPoolHistory();
-        }, 3000); // Wait 3 seconds for pool to finalize
+          setSoftLoading(false);
+        }, 1500); // Wait 1.5 seconds for pool to finalize
       }
     };
 
@@ -264,10 +267,18 @@ const AssetDetail = () => {
 
       console.log('✅ Bet placed successfully!');
 
+      // Show consistent notification like Fast page
       toast({
-        title: "Opinião registrada!",
-        description: `Você opinou que vai ${side === 'subiu' ? 'SUBIR' : 'DESCER'} com ${betAmount} RZ (x${odds.toFixed(2)})`,
+        title: "✅ Opinião registrada!",
+        description: `${side === 'subiu' ? '📈 SUBIR' : '📉 DESCER'} • ${betAmount} RZ • Odds: x${odds.toFixed(2)}`,
+        duration: 3000,
+        className: side === 'subiu' 
+          ? 'bg-[#00ff90]/10 border-[#00ff90]' 
+          : 'bg-[#ff2389]/10 border-[#ff2389]'
       });
+      
+      // Force profile refresh for instant balance update
+      window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
       
     } catch (error) {
       console.error('❌ Error placing bet:', error);
@@ -301,7 +312,17 @@ const AssetDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 relative">
+      {/* Soft Loading Overlay */}
+      {softLoading && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-[#ff2389] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-lg font-semibold">Carregando próximo pool...</p>
+          </div>
+        </div>
+      )}
+      
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Link to="/fast" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6">
           <ArrowLeft className="w-4 h-4" />
