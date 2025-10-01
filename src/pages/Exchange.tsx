@@ -440,7 +440,7 @@ const ExchangeNew = () => {
             {fastMarketsButtonVisible && (
               <Button
                 asChild
-                className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 hover:from-[#ff2389]/90 hover:to-[#ff2389]/70 animate-pulse"
+                className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 hover:from-[#ff2389]/90 hover:to-[#ff2389]/70 hover:shadow-[0_0_20px_rgba(255,35,137,0.5)] animate-pulse transition-all duration-300"
                 size="lg"
               >
                 <a href="/fast" className="flex items-center gap-2">

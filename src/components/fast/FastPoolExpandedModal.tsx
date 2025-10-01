@@ -114,14 +114,14 @@ export const FastPoolExpandedModal = ({
         className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border-border"
       >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold mb-2">
-            {pool.asset_name}
-          </DialogTitle>
-          <div className="space-y-1">
-            <p className="text-base font-bold text-center text-foreground">{pool.question}</p>
-            <div className="flex items-center gap-2 text-sm">
+          <div className="space-y-3">
+            <DialogTitle className="text-3xl font-bold text-center">
+              {pool.asset_name}
+            </DialogTitle>
+            <p className="text-xl font-bold text-center text-foreground">{pool.question}</p>
+            <div className="flex items-center justify-center gap-2 text-base">
               <span className="text-muted-foreground">Preço atual:</span>
-              <span className="font-semibold text-primary">${pool.opening_price.toLocaleString()}</span>
+              <span className="font-semibold text-primary text-lg">${pool.opening_price.toLocaleString()}</span>
             </div>
           </div>
         </DialogHeader>
@@ -162,7 +162,8 @@ export const FastPoolExpandedModal = ({
                   className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80"
                   style={{ 
                     width: `${(countdown / 60) * 100}%`,
-                    transition: 'width 16ms linear'
+                    transition: 'width 16ms linear',
+                    animation: countdown <= 23 && countdown > 0 ? `heartbeat ${Math.max(0.3, countdown / 60)}s ease-in-out infinite` : undefined
                   }}
                 />
               </div>

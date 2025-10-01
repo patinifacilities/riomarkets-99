@@ -59,7 +59,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [walletHoverOpen, setWalletHoverOpen] = useState(false);
 
-  // Listen for fast market win animations
+  // Listen for fast market win animations and force profile refresh
   useEffect(() => {
     const handleWinAnimation = (event: CustomEvent) => {
       const target = document.getElementById('fast-winner-animation-target');
@@ -73,13 +73,22 @@ const Header = () => {
           winElement.remove();
         }, 2000);
       }
+      
+      // Force balance update
+      refetchProfile();
+    };
+    
+    const handleForceRefresh = () => {
+      refetchProfile();
     };
     
     window.addEventListener('fastWinAnimation', handleWinAnimation as EventListener);
+    window.addEventListener('forceProfileRefresh', handleForceRefresh);
     return () => {
       window.removeEventListener('fastWinAnimation', handleWinAnimation as EventListener);
+      window.removeEventListener('forceProfileRefresh', handleForceRefresh);
     };
-  }, []);
+  }, [refetchProfile]);
 
   const navItems = [
     { href: '/fast', icon: Zap, label: 'Fast', special: 'pulse' },

@@ -383,6 +383,9 @@ const Fast = () => {
         playCoinSound();
         const winAmount = bet.payout_amount - bet.amount_rioz;
         
+        // Immediately refresh profile to update balance
+        refetchProfile();
+        
         // Show bottom-right notification
         toast({
           title: "🎉 Você ganhou!",
@@ -391,16 +394,19 @@ const Fast = () => {
           className: 'bg-[#00ff90]/10 border-[#00ff90] fixed bottom-4 right-4'
         });
         
-        // Trigger header animation
+        // Trigger header animation and force refresh
         const event = new CustomEvent('fastWinAnimation', { 
           detail: { amount: winAmount } 
         });
         window.dispatchEvent(event);
+        
+        // Force header to refresh balance
+        window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
       }
     } catch (error) {
       console.error('Error checking winnings:', error);
     }
-  }, [user, toast]);
+  }, [user, toast, refetchProfile]);
 
   const handleBet = async (poolId: string, side: 'subiu' | 'desceu') => {
     console.log('🎯 handleBet called', { poolId, side, countdown, betAmount, userBalance: profile?.saldo_moeda });
@@ -943,18 +949,9 @@ const Fast = () => {
           </div>
         </div>
 
-        {/* TradingView Info - No background */}
-        <div className="max-w-4xl mx-auto mb-6">
-          <div className="flex items-center justify-center gap-3 p-4 rounded-xl border border-border/50">
-            <p className="text-sm text-muted-foreground">
-              Cotações em <span className="font-semibold text-foreground">tempo real</span> diretamente do <span className="font-semibold text-foreground">TradingView</span>
-            </p>
-          </div>
-        </div>
-
         {/* Recent Results - Category Specific */}
         {currentCategoryHistory.length > 0 && (
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto mb-6">
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
                <CardHeader>
                  <CardTitle className="flex items-center gap-2">
@@ -1010,6 +1007,15 @@ const Fast = () => {
             </Card>
           </div>
         )}
+
+        {/* TradingView Info - No background */}
+        <div className="max-w-4xl mx-auto mb-6">
+          <div className="flex items-center justify-center gap-3 p-4 rounded-xl border border-border/50">
+            <p className="text-sm text-muted-foreground">
+              Cotações em <span className="font-semibold text-foreground">tempo real</span> diretamente do <span className="font-semibold text-foreground">TradingView</span>
+            </p>
+          </div>
+        </div>
 
         {/* Info Cards */}
         <div className="max-w-4xl mx-auto mt-12 grid md:grid-cols-2 gap-6">
