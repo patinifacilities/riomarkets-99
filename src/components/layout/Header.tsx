@@ -15,19 +15,12 @@ import {
   SheetHeader,
   SheetTitle
 } from '@/components/ui/sheet';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useState, useEffect } from 'react';
 import { TickerBar } from '@/components/ui/ticker-bar';
-import { WalletHoverCard } from '@/components/wallet/WalletHoverCard';
 import { DarkModeToggle } from './DarkModeToggle';
 import { AddBrlModal } from '@/components/exchange/AddBrlModal';
 
@@ -67,7 +60,6 @@ const Header = () => {
 
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [walletHoverOpen, setWalletHoverOpen] = useState(false);
 
   // Listen for fast market win animations and force profile refresh
   useEffect(() => {
@@ -284,17 +276,17 @@ const Header = () => {
           {isMobile && !isLoggedIn && (
             <div className="flex items-center flex-1 relative">
               <Link to="/">
-                <div className="relative h-7 w-32">
+                <div className="relative h-7 min-w-[120px]">
                   <img 
                     src={logoImageWhite}
                     alt="Rio Markets" 
-                    className="absolute h-7 w-auto transition-opacity duration-300" 
+                    className="absolute h-7 w-auto object-contain transition-opacity duration-300" 
                     style={{ opacity: resolvedTheme === 'light' ? 0 : 1 }}
                   />
                   <img 
                     src={logoImageBlack}
                     alt="Rio Markets" 
-                    className="absolute h-7 w-auto transition-opacity duration-300" 
+                    className="absolute h-7 w-auto object-contain transition-opacity duration-300" 
                     style={{ opacity: resolvedTheme === 'light' ? 1 : 0 }}
                   />
                 </div>
@@ -305,17 +297,17 @@ const Header = () => {
           {/* Desktop Logo */}
           <div className="hidden md:flex items-center mr-6 relative">
             <Link to="/">
-              <div className="relative h-8 w-36">
+              <div className="relative h-8 min-w-[140px]">
                 <img 
                   src={logoImageWhite}
                   alt="Rio Markets" 
-                  className="absolute h-8 w-auto transition-opacity duration-300" 
+                  className="absolute h-8 w-auto object-contain transition-opacity duration-300" 
                   style={{ opacity: resolvedTheme === 'light' ? 0 : 1 }}
                 />
                 <img 
                   src={logoImageBlack}
                   alt="Rio Markets" 
-                  className="absolute h-8 w-auto transition-opacity duration-300" 
+                  className="absolute h-8 w-auto object-contain transition-opacity duration-300" 
                   style={{ opacity: resolvedTheme === 'light' ? 1 : 0 }}
                 />
               </div>
@@ -398,43 +390,19 @@ const Header = () => {
               <>
                 {/* Wallet Balance */}
                 <div className="relative overflow-visible">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Link to="/wallet">
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            className="gap-2 bg-primary/10 border border-primary/30 text-primary rounded-xl hover:bg-primary/10"
-                          >
-                            <Wallet className="w-4 h-4" />
-                            {profile?.saldo_moeda >= 1000 
-                              ? Math.floor(profile.saldo_moeda).toLocaleString('pt-BR') 
-                              : (profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                            } RZ
-                          </Button>
-                        </Link>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom" className="bg-card border-border p-4">
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between gap-4">
-                            <span className="text-sm text-muted-foreground">Saldo RZ:</span>
-                            <span className="font-semibold">{(profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })} RZ</span>
-                          </div>
-                          <div className="flex items-center justify-between gap-4">
-                            <span className="text-sm text-muted-foreground">Saldo R$:</span>
-                            <span className="font-semibold">R$ {((profile?.saldo_moeda || 0) * 1).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                          </div>
-                          <div className="pt-2 border-t border-border">
-                            <div className="flex items-center justify-between gap-4">
-                              <span className="text-sm font-medium">Total:</span>
-                              <span className="font-bold text-primary">R$ {((profile?.saldo_moeda || 0) * 1).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <Link to="/wallet">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="gap-2 bg-primary/10 border border-primary/30 text-primary rounded-xl hover:bg-primary/10"
+                    >
+                      <Wallet className="w-4 h-4" />
+                      {profile?.saldo_moeda >= 1000 
+                        ? Math.floor(profile.saldo_moeda).toLocaleString('pt-BR') 
+                        : (profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                      } RZ
+                    </Button>
+                  </Link>
                   
                   {/* Winner Balance Animation for Fast Markets */}
                   {location.pathname === '/fast' && (
@@ -530,13 +498,7 @@ const Header = () => {
                 </Button>
               </Link>
             ) : null}
-          </div>
-
-        {/* Wallet Hover Card */}
-        <WalletHoverCard 
-          isOpen={walletHoverOpen} 
-          onClose={() => setWalletHoverOpen(false)} 
-        />
+           </div>
         </div>
       </div>
       

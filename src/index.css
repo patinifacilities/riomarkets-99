@@ -527,6 +527,44 @@
   }
 }
 
+/* Rainbow animations for topic cards */
+@keyframes rainbow-1 {
+  0%, 100% { background: linear-gradient(135deg, rgba(155, 255, 198, 0.3), transparent); }
+  50% { background: linear-gradient(135deg, rgba(255, 155, 198, 0.3), transparent); }
+}
+
+@keyframes rainbow-2 {
+  0%, 100% { background: linear-gradient(135deg, rgba(255, 155, 198, 0.3), transparent); }
+  50% { background: linear-gradient(135deg, rgba(155, 198, 255, 0.3), transparent); }
+}
+
+@keyframes rainbow-3 {
+  0%, 100% { background: linear-gradient(135deg, rgba(155, 198, 255, 0.3), transparent); }
+  50% { background: linear-gradient(135deg, rgba(255, 255, 155, 0.3), transparent); }
+}
+
+@keyframes rainbow-4 {
+  0%, 100% { background: linear-gradient(135deg, rgba(255, 255, 155, 0.3), transparent); }
+  50% { background: linear-gradient(135deg, rgba(255, 155, 255, 0.3), transparent); }
+}
+
+@keyframes rainbow-5 {
+  0%, 100% { background: linear-gradient(135deg, rgba(255, 155, 255, 0.3), transparent); }
+  50% { background: linear-gradient(135deg, rgba(155, 255, 255, 0.3), transparent); }
+}
+
+@keyframes rainbow-6 {
+  0%, 100% { background: linear-gradient(135deg, rgba(155, 255, 255, 0.3), transparent); }
+  50% { background: linear-gradient(135deg, rgba(255, 198, 155, 0.3), transparent); }
+}
+
+.animate-rainbow-1 { animation: rainbow-1 3s ease-in-out infinite; }
+.animate-rainbow-2 { animation: rainbow-2 3s ease-in-out infinite 0.5s; }
+.animate-rainbow-3 { animation: rainbow-3 3s ease-in-out infinite 1s; }
+.animate-rainbow-4 { animation: rainbow-4 3s ease-in-out infinite 1.5s; }
+.animate-rainbow-5 { animation: rainbow-5 3s ease-in-out infinite 2s; }
+.animate-rainbow-6 { animation: rainbow-6 3s ease-in-out infinite 2.5s; }
+
 .win-animation {
   position: absolute;
   top: 50%;

@@ -256,42 +256,44 @@ const Home = () => {
           {/* Topic Filters - Infinite Loop Side Scroller */}
           <div>
             <div className="relative overflow-visible py-4">
-              {/* Fade overlays */}
-              <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none"></div>
-              <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none"></div>
+              {/* Fade overlays - lower z-index */}
+              <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background via-background/80 to-transparent z-[5] pointer-events-none"></div>
+              <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background via-background/80 to-transparent z-[5] pointer-events-none"></div>
               
-              <div className="overflow-x-auto scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              <div className="overflow-x-auto scrollbar-hide scroll-smooth relative z-[10]" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 <div className="flex gap-4 pb-2 min-w-max animate-infinite-scroll hover:pause">
                   {/* First set of topics */}
                   {topicFilters.map((topic, index) => {
                     const isSelected = selectedTopics.includes(topic.id);
                     const IconComponent = topic.Icon;
                     const animationClass = `animate-rainbow-${(index % 6) + 1}`;
+                    const delayClass = `animation-delay-${index * 100}`;
                     return (
                       <button
                         key={topic.id}
                         onClick={() => handleTopicSelect(topic.id)}
                         className={cn(
-                          "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap relative z-20",
-                          "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg overflow-hidden",
+                          "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap relative",
+                          "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg overflow-visible",
                           "animate-fade-in",
                           isSelected
-                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50 animate-pulse-gentle' 
-                            : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm'
+                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50 animate-pulse-gentle z-[30]' 
+                            : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm hover:z-[20] z-[15]'
                         )}
+                        style={{ animationDelay: `${index * 50}ms` }}
                       >
                         {isSelected && (
                           <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent animate-shimmer" />
                         )}
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 hover:rotate-12 hover:scale-110 relative overflow-hidden ${
-                          isSelected ? 'bg-primary-foreground/20' : ''
+                          isSelected ? 'bg-primary-foreground/20 animate-bounce' : 'animate-pulse'
                         }`}>
                           {!isSelected && (
                             <div className={`absolute inset-0 opacity-40 ${animationClass}`}></div>
                           )}
-                          <IconComponent className="w-6 h-6 relative z-10" />
+                          <IconComponent className={`w-6 h-6 relative z-10 ${!isSelected ? 'animate-pulse' : ''}`} />
                         </div>
-                        <span className="text-base relative z-10">{topic.label}</span>
+                        <span className={`text-base relative z-10 ${!isSelected ? 'animate-fade-in' : ''}`}>{topic.label}</span>
                         {isSelected && (
                           <X 
                             className="w-5 h-5 ml-2 hover:scale-110 transition-transform relative z-10" 
@@ -314,23 +316,24 @@ const Home = () => {
                         key={`${topic.id}-duplicate`}
                         onClick={() => handleTopicSelect(topic.id)}
                         className={cn(
-                          "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap",
-                          "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg relative overflow-hidden",
+                          "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap relative",
+                          "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg overflow-visible",
                           "animate-fade-in",
                           isSelected
-                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50' 
-                            : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm'
+                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50 z-[30]' 
+                            : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm hover:z-[20] z-[15]'
                         )}
+                        style={{ animationDelay: `${(index + topicFilters.length) * 50}ms` }}
                       >
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 hover:rotate-12 hover:scale-110 relative overflow-hidden ${
-                          isSelected ? 'bg-primary-foreground/20' : ''
+                          isSelected ? 'bg-primary-foreground/20 animate-bounce' : 'animate-pulse'
                         }`}>
                           {!isSelected && (
                             <div className={`absolute inset-0 opacity-40 ${animationClass}`}></div>
                           )}
-                          <IconComponent className="w-6 h-6 relative z-10" />
+                          <IconComponent className={`w-6 h-6 relative z-10 ${!isSelected ? 'animate-pulse' : ''}`} />
                         </div>
-                        <span className="text-base">{topic.label}</span>
+                        <span className={`text-base ${!isSelected ? 'animate-fade-in' : ''}`}>{topic.label}</span>
                         {isSelected && (
                           <X 
                             className="w-5 h-5 ml-2 hover:scale-110 transition-transform" 
