@@ -355,25 +355,6 @@ const AssetDetail = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 relative">
-      {/* Soft Loading Overlay */}
-      {softLoading && (
-        <div className="fixed inset-0 z-50 bg-background/90 backdrop-blur-md flex items-center justify-center">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#ff2389]/20 to-[#00ff90]/20 rounded-full blur-xl animate-pulse"></div>
-            <div className="relative bg-card border-2 border-primary/30 rounded-2xl p-8 shadow-2xl">
-              <div className="flex flex-col items-center gap-4">
-                <div className="relative">
-                  <div className="w-20 h-20 border-4 border-primary/20 rounded-full"></div>
-                  <div className="absolute inset-0 w-20 h-20 border-4 border-[#ff2389] border-t-transparent rounded-full animate-spin"></div>
-                </div>
-                <p className="text-lg font-bold text-foreground">Carregando próximo pool...</p>
-                <p className="text-sm text-muted-foreground">Aguarde um momento</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Link to="/fast" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6">
           <ArrowLeft className="w-4 h-4" />
@@ -397,6 +378,22 @@ const AssetDetail = () => {
 
         <div className="max-w-2xl mx-auto">
           <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm">
+            {/* Loading overlay only for this card */}
+            {softLoading && (
+              <div className="absolute inset-0 z-50 bg-background/95 backdrop-blur-md flex items-center justify-center rounded-lg">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#ff2389]/20 to-[#00ff90]/20 rounded-full blur-xl animate-pulse"></div>
+                  <div className="relative flex flex-col items-center gap-3">
+                    <div className="relative">
+                      <div className="w-16 h-16 border-4 border-primary/20 rounded-full"></div>
+                      <div className="absolute inset-0 w-16 h-16 border-4 border-[#ff2389] border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">Carregando próximo pool...</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5"></div>
             
             {currentPool.paused && (
@@ -569,11 +566,29 @@ const AssetDetail = () => {
 
         {/* Live Price Chart */}
         <div className="max-w-4xl mx-auto mt-8">
-          <LivePriceChart 
-            assetSymbol={currentPool.asset_symbol} 
-            assetName={currentPool.asset_name}
-            poolStartPrice={currentPool.opening_price}
-          />
+          <div className="relative">
+            {/* Loading overlay only for chart card */}
+            {softLoading && (
+              <div className="absolute inset-0 z-50 bg-background/95 backdrop-blur-md flex items-center justify-center rounded-lg">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#ff2389]/20 to-[#00ff90]/20 rounded-full blur-xl animate-pulse"></div>
+                  <div className="relative flex flex-col items-center gap-3">
+                    <div className="relative">
+                      <div className="w-16 h-16 border-4 border-primary/20 rounded-full"></div>
+                      <div className="absolute inset-0 w-16 h-16 border-4 border-[#ff2389] border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">Carregando próximo pool...</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <LivePriceChart 
+              assetSymbol={currentPool.asset_symbol} 
+              assetName={currentPool.asset_name}
+              poolStartPrice={currentPool.opening_price}
+            />
+          </div>
         </div>
 
         {/* History */}

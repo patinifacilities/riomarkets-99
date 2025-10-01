@@ -102,7 +102,13 @@ export const RecentWinsCard = () => {
                       {win.market_title}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(win.created_at).toLocaleDateString('pt-BR')}
+                      {new Date(win.created_at).toLocaleString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
                     </p>
                   </div>
                   <div className="text-right ml-4">
