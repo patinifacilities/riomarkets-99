@@ -33,6 +33,7 @@ export const AssetConfigCard = ({ asset, onUpdate, onTogglePause, getCategoryCol
   const [assetName, setAssetName] = useState(asset.asset_name);
   const [question, setQuestion] = useState(asset.question);
   const [saving, setSaving] = useState(false);
+  const [hiding, setHiding] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -82,6 +83,37 @@ export const AssetConfigCard = ({ asset, onUpdate, onTogglePause, getCategoryCol
     setAssetName(asset.asset_name);
     setQuestion(asset.question);
     setIsEditing(false);
+  };
+
+  const handleHide = async () => {
+    setHiding(true);
+    try {
+      const { error } = await supabase
+        .from('fast_pool_configs')
+        .update({
+          paused: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', asset.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Ativo ocultado",
+        description: "O ativo foi ocultado da página Fast",
+      });
+
+      onUpdate();
+    } catch (error) {
+      console.error('Error hiding asset:', error);
+      toast({
+        title: "Erro",
+        description: "Falha ao ocultar o ativo",
+        variant: "destructive"
+      });
+    } finally {
+      setHiding(false);
+    }
   };
 
   return (
@@ -197,6 +229,17 @@ export const AssetConfigCard = ({ asset, onUpdate, onTogglePause, getCategoryCol
             >
               {asset.paused ? <Play className="w-4 h-4 text-gray-800" /> : <Pause className="w-4 h-4" />}
               {asset.paused ? 'Retomar' : 'Pausar'}
+            </Button>
+
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2 bg-muted hover:bg-muted/80"
+              onClick={handleHide}
+              disabled={hiding}
+            >
+              <X className="w-4 h-4" />
+              {hiding ? 'Ocultando...' : 'Ocultar'}
             </Button>
           </div>
         </>

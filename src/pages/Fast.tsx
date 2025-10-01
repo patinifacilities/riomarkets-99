@@ -919,14 +919,11 @@ const Fast = () => {
                        </div>
                       <div className="w-full bg-muted/20 rounded-full h-2 overflow-hidden">
                         <div 
-                          className={cn(
-                            "h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80",
-                            countdown <= 15 && countdown > 5 && "animate-pulse duration-1000",
-                            countdown <= 5 && "animate-pulse duration-300"
-                          )}
+                          className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80"
                            style={{ 
                              width: `${(countdown / 60) * 100}%`,
-                             transition: 'width 16ms linear'
+                             transition: 'width 16ms linear',
+                             animation: countdown <= 23 && countdown > 0 ? `pulse ${Math.max(0.2, (countdown - 23) / 37 * 2)}s cubic-bezier(0.4, 0, 0.6, 1) infinite` : undefined
                            }}
                         />
                       </div>

@@ -55,6 +55,7 @@ export function EmailSuggestions({ value, onSelect, inputRef }: EmailSuggestions
       } else if (e.key === 'Enter' && suggestions.length > 0) {
         e.preventDefault();
         onSelect(suggestions[selectedIndex]);
+        setSuggestions([]); // Clear suggestions after selection
       } else if (e.key === 'Escape') {
         setSuggestions([]);
       }
@@ -78,7 +79,10 @@ export function EmailSuggestions({ value, onSelect, inputRef }: EmailSuggestions
         <button
           key={suggestion}
           type="button"
-          onClick={() => onSelect(suggestion)}
+          onClick={() => {
+            onSelect(suggestion);
+            setSuggestions([]); // Clear suggestions after selection
+          }}
           className={`w-full px-4 py-2 text-left text-sm hover:bg-muted transition-colors ${
             index === selectedIndex ? 'bg-muted' : ''
           }`}
