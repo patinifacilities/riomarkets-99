@@ -1,20 +1,54 @@
-import { Trophy, TrendingUp, Users, Award, Target, BarChart3 } from 'lucide-react';
+import { Trophy, TrendingUp, Users, Award, Target, BarChart3, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { fakeUsers } from '@/data/fake-users';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 const Ranking = () => {
   const { user } = useAuth();
   const { data: profile } = useProfile(user?.id);
   const [showLevelsModal, setShowLevelsModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [realUsers, setRealUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  
   const sortedUsers = [...fakeUsers].sort((a, b) => b.saldo_moeda - a.saldo_moeda).slice(0, 25);
+
+  useEffect(() => {
+    loadRealUsers();
+  }, []);
+
+  const loadRealUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, nome, username, profile_pic_url, saldo_moeda, nivel')
+        .order('saldo_moeda', { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+      setRealUsers(data || []);
+    } catch (error) {
+      console.error('Error loading users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter users based on search term (username)
+  const filteredUsers = searchTerm
+    ? realUsers.filter(u => 
+        u.username?.toLowerCase().includes(searchTerm.toLowerCase().replace('@', ''))
+      )
+    : sortedUsers;
   
   const stats = {
     totalUsers: fakeUsers.length,
@@ -263,13 +297,33 @@ const Ranking = () => {
         {/* Ranking List */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Trophy className="w-5 h-5" />
-              Ranking Geral
-            </CardTitle>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <CardTitle className="flex items-center gap-2">
+                <Trophy className="w-5 h-5" />
+                Ranking Geral
+              </CardTitle>
+              <div className="relative w-full sm:w-80">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Buscar por @usuario..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 h-11 bg-background/50 border-border-secondary focus:border-primary transition-colors"
+                />
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="space-y-2">
-            {sortedUsers.map((user, index) => (
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : filteredUsers.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                Nenhum usuário encontrado
+              </div>
+            ) : (
+              filteredUsers.map((user, index) => (
               <div key={`${user.id}-${index}`} className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-card/50 transition-all">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary font-bold text-sm">
@@ -286,22 +340,29 @@ const Ranking = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-semibold text-sm">{user.nome}</h3>
+                      {user.username && (
+                        <span className="text-xs text-muted-foreground">@{user.username}</span>
+                      )}
                       {getLevelBadge(user.nivel)}
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      Precisão: <span className="text-success font-medium">{((user.analises_certas / user.total_analises) * 100).toFixed(1)}%</span> • ({user.analises_certas}/{user.total_analises})
-                    </div>
+                    {user.analises_certas !== undefined && (
+                      <div className="text-xs text-muted-foreground">
+                        Precisão: <span className="text-success font-medium">{((user.analises_certas / user.total_analises) * 100).toFixed(1)}%</span> • ({user.analises_certas}/{user.total_analises})
+                      </div>
+                    )}
                   </div>
                 </div>
                 
                 <div className="text-right">
                   <div className="font-bold text-sm">{user.saldo_moeda.toLocaleString()} RZ</div>
-                  <div className="text-xs text-muted-foreground">
-                    +{user.ganho_total.toLocaleString()} RZ
-                  </div>
+                  {user.ganho_total !== undefined && (
+                    <div className="text-xs text-muted-foreground">
+                      +{user.ganho_total.toLocaleString()} RZ
+                    </div>
+                  )}
                 </div>
               </div>
-            ))}
+            )))}
           </CardContent>
         </Card>
       </div>

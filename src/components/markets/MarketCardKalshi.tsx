@@ -134,7 +134,10 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5 pointer-events-none"></div>
         <Link to={`/market/${market.id}`} className="block relative z-10">
           {/* Header */}
-          <div className="p-4 pb-3">
+          <div 
+            className="p-4 pb-3 cursor-pointer" 
+            onClick={() => navigate(`/market/${market.id}`)}
+          >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
                 <div 

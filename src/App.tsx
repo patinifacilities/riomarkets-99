@@ -76,8 +76,7 @@ function App() {
             <Route path="/admin/news" element={<AdminNews />} />
             <Route path="/admin/markets" element={<AdminMarkets />} />
             <Route path="/admin/fast" element={<AdminFast />} />
-            <Route path="/admin/fast/config" element={<AdminFastPoolConfig />} />
-            <Route path="/admin/fast/:poolId/config" element={<AdminFastPoolConfig />} />
+            <Route path="/admin/fast/pool/:assetId/config" element={<AdminFastPoolConfig />} />
             <Route path="/admin/gateway-config/:gatewayId" element={<AdminGatewayConfig />} />
             <Route path="/admin/gateways-saque" element={<AdminGatewaysSaque />} />
           <Route path="/opinioes" element={<Opinioes />} />

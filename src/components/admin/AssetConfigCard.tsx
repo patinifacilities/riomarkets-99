@@ -179,7 +179,7 @@ export const AssetConfigCard = ({ asset, onUpdate, onTogglePause, getCategoryCol
               variant="outline" 
               size="sm" 
               className="gap-2"
-              onClick={() => navigate(`/admin/fast/${asset.id}/config`)}
+              onClick={() => navigate(`/admin/fast/pool/${asset.id}/config`)}
             >
               <Settings className="w-4 h-4" />
               Configurar API

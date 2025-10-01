@@ -221,8 +221,14 @@ const Fast = () => {
     }
   }, [selectedCategory, fastSystemEnabled]);
 
-  // Load pool history by category and check for new results - always load 10 per category
+  // Load pool history by category and check for new results - only if FAST is enabled
   const loadPoolHistory = useCallback(async () => {
+    // Don't load history if FAST system is disabled
+    if (!fastSystemEnabled) {
+      setPoolHistory({});
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('fast_pool_results')
@@ -256,7 +262,7 @@ const Fast = () => {
     } catch (error) {
       console.error('Error loading history:', error);
     }
-  }, []);
+  }, [fastSystemEnabled]);
 
   // State for pool results
   const [poolResults, setPoolResults] = useState<Record<string, 'subiu' | 'desceu' | 'manteve' | null>>({});

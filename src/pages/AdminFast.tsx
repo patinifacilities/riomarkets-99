@@ -343,7 +343,7 @@ const AdminFast = () => {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
             <Card className="bg-card-secondary border-border-secondary">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total de Pools</CardTitle>
@@ -381,6 +381,22 @@ const AdminFast = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.total_volume.toFixed(2)} RIOZ</div>
+              </CardContent>
+            </Card>
+
+            {/* Gold Pass Revenue Card */}
+            <Card className="bg-gradient-to-br from-[#FFD700]/20 via-[#FFA500]/10 to-[#FF8C00]/20 border-[#FFD700]/30 shadow-lg shadow-[#FFD700]/20">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-[#FFD700]">Gold Pass</CardTitle>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FFD700] via-[#FFA500] to-[#FF8C00] flex items-center justify-center">
+                  <span className="text-white text-lg">👑</span>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FF8C00] bg-clip-text text-transparent">
+                  R$ 0,00
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Receita total</p>
               </CardContent>
             </Card>
           </div>

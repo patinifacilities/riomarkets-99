@@ -24,6 +24,7 @@ import { BetSlider } from '@/components/markets/BetSlider';
 import { SliderConfirm } from '@/components/ui/slider-confirm';
 import { OpenOpinionsCard } from '@/components/markets/OpenOpinionsCard';
 import { OpenOpinionsCardDetail } from '@/components/markets/OpenOpinionsCardDetail';
+import { LivePriceChart } from '@/components/markets/LivePriceChart';
 
 const MarketDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -356,6 +357,12 @@ const MarketDetail = () => {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Live Price Chart */}
+            <LivePriceChart 
+              assetSymbol={market.id}
+              assetName={market.titulo}
+            />
 
             {/* Pool Progress Bar */}
             <div>
