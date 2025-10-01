@@ -258,14 +258,20 @@ async function finalizePool(supabase: any, poolId: string) {
   if (poolError) throw poolError;
   if (!pool) throw new Error('Pool not found');
 
-  // Get current price for this specific asset
+  // Wait 1 second to fetch the closing price (1 second before pool officially ends)
+  // This matches the opening price timing (1 second after pool starts)
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  // Get closing price for this specific asset (1 second before end)
   const { data: marketData } = await supabase.functions.invoke('get-market-data', {
     body: { symbols: [pool.asset_symbol] }
   });
   
   const closingPrice = marketData?.prices?.[pool.asset_symbol] || getFallbackPriceForSymbol(pool.asset_symbol);
 
-  // Determine result
+  console.log(`Pool ${poolId} - Opening: ${pool.opening_price}, Closing: ${closingPrice}`);
+
+  // Determine result based on price comparison
   const priceChange = ((closingPrice - pool.opening_price) / pool.opening_price) * 100;
   let result: string;
   
