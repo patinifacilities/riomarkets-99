@@ -299,7 +299,7 @@ const ExchangeNew = () => {
                     placeholder="0"
                     value={formatNumber(fromAmount)}
                     onChange={(e) => handleAmountChange(e.target.value)}
-                    className="pl-32 pr-4 h-32 text-right text-[600px] leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
+                    className="pl-32 pr-4 h-32 text-right text-[1800px] leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
                   />
                 </div>
                 {fromAmount && parseFloat(fromAmount.replace(/[^\d.]/g, '')) > fromBalance && (
@@ -389,7 +389,7 @@ const ExchangeNew = () => {
                   placeholder="0"
                   value={formatNumber(toAmount)}
                   readOnly
-                  className="pl-32 pr-4 h-32 text-right text-[200px] leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
+                  className="pl-32 pr-4 h-32 text-right text-[600px] leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
                 />
               </div>
             </div>
