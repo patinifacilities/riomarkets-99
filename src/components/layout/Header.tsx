@@ -44,6 +44,16 @@ const Header = () => {
   const [showDepositModal, setShowDepositModal] = useState(false);
   const { resolvedTheme } = useTheme();
 
+  // Pre-load both logos for smooth transition
+  useEffect(() => {
+    const preloadImage = (src: string) => {
+      const img = new Image();
+      img.src = src;
+    };
+    preloadImage(logoImageWhite);
+    preloadImage(logoImageBlack);
+  }, []);
+
   // Authentication check - only require session and user, profile should be optional for initial render
   const isLoggedIn = !loading && !!session && !!user;
 
@@ -272,25 +282,43 @@ const Header = () => {
 
           {/* Logo - Mobile (left side when not logged in) and Desktop */}
           {isMobile && !isLoggedIn && (
-            <div className="flex items-center flex-1">
+            <div className="flex items-center flex-1 relative">
               <Link to="/">
-                <img 
-                  src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
-                  alt="Rio Markets" 
-                  className="h-7 w-auto" 
-                />
+                <div className="relative h-7 w-32">
+                  <img 
+                    src={logoImageWhite}
+                    alt="Rio Markets" 
+                    className="absolute h-7 w-auto transition-opacity duration-300" 
+                    style={{ opacity: resolvedTheme === 'light' ? 0 : 1 }}
+                  />
+                  <img 
+                    src={logoImageBlack}
+                    alt="Rio Markets" 
+                    className="absolute h-7 w-auto transition-opacity duration-300" 
+                    style={{ opacity: resolvedTheme === 'light' ? 1 : 0 }}
+                  />
+                </div>
               </Link>
             </div>
           )}
           
           {/* Desktop Logo */}
-          <div className="hidden md:flex items-center mr-6">
+          <div className="hidden md:flex items-center mr-6 relative">
             <Link to="/">
-              <img 
-                src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
-                alt="Rio Markets" 
-                className="h-8 w-auto" 
-              />
+              <div className="relative h-8 w-36">
+                <img 
+                  src={logoImageWhite}
+                  alt="Rio Markets" 
+                  className="absolute h-8 w-auto transition-opacity duration-300" 
+                  style={{ opacity: resolvedTheme === 'light' ? 0 : 1 }}
+                />
+                <img 
+                  src={logoImageBlack}
+                  alt="Rio Markets" 
+                  className="absolute h-8 w-auto transition-opacity duration-300" 
+                  style={{ opacity: resolvedTheme === 'light' ? 1 : 0 }}
+                />
+              </div>
             </Link>
           </div>
 

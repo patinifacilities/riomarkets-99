@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Users, Search, ArrowLeft, Edit, Play, Pause } from 'lucide-react';
+import { Users, Search, ArrowLeft, Edit, Play, Pause, Lock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -134,7 +134,13 @@ const AdminUsers = () => {
                         <p className="text-sm text-muted-foreground">Rioz Coin</p>
                       </div>
 
-                      <div className="hidden md:flex gap-2">
+                      <div className="hidden md:flex gap-2 items-center">
+                        {user.is_blocked && (
+                          <Badge variant="destructive" className="bg-red-500 text-white">
+                            Bloqueado
+                          </Badge>
+                        )}
+                        
                         <Button
                           variant="outline"
                           size="sm"
@@ -152,7 +158,9 @@ const AdminUsers = () => {
                           size="sm"
                           className={cn(
                             "rounded-full w-10 h-10 p-0",
-                            user.is_blocked ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"
+                            user.is_blocked 
+                              ? "bg-yellow-500 hover:bg-yellow-600 border-yellow-600" 
+                              : "bg-red-500 hover:bg-red-600"
                           )}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -161,7 +169,7 @@ const AdminUsers = () => {
                           title={user.is_blocked ? "Desbloquear usuário" : "Bloquear usuário"}
                         >
                           {user.is_blocked ? (
-                            <Play className="w-5 h-5" />
+                            <Lock className="w-5 h-5 text-black" />
                           ) : (
                             <Pause className="w-5 h-5" />
                           )}
@@ -198,22 +206,42 @@ const AdminUsers = () => {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                {userToBlock?.is_blocked ? 'Desbloquear usuário?' : 'Bloquear usuário?'}
+                {userToBlock?.is_blocked ? 'Desbloquear usuário?' : 'Bloquear usuário temporariamente?'}
               </AlertDialogTitle>
-              <AlertDialogDescription>
+              <AlertDialogDescription asChild>
                 {userToBlock?.is_blocked ? (
-                  <>Você está prestes a <strong>desbloquear</strong> o usuário <strong>{userToBlock?.nome}</strong>. 
-                  O usuário poderá enviar opiniões e realizar saques novamente.</>
+                  <div>
+                    Você está prestes a <strong>desbloquear</strong> o usuário <strong>{userToBlock?.nome}</strong>. 
+                    O usuário poderá:
+                    <ul className="mt-2 ml-4 list-disc space-y-1">
+                      <li>Enviar opiniões nos mercados</li>
+                      <li>Realizar saques de saldo</li>
+                      <li>Participar dos Fast Markets</li>
+                    </ul>
+                  </div>
                 ) : (
-                  <>Você está prestes a <strong>bloquear</strong> o usuário <strong>{userToBlock?.nome}</strong>. 
-                  O usuário não poderá enviar opiniões nem realizar saques.</>
+                  <div>
+                    Você está prestes a <strong>bloquear o usuário {userToBlock?.nome} temporariamente</strong>. 
+                    <p className="mt-2 mb-2">O usuário só será desbloqueado se um administrador desbloquear manualmente.</p>
+                    <p className="mb-2">Enquanto bloqueado, o usuário <strong>não poderá</strong>:</p>
+                    <ul className="ml-4 list-disc space-y-1">
+                      <li>Enviar opiniões nos mercados</li>
+                      <li>Realizar saques de saldo</li>
+                      <li>Participar dos Fast Markets</li>
+                      <li>Fazer conversões na Exchange</li>
+                    </ul>
+                  </div>
                 )}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
               <AlertDialogAction
-                className={userToBlock?.is_blocked ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"}
+                className={cn(
+                  userToBlock?.is_blocked 
+                    ? "bg-green-500 hover:bg-green-600 text-white" 
+                    : "bg-red-500 hover:bg-red-600 text-white"
+                )}
                 onClick={async () => {
                   if (!userToBlock) return;
                   
