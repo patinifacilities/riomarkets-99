@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -47,6 +48,9 @@ const Auth = () => {
   });
   const [currentStep, setCurrentStep] = useState(0);
   const [cpfError, setCpfError] = useState(false);
+  const [passwordMismatch, setPasswordMismatch] = useState(false);
+  
+  const totalSteps = 5; // Total registration steps
 
   useEffect(() => {
     let mounted = true;
@@ -122,6 +126,36 @@ const Auth = () => {
       setCpfError(false);
     }
   }, [formData.cpf]);
+
+  // Check password mismatch
+  useEffect(() => {
+    if (formData.confirmPassword) {
+      setPasswordMismatch(formData.password !== formData.confirmPassword);
+    } else {
+      setPasswordMismatch(false);
+    }
+  }, [formData.password, formData.confirmPassword]);
+
+  // Validate uniqueness
+  const checkUniqueness = async (field: 'email' | 'username' | 'cpf', value: string) => {
+    if (!value) return true;
+    
+    try {
+      if (field === 'email') {
+        const { data } = await supabase.from('profiles').select('id').eq('email', value).single();
+        return !data;
+      } else if (field === 'username') {
+        const { data } = await supabase.from('profiles').select('id').eq('username', value).single();
+        return !data;
+      } else if (field === 'cpf') {
+        const { data } = await supabase.from('profiles').select('id').eq('cpf', value).single();
+        return !data;
+      }
+    } catch (error) {
+      return true; // If error checking, allow to proceed
+    }
+    return true;
+  };
 
   const handleSignUp = async () => {
     console.log('Attempting sign up...');
@@ -216,7 +250,13 @@ const Auth = () => {
       return;
     }
 
-    if (!isLogin && formData.cpf && !validateCPF(formData.cpf)) {
+    if (!isLogin && !formData.cpf) {
+      setError('CPF é obrigatório');
+      setLoading(false);
+      return;
+    }
+
+    if (!isLogin && !validateCPF(formData.cpf)) {
       setError('CPF inválido');
       setLoading(false);
       return;
@@ -348,6 +388,15 @@ const Auth = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {!isLogin && (
+                <div className="mb-4">
+                  <Progress value={(currentStep + 1) / totalSteps * 100} className="h-2" />
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    Passo {currentStep + 1} de {totalSteps}
+                  </p>
+                </div>
+              )}
+              
               <form onSubmit={handleSubmit} className="space-y-4">
                 {!isLogin ? (
                   <>
@@ -389,14 +438,17 @@ const Auth = () => {
                         <div>
                           <label htmlFor="username" className="text-sm font-medium mb-2 block">Username</label>
                           <div className="relative">
-                            <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground font-medium">@</span>
                             <Input
                               id="username"
                               type="text"
-                              placeholder="seu_username"
+                              placeholder="username"
                               value={formData.username}
-                              onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-                              className="pl-10"
+                              onChange={(e) => {
+                                const value = e.target.value.replace(/^@/, '');
+                                setFormData(prev => ({ ...prev, username: value }));
+                              }}
+                              className="pl-7"
                               aria-label="Digite seu username"
                               autoFocus
                             />
@@ -409,9 +461,22 @@ const Auth = () => {
                           <Button 
                             type="button" 
                             className="w-full" 
-                            onClick={() => {
-                              if (formData.username && validateUsername(formData.username)) setCurrentStep(2);
-                              else setError('Username inválido (3-20 caracteres alfanuméricos)');
+                            onClick={async () => {
+                              if (!formData.username) {
+                                setError('Username é obrigatório');
+                                return;
+                              }
+                              if (!validateUsername(formData.username)) {
+                                setError('Username inválido (3-20 caracteres alfanuméricos)');
+                                return;
+                              }
+                              const isUnique = await checkUniqueness('username', formData.username);
+                              if (!isUnique) {
+                                setError('Username já cadastrado');
+                                return;
+                              }
+                              setError('');
+                              setCurrentStep(2);
                             }}
                           >
                             Continuar
@@ -424,7 +489,7 @@ const Auth = () => {
                     {currentStep === 2 && (
                       <div className="space-y-4">
                         <div>
-                          <label htmlFor="cpf" className="text-sm font-medium mb-2 block">CPF (opcional)</label>
+                          <label htmlFor="cpf" className="text-sm font-medium mb-2 block">CPF</label>
                           <div className="relative">
                             <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                             <Input
@@ -450,8 +515,22 @@ const Auth = () => {
                           <Button 
                             type="button" 
                             className="w-full" 
-                            onClick={() => {
-                              if (!formData.cpf || !cpfError) setCurrentStep(3);
+                            onClick={async () => {
+                              if (!formData.cpf) {
+                                setError('CPF é obrigatório');
+                                return;
+                              }
+                              if (cpfError) {
+                                setError('CPF inválido');
+                                return;
+                              }
+                              const isUnique = await checkUniqueness('cpf', formData.cpf);
+                              if (!isUnique) {
+                                setError('CPF já cadastrado');
+                                return;
+                              }
+                              setError('');
+                              setCurrentStep(3);
                             }}
                             disabled={cpfError}
                           >
@@ -487,9 +566,18 @@ const Auth = () => {
                           <Button 
                             type="button" 
                             className="w-full" 
-                            onClick={() => {
-                              if (formData.email) setCurrentStep(4);
-                              else setError('Email é obrigatório');
+                            onClick={async () => {
+                              if (!formData.email) {
+                                setError('Email é obrigatório');
+                                return;
+                              }
+                              const isUnique = await checkUniqueness('email', formData.email);
+                              if (!isUnique) {
+                                setError('Email já cadastrado');
+                                return;
+                              }
+                              setError('');
+                              setCurrentStep(4);
                             }}
                           >
                             Continuar
@@ -498,7 +586,7 @@ const Auth = () => {
                       </div>
                     )}
 
-                    {/* Step 5: Password */}
+                    {/* Step 5: Password, Confirm Password & Terms */}
                     {currentStep === 4 && (
                       <div className="space-y-4">
                         <div>
@@ -525,77 +613,45 @@ const Auth = () => {
                           </div>
                         </div>
 
-                        {/* Password Requirements - fade out when complete */}
+                        {/* Password Requirements - truly disappear when complete */}
                         {formData.password && (
                           <div className="space-y-2 p-3 rounded-lg border border-border bg-muted/20">
                             <div className="text-sm font-medium text-foreground">Requisitos da senha:</div>
-                            <div className="grid grid-cols-1 gap-1">
-                              <div 
-                                className={`flex items-center gap-2 text-xs transition-opacity duration-300 ${
-                                  passwordRequirements.length ? 'text-success opacity-0' : 'text-muted-foreground opacity-100'
-                                }`}
-                              >
-                                {passwordRequirements.length ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                                Pelo menos 8 caracteres
-                              </div>
-                              <div 
-                                className={`flex items-center gap-2 text-xs transition-opacity duration-300 ${
-                                  passwordRequirements.uppercase ? 'text-success opacity-0' : 'text-muted-foreground opacity-100'
-                                }`}
-                              >
-                                {passwordRequirements.uppercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                                Uma letra maiúscula
-                              </div>
-                              <div 
-                                className={`flex items-center gap-2 text-xs transition-opacity duration-300 ${
-                                  passwordRequirements.lowercase ? 'text-success opacity-0' : 'text-muted-foreground opacity-100'
-                                }`}
-                              >
-                                {passwordRequirements.lowercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                                Uma letra minúscula
-                              </div>
-                              <div 
-                                className={`flex items-center gap-2 text-xs transition-opacity duration-300 ${
-                                  passwordRequirements.number ? 'text-success opacity-0' : 'text-muted-foreground opacity-100'
-                                }`}
-                              >
-                                {passwordRequirements.number ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                                Um número
-                              </div>
-                              <div 
-                                className={`flex items-center gap-2 text-xs transition-opacity duration-300 ${
-                                  passwordRequirements.special ? 'text-success opacity-0' : 'text-muted-foreground opacity-100'
-                                }`}
-                              >
-                                {passwordRequirements.special ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                                Um caractere especial
-                              </div>
+                            <div className="space-y-1">
+                              {!passwordRequirements.length && (
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <X className="w-3 h-3" />
+                                  Pelo menos 8 caracteres
+                                </div>
+                              )}
+                              {!passwordRequirements.uppercase && (
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <X className="w-3 h-3" />
+                                  Uma letra maiúscula
+                                </div>
+                              )}
+                              {!passwordRequirements.lowercase && (
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <X className="w-3 h-3" />
+                                  Uma letra minúscula
+                                </div>
+                              )}
+                              {!passwordRequirements.number && (
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <X className="w-3 h-3" />
+                                  Um número
+                                </div>
+                              )}
+                              {!passwordRequirements.special && (
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <X className="w-3 h-3" />
+                                  Um caractere especial
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
 
-                        <div className="flex gap-2">
-                          <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(3)}>
-                            Voltar
-                          </Button>
-                          <Button 
-                            type="button" 
-                            className="w-full" 
-                            onClick={() => {
-                              if (Object.values(passwordRequirements).every(Boolean)) setCurrentStep(5);
-                              else setError('A senha não atende aos requisitos de segurança');
-                            }}
-                            disabled={!Object.values(passwordRequirements).every(Boolean)}
-                          >
-                            Continuar
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Step 6: Confirm Password & Terms */}
-                    {currentStep === 5 && (
-                      <div className="space-y-4">
                         <div>
                           <label htmlFor="confirmPassword" className="text-sm font-medium mb-2 block">Confirmar senha</label>
                           <div className="relative">
@@ -618,6 +674,9 @@ const Auth = () => {
                               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                           </div>
+                          {passwordMismatch && (
+                            <p className="text-xs mt-1 text-white">As senhas não coincidem</p>
+                          )}
                         </div>
 
                         <div className="flex items-start space-x-2 p-3 rounded-lg border border-primary/20 bg-primary/5">
@@ -643,13 +702,13 @@ const Auth = () => {
                         </div>
 
                         <div className="flex gap-2">
-                          <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(4)}>
+                          <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(3)}>
                             Voltar
                           </Button>
                           <Button 
                             type="submit" 
                             className="w-full" 
-                            disabled={loading || !acceptedTerms || formData.password !== formData.confirmPassword}
+                            disabled={loading || !acceptedTerms || passwordMismatch || !Object.values(passwordRequirements).every(Boolean)}
                           >
                             {loading ? 'Cadastrando...' : 'Criar conta'}
                           </Button>
@@ -716,8 +775,8 @@ const Auth = () => {
                 )}
 
                 {error && (
-                  <Alert variant="destructive" role="alert" aria-live="polite">
-                    <AlertDescription>{error}</AlertDescription>
+                  <Alert variant="destructive" role="alert" aria-live="polite" className="bg-destructive/10 border-destructive text-white">
+                    <AlertDescription className="text-white">{error}</AlertDescription>
                   </Alert>
                 )}
 
@@ -752,26 +811,11 @@ const Auth = () => {
                     </div>
                   </div>
                 )}
-
-                <Button 
-                  type="submit" 
-                  className="w-full shadow-success min-h-[44px]"
-                  disabled={loading}
-                  aria-label={isLogin ? "Entrar na sua conta" : "Criar nova conta"}
-                >
-                  {loading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  ) : (
-                    <>
-                      {isLogin ? <LogIn className="w-4 h-4 mr-2" /> : <UserPlus className="w-4 h-4 mr-2" />}
-                      {isLogin ? 'Entrar' : 'Criar conta'}
-                    </>
-                  )}
-                </Button>
               </form>
 
-              {/* Social Login Buttons */}
-              <div className="space-y-3">
+              {/* Social Login Buttons - only show on login or first step of registration */}
+              {(isLogin || (!isLogin && currentStep === 0)) && (
+                <div className="space-y-3">
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t border-border" />
@@ -864,7 +908,8 @@ const Auth = () => {
                   </svg>
                   Entrar com Twitch
                 </Button>
-              </div>
+                </div>
+              )}
 
               {/* Toggle Login/Register */}
               <div className="text-center">
