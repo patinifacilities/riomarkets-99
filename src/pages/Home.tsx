@@ -255,7 +255,6 @@ const Home = () => {
         <div className="flex flex-col gap-6">
           {/* Topic Filters - Infinite Loop Side Scroller */}
           <div>
-            <h3 className="text-lg font-bold mb-4 text-foreground">Filtro</h3>
             <div className="relative overflow-visible py-4">
               {/* Fade overlays */}
               <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none"></div>

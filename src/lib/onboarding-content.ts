@@ -38,7 +38,7 @@ export const ONBOARDING_STEPS: OnboardingStepContent[] = [
     id: 3,
     title: 'Fast Markets: Pools de 60 segundos',
     description: 'Opine se ativos cripto, commodities, forex ou ações vão subir ou descer em <span style="color: white; font-weight: 600;">60 segundos</span>. Odds dinâmicas e resultados instantâneos.',
-    tip: 'Perfeito para quem busca ação rápida e decisões ágeis.',
+    tip: '<span style="color: white;">Perfeito para quem busca ação rápida e decisões ágeis.</span>',
     icon: Zap,
   },
   {
