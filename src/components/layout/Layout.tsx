@@ -18,7 +18,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const isMobile = useIsMobile();
   
   const isAuthPage = location.pathname === '/auth';
+  const isFastPage = location.pathname === '/fast';
   const shouldHideHeaderFooter = isAuthPage; // Hide on Auth page for both mobile and desktop
+  const shouldHideFooter = shouldHideHeaderFooter || isFastPage; // Hide footer on Fast page too
 
   // Initialize onboarding after hydration
   useEffect(() => {
@@ -65,7 +67,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <main className="flex-1 min-h-0">
         {children}
       </main>
-      {!shouldHideHeaderFooter && <Footer />}
+      {!shouldHideFooter && <Footer />}
       {!shouldHideHeaderFooter && <ComplianceBanner variant="sticky" />}
       {!shouldHideHeaderFooter && <OnboardingModal />}
       {!shouldHideHeaderFooter && <RianaChat />}
