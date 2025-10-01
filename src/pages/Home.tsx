@@ -3,6 +3,7 @@ import { Filter, LogIn, UserPlus, BarChart3, Zap, Target, Shield, Sparkles, X, L
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import MarketCardKalshi from '@/components/markets/MarketCardKalshi';
 import hotFire from '@/assets/hot-fire.png';
 import { FilterChips } from '@/components/ui/filter-chips';
@@ -18,6 +19,7 @@ import { OnboardingTrigger } from '@/components/onboarding/OnboardingTrigger';
 import { track } from '@/lib/analytics';
 import { Search, TrendingUp } from 'lucide-react';
 import rioLogo from '@/assets/rio-white-logo-new.png';
+import { cn } from '@/lib/utils';
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -28,7 +30,7 @@ const Home = () => {
   const [selectedStatus, setSelectedStatus] = useState<string[]>(['active']);
   const location = useLocation();
   const navigate = useNavigate();
-
+  
   // Topic filters with modern Lucide icons
   const topicFilters = [
     { id: 'politics', label: 'Política', value: 'politica', Icon: Landmark },
@@ -173,8 +175,9 @@ const Home = () => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/3 rounded-full blur-3xl animate-pulse-gentle" />
       </div>
       
+      <div className="relative z-10">
       {/* Hero Section - Trading Aligned */}
-      <section className="relative min-h-[42vh] md:min-h-[52vh] flex flex-col items-center justify-center bg-[color:var(--bg-app)] z-10">
+      <section className="relative min-h-[42vh] md:min-h-[52vh] flex flex-col items-center justify-center bg-[color:var(--bg-app)]">
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
           
           <div className="text-center mb-6 md:mb-8">
@@ -268,15 +271,14 @@ const Home = () => {
                       <button
                         key={topic.id}
                         onClick={() => handleTopicSelect(topic.id)}
-                        className={`
-                          flex items-center gap-4 px-10 py-7 rounded-2xl text-lg font-bold whitespace-nowrap
-                          transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg
-                          animate-fade-in animate-rainbow-border
-                          ${isSelected 
+                        className={cn(
+                          "flex items-center gap-4 px-10 py-7 rounded-2xl text-lg font-bold whitespace-nowrap",
+                          "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg",
+                          "animate-fade-in animate-rainbow-border",
+                          isSelected 
                             ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50' 
                             : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm animate-subtle-glow'
-                          }
-                        `}
+                        )}
                       >
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 hover:rotate-12 hover:scale-110 ${
                           isSelected ? 'bg-primary-foreground/20' : 'bg-primary/10'
@@ -304,15 +306,14 @@ const Home = () => {
                       <button
                         key={`${topic.id}-duplicate`}
                         onClick={() => handleTopicSelect(topic.id)}
-                        className={`
-                          flex items-center gap-4 px-10 py-7 rounded-2xl text-lg font-bold whitespace-nowrap
-                          transition-all duration-300 hover:scale-110 hover:-translate-y-1 border-2 shadow-lg
-                          animate-fade-in
-                          ${isSelected 
+                        className={cn(
+                          "flex items-center gap-4 px-10 py-7 rounded-2xl text-lg font-bold whitespace-nowrap",
+                          "transition-all duration-300 hover:scale-110 hover:-translate-y-1 border-2 shadow-lg",
+                          "animate-fade-in",
+                          isSelected 
                             ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50' 
                             : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm'
-                          }
-                        `}
+                        )}
                       >
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 hover:rotate-12 hover:scale-110 ${
                           isSelected ? 'bg-primary-foreground/20' : 'bg-primary/10'
@@ -338,43 +339,51 @@ const Home = () => {
           </div>
 
         </div>
-
-        {/* Search Bar - Below Status Filters */}
-        <div className="mt-4">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Buscar mercados..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-10 bg-background/80 border-border/50 text-foreground placeholder:text-muted-foreground rounded-xl shadow-sm focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-        </div>
-
-      </div>
-
-      {/* Markets Grid */}
-      <div id="markets-section" className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-[color:var(--text-primary)] flex items-center gap-2">
-              <TrendingUp className="w-6 h-6 text-[#00FF91]" />
-              Markets
-            </h2>
+        
+        {/* Filter Controls */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-3 flex-wrap w-full">
+            <h2 className="text-2xl font-bold text-foreground">Markets</h2>
             
-            {/* Status Filters */}
+            {/* Search Bar - Between Markets and Status Filter */}
+            <div className="flex-1 max-w-md">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  placeholder="Buscar mercados..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 h-10 bg-background/80 border-border/50 text-foreground placeholder:text-muted-foreground rounded-xl shadow-sm focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+            </div>
+            
+            {/* Status Filter */}
             <FilterChips
               chips={statusFilters}
               selectedChips={selectedStatus}
               onChipSelect={handleStatusSelect}
               onRemoveChip={handleRemoveStatus}
-              chipClassName="px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200"
-              className="flex flex-wrap gap-2"
+              className="flex-shrink-0"
+              chipClassName="px-2.5 py-1 text-xs"
             />
           </div>
+
+          {/* Sort Dropdown */}
+          <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="recent">Mais recentes</SelectItem>
+              <SelectItem value="volume">Maior volume</SelectItem>
+              <SelectItem value="trending">Tendência</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
+        {/* Markets Grid */}
+        <div id="markets-section">
         {isLoading ? (
           <MarketGridSkeleton />
         ) : sortedAndFilteredMarkets.length === 0 ? (
@@ -431,8 +440,7 @@ const Home = () => {
               })}
           </div>
         )}
-      </div>
-      
+        </div>
         
         {/* FAQ Section */}
         <FAQ />
@@ -440,10 +448,9 @@ const Home = () => {
         {/* Inline Compliance Banner */}
         <ComplianceBanner variant="inline" />
         
-        {/* Compliance Banner - Inline variant */}
-        <ComplianceBanner variant="inline" />
-      
-      <div className="pb-[env(safe-area-inset-bottom)]" />
+        <div className="pb-[env(safe-area-inset-bottom)]" />
+      </div>
+      </div>
     </div>
   );
 };

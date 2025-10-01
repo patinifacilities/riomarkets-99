@@ -112,21 +112,20 @@ export const FastPoolExpandedModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
         className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border-border"
-        hideCloseButton={true}
+        hideCloseButton={false}
       >
-        <div className="flex items-center justify-between mb-6">
-          <DialogTitle className="text-2xl font-bold">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold mb-2">
             {pool.asset_name}
           </DialogTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onClose()}
-            className="h-12 w-12"
-          >
-            <X className="h-8 w-8" />
-          </Button>
-        </div>
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">{pool.question}</p>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Preço atual:</span>
+              <span className="font-semibold text-primary">${pool.opening_price.toLocaleString()}</span>
+            </div>
+          </div>
+        </DialogHeader>
 
         <div className="space-y-6 py-4">
           {/* Countdown */}
@@ -247,7 +246,7 @@ export const FastPoolExpandedModal = ({
             >
               <div className="flex flex-col items-center gap-2">
                 <ArrowUp className="w-8 h-8" />
-                <span>VAI SUBIR</span>
+                <span>SUBIR</span>
               </div>
             </Button>
 
@@ -266,7 +265,7 @@ export const FastPoolExpandedModal = ({
             >
               <div className="flex flex-col items-center gap-2">
                 <ArrowDown className="w-8 h-8" />
-                <span>VAI DESCER</span>
+                <span>DESCER</span>
               </div>
             </Button>
           </div>

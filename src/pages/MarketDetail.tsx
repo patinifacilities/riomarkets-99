@@ -232,13 +232,13 @@ const MarketDetail = () => {
                       />
                     
                     {selectedOption && (
-                      <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">
-                        <div className="text-sm text-muted-foreground mb-2">Opção selecionada:</div>
-                        <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
-                        <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
-                        <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
-                        <div className="text-lg font-bold text-success bg-success/10 px-2 py-1 rounded">Lucro estimado: +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz</div>
-                      </div>
+                     <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">
+                       <div className="text-sm text-muted-foreground mb-2">Opção selecionada:</div>
+                       <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
+                       <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
+                       <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
+                       <div className="text-lg font-bold text-success bg-gradient-to-r from-yellow-400/20 via-yellow-500/30 to-yellow-400/20 px-2 py-1 rounded animate-golden-fade">Lucro estimado: +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz</div>
+                     </div>
                     )}
                     
                      {(userProfile?.saldo_moeda || 0) === 0 ? (
@@ -255,7 +255,10 @@ const MarketDetail = () => {
                            size="sm"
                            aria-label="Opinar Sim"
                          >
-                           Opinar Sim
+                           <div className="flex items-center justify-between w-full">
+                             <span>Opinar Sim</span>
+                             <span className="text-xs opacity-80">{(market.odds?.sim || 1.5).toFixed(2)}x</span>
+                           </div>
                          </Button>
                          <Button 
                            onClick={() => setSelectedOption('nao')}
@@ -264,7 +267,10 @@ const MarketDetail = () => {
                            size="sm"
                            aria-label="Opinar Não"
                          >
-                           Opinar Não
+                           <div className="flex items-center justify-between w-full">
+                             <span>Opinar Não</span>
+                             <span className="text-xs opacity-80">{(market.odds?.não || market.odds?.nao || 1.5).toFixed(2)}x</span>
+                           </div>
                          </Button>
                        </div>
                      )}
@@ -398,7 +404,7 @@ const MarketDetail = () => {
                   }
                 };
                 
-                return (
+                 return (
                   <Card 
                     key={opcao}
                     className={`cursor-pointer transition-all duration-200 hover:shadow-lg hover:ring-1 ${
@@ -410,7 +416,10 @@ const MarketDetail = () => {
                            ? 'hover:ring-[#ff2389] hover:shadow-danger hover:border-[#ff2389]'
                            : 'hover:ring-[#00ff90] hover:shadow-success hover:border-[#00ff90]')
                     }`}
-                    onClick={() => setSelectedOption(opcao)}
+                    onClick={() => {
+                      setSelectedOption(opcao);
+                      scrollToWallet();
+                    }}
                   >
                     <CardContent className="p-6 text-center">
                       <div className={`text-2xl font-bold mb-2 ${getColorClass()}`}>
@@ -510,15 +519,15 @@ const MarketDetail = () => {
                       estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
                     />
                   
-                  {selectedOption && (
-                    <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">
-                      <div className="text-sm text-muted-foreground mb-2">Opção selecionada:</div>
-                      <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
-                      <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
-                      <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
-                      <div className="text-lg font-bold text-success bg-success/10 px-2 py-1 rounded">Lucro estimado: +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz</div>
-                    </div>
-                  )}
+                   {selectedOption && (
+                     <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">
+                       <div className="text-sm text-muted-foreground mb-2">Opção selecionada:</div>
+                       <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
+                       <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
+                       <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
+                       <div className="text-lg font-bold text-success bg-gradient-to-r from-yellow-400/20 via-yellow-500/30 to-yellow-400/20 px-2 py-1 rounded animate-golden-fade">Lucro estimado: +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz</div>
+                     </div>
+                   )}
                   
                    {(userProfile?.saldo_moeda || 0) === 0 ? (
                      <div className="p-4 bg-warning/10 border border-warning rounded-lg text-center">
@@ -535,7 +544,10 @@ const MarketDetail = () => {
                            size="sm"
                            aria-label="Opinar Sim"
                          >
-                           Opinar Sim
+                           <div className="flex items-center justify-between w-full">
+                             <span>Opinar Sim</span>
+                             <span className="text-xs opacity-80">{(market.odds?.sim || 1.5).toFixed(2)}x</span>
+                           </div>
                          </Button>
                          <Button 
                            onClick={() => setSelectedOption('nao')}
@@ -544,7 +556,10 @@ const MarketDetail = () => {
                            size="sm"
                            aria-label="Opinar Não"
                          >
-                           Opinar Não
+                           <div className="flex items-center justify-between w-full">
+                             <span>Opinar Não</span>
+                             <span className="text-xs opacity-80">{(market.odds?.não || market.odds?.nao || 1.5).toFixed(2)}x</span>
+                           </div>
                          </Button>
                        </div>
                        

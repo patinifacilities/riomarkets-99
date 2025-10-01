@@ -375,6 +375,22 @@
   animation-iteration-count: 20;
 }
 
+@keyframes golden-fade {
+  0%, 100% { 
+    background-position: 0% 50%;
+    box-shadow: 0 0 10px rgba(234, 179, 8, 0.2);
+  }
+  50% { 
+    background-position: 100% 50%;
+    box-shadow: 0 0 20px rgba(234, 179, 8, 0.4);
+  }
+}
+
+.animate-golden-fade {
+  background-size: 200% 100%;
+  animation: golden-fade 3s ease-in-out infinite;
+}
+
 /* Custom styles for skeleton loading */
 @keyframes pulse {
   0%, 100% {

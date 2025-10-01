@@ -41,17 +41,17 @@ export const OpenOpinionsCardDetail: React.FC<OpenOpinionsCardDetailProps> = ({
   const { toast } = useToast();
 
   const fetchOpenOrders = async () => {
-    if (!user || !marketId) {
+    if (!user) {
       setLoading(false);
       return;
     }
 
     try {
+      // Fetch all open orders for the user, not just for this market
       const { data, error } = await supabase
         .from('orders')
         .select('*')
         .eq('user_id', user.id)
-        .eq('market_id', marketId)
         .eq('status', 'ativa')
         .order('created_at', { ascending: false });
 
@@ -81,7 +81,7 @@ export const OpenOpinionsCardDetail: React.FC<OpenOpinionsCardDetailProps> = ({
     return () => {
       window.removeEventListener('refreshOpenOpinions', handleRefresh);
     };
-  }, [user, marketId]);
+  }, [user]);
 
   const handleCancelOrder = async (orderId: string, orderAmount: number) => {
     if (!user) return;
