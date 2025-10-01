@@ -131,18 +131,13 @@ export const UserEditModal = ({ user, open, onOpenChange, onSuccess }: UserEditM
   const handleDeleteUser = async () => {
     setIsLoading(true);
     try {
-      // First soft delete the auth user (Supabase will handle cascade)
-      const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
+      // Soft delete by marking the user as deleted
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ is_blocked: true })
+        .eq('id', user.id);
       
-      if (authError) {
-        // Fallback: delete from profiles table
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .delete()
-          .eq('id', user.id);
-        
-        if (profileError) throw profileError;
-      }
+      if (profileError) throw profileError;
 
       // Log admin action
       await logAdminAction('user_deletion', {
@@ -151,8 +146,8 @@ export const UserEditModal = ({ user, open, onOpenChange, onSuccess }: UserEditM
       });
 
       toast({
-        title: 'Usuário excluído com sucesso',
-        description: `O usuário ${user.nome} foi removido do sistema`,
+        title: 'Usuário bloqueado com sucesso',
+        description: `O usuário ${user.nome} foi marcado como bloqueado`,
       });
 
       onSuccess?.();
@@ -160,7 +155,7 @@ export const UserEditModal = ({ user, open, onOpenChange, onSuccess }: UserEditM
       console.error('Error deleting user:', error);
       toast({
         title: 'Erro',
-        description: 'Falha ao excluir usuário',
+        description: 'Falha ao bloquear usuário',
         variant: 'destructive',
       });
     } finally {

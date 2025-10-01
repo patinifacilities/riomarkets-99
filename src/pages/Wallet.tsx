@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Wallet, DollarSign } from 'lucide-react';
@@ -7,7 +8,6 @@ import { useProfile } from '@/hooks/useProfile';
 import { useWalletTransactions, useUserOrders } from '@/hooks/useWallet';
 import { useExchangeStore } from '@/stores/useExchangeStore';
 import { AddBrlModal } from '@/components/exchange/AddBrlModal';
-import { WithdrawModal } from '@/components/wallet/WithdrawModal';
 import { CancelBetModal } from '@/components/wallet/CancelBetModal';
 import { OrderHistoryCard } from '@/components/wallet/OrderHistoryCard';
 import { ExpandableRiozCard } from '@/components/wallet/ExpandableRiozCard';
@@ -17,12 +17,12 @@ import { RecentWinsCard } from '@/components/wallet/RecentWinsCard';
 
 const WalletPage = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { data: transactions, refetch: refetchTransactions } = useWalletTransactions(user?.id);
   const { data: orders } = useUserOrders(user?.id);
   const { balance, fetchBalance } = useExchangeStore();
   const [showDepositModal, setShowDepositModal] = useState(false);
-  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showCancelBetModal, setShowCancelBetModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
@@ -34,12 +34,12 @@ const WalletPage = () => {
 
   useEffect(() => {
     // Refresh data when modals close
-    if (!showDepositModal && !showWithdrawModal && user) {
+    if (!showDepositModal && user) {
       refetchProfile();
       refetchTransactions();
       fetchBalance();
     }
-  }, [showDepositModal, showWithdrawModal, user, refetchProfile, refetchTransactions, fetchBalance]);
+  }, [showDepositModal, user, refetchProfile, refetchTransactions, fetchBalance]);
 
   // Calculate totals - Use profile balance as primary source
   const currentBalance = profile?.saldo_moeda || 0;
@@ -77,7 +77,7 @@ const WalletPage = () => {
           </div>
           
           <Button
-            onClick={() => setShowWithdrawModal(true)}
+            onClick={() => navigate('/withdraw')}
             variant="default"
             size="sm"
             className="gap-2"
@@ -126,17 +126,6 @@ const WalletPage = () => {
           onOpenChange={setShowDepositModal}
           onSuccess={() => {
             setShowDepositModal(false);
-            refetchProfile();
-            refetchTransactions();
-            fetchBalance();
-          }}
-        />
-
-        <WithdrawModal
-          open={showWithdrawModal}
-          onOpenChange={setShowWithdrawModal}
-          onSuccess={() => {
-            setShowWithdrawModal(false);
             refetchProfile();
             refetchTransactions();
             fetchBalance();

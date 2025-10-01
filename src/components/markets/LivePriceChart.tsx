@@ -112,7 +112,7 @@ export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) 
       <CardContent>
         <div className="relative w-full h-64 bg-gradient-to-br from-muted/40 via-muted/30 to-muted/20 rounded-lg overflow-hidden border border-border/50">
           {priceData.length > 1 && (
-            <svg className="w-full h-full">
+            <svg className="w-full h-full" viewBox="0 0 800 256" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="priceGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                   <stop offset="0%" className={priceChange >= 0 ? 'text-[#00ff90]' : 'text-[#ff2389]'} stopColor="currentColor" stopOpacity="0.3" />
@@ -123,13 +123,13 @@ export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) 
               {/* Area under the line */}
               <path
                 d={`
-                  M 0 ${256}
+                  M 0 256
                   ${priceData.map((point, index) => {
-                    const x = (index / (priceData.length - 1)) * 100;
+                    const x = (index / (priceData.length - 1)) * 800;
                     const y = 256 - ((point.price - minPrice) / priceRange) * 240;
-                    return `L ${x}% ${y}`;
+                    return `L ${x} ${y}`;
                   }).join(' ')}
-                  L 100% ${256}
+                  L 800 256
                   Z
                 `}
                 fill="url(#priceGradient)"
@@ -138,9 +138,9 @@ export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) 
               {/* Price line */}
               <path
                 d={priceData.map((point, index) => {
-                  const x = (index / (priceData.length - 1)) * 100;
+                  const x = (index / (priceData.length - 1)) * 800;
                   const y = 256 - ((point.price - minPrice) / priceRange) * 240;
-                  return `${index === 0 ? 'M' : 'L'} ${x}% ${y}`;
+                  return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
                 }).join(' ')}
                 fill="none"
                 stroke={priceChange >= 0 ? '#00ff90' : '#ff2389'}
@@ -153,14 +153,14 @@ export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) 
               {priceData.length > 0 && (
                 <>
                   <circle
-                    cx="100%"
+                    cx="800"
                     cy={256 - ((priceData[priceData.length - 1].price - minPrice) / priceRange) * 240}
                     r="6"
                     fill={priceChange >= 0 ? '#00ff90' : '#ff2389'}
                     className="animate-pulse"
                   />
                   <circle
-                    cx="100%"
+                    cx="800"
                     cy={256 - ((priceData[priceData.length - 1].price - minPrice) / priceRange) * 240}
                     r="10"
                     fill={priceChange >= 0 ? '#00ff90' : '#ff2389'}

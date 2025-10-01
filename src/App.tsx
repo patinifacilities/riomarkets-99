@@ -5,6 +5,7 @@ import Home from '@/pages/Home';
 import Auth from '@/pages/Auth';
 import ProfilePage from '@/pages/Profile';
 import WalletPage from '@/pages/Wallet';
+import Withdraw from '@/pages/Withdraw';
 import Exchange from '@/pages/Exchange';
 import Fast from '@/pages/Fast';
 import CardPayment from '@/pages/CardPayment';
@@ -57,6 +58,7 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/withdraw" element={<Withdraw />} />
           <Route path="/fast" element={<Fast />} />
           <Route path="/exchange" element={<Exchange />} />
           <Route path="/card-payment" element={<CardPayment />} />
