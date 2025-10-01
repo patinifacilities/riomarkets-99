@@ -25,15 +25,16 @@ export const useProfile = (userId?: string) => {
   useEffect(() => {
     if (!userId) return;
 
-    // Handle manual refresh events
+    // Handle manual refresh events - instant update
     const handleForceRefresh = () => {
+      console.log('🔄 Force refresh triggered for profile:', userId);
       queryClient.invalidateQueries({ queryKey: ['profile', userId] });
       queryClient.refetchQueries({ queryKey: ['profile', userId] });
     };
 
     window.addEventListener('forceProfileRefresh', handleForceRefresh);
     
-    // Subscribe to realtime updates for this user's profile
+    // Subscribe to realtime updates for this user's profile - instant update
     const channel = supabase
       .channel(`profile-${userId}`)
       .on(
@@ -44,8 +45,9 @@ export const useProfile = (userId?: string) => {
           table: 'profiles',
           filter: `id=eq.${userId}`
         },
-        () => {
-          // Invalidate and refetch when profile is updated
+        (payload) => {
+          console.log('💰 Profile balance updated via realtime:', payload);
+          // Instant invalidate and refetch when profile is updated
           queryClient.invalidateQueries({ queryKey: ['profile', userId] });
           queryClient.refetchQueries({ queryKey: ['profile', userId] });
         }

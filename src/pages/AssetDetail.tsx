@@ -164,18 +164,60 @@ const AssetDetail = () => {
     return () => clearInterval(timer);
   }, [currentPool?.id]); // Only re-run when pool ID changes
 
-  const getOdds = () => {
-    const timeElapsed = 60 - countdown;
+  // Load algorithm config for dynamic odds calculation
+  const [algorithmConfig, setAlgorithmConfig] = useState({
+    pool_duration_seconds: 60,
+    lockout_time_seconds: 15,
+    odds_start: 1.80,
+    odds_end: 1.10
+  });
+
+  useEffect(() => {
+    const loadAlgorithmConfig = async () => {
+      try {
+        const { data } = await supabase
+          .from('fast_pool_algorithm_config')
+          .select('pool_duration_seconds, lockout_time_seconds, odds_start, odds_end')
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        if (data) {
+          setAlgorithmConfig({
+            pool_duration_seconds: data.pool_duration_seconds,
+            lockout_time_seconds: data.lockout_time_seconds,
+            odds_start: Number(data.odds_start),
+            odds_end: Number(data.odds_end)
+          });
+        }
+      } catch (error) {
+        console.error('Error loading algorithm config:', error);
+      }
+    };
     
-    if (timeElapsed <= 28) {
-      const progress = timeElapsed / 28;
-      return Math.max(1.20, 1.80 - (progress * 0.60));
-    } else if (timeElapsed <= 50) {
-      const progress = (timeElapsed - 28) / 22;
-      return Math.max(1.10, 1.20 - (progress * 0.10));
-    } else {
-      return 1.10;
+    loadAlgorithmConfig();
+  }, []);
+
+  const getOdds = () => {
+    const duration = algorithmConfig.pool_duration_seconds;
+    const lockout = algorithmConfig.lockout_time_seconds;
+    const oddsStart = algorithmConfig.odds_start;
+    const oddsEnd = algorithmConfig.odds_end;
+    
+    const timeElapsed = duration - countdown;
+    const effectiveTime = duration - lockout; // Time before lockout
+    
+    if (timeElapsed >= effectiveTime) {
+      // During lockout period
+      return oddsEnd;
     }
+    
+    // Calculate progress through the effective time
+    const progress = timeElapsed / effectiveTime;
+    const oddsDiff = oddsStart - oddsEnd;
+    
+    // Linear decrease from start to end odds
+    return Math.max(oddsEnd, oddsStart - (progress * oddsDiff));
   };
 
   const handleBet = async (side: 'subiu' | 'desceu') => {
@@ -315,10 +357,19 @@ const AssetDetail = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 relative">
       {/* Soft Loading Overlay */}
       {softLoading && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-[#ff2389] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-lg font-semibold">Carregando próximo pool...</p>
+        <div className="fixed inset-0 z-50 bg-background/90 backdrop-blur-md flex items-center justify-center">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#ff2389]/20 to-[#00ff90]/20 rounded-full blur-xl animate-pulse"></div>
+            <div className="relative bg-card border-2 border-primary/30 rounded-2xl p-8 shadow-2xl">
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative">
+                  <div className="w-20 h-20 border-4 border-primary/20 rounded-full"></div>
+                  <div className="absolute inset-0 w-20 h-20 border-4 border-[#ff2389] border-t-transparent rounded-full animate-spin"></div>
+                </div>
+                <p className="text-lg font-bold text-foreground">Carregando próximo pool...</p>
+                <p className="text-sm text-muted-foreground">Aguarde um momento</p>
+              </div>
+            </div>
           </div>
         </div>
       )}

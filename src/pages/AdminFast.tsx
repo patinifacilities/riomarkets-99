@@ -240,10 +240,44 @@ const AdminFast = () => {
 
   const handleTogglePause = async (pool: FastPool) => {
     try {
+      const isPausing = !pool.paused;
+      
+      // If pausing, refund users first
+      if (isPausing) {
+        toast({
+          title: "Processando...",
+          description: "Reembolsando opiniões ativas...",
+        });
+
+        const { data: refundData, error: refundError } = await supabase.functions.invoke(
+          'refund-paused-pool-bets',
+          {
+            body: { assetSymbol: pool.asset_symbol }
+          }
+        );
+
+        if (refundError) {
+          console.error('Error refunding bets:', refundError);
+          toast({
+            title: "Aviso",
+            description: "Pool pausado, mas houve erro ao processar reembolsos",
+            variant: "destructive"
+          });
+        } else {
+          console.log('Refund result:', refundData);
+          if (refundData?.refundedBets > 0) {
+            toast({
+              title: "Reembolsos processados",
+              description: `${refundData.refundedBets} opiniões foram reembolsadas`,
+            });
+          }
+        }
+      }
+      
       // Update the config in fast_pool_configs
       const { error: configError } = await supabase
         .from('fast_pool_configs')
-        .update({ paused: !pool.paused })
+        .update({ paused: isPausing })
         .eq('asset_symbol', pool.asset_symbol);
       
       if (configError) throw configError;
@@ -251,15 +285,15 @@ const AdminFast = () => {
       // Also update all active rounds in fast_pools
       const { error: poolsError } = await supabase
         .from('fast_pools')
-        .update({ paused: !pool.paused })
+        .update({ paused: isPausing })
         .eq('asset_symbol', pool.asset_symbol)
         .eq('status', 'active');
       
       if (poolsError) throw poolsError;
       
       toast({
-        title: pool.paused ? "Pool retomado" : "Pool pausado",
-        description: `${pool.asset_name} foi ${pool.paused ? 'retomado' : 'pausado'}`,
+        title: isPausing ? "Pool pausado" : "Pool retomado",
+        description: `${pool.asset_name} foi ${isPausing ? 'pausado' : 'retomado'}`,
       });
       
       fetchGeneralPoolConfigs();
