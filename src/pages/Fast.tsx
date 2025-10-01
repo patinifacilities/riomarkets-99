@@ -793,11 +793,7 @@ const Fast = () => {
                 <CardHeader 
                   className="relative z-10 text-center pb-3 cursor-pointer"
                   onClick={() => {
-                    if (!user) {
-                      navigate('/auth');
-                    } else {
-                      navigate(`/asset/${pool.asset_symbol}`);
-                    }
+                    navigate(`/asset/${pool.asset_symbol}`);
                   }}
                 >
                    <div className="flex items-center justify-between mb-2">
@@ -984,6 +980,18 @@ const Fast = () => {
                      </div>
                    )}
                   
+                  {!user && (
+                    <div className="absolute inset-0 top-10 bg-black/60 backdrop-blur-md rounded-lg flex items-center justify-center">
+                      <div className="text-center">
+                        <p className="text-white text-sm font-medium mb-3">Login necessário</p>
+                        <Link to="/auth">
+                          <Button size="sm" className="bg-[#00ff90] text-black hover:bg-[#00ff90]/90 font-semibold">
+                            Fazer Login
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
@@ -1098,6 +1106,25 @@ const Fast = () => {
           </Card>
         </div>
         
+        {!user && (
+          <div className="max-w-4xl mx-auto mt-8">
+            <Card className="border-orange-200 bg-orange-50 dark:bg-orange-900/20 dark:border-orange-800">
+              <CardContent className="p-6 text-center">
+                <h3 className="text-lg font-semibold text-orange-800 dark:text-orange-200 mb-2">
+                  Login Necessário para Opinar
+                </h3>
+                <p className="text-orange-600 dark:text-orange-300 mb-4">
+                  Você pode visualizar os Fast Markets, mas precisa estar logado para enviar suas opiniões e participar dos pools.
+                </p>
+                <Link to="/auth">
+                  <Button className="bg-orange-600 hover:bg-orange-700 text-white">
+                    Fazer Login
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        )}
         
         {/* Terms Button at Bottom */}
         <div className="max-w-4xl mx-auto mt-8 text-center">
