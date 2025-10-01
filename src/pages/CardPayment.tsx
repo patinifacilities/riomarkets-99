@@ -20,6 +20,7 @@ const CardPayment = () => {
     name: '',
     expiry: '',
     cvv: '',
+    cpf: '',
   });
   
   const [saveCard, setSaveCard] = useState(false);
@@ -37,13 +38,33 @@ const CardPayment = () => {
     return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}`;
   };
 
+  const formatCPF = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 11) {
+      return numbers
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    }
+    return value;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!cardData.number || !cardData.name || !cardData.expiry || !cardData.cvv) {
+    if (!cardData.number || !cardData.name || !cardData.expiry || !cardData.cvv || !cardData.cpf) {
       toast({
         title: "Campos obrigatórios",
         description: "Por favor, preencha todos os campos do cartão.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (cardData.cpf.replace(/\D/g, '').length !== 11) {
+      toast({
+        title: "CPF inválido",
+        description: "Por favor, insira um CPF válido.",
         variant: "destructive",
       });
       return;
@@ -58,8 +79,15 @@ const CardPayment = () => {
       toast({
         title: "Pagamento processado!",
         description: `Depósito de R$ ${amount} realizado com sucesso.`,
-        className: "bg-success text-success-foreground",
+        className: "bg-[#00ff90] text-gray-800 border-0",
       });
+
+      if (saveCard) {
+        toast({
+          title: "Cartão salvo",
+          description: "Seus dados foram salvos para futuros pagamentos.",
+        });
+      }
       
       navigate('/wallet');
     } catch (error) {
@@ -195,6 +223,23 @@ const CardPayment = () => {
                   </div>
                 </div>
 
+                <div>
+                  <Label htmlFor="cpf">CPF do titular</Label>
+                  <Input
+                    id="cpf"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="000.000.000-00"
+                    value={cardData.cpf}
+                    onChange={(e) => setCardData(prev => ({ 
+                      ...prev, 
+                      cpf: formatCPF(e.target.value) 
+                    }))}
+                    maxLength={14}
+                    className="mt-1"
+                  />
+                </div>
+
                 <div className="flex items-center space-x-2 pt-4">
                   <Checkbox 
                     id="saveCard" 
@@ -207,7 +252,7 @@ const CardPayment = () => {
                   >
                     <div className="flex items-center gap-2">
                       <Save className="w-4 h-4" />
-                      Salvar cartão para depósitos futuros
+                      Salvar cartão para futuros pagamentos instantâneos
                     </div>
                   </Label>
                 </div>

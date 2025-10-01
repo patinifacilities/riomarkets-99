@@ -86,12 +86,11 @@ export const AddBrlModal = ({ open, onOpenChange, onSuccess }: AddBrlModalProps)
       return;
     }
 
-    if (numericAmount < 500) { // 5.00 in centavos
+    if (numericAmount < 500) { // 5.00 in centavos (R$ 5,00)
       toast({
-        title: "Valor mínimo não atingido",
-        description: "O valor mínimo de depósito é R$ 5,00.",
+        title: "Valor mínimo",
+        description: "O valor mínimo para depósito é R$ 5,00.",
         variant: "destructive",
-        className: "bg-warning/10 border-warning text-warning-foreground",
       });
       return;
     }

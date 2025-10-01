@@ -62,8 +62,8 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
       await navigator.clipboard.writeText(pixCode);
       setCopied(true);
       toast({
-        title: "Código copiado!",
-        description: "Chave PIX copiada com sucesso.",
+        title: "Chave PIX copiada!",
+        description: "Cole no app do seu banco para pagar.",
         className: "bg-[#00ff90] text-gray-800 border-0",
       });
       setTimeout(() => setCopied(false), 2000);
