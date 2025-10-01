@@ -195,6 +195,13 @@ const AdminMarkets = () => {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
+                          {market.icon_url && (
+                            <img 
+                              src={market.icon_url} 
+                              alt={market.titulo} 
+                              className="w-6 h-6 object-contain"
+                            />
+                          )}
                           <h3 className="font-semibold">{market.titulo}</h3>
                           <Badge className={getStatusColor(market.status)}>
                             {market.status}

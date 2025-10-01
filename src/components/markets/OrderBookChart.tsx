@@ -44,13 +44,13 @@ export const OrderBookChart = ({ market }: OrderBookChartProps) => {
   console.log('Market pool options:', marketPool?.options);
   
   const simData = marketPool?.options.find(opt => {
-    const label = opt.label.toLowerCase();
-    return label.includes('sim') || label.includes('yes') || label === 'sim';
+    const label = opt.label.toLowerCase().trim();
+    return label === 'sim' || label === 'yes';
   });
   
   const naoData = marketPool?.options.find(opt => {
-    const label = opt.label.toLowerCase();
-    return label.includes('não') || label.includes('nao') || label.includes('no') || label === 'não' || label === 'nao';
+    const label = opt.label.toLowerCase().trim();
+    return label === 'não' || label === 'nao' || label === 'no';
   });
 
   const simTotal = simData?.pool || 0;

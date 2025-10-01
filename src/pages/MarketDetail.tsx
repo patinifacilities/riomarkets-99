@@ -498,10 +498,12 @@ const MarketDetail = () => {
               }}
             />
 
-            {/* Order Book */}
-            <Card className="bg-card-secondary border-border-secondary rounded-lg">
-              <OrderBookChart market={market} />
-            </Card>
+            {/* Order Book - only show for binary markets */}
+            {market.market_type === 'binary' && (
+              <Card className="bg-card-secondary border-border-secondary rounded-lg">
+                <OrderBookChart market={market} />
+              </Card>
+            )}
           </div>
 
             {/* User Info Panel - Desktop */}
@@ -564,22 +566,34 @@ const MarketDetail = () => {
                        <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
                        <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
                        <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
-                       <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
-                         {/* Gold fill based on slider progress */}
-                         <div 
-                           className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 transition-all duration-100"
-                           style={{
-                             width: `${sliderProgress * 100}%`,
-                           }}
-                         />
-                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-shimmer"></div>
-                         <div className="relative z-10 text-center">
-                           <span className="text-xs font-semibold text-yellow-500/80 tracking-wide">LUCRO ESTIMADO</span>
-                           <div className="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent mt-1">
-                             +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz
-                           </div>
-                         </div>
-                       </div>
+                        <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
+                          {/* Gold fill based on slider progress */}
+                          <div 
+                            className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 transition-all duration-100"
+                            style={{
+                              width: `${sliderProgress * 100}%`,
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-shimmer"></div>
+                          <div className="relative z-10 text-center">
+                            <span 
+                              className="text-xs font-semibold tracking-wide transition-colors duration-300"
+                              style={{
+                                color: sliderProgress > 0.3 ? '#374151' : 'rgba(234, 179, 8, 0.5)'
+                              }}
+                            >
+                              LUCRO ESTIMADO
+                            </span>
+                            <div 
+                              className="text-2xl font-bold mt-1 transition-colors duration-300"
+                              style={{
+                                color: sliderProgress > 0.3 ? '#374151' : '#eab308'
+                              }}
+                            >
+                              +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz
+                            </div>
+                          </div>
+                        </div>
                      </div>
                    )}
                   
