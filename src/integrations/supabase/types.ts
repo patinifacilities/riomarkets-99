@@ -1257,6 +1257,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_rankings: {
+        Row: {
+          accuracy_percent: number
+          best_win_streak: number
+          created_at: string
+          id: string
+          last_bet_at: string | null
+          rank_position: number | null
+          rank_tier: string
+          total_bets: number
+          total_losses: number
+          total_profit: number
+          total_wagered: number
+          total_wins: number
+          updated_at: string
+          user_id: string
+          win_streak: number
+        }
+        Insert: {
+          accuracy_percent?: number
+          best_win_streak?: number
+          created_at?: string
+          id?: string
+          last_bet_at?: string | null
+          rank_position?: number | null
+          rank_tier?: string
+          total_bets?: number
+          total_losses?: number
+          total_profit?: number
+          total_wagered?: number
+          total_wins?: number
+          updated_at?: string
+          user_id: string
+          win_streak?: number
+        }
+        Update: {
+          accuracy_percent?: number
+          best_win_streak?: number
+          created_at?: string
+          id?: string
+          last_bet_at?: string | null
+          rank_position?: number | null
+          rank_tier?: string
+          total_bets?: number
+          total_losses?: number
+          total_profit?: number
+          total_wagered?: number
+          total_wins?: number
+          updated_at?: string
+          user_id?: string
+          win_streak?: number
+        }
+        Relationships: []
+      }
       user_watchlist: {
         Row: {
           created_at: string | null
@@ -1550,6 +1604,10 @@ export type Database = {
       }
       update_market_stats: {
         Args: { target_market_id: string }
+        Returns: undefined
+      }
+      update_rank_positions: {
+        Args: Record<PropertyKey, never>
         Returns: undefined
       }
       update_rate_price: {
