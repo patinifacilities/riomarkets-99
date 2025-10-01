@@ -64,9 +64,10 @@ export function PressCardCompact({ article }: PressCardCompactProps) {
 
   return (
     <>
-      <article className="bg-gradient-to-br from-card via-card to-card/80 rounded-xl border border-border/50 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 group cursor-pointer p-5 relative overflow-hidden" onClick={handleReadMore}>
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-[#ff2389]/[0.02] pointer-events-none" />
+      <article className="bg-gradient-to-br from-card via-card/95 to-card/90 rounded-2xl border-2 border-border/40 hover:border-primary/60 hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500 group cursor-pointer p-6 relative overflow-hidden backdrop-blur-sm" onClick={handleReadMore}>
+        {/* Animated gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.05] via-[#ff2389]/[0.03] to-transparent opacity-70 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(0,255,145,0.1),transparent)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
         
         <div className="flex items-start gap-4 relative z-10">
           {/* Vehicle Logo */}
@@ -116,7 +117,8 @@ export function PressCardCompact({ article }: PressCardCompactProps) {
         </div>
         
         {/* Hover indicator */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-[#ff2389] to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 animate-shimmer" />
+        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full blur-2xl" />
       </article>
 
       {/* Reading Modal */}

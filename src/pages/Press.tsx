@@ -64,24 +64,25 @@ export default function Press() {
   return (
     <>
       <Helmet>
-        <title>Na mídia - Rio Markets</title>
-        <meta name="description" content="Veja o que a imprensa está falando sobre o Rio Markets. Reportagens, artigos e menções em grandes veículos de comunicação." />
-        <meta property="og:title" content="Na mídia - Rio Markets" />
-        <meta property="og:description" content="O que a imprensa está falando sobre o Rio Markets" />
+        <title>Notícias - Rio Markets</title>
+        <meta name="description" content="As últimas notícias e acontecimentos do mundo. Mantenha-se atualizado com as principais informações em tempo real." />
+        <meta property="og:title" content="Notícias - Rio Markets" />
+        <meta property="og:description" content="Notícias e acontecimentos em tempo real" />
         <link rel="canonical" href="https://riomarkets.com/press" />
       </Helmet>
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <header className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-6">
-            <Newspaper className="h-8 w-8 text-primary" />
+        <header className="text-center mb-12 relative">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary/20 via-[#ff2389]/20 to-primary/20 rounded-2xl mb-6 relative overflow-hidden animate-pulse-glow">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-[#ff2389]/10 animate-pulse"></div>
+            <Newspaper className="h-10 w-10 text-primary relative z-10" />
           </div>
           <div className="flex items-center justify-center gap-4 mb-4">
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-              Na mídia
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text">
+              Notícias
             </h1>
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-red-600 rounded-full animate-pulse-glow">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-red-600 to-[#ff2389] rounded-full animate-pulse-glow shadow-lg shadow-red-500/30">
               <div className="w-2 h-2 bg-white rounded-full animate-ping" />
               <span className="text-xs font-bold text-white uppercase tracking-wider">LIVE</span>
             </div>

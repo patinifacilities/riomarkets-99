@@ -123,8 +123,62 @@
     100% { background: linear-gradient(135deg, hsl(155, 100%, 45%) 0%, hsl(328, 100%, 54%) 100%); }
   }
 
+  @keyframes rainbow-1 {
+    0%, 100% { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+    50% { background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%); }
+  }
+
+  @keyframes rainbow-2 {
+    0%, 100% { background: linear-gradient(135deg, #00ff90 0%, #00cc70 100%); }
+    50% { background: linear-gradient(135deg, #00cc70 0%, #00ff90 100%); }
+  }
+
+  @keyframes rainbow-3 {
+    0%, 100% { background: linear-gradient(135deg, #ff2389 0%, #ff5c9a 100%); }
+    50% { background: linear-gradient(135deg, #ff5c9a 0%, #ff2389 100%); }
+  }
+
+  @keyframes rainbow-4 {
+    0%, 100% { background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); }
+    50% { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); }
+  }
+
+  @keyframes rainbow-5 {
+    0%, 100% { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
+    50% { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); }
+  }
+
+  @keyframes rainbow-6 {
+    0%, 100% { background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); }
+    50% { background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%); }
+  }
+
   .animate-rainbow-bg {
     animation: rainbow-bg 4s ease-in-out infinite;
+  }
+
+  .animate-rainbow-1 {
+    animation: rainbow-1 3s ease-in-out infinite;
+  }
+
+  .animate-rainbow-2 {
+    animation: rainbow-2 3.5s ease-in-out infinite;
+  }
+
+  .animate-rainbow-3 {
+    animation: rainbow-3 3.2s ease-in-out infinite;
+  }
+
+  .animate-rainbow-4 {
+    animation: rainbow-4 3.8s ease-in-out infinite;
+  }
+
+  .animate-rainbow-5 {
+    animation: rainbow-5 3.3s ease-in-out infinite;
+  }
+
+  .animate-rainbow-6 {
+    animation: rainbow-6 3.6s ease-in-out infinite;
   }
 
   /* 118 BPM pulse animation (0.508s per beat) */

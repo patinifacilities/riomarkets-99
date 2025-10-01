@@ -413,11 +413,7 @@ const Fast = () => {
     
     if (!user || !currentPools.length) {
       console.log('❌ Blocked: no user or no pools');
-      toast({
-        title: "Erro",
-        description: "Você precisa estar logado e ter pools ativos.",
-        variant: "destructive"
-      });
+      window.location.href = '/auth';
       return;
     }
 
@@ -742,7 +738,10 @@ const Fast = () => {
                 
                 <CardHeader 
                   className="relative z-10 text-center pb-3 cursor-pointer"
-                  onClick={() => setExpandedPool(pool)}
+                  onClick={() => {
+                    if (!user) return;
+                    setExpandedPool(pool);
+                  }}
                 >
                    <div className="flex items-center justify-between mb-2">
                      <div className="flex items-center gap-2">

@@ -263,9 +263,10 @@ const Home = () => {
               <div className="overflow-x-auto scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 <div className="flex gap-4 pb-2 min-w-max animate-infinite-scroll hover:pause">
                   {/* First set of topics */}
-                  {topicFilters.map((topic) => {
+                  {topicFilters.map((topic, index) => {
                     const isSelected = selectedTopics.includes(topic.id);
                     const IconComponent = topic.Icon;
+                    const animationClass = `animate-rainbow-${(index % 6) + 1}`;
                     return (
                       <button
                         key={topic.id}
@@ -283,7 +284,7 @@ const Home = () => {
                           isSelected ? 'bg-primary-foreground/20' : ''
                         }`}>
                           {!isSelected && (
-                            <div className="absolute inset-0 animate-rainbow-bg opacity-40"></div>
+                            <div className={`absolute inset-0 opacity-40 ${animationClass}`}></div>
                           )}
                           <IconComponent className="w-8 h-8 relative z-10" />
                         </div>
@@ -301,9 +302,10 @@ const Home = () => {
                     );
                   })}
                   {/* Duplicate set for infinite loop effect */}
-                  {topicFilters.map((topic) => {
+                  {topicFilters.map((topic, index) => {
                     const isSelected = selectedTopics.includes(topic.id);
                     const IconComponent = topic.Icon;
+                    const animationClass = `animate-rainbow-${(index % 6) + 1}`;
                     return (
                       <button
                         key={`${topic.id}-duplicate`}
@@ -321,7 +323,7 @@ const Home = () => {
                           isSelected ? 'bg-primary-foreground/20' : ''
                         }`}>
                           {!isSelected && (
-                            <div className="absolute inset-0 animate-rainbow-bg opacity-40"></div>
+                            <div className={`absolute inset-0 opacity-40 ${animationClass}`}></div>
                           )}
                           <IconComponent className="w-8 h-8 relative z-10" />
                         </div>
