@@ -11,6 +11,7 @@ interface PricePoint {
 interface LivePriceChartProps {
   assetSymbol: string;
   assetName: string;
+  poolStartPrice?: number; // Optional: price when pool started
 }
 
 // Map asset symbols to Binance trading pairs and real-time data sources
@@ -30,7 +31,7 @@ const isBinanceSupported = (assetSymbol: string): boolean => {
   return ['BTC', 'ETH', 'SOL', 'GOLD', 'SILVER'].includes(assetSymbol);
 };
 
-export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) => {
+export const LivePriceChart = ({ assetSymbol, assetName, poolStartPrice }: LivePriceChartProps) => {
   const [priceData, setPriceData] = useState<PricePoint[]>([]);
   const [currentPrice, setCurrentPrice] = useState<number>(0);
   const [priceChange, setPriceChange] = useState<number>(0);
@@ -166,7 +167,8 @@ export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) 
   }, [assetSymbol]);
 
   const maxPrice = Math.max(...priceData.map(p => p.price), currentPrice);
-  const minPrice = Math.min(...priceData.map(p => p.price), currentPrice);
+  // Use pool start price as minimum if available, otherwise use actual minimum
+  const minPrice = poolStartPrice || Math.min(...priceData.map(p => p.price), currentPrice);
   const priceRange = maxPrice - minPrice || 1;
 
   return (

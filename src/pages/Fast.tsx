@@ -16,6 +16,7 @@ import { FastPoolExpandedModal } from '@/components/fast/FastPoolExpandedModal';
 import { DarkModeToggle } from '@/components/layout/DarkModeToggle';
 import { Link, useNavigate } from 'react-router-dom';
 import { getNasdaqStatus, type MarketStatus } from '@/lib/market-hours';
+import { PoolPriceDisplay } from '@/components/fast/PoolPriceDisplay';
 
 interface FastPool {
   id: string;
@@ -960,11 +961,11 @@ const Fast = () => {
                   
                   <p className="text-sm text-muted-foreground mb-2">{pool.question}</p>
                   
-                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                    <span className="bg-muted/50 px-2 py-1 rounded">{pool.asset_symbol}</span>
-                    <span>•</span>
-                    <span>${pool.opening_price.toLocaleString()}</span>
-                  </div>
+                   <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                     <span className="bg-muted/50 px-2 py-1 rounded">{pool.asset_symbol}</span>
+                     <span>•</span>
+                     <PoolPriceDisplay assetSymbol={pool.asset_symbol} />
+                   </div>
                 </CardHeader>
 
                 <CardContent className="relative z-10 space-y-4">

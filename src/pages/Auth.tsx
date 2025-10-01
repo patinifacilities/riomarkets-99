@@ -726,7 +726,7 @@ const Auth = () => {
                     <div>
                       <label htmlFor="email" className="text-sm font-medium mb-2 block">Email</label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 z-10" />
                         <Input
                           ref={loginEmailInputRef}
                           id="email"
@@ -736,6 +736,11 @@ const Auth = () => {
                           onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                           className="pl-10"
                           required
+                        />
+                        <EmailSuggestions
+                          value={formData.email}
+                          onSelect={(email) => setFormData(prev => ({ ...prev, email }))}
+                          inputRef={loginEmailInputRef}
                         />
                       </div>
                     </div>

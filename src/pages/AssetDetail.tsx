@@ -162,11 +162,11 @@ const AssetDetail = () => {
         console.log('🔄 Loading next pool...');
         loadPoolData();
         loadPoolHistory();
-      }, 5000); // Increased to 5 seconds to ensure next pool is created
+      }, 3000); // Wait 3 seconds for next pool to be created
       
       return () => clearTimeout(reloadTimer);
     }
-  }, [countdown, currentPool?.id]); // Changed dependency to countdown (not countdown > 0)
+  }, [countdown > 0, currentPool?.id]); // Trigger when countdown goes from > 0 to 0
 
   const getOdds = () => {
     const timeElapsed = 60 - countdown;
@@ -421,6 +421,7 @@ const AssetDetail = () => {
           <LivePriceChart 
             assetSymbol={currentPool.asset_symbol} 
             assetName={currentPool.asset_name}
+            poolStartPrice={currentPool.opening_price}
           />
         </div>
 

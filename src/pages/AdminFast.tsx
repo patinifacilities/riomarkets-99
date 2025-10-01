@@ -342,10 +342,16 @@ const AdminFast = () => {
                   />
                 </div>
               </div>
-              <Button onClick={() => navigate('/admin/fast/algorithm')} variant="outline" className="gap-2">
-                <TrendingUp className="w-4 h-4" />
-                Ajustar Algoritmo
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button onClick={() => navigate('/admin/fast/api-config')} variant="outline" className="gap-2">
+                  <Settings className="w-4 h-4" />
+                  APIs
+                </Button>
+                <Button onClick={() => navigate('/admin/fast/algorithm')} variant="outline" className="gap-2">
+                  <TrendingUp className="w-4 h-4" />
+                  Algoritmo
+                </Button>
+              </div>
             </div>
           </div>
 
