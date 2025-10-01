@@ -142,9 +142,18 @@ async function createSynchronizedPools(supabase: any, category = 'crypto') {
   
   const poolDuration = algorithmConfig?.pool_duration_seconds || 60;
   
-  // Wait 500ms before fetching prices and creating pools
-  await new Promise(resolve => setTimeout(resolve, 500));
+  // Get pool configurations with custom names
+  const poolConfigs = await getPoolConfigurationsWithCustomNames(supabase, category);
   
+  // Get real market prices IMMEDIATELY for all symbols
+  const symbols = poolConfigs.map(config => config.symbol);
+  const { data: marketData } = await supabase.functions.invoke('get-market-data', {
+    body: { symbols }
+  });
+
+  const prices = marketData?.prices || {};
+  
+  // Create pools with current time and prices
   const now = new Date();
   const endTime = new Date(now.getTime() + (poolDuration * 1000));
 
@@ -156,17 +165,6 @@ async function createSynchronizedPools(supabase: any, category = 'crypto') {
     .limit(1);
 
   const nextRoundNumber = (lastPool?.[0]?.round_number || 0) + 1;
-
-  // Get pool configurations - check database first for custom names
-  const poolConfigs = await getPoolConfigurationsWithCustomNames(supabase, category);
-  
-  // Get real market prices for all symbols (1 second after pool creation was triggered)
-  const symbols = poolConfigs.map(config => config.symbol);
-  const { data: marketData } = await supabase.functions.invoke('get-market-data', {
-    body: { symbols }
-  });
-
-  const prices = marketData?.prices || {};
 
   // Use algorithm base_odds if available, otherwise default
   const baseOdds = algorithmConfig?.odds_start || 1.65;
@@ -258,11 +256,7 @@ async function finalizePool(supabase: any, poolId: string) {
   if (poolError) throw poolError;
   if (!pool) throw new Error('Pool not found');
 
-  // Wait 500ms to fetch the closing price
-  // This matches the opening price timing (500ms after pool starts)
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  // Get closing price for this specific asset (1 second before end)
+  // Get closing price IMMEDIATELY for this specific asset
   const { data: marketData } = await supabase.functions.invoke('get-market-data', {
     body: { symbols: [pool.asset_symbol] }
   });
@@ -445,9 +439,21 @@ async function createAllCategoriesPools(supabase: any) {
   
   const poolDuration = algorithmConfig?.pool_duration_seconds || 60;
   
-  // Wait 500ms before fetching prices and creating pools
-  await new Promise(resolve => setTimeout(resolve, 500));
+  // Collect all symbols first
+  const allSymbols: string[] = [];
+  for (const category of categories) {
+    const poolConfigs = getPoolConfigurations(category);
+    poolConfigs.forEach(config => allSymbols.push(config.symbol));
+  }
+
+  // Get real market prices IMMEDIATELY for all symbols at once
+  const { data: marketData } = await supabase.functions.invoke('get-market-data', {
+    body: { symbols: allSymbols }
+  });
+
+  const prices = marketData?.prices || {};
   
+  // Create pools with current time
   const now = new Date();
   const endTime = new Date(now.getTime() + (poolDuration * 1000));
 
@@ -460,9 +466,8 @@ async function createAllCategoriesPools(supabase: any) {
 
   const nextRoundNumber = (lastPool?.[0]?.round_number || 0) + 1;
 
-  // Collect all pool configurations for all categories
+  // Collect all pool configurations
   const allPoolsToInsert = [];
-  const allSymbols: string[] = [];
 
   // Get all custom configurations from database
   const { data: customConfigs } = await supabase
@@ -476,18 +481,6 @@ async function createAllCategoriesPools(supabase: any) {
       question: config.question
     });
   });
-
-  for (const category of categories) {
-    const poolConfigs = getPoolConfigurations(category);
-    poolConfigs.forEach(config => allSymbols.push(config.symbol));
-  }
-
-  // Get real market prices for all symbols at once (1 second after pool creation triggered)
-  const { data: marketData } = await supabase.functions.invoke('get-market-data', {
-    body: { symbols: allSymbols }
-  });
-
-  const prices = marketData?.prices || {};
   
   // Use algorithm base_odds if available, otherwise default
   const baseOdds = algorithmConfig?.odds_start || 1.65;

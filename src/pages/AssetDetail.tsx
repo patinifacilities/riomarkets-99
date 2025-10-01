@@ -328,14 +328,14 @@ const AssetDetail = () => {
 
       console.log('✅ Bet placed successfully!');
 
-      // Show consistent notification like Fast page
+      // Show toast notification
       toast({
         title: "✅ Opinião registrada!",
         description: `${side === 'subiu' ? '📈 SUBIR' : '📉 DESCER'} • ${betAmount} RZ • Odds: x${odds.toFixed(2)}`,
         duration: 3000,
         className: side === 'subiu' 
-          ? 'border-[#00ff90] bg-[#00ff90]/10' 
-          : 'border-[#ff2389] bg-[#ff2389]/10'
+          ? 'border-[#00ff90] bg-[#00ff90]/10 text-foreground' 
+          : 'border-[#ff2389] bg-[#ff2389]/10 text-foreground'
       });
       
       // Force profile refresh for instant balance update
