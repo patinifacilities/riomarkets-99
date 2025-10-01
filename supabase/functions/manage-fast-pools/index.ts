@@ -141,6 +141,10 @@ async function createSynchronizedPools(supabase: any, category = 'crypto') {
     .single();
   
   const poolDuration = algorithmConfig?.pool_duration_seconds || 60;
+  
+  // Wait 1 second before fetching prices and creating pools
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
   const now = new Date();
   const endTime = new Date(now.getTime() + (poolDuration * 1000));
 
@@ -153,10 +157,10 @@ async function createSynchronizedPools(supabase: any, category = 'crypto') {
 
   const nextRoundNumber = (lastPool?.[0]?.round_number || 0) + 1;
 
-  // Define pool configurations for each category
-  const poolConfigs = getPoolConfigurations(category);
+  // Get pool configurations - check database first for custom names
+  const poolConfigs = await getPoolConfigurationsWithCustomNames(supabase, category);
   
-  // Get real market prices for all symbols
+  // Get real market prices for all symbols (1 second after pool creation was triggered)
   const symbols = poolConfigs.map(config => config.symbol);
   const { data: marketData } = await supabase.functions.invoke('get-market-data', {
     body: { symbols }
@@ -190,6 +194,30 @@ async function createSynchronizedPools(supabase: any, category = 'crypto') {
   if (error) throw error;
 
   return pools;
+}
+
+async function getPoolConfigurationsWithCustomNames(supabase: any, category: string) {
+  // Get custom configurations from database
+  const { data: configs } = await supabase
+    .from('fast_pool_configs')
+    .select('asset_symbol, asset_name, question')
+    .eq('category', category);
+  
+  const configMap = new Map();
+  (configs || []).forEach((config: any) => {
+    configMap.set(config.asset_symbol, {
+      name: config.asset_name,
+      question: config.question
+    });
+  });
+  
+  // Get default configurations and override with custom ones
+  const defaultConfigs = getPoolConfigurations(category);
+  return defaultConfigs.map(config => ({
+    ...config,
+    name: configMap.get(config.symbol)?.name || config.name,
+    question: configMap.get(config.symbol)?.question || config.question
+  }));
 }
 
 function getPoolConfigurations(category: string) {
@@ -409,6 +437,10 @@ async function createAllCategoriesPools(supabase: any) {
     .single();
   
   const poolDuration = algorithmConfig?.pool_duration_seconds || 60;
+  
+  // Wait 1 second before fetching prices and creating pools
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
   const now = new Date();
   const endTime = new Date(now.getTime() + (poolDuration * 1000));
 
@@ -425,12 +457,25 @@ async function createAllCategoriesPools(supabase: any) {
   const allPoolsToInsert = [];
   const allSymbols: string[] = [];
 
+  // Get all custom configurations from database
+  const { data: customConfigs } = await supabase
+    .from('fast_pool_configs')
+    .select('asset_symbol, asset_name, question, category');
+  
+  const configMap = new Map();
+  (customConfigs || []).forEach((config: any) => {
+    configMap.set(`${config.category}-${config.asset_symbol}`, {
+      name: config.asset_name,
+      question: config.question
+    });
+  });
+
   for (const category of categories) {
     const poolConfigs = getPoolConfigurations(category);
     poolConfigs.forEach(config => allSymbols.push(config.symbol));
   }
 
-  // Get real market prices for all symbols at once
+  // Get real market prices for all symbols at once (1 second after pool creation triggered)
   const { data: marketData } = await supabase.functions.invoke('get-market-data', {
     body: { symbols: allSymbols }
   });
@@ -445,11 +490,12 @@ async function createAllCategoriesPools(supabase: any) {
     const poolConfigs = getPoolConfigurations(category);
     
     for (const config of poolConfigs) {
+      const customConfig = configMap.get(`${category}-${config.symbol}`);
       allPoolsToInsert.push({
         round_number: nextRoundNumber,
         asset_symbol: config.symbol,
-        asset_name: config.name,
-        question: config.question,
+        asset_name: customConfig?.name || config.name,
+        question: customConfig?.question || config.question,
         category: category,
         opening_price: prices[config.symbol] || config.fallbackPrice,
         round_start_time: now.toISOString(),

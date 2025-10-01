@@ -166,7 +166,7 @@ const AssetDetail = () => {
       
       return () => clearTimeout(reloadTimer);
     }
-  }, [countdown > 0, currentPool?.id]); // Trigger when countdown goes from > 0 to 0
+  }, [countdown, currentPool?.id]); // Re-run when countdown or pool changes
 
   const getOdds = () => {
     const timeElapsed = 60 - countdown;

@@ -156,15 +156,31 @@ const AdminFast = () => {
 
   const fetchGeneralPoolConfigs = async () => {
     try {
-      // Get general pool configurations from fast_pool_configs table
-      const { data, error } = await supabase
+      // Get all pool configurations
+      const { data: configs, error: configsError } = await supabase
         .from('fast_pool_configs')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (configsError) throw configsError;
       
-      setPools(data || []);
+      // Get distinct asset symbols that have been used in pools
+      const { data: usedAssets, error: assetsError } = await supabase
+        .from('fast_pools')
+        .select('asset_symbol')
+        .order('created_at', { ascending: false });
+      
+      if (assetsError) throw assetsError;
+      
+      // Create a set of used asset symbols
+      const usedSymbols = new Set((usedAssets || []).map(a => a.asset_symbol));
+      
+      // Filter configs to only show assets that have been used in pools
+      const filteredConfigs = (configs || []).filter(config => 
+        usedSymbols.has(config.asset_symbol)
+      );
+      
+      setPools(filteredConfigs);
     } catch (error) {
       console.error('Error fetching pool configs:', error);
     } finally {
