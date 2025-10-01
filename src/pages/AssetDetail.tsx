@@ -152,22 +152,22 @@ const AssetDetail = () => {
     return () => clearInterval(timer);
   }, [currentPool]);
   
-  // Trigger reload when countdown reaches 0 - only once per pool
+  // Trigger reload when countdown reaches 0
   useEffect(() => {
-    // Only trigger if countdown just reached 0 (not already at 0)
+    // Only trigger if countdown reached 0 and we have a current pool
     if (countdown > 0 || !currentPool) return;
     
     console.log('⏰ Countdown reached 0, scheduling pool reload...');
     
-    // Wait for pool to finalize and next pool to be created (5 seconds to account for the 1s delay in finalization)
+    // Wait for pool to finalize and next pool to be created (2 seconds)
     const reloadTimer = setTimeout(() => {
       console.log('🔄 Loading next pool...');
       loadPoolData();
       loadPoolHistory();
-    }, 5000);
+    }, 2000);
     
     return () => clearTimeout(reloadTimer);
-  }, [currentPool?.id]); // Only trigger when pool ID changes (new pool created)
+  }, [countdown, currentPool?.id]); // Trigger when countdown reaches 0
 
   const getOdds = () => {
     const timeElapsed = 60 - countdown;
@@ -254,9 +254,6 @@ const AssetDetail = () => {
         title: "Opinião registrada!",
         description: `Você opinou que vai ${side === 'subiu' ? 'SUBIR' : 'DESCER'} com ${betAmount} RZ (x${odds.toFixed(2)})`,
       });
-
-      // Reset bet amount
-      setBetAmount(100);
       
     } catch (error) {
       console.error('Error placing bet:', error);

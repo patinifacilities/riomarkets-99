@@ -21,21 +21,40 @@ export interface Profile {
 export const useProfile = (userId?: string) => {
   const queryClient = useQueryClient();
   
-  // Listen for balance updates
-  // Remover event listeners que causam loop infinito
+  // Listen for balance updates via events and realtime subscription
   useEffect(() => {
-    // Apenas invalidar quando necessário, sem loops
+    if (!userId) return;
+
+    // Handle manual refresh events
     const handleForceRefresh = () => {
-      if (userId) {
-        queryClient.invalidateQueries({ queryKey: ['profile', userId] });
-        queryClient.refetchQueries({ queryKey: ['profile', userId] });
-      }
+      queryClient.invalidateQueries({ queryKey: ['profile', userId] });
+      queryClient.refetchQueries({ queryKey: ['profile', userId] });
     };
 
     window.addEventListener('forceProfileRefresh', handleForceRefresh);
     
+    // Subscribe to realtime updates for this user's profile
+    const channel = supabase
+      .channel(`profile-${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${userId}`
+        },
+        () => {
+          // Invalidate and refetch when profile is updated
+          queryClient.invalidateQueries({ queryKey: ['profile', userId] });
+          queryClient.refetchQueries({ queryKey: ['profile', userId] });
+        }
+      )
+      .subscribe();
+    
     return () => {
       window.removeEventListener('forceProfileRefresh', handleForceRefresh);
+      supabase.removeChannel(channel);
     };
   }, [userId, queryClient]);
 
