@@ -13,7 +13,7 @@ import { FastMarketTermsModal } from '@/components/fast/FastMarketTermsModal';
 import { FastPoolHistoryModal } from '@/components/fast/FastPoolHistoryModal';
 import { FastPoolExpandedModal } from '@/components/fast/FastPoolExpandedModal';
 import { DarkModeToggle } from '@/components/layout/DarkModeToggle';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface FastPool {
   id: string;
@@ -61,6 +61,7 @@ const Fast = () => {
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const { toast } = useToast();
   const { resolvedTheme } = useTheme();
+  const navigate = useNavigate();
 
   // Category options for fast pools with styling - Crypto first, then Commodities
   const categoryOptions = [
@@ -792,8 +793,7 @@ const Fast = () => {
                 <CardHeader 
                   className="relative z-10 text-center pb-3 cursor-pointer"
                   onClick={() => {
-                    if (!user) return;
-                    setExpandedPool(pool);
+                    navigate(`/asset/${pool.asset_symbol}`);
                   }}
                 >
                    <div className="flex items-center justify-between mb-2">

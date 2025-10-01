@@ -14,6 +14,7 @@ import Press from '@/pages/Press';
 import Support from '@/pages/Support';
 import MarketDetail from '@/pages/MarketDetail';
 import MarketAudit from '@/pages/MarketAudit';
+import AssetDetail from '@/pages/AssetDetail';
 import Admin from '@/pages/Admin';
 import AdminCategories from '@/pages/AdminCategories';
 import AdminUsers from '@/pages/AdminUsers';
@@ -64,6 +65,7 @@ function App() {
           <Route path="/support" element={<Support />} />
           <Route path="/market/:id" element={<MarketDetail />} />
           <Route path="/market/:id/audit" element={<MarketAudit />} />
+          <Route path="/asset/:assetSymbol" element={<AssetDetail />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/categories" element={<AdminCategories />} />
             <Route path="/admin/users" element={<AdminUsers />} />

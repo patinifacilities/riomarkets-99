@@ -186,12 +186,16 @@ export const AssetConfigCard = ({ asset, onUpdate, onTogglePause, getCategoryCol
             </Button>
             
             <Button 
-              variant={asset.paused ? "default" : "outline"}
+              variant={asset.paused ? "outline" : "outline"}
               size="sm" 
-              className={`gap-2 ${!asset.paused ? 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-[#ff2389]' : 'bg-success hover:bg-success/90 text-white'}`}
+              className={`gap-2 ${
+                asset.paused 
+                  ? 'text-muted-foreground hover:text-muted-foreground' 
+                  : 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-[#ff2389]'
+              }`}
               onClick={() => onTogglePause(asset)}
             >
-              {asset.paused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+              {asset.paused ? <Play className="w-4 h-4 text-muted-foreground" /> : <Pause className="w-4 h-4" />}
               {asset.paused ? 'Retomar' : 'Pausar'}
             </Button>
           </div>

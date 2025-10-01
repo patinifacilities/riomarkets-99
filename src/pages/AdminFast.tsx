@@ -321,17 +321,22 @@ const AdminFast = () => {
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-4 bg-card/50 px-6 py-3 rounded-lg border border-border">
-                <TrendingUp className="w-6 h-6 text-primary" />
+                <svg className="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="currentColor"/>
+                </svg>
                 <Label htmlFor="fast-toggle" className="cursor-pointer font-bold text-lg">
                   Fast
                 </Label>
                 <div className="flex items-center gap-2">
-                  <Power className={`w-5 h-5 transition-colors ${fastEnabled ? 'text-success' : 'text-muted-foreground'}`} />
+                  <Power className={`w-5 h-5 transition-colors ${fastEnabled ? 'text-[#00ff90]' : 'text-muted-foreground'}`} />
                   <Switch
                     id="fast-toggle"
                     checked={fastEnabled}
                     onCheckedChange={handleToggleFast}
-                    className="data-[state=checked]:bg-success scale-125"
+                    style={{
+                      backgroundColor: fastEnabled ? '#ff2389' : undefined
+                    }}
+                    className="scale-125 data-[state=unchecked]:bg-muted"
                   />
                 </div>
               </div>
@@ -385,7 +390,10 @@ const AdminFast = () => {
             </Card>
 
             {/* Gold Pass Revenue Card */}
-            <Card className="bg-gradient-to-br from-[#FFD700]/20 via-[#FFA500]/10 to-[#FF8C00]/20 border-[#FFD700]/30 shadow-lg shadow-[#FFD700]/20">
+            <Card 
+              className="bg-gradient-to-br from-[#FFD700]/20 via-[#FFA500]/10 to-[#FF8C00]/20 border-[#FFD700]/30 shadow-lg shadow-[#FFD700]/20 cursor-pointer hover:shadow-[#FFD700]/30 transition-all"
+              onClick={() => navigate('/admin/revenue')}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-[#FFD700]">Gold Pass</CardTitle>
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FFD700] via-[#FFA500] to-[#FF8C00] flex items-center justify-center">
