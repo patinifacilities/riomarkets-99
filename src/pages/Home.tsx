@@ -272,7 +272,7 @@ const Home = () => {
                         key={topic.id}
                         onClick={() => handleTopicSelect(topic.id)}
                         className={cn(
-                          "flex items-center gap-4 px-10 py-7 rounded-2xl text-lg font-bold whitespace-nowrap",
+                          "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap",
                           "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg relative overflow-hidden",
                           "animate-fade-in",
                           isSelected
@@ -280,18 +280,18 @@ const Home = () => {
                             : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm'
                         )}
                       >
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 hover:rotate-12 hover:scale-110 relative overflow-hidden ${
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 hover:rotate-12 hover:scale-110 relative overflow-hidden ${
                           isSelected ? 'bg-primary-foreground/20' : ''
                         }`}>
                           {!isSelected && (
                             <div className={`absolute inset-0 opacity-40 ${animationClass}`}></div>
                           )}
-                          <IconComponent className="w-8 h-8 relative z-10" />
+                          <IconComponent className="w-6 h-6 relative z-10" />
                         </div>
-                        <span className="text-lg">{topic.label}</span>
+                        <span className="text-base">{topic.label}</span>
                         {isSelected && (
                           <X 
-                            className="w-6 h-6 ml-2 hover:scale-110 transition-transform" 
+                            className="w-5 h-5 ml-2 hover:scale-110 transition-transform" 
                             onClick={(e) => {
                               e.stopPropagation();
                               handleRemoveTopic(topic.id);
@@ -311,7 +311,7 @@ const Home = () => {
                         key={`${topic.id}-duplicate`}
                         onClick={() => handleTopicSelect(topic.id)}
                         className={cn(
-                          "flex items-center gap-4 px-10 py-7 rounded-2xl text-lg font-bold whitespace-nowrap",
+                          "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap",
                           "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg relative overflow-hidden",
                           "animate-fade-in",
                           isSelected
@@ -319,18 +319,18 @@ const Home = () => {
                             : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm'
                         )}
                       >
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 hover:rotate-12 hover:scale-110 relative overflow-hidden ${
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 hover:rotate-12 hover:scale-110 relative overflow-hidden ${
                           isSelected ? 'bg-primary-foreground/20' : ''
                         }`}>
                           {!isSelected && (
                             <div className={`absolute inset-0 opacity-40 ${animationClass}`}></div>
                           )}
-                          <IconComponent className="w-8 h-8 relative z-10" />
+                          <IconComponent className="w-6 h-6 relative z-10" />
                         </div>
-                        <span className="text-lg">{topic.label}</span>
+                        <span className="text-base">{topic.label}</span>
                         {isSelected && (
                           <X 
-                            className="w-6 h-6 ml-2 hover:scale-110 transition-transform" 
+                            className="w-5 h-5 ml-2 hover:scale-110 transition-transform" 
                             onClick={(e) => {
                               e.stopPropagation();
                               handleRemoveTopic(topic.id);
@@ -375,18 +375,6 @@ const Home = () => {
               chipClassName="px-2.5 py-1 text-xs"
             />
           </div>
-
-          {/* Sort Dropdown */}
-          <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Ordenar por" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="recent">Mais recentes</SelectItem>
-              <SelectItem value="volume">Maior volume</SelectItem>
-              <SelectItem value="trending">Tendência</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         {/* Markets Grid */}

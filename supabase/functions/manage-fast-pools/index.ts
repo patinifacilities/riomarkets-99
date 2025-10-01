@@ -132,8 +132,17 @@ async function createNewPool(supabase: any, category = 'crypto') {
 }
 
 async function createSynchronizedPools(supabase: any, category = 'crypto') {
+  // Get algorithm configuration
+  const { data: algorithmConfig } = await supabase
+    .from('fast_pool_algorithm_config')
+    .select('pool_duration_seconds, odds_start, odds_end, odds_curve_intensity, lockout_time_seconds, max_odds, min_odds')
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .single();
+  
+  const poolDuration = algorithmConfig?.pool_duration_seconds || 60;
   const now = new Date();
-  const endTime = new Date(now.getTime() + 60000); // 60 seconds from now
+  const endTime = new Date(now.getTime() + (poolDuration * 1000));
 
   // Get current round number
   const { data: lastPool } = await supabase
@@ -155,6 +164,9 @@ async function createSynchronizedPools(supabase: any, category = 'crypto') {
 
   const prices = marketData?.prices || {};
 
+  // Use algorithm base_odds if available, otherwise default
+  const baseOdds = algorithmConfig?.odds_start || 1.65;
+
   // Create all 3 pools with synchronized timing
   const poolsToInsert = poolConfigs.map((config, index) => ({
     round_number: nextRoundNumber,
@@ -165,7 +177,7 @@ async function createSynchronizedPools(supabase: any, category = 'crypto') {
     opening_price: prices[config.symbol] || config.fallbackPrice,
     round_start_time: now.toISOString(),
     round_end_time: endTime.toISOString(),
-    base_odds: 1.65,
+    base_odds: baseOdds,
     status: 'active',
     paused: false
   }));
@@ -387,8 +399,18 @@ function getFallbackPriceForSymbol(symbol: string): number {
 
 async function createAllCategoriesPools(supabase: any) {
   const categories = ['commodities', 'crypto', 'forex', 'stocks'];
+  
+  // Get algorithm configuration
+  const { data: algorithmConfig } = await supabase
+    .from('fast_pool_algorithm_config')
+    .select('pool_duration_seconds, odds_start, odds_end, odds_curve_intensity, lockout_time_seconds, max_odds, min_odds')
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .single();
+  
+  const poolDuration = algorithmConfig?.pool_duration_seconds || 60;
   const now = new Date();
-  const endTime = new Date(now.getTime() + 60000); // 60 seconds from now
+  const endTime = new Date(now.getTime() + (poolDuration * 1000));
 
   // Get current round number
   const { data: lastPool } = await supabase
@@ -414,6 +436,9 @@ async function createAllCategoriesPools(supabase: any) {
   });
 
   const prices = marketData?.prices || {};
+  
+  // Use algorithm base_odds if available, otherwise default
+  const baseOdds = algorithmConfig?.odds_start || 1.65;
 
   // Create pools for all categories with same timing
   for (const category of categories) {
@@ -429,7 +454,7 @@ async function createAllCategoriesPools(supabase: any) {
         opening_price: prices[config.symbol] || config.fallbackPrice,
         round_start_time: now.toISOString(),
         round_end_time: endTime.toISOString(),
-        base_odds: 1.65,
+        base_odds: baseOdds,
         status: 'active',
         paused: false
       });

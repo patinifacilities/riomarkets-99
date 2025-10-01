@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Users, Search, ArrowLeft, Edit } from 'lucide-react';
+import { Users, Search, ArrowLeft, Edit, Play, Pause } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,8 @@ import { UserEditModal } from '@/components/admin/UserEditModal';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -132,6 +134,49 @@ const AdminUsers = () => {
                         >
                           <Edit className="w-4 h-4 mr-1" />
                           Editar
+                        </Button>
+                        
+                        <Button
+                          variant={user.is_blocked ? "default" : "destructive"}
+                          size="sm"
+                          className={cn(
+                            "rounded-full w-10 h-10 p-0",
+                            user.is_blocked && "bg-green-500 hover:bg-green-600"
+                          )}
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            try {
+                              const { error } = await supabase
+                                .from('profiles')
+                                .update({ is_blocked: !user.is_blocked })
+                                .eq('id', user.id);
+                              
+                              if (error) throw error;
+                              
+                              toast({
+                                title: user.is_blocked ? "Usuário desbloqueado" : "Usuário bloqueado",
+                                description: user.is_blocked 
+                                  ? "O usuário pode agora opinar e sacar"
+                                  : "O usuário não pode mais opinar ou sacar",
+                              });
+                              
+                              refetch();
+                            } catch (error) {
+                              console.error('Error toggling block:', error);
+                              toast({
+                                title: "Erro",
+                                description: "Não foi possível alterar o status do usuário",
+                                variant: "destructive"
+                              });
+                            }
+                          }}
+                          title={user.is_blocked ? "Desbloquear usuário" : "Bloquear usuário"}
+                        >
+                          {user.is_blocked ? (
+                            <Play className="w-5 h-5" />
+                          ) : (
+                            <Pause className="w-5 h-5" />
+                          )}
                         </Button>
                       </div>
                     </div>

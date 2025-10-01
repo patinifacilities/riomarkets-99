@@ -903,6 +903,7 @@ export type Database = {
           email: string
           id: string
           is_admin: boolean
+          is_blocked: boolean | null
           nivel: string
           nome: string
           profile_pic_url: string | null
@@ -916,6 +917,7 @@ export type Database = {
           email: string
           id: string
           is_admin?: boolean
+          is_blocked?: boolean | null
           nivel?: string
           nome: string
           profile_pic_url?: string | null
@@ -929,6 +931,7 @@ export type Database = {
           email?: string
           id?: string
           is_admin?: boolean
+          is_blocked?: boolean | null
           nivel?: string
           nome?: string
           profile_pic_url?: string | null

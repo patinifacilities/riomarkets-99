@@ -8,6 +8,7 @@ export interface Profile {
   saldo_moeda: number;
   nivel: string;
   is_admin: boolean;
+  is_blocked?: boolean;
   created_at: string;
   profile_pic_url?: string;
 }

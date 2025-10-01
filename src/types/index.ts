@@ -5,8 +5,24 @@ export interface User {
   saldo_moeda: number;
   nivel: 'iniciante' | 'analista' | 'guru' | 'root';
   is_admin: boolean;
+  is_blocked?: boolean;
   created_at: string;
   profile_pic_url?: string;
+}
+
+export interface Profile {
+  id: string;
+  nome: string;
+  email: string;
+  username?: string;
+  cpf?: string;
+  saldo_moeda: number;
+  nivel: 'iniciante' | 'analista' | 'guru' | 'root';
+  is_admin: boolean;
+  is_blocked?: boolean;
+  profile_pic_url?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export type MarketType = 'binary' | 'three_way' | 'multi';

@@ -57,6 +57,13 @@ const WalletPage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
+      {/* Blocked User Warning */}
+      {profile?.is_blocked && (
+        <div className="bg-red-500 text-white px-4 py-3 text-center font-semibold">
+          ⚠️ Sua conta está temporariamente bloqueada. Você não pode realizar saques no momento. Entre em contato com o suporte.
+        </div>
+      )}
+      
       <div className="container mx-auto px-4 py-6">
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -74,6 +81,7 @@ const WalletPage = () => {
             variant="default"
             size="sm"
             className="gap-2"
+            disabled={profile?.is_blocked}
           >
             <DollarSign className="w-4 h-4" />
             Saque

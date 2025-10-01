@@ -471,6 +471,16 @@ const Fast = () => {
       return;
     }
 
+    // Check if user is blocked
+    if (profile?.is_blocked) {
+      toast({
+        title: "Conta bloqueada",
+        description: "Sua conta está temporariamente bloqueada. Entre em contato com o suporte.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const pool = currentPools.find(p => p.id === poolId);
     if (!pool) return;
 

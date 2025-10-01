@@ -9,6 +9,7 @@ export interface Profile {
   saldo_moeda: number;
   nivel: 'iniciante' | 'analista' | 'guru' | 'root';
   is_admin: boolean;
+  is_blocked?: boolean;
   created_at: string;
   updated_at: string;
   username?: string;
