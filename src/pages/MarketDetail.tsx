@@ -397,8 +397,8 @@ const MarketDetail = () => {
 
             {/* Pool Progress Bar */}
             <div>
-              <h3 className="text-lg font-semibold mb-4">Odds do Mercado</h3>
-              <PoolProgressBar 
+              <h3 className="text-lg font-semibold mb-4">Opiniões order book</h3>
+              <PoolProgressBar
                 simPercent={pool?.percent_sim || 0} 
                 naoPercent={pool?.percent_nao || 0}
                 showOdds={true}
@@ -476,7 +476,12 @@ const MarketDetail = () => {
                     }`}
                     onClick={() => {
                       setSelectedOption(opcao);
-                      scrollToWallet();
+                      // On desktop, scroll to top; on mobile, scroll to wallet
+                      if (window.innerWidth >= 1024) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      } else {
+                        scrollToWallet();
+                      }
                     }}
                   >
                     <CardContent className="p-6 text-center">
@@ -516,13 +521,6 @@ const MarketDetail = () => {
                 refetchMarket();
               }}
             />
-
-            {/* Order Book - only show for binary markets */}
-            {market.market_type === 'binary' && (
-              <Card className="bg-card-secondary border-border-secondary rounded-lg">
-                <OrderBookChart market={market} />
-              </Card>
-            )}
           </div>
 
             {/* User Info Panel - Desktop */}

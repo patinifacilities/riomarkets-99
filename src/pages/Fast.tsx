@@ -369,6 +369,9 @@ const Fast = () => {
   const finalizePools = async () => {
     if (!currentPools.length) return;
     
+    // Close expanded modal when finalizing pools
+    setExpandedPool(null);
+    
     try {
       // Finalize all pools in parallel
       await Promise.all(
@@ -697,6 +700,35 @@ const Fast = () => {
   };
 
   const currentCategoryHistory = poolHistory[selectedCategory] || [];
+
+  // Don't render pool cards if FAST is disabled
+  if (!fastSystemEnabled) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+        <div className="container mx-auto px-4 pt-8 pb-20">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ff2389]/10 to-[#ff2389]/5 px-6 py-3 rounded-full border border-[#ff2389]/20 mb-4">
+              <Zap className="w-5 h-5 text-[#ff2389] animate-pulse" />
+              <span className="text-[#ff2389] font-semibold tracking-wide">FAST MARKETS</span>
+            </div>
+          </div>
+          
+          <div className="max-w-2xl mx-auto mt-20">
+            <div className="text-center p-12 bg-card/50 backdrop-blur-sm rounded-2xl border border-border">
+              <div className="text-7xl mb-6">🚧</div>
+              <h2 className="text-3xl font-bold mb-4">Em Atualização</h2>
+              <p className="text-muted-foreground text-lg mb-6">
+                Os mercados Fast estão temporariamente indisponíveis para manutenção.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Voltaremos em breve com melhorias!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">

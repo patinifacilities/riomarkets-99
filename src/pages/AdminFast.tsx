@@ -344,10 +344,6 @@ const AdminFast = () => {
                 <TrendingUp className="w-4 h-4" />
                 Ajustar Algoritmo
               </Button>
-              <Button onClick={() => navigate('/admin/fast/config')} className="gap-2">
-                <Settings className="w-4 h-4" />
-                Configuração Central
-              </Button>
             </div>
           </div>
 
