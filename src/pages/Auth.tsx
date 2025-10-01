@@ -45,6 +45,8 @@ const Auth = () => {
     number: false,
     special: false
   });
+  const [currentStep, setCurrentStep] = useState(0);
+  const [cpfError, setCpfError] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -111,6 +113,15 @@ const Auth = () => {
       setPasswordRequirements(validatePassword(formData.password));
     }
   }, [formData.password]);
+
+  // Validate CPF on change
+  useEffect(() => {
+    if (formData.cpf.length === 11) {
+      setCpfError(!validateCPF(formData.cpf));
+    } else if (formData.cpf.length > 0) {
+      setCpfError(false);
+    }
+  }, [formData.cpf]);
 
   const handleSignUp = async () => {
     console.log('Attempting sign up...');
@@ -310,10 +321,10 @@ const Auth = () => {
                 <TypewriterText
                   baseText=""
                   texts={[
-                    "Rápidos",
                     "para Análise Estratégica",
                     "baseados em Dados",
-                    "com Transparência Total"
+                    "com Transparência Total",
+                    "Rápidos"
                   ]}
                   customColors={{
                     "Rápidos": "#ff2389"
@@ -338,204 +349,370 @@ const Auth = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <form onSubmit={handleSubmit} className="space-y-4">
-                {!isLogin && (
+                {!isLogin ? (
                   <>
-                    <div>
-                      <label htmlFor="name" className="text-sm font-medium mb-2 block">Nome completo</label>
-                      <div className="relative">
-                        <UserPlus className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                        <Input
-                          id="name"
-                          type="text"
-                          placeholder="Seu nome completo"
-                          value={formData.name}
-                          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                          className="pl-10"
-                          aria-label="Digite seu nome completo"
-                          required={!isLogin}
-                        />
+                    {/* Step 1: Name */}
+                    {currentStep === 0 && (
+                      <div className="space-y-4">
+                        <div>
+                          <label htmlFor="name" className="text-sm font-medium mb-2 block">Nome completo</label>
+                          <div className="relative">
+                            <UserPlus className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                            <Input
+                              id="name"
+                              type="text"
+                              placeholder="Seu nome completo"
+                              value={formData.name}
+                              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                              className="pl-10"
+                              aria-label="Digite seu nome completo"
+                              autoFocus
+                            />
+                          </div>
+                        </div>
+                        <Button 
+                          type="button" 
+                          className="w-full" 
+                          onClick={() => {
+                            if (formData.name) setCurrentStep(1);
+                            else setError('Nome é obrigatório');
+                          }}
+                        >
+                          Continuar
+                        </Button>
                       </div>
-                    </div>
-
-                    <div>
-                      <label htmlFor="username" className="text-sm font-medium mb-2 block">Username</label>
-                      <div className="relative">
-                        <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                        <Input
-                          id="username"
-                          type="text"
-                          placeholder="seu_username"
-                          value={formData.username}
-                          onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-                          className="pl-10"
-                          aria-label="Digite seu username"
-                          required={!isLogin}
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label htmlFor="cpf" className="text-sm font-medium mb-2 block">CPF (opcional)</label>
-                      <div className="relative">
-                        <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                        <Input
-                          id="cpf"
-                          type="text"
-                          placeholder="000.000.000-00"
-                          value={formatCPF(formData.cpf)}
-                          onChange={(e) => setFormData(prev => ({ ...prev, cpf: e.target.value.replace(/\D/g, '') }))}
-                          className="pl-10"
-                          aria-label="Digite seu CPF"
-                          maxLength={14}
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                <div>
-                  <label htmlFor="email" className="text-sm font-medium mb-2 block">Email</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="seu@email.com"
-                      value={formData.email}
-                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                      className="pl-10"
-                      aria-label="Digite seu endereço de email"
-                      list="email-suggestions"
-                      required
-                    />
-                    {formData.email.includes('@') && !formData.email.includes('@gmail') && !formData.email.includes('@hotmail') && !formData.email.includes('@outlook') && !formData.email.includes('@yahoo') && (
-                      <datalist id="email-suggestions">
-                        <option value={formData.email.split('@')[0] + '@gmail.com'} />
-                        <option value={formData.email.split('@')[0] + '@hotmail.com'} />
-                        <option value={formData.email.split('@')[0] + '@outlook.com'} />
-                        <option value={formData.email.split('@')[0] + '@yahoo.com.br'} />
-                      </datalist>
                     )}
-                  </div>
-                </div>
 
-                <div>
-                  <label htmlFor="password" className="text-sm font-medium mb-2 block">Senha</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Sua senha"
-                      value={formData.password}
-                      onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                      className="pl-10 pr-10"
-                      aria-label="Digite sua senha"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"
-                      aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
+                    {/* Step 2: Username */}
+                    {currentStep === 1 && (
+                      <div className="space-y-4">
+                        <div>
+                          <label htmlFor="username" className="text-sm font-medium mb-2 block">Username</label>
+                          <div className="relative">
+                            <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                            <Input
+                              id="username"
+                              type="text"
+                              placeholder="seu_username"
+                              value={formData.username}
+                              onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                              className="pl-10"
+                              aria-label="Digite seu username"
+                              autoFocus
+                            />
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(0)}>
+                            Voltar
+                          </Button>
+                          <Button 
+                            type="button" 
+                            className="w-full" 
+                            onClick={() => {
+                              if (formData.username && validateUsername(formData.username)) setCurrentStep(2);
+                              else setError('Username inválido (3-20 caracteres alfanuméricos)');
+                            }}
+                          >
+                            Continuar
+                          </Button>
+                        </div>
+                      </div>
+                    )}
 
-                {!isLogin && (
-                  <div>
-                    <label htmlFor="confirmPassword" className="text-sm font-medium mb-2 block">Confirmar senha</label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                      <Input
-                        id="confirmPassword"
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="Confirme sua senha"
-                        value={formData.confirmPassword}
-                        onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        className="pl-10 pr-10"
-                        aria-label="Confirme sua senha"
-                        required={!isLogin}
-                      />
+                    {/* Step 3: CPF */}
+                    {currentStep === 2 && (
+                      <div className="space-y-4">
+                        <div>
+                          <label htmlFor="cpf" className="text-sm font-medium mb-2 block">CPF (opcional)</label>
+                          <div className="relative">
+                            <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                            <Input
+                              id="cpf"
+                              type="text"
+                              placeholder="000.000.000-00"
+                              value={formatCPF(formData.cpf)}
+                              onChange={(e) => setFormData(prev => ({ ...prev, cpf: e.target.value.replace(/\D/g, '') }))}
+                              className={`pl-10 ${cpfError ? 'border-[#ff2389] focus-visible:ring-[#ff2389]' : ''}`}
+                              aria-label="Digite seu CPF"
+                              maxLength={14}
+                              autoFocus
+                            />
+                          </div>
+                          {cpfError && (
+                            <p className="text-xs mt-1" style={{ color: '#ff2389' }}>CPF inválido</p>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(1)}>
+                            Voltar
+                          </Button>
+                          <Button 
+                            type="button" 
+                            className="w-full" 
+                            onClick={() => {
+                              if (!formData.cpf || !cpfError) setCurrentStep(3);
+                            }}
+                            disabled={cpfError}
+                          >
+                            Continuar
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 4: Email */}
+                    {currentStep === 3 && (
+                      <div className="space-y-4">
+                        <div>
+                          <label htmlFor="email" className="text-sm font-medium mb-2 block">Email</label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                            <Input
+                              id="email"
+                              type="email"
+                              placeholder="seu@email.com"
+                              value={formData.email}
+                              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                              className="pl-10"
+                              aria-label="Digite seu endereço de email"
+                              autoFocus
+                            />
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(2)}>
+                            Voltar
+                          </Button>
+                          <Button 
+                            type="button" 
+                            className="w-full" 
+                            onClick={() => {
+                              if (formData.email) setCurrentStep(4);
+                              else setError('Email é obrigatório');
+                            }}
+                          >
+                            Continuar
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 5: Password */}
+                    {currentStep === 4 && (
+                      <div className="space-y-4">
+                        <div>
+                          <label htmlFor="password" className="text-sm font-medium mb-2 block">Senha</label>
+                          <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                            <Input
+                              id="password"
+                              type={showPassword ? 'text' : 'password'}
+                              placeholder="Sua senha"
+                              value={formData.password}
+                              onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                              className="pl-10 pr-10"
+                              aria-label="Digite sua senha"
+                              autoFocus
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"
+                            >
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Password Requirements - fade out when complete */}
+                        {formData.password && (
+                          <div className="space-y-2 p-3 rounded-lg border border-border bg-muted/20">
+                            <div className="text-sm font-medium text-foreground">Requisitos da senha:</div>
+                            <div className="grid grid-cols-1 gap-1">
+                              <div 
+                                className={`flex items-center gap-2 text-xs transition-opacity duration-300 ${
+                                  passwordRequirements.length ? 'text-success opacity-0' : 'text-muted-foreground opacity-100'
+                                }`}
+                              >
+                                {passwordRequirements.length ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                                Pelo menos 8 caracteres
+                              </div>
+                              <div 
+                                className={`flex items-center gap-2 text-xs transition-opacity duration-300 ${
+                                  passwordRequirements.uppercase ? 'text-success opacity-0' : 'text-muted-foreground opacity-100'
+                                }`}
+                              >
+                                {passwordRequirements.uppercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                                Uma letra maiúscula
+                              </div>
+                              <div 
+                                className={`flex items-center gap-2 text-xs transition-opacity duration-300 ${
+                                  passwordRequirements.lowercase ? 'text-success opacity-0' : 'text-muted-foreground opacity-100'
+                                }`}
+                              >
+                                {passwordRequirements.lowercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                                Uma letra minúscula
+                              </div>
+                              <div 
+                                className={`flex items-center gap-2 text-xs transition-opacity duration-300 ${
+                                  passwordRequirements.number ? 'text-success opacity-0' : 'text-muted-foreground opacity-100'
+                                }`}
+                              >
+                                {passwordRequirements.number ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                                Um número
+                              </div>
+                              <div 
+                                className={`flex items-center gap-2 text-xs transition-opacity duration-300 ${
+                                  passwordRequirements.special ? 'text-success opacity-0' : 'text-muted-foreground opacity-100'
+                                }`}
+                              >
+                                {passwordRequirements.special ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                                Um caractere especial
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex gap-2">
+                          <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(3)}>
+                            Voltar
+                          </Button>
+                          <Button 
+                            type="button" 
+                            className="w-full" 
+                            onClick={() => {
+                              if (Object.values(passwordRequirements).every(Boolean)) setCurrentStep(5);
+                              else setError('A senha não atende aos requisitos de segurança');
+                            }}
+                            disabled={!Object.values(passwordRequirements).every(Boolean)}
+                          >
+                            Continuar
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 6: Confirm Password & Terms */}
+                    {currentStep === 5 && (
+                      <div className="space-y-4">
+                        <div>
+                          <label htmlFor="confirmPassword" className="text-sm font-medium mb-2 block">Confirmar senha</label>
+                          <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                            <Input
+                              id="confirmPassword"
+                              type={showPassword ? 'text' : 'password'}
+                              placeholder="Confirme sua senha"
+                              value={formData.confirmPassword}
+                              onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                              className="pl-10 pr-10"
+                              aria-label="Confirme sua senha"
+                              autoFocus
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"
+                            >
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start space-x-2 p-3 rounded-lg border border-primary/20 bg-primary/5">
+                          <Checkbox
+                            id="terms"
+                            checked={acceptedTerms}
+                            onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
+                          />
+                          <div className="space-y-1">
+                            <label
+                              htmlFor="terms"
+                              className="text-sm font-medium leading-none cursor-pointer"
+                            >
+                              Aceito os Termos de Uso e Política de Privacidade
+                            </label>
+                            <p className="text-xs text-muted-foreground">
+                              Ao se cadastrar, você concorda com nossos{' '}
+                              <a href="#" className="text-primary hover:underline">Termos de Uso</a>
+                              {' '}e{' '}
+                              <a href="#" className="text-primary hover:underline">Política de Privacidade</a>
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(4)}>
+                            Voltar
+                          </Button>
+                          <Button 
+                            type="submit" 
+                            className="w-full" 
+                            disabled={loading || !acceptedTerms || formData.password !== formData.confirmPassword}
+                          >
+                            {loading ? 'Cadastrando...' : 'Criar conta'}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {/* Login Form */}
+                    <div>
+                      <label htmlFor="email" className="text-sm font-medium mb-2 block">Email</label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="seu@email.com"
+                          value={formData.email}
+                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                          className="pl-10"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label htmlFor="password" className="text-sm font-medium mb-2 block">Senha</label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                        <Input
+                          id="password"
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="Sua senha"
+                          value={formData.password}
+                          onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                          className="pl-10 pr-10"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
                       <button
                         type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"
-                        aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                        onClick={() => setShowForgotPassword(true)}
+                        className="text-sm text-primary hover:underline"
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        Esqueceu a senha?
                       </button>
                     </div>
-                  </div>
-                )}
 
-                {/* Password Requirements */}
-                {!isLogin && formData.password && (
-                  <div className="space-y-2 p-3 rounded-lg border border-border bg-muted/20">
-                    <div className="text-sm font-medium text-foreground">Requisitos da senha:</div>
-                    <div className="grid grid-cols-1 gap-1">
-                      <div className={`flex items-center gap-2 text-xs ${passwordRequirements.length ? 'text-success' : 'text-muted-foreground'}`}>
-                        {passwordRequirements.length ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                        Pelo menos 8 caracteres
-                      </div>
-                      <div className={`flex items-center gap-2 text-xs ${passwordRequirements.uppercase ? 'text-success' : 'text-muted-foreground'}`}>
-                        {passwordRequirements.uppercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                        Uma letra maiúscula
-                      </div>
-                      <div className={`flex items-center gap-2 text-xs ${passwordRequirements.lowercase ? 'text-success' : 'text-muted-foreground'}`}>
-                        {passwordRequirements.lowercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                        Uma letra minúscula
-                      </div>
-                      <div className={`flex items-center gap-2 text-xs ${passwordRequirements.number ? 'text-success' : 'text-muted-foreground'}`}>
-                        {passwordRequirements.number ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                        Um número
-                      </div>
-                      <div className={`flex items-center gap-2 text-xs ${passwordRequirements.special ? 'text-success' : 'text-muted-foreground'}`}>
-                        {passwordRequirements.special ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                        Um caractere especial
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {isLogin && (
-                  <div className="text-right">
-                    <button
-                      type="button"
-                      onClick={() => setShowForgotPassword(true)}
-                      className="text-sm text-primary hover:underline focus:outline-none focus:underline"
-                      aria-label="Esqueceu sua senha?"
-                    >
-                      Esqueceu a senha?
-                    </button>
-                  </div>
-                )}
-
-                {!isLogin && (
-                  <div className="flex items-start space-x-2 p-3 rounded-lg border border-primary/20 bg-primary/5">
-                    <Checkbox
-                      id="terms"
-                      checked={acceptedTerms}
-                      onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
-                      aria-describedby="terms-description"
-                    />
-                    <div className="space-y-1">
-                      <label
-                        htmlFor="terms"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                      >
-                        Aceito os Termos de Uso e Política de Privacidade
-                      </label>
-                      <p id="terms-description" className="text-xs text-muted-foreground">
-                        Ao se cadastrar, você concorda com nossos{' '}
-                        <a href="#" className="text-primary hover:underline">Termos de Uso</a>
-                        {' '}e{' '}
-                        <a href="#" className="text-primary hover:underline">Política de Privacidade</a>
-                      </p>
-                    </div>
-                  </div>
+                    <Button type="submit" className="w-full" disabled={loading}>
+                      {loading ? 'Entrando...' : 'Entrar'}
+                    </Button>
+                  </>
                 )}
 
                 {error && (

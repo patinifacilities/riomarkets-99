@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { ProfileImageUpload } from '@/components/profile/ProfileImageUpload';
 import { 
   User, 
   Mail, 
@@ -20,7 +21,8 @@ import {
   Edit, 
   Save, 
   X, 
-  ArrowLeft
+  ArrowLeft,
+  Wallet
 } from 'lucide-react';
 
 const Profile = () => {
@@ -162,47 +164,76 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate(-1)}
-            className="gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
-          </Button>
-          <h1 className="text-3xl font-bold">Meu Perfil</h1>
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Modern Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate(-1)}
+              className="gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Voltar
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold">Meu Perfil</h1>
+              <p className="text-muted-foreground text-sm">Gerencie suas informações e preferências</p>
+            </div>
+          </div>
+          <Badge variant="outline" className="capitalize">
+            {profile.nivel}
+          </Badge>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Profile Card */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Modern Profile Card */}
           <div className="lg:col-span-1">
-            <Card>
-              <CardContent className="p-6 text-center">
-                <Avatar className="w-24 h-24 mx-auto mb-4">
-                  <AvatarImage src={profile.profile_pic_url} />
-                  <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-                    {profile.nome ? profile.nome.charAt(0).toUpperCase() : 'U'}
-                  </AvatarFallback>
-                </Avatar>
+            <Card className="border-2">
+              <CardContent className="p-6 text-center space-y-6">
+                <div className="relative inline-block">
+                  <Avatar className="w-32 h-32 border-4 border-background shadow-lg">
+                    <AvatarImage src={profile.profile_pic_url} />
+                    <AvatarFallback className="text-4xl bg-gradient-primary text-primary-foreground">
+                      {profile.nome ? profile.nome.charAt(0).toUpperCase() : 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
+                    <ProfileImageUpload 
+                      userId={profile.id}
+                      currentImageUrl={profile.profile_pic_url}
+                      onImageUpdated={() => refetch()}
+                    />
+                  </div>
+                </div>
                 
-                <h2 className="text-xl font-semibold mb-2">{profile.nome || 'Usuário'}</h2>
-                <Badge variant="secondary" className="mb-4 capitalize">
-                  {profile.nivel}
-                </Badge>
+                <div className="space-y-2">
+                  <h2 className="text-2xl font-bold">{profile.nome || 'Usuário'}</h2>
+                  {profile.username && (
+                    <p className="text-muted-foreground text-sm">@{profile.username}</p>
+                  )}
+                </div>
                 
-                <div className="bg-gradient-primary p-4 rounded-lg text-primary-foreground">
-                  <div className="text-sm opacity-90">Saldo</div>
-                  <div className="text-2xl font-bold">
+                <div className="bg-gradient-primary p-6 rounded-xl text-primary-foreground shadow-lg">
+                  <div className="flex items-center justify-center gap-2 mb-2 opacity-90">
+                    <Wallet className="w-4 h-4" />
+                    <span className="text-sm font-medium">Saldo Total</span>
+                  </div>
+                  <div className="text-3xl font-bold">
                     {profile.saldo_moeda.toLocaleString('pt-BR', { 
                       minimumFractionDigits: 2, 
                       maximumFractionDigits: 2 
                     })} RZ
                   </div>
                 </div>
+
+                <Button 
+                  className="w-full"
+                  onClick={() => navigate('/wallet')}
+                >
+                  Ver Carteira Completa
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -210,9 +241,9 @@ const Profile = () => {
           {/* Profile Information */}
           <div className="lg:col-span-2 space-y-6">
             {/* Personal Information */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
+            <Card className="border-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-4">
+                <CardTitle className="flex items-center gap-2 text-xl">
                   <User className="w-5 h-5" />
                   Informações Pessoais
                 </CardTitle>
@@ -258,17 +289,6 @@ const Profile = () => {
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="profile_pic">URL da foto de perfil</Label>
-                  <Input
-                    id="profile_pic"
-                    value={formData.profile_pic_url}
-                    onChange={(e) => setFormData(prev => ({ ...prev, profile_pic_url: e.target.value }))}
-                    disabled={!isEditing}
-                    placeholder="https://exemplo.com/foto.jpg"
-                    className="mt-1"
-                  />
-                </div>
 
                 <Separator />
 
@@ -295,9 +315,9 @@ const Profile = () => {
             </Card>
 
             {/* Security Settings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <Card className="border-2">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-xl">
                   <Shield className="w-5 h-5" />
                   Segurança
                 </CardTitle>
@@ -330,25 +350,17 @@ const Profile = () => {
             </Card>
 
             {/* Account Actions */}
-            <Card>
+            <Card className="border-2 bg-muted/30">
               <CardContent className="p-6">
-                <div className="flex flex-col sm:flex-row gap-4 justify-between">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => navigate('/wallet')}
-                    className="flex-1"
-                  >
-                    Ver Carteira
-                  </Button>
-                  <Button 
-                    variant="destructive" 
-                    onClick={handleLogout}
-                    className="flex-1"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sair da conta
-                  </Button>
-                </div>
+                <Button 
+                  variant="destructive" 
+                  onClick={handleLogout}
+                  className="w-full"
+                  size="lg"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sair da conta
+                </Button>
               </CardContent>
             </Card>
           </div>
