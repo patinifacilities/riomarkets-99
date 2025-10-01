@@ -12,6 +12,17 @@ interface LivePriceChartProps {
   assetName: string;
 }
 
+// Map asset symbols to Binance trading pairs
+const getBinanceSymbol = (assetSymbol: string): string => {
+  const symbolMap: Record<string, string> = {
+    'BTC': 'btcusdt',
+    'ETH': 'ethusdt',
+    'SOL': 'solusdt',
+    'OIL': 'btcusdt', // Fallback to BTC for commodities as Binance doesn't have oil
+  };
+  return symbolMap[assetSymbol] || 'btcusdt';
+};
+
 export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) => {
   const [priceData, setPriceData] = useState<PricePoint[]>([]);
   const [currentPrice, setCurrentPrice] = useState<number>(0);
@@ -22,9 +33,11 @@ export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) 
     let ws: WebSocket | null = null;
     let reconnectTimeout: NodeJS.Timeout;
     
+    const binanceSymbol = getBinanceSymbol(assetSymbol);
+    
     const connectWebSocket = () => {
-      // Connect to Binance WebSocket for real-time BTC price
-      ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
+      // Connect to Binance WebSocket for real-time price
+      ws = new WebSocket(`wss://stream.binance.com:9443/ws/${binanceSymbol}@ticker`);
       
       ws.onopen = () => {
         console.log('Connected to Binance WebSocket');
@@ -87,7 +100,7 @@ export const LivePriceChart = ({ assetSymbol, assetName }: LivePriceChartProps) 
         clearTimeout(reconnectTimeout);
       }
     };
-  }, []);
+  }, [assetSymbol]);
 
   const maxPrice = Math.max(...priceData.map(p => p.price), currentPrice);
   const minPrice = Math.min(...priceData.map(p => p.price), currentPrice);

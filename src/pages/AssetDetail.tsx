@@ -143,30 +143,27 @@ const AssetDetail = () => {
       const now = new Date().getTime();
       const endTime = new Date(currentPool.round_end_time).getTime();
       const timeLeft = Math.max(0, (endTime - now) / 1000);
-      
-      // Only update countdown if it changed significantly to avoid too many re-renders
-      if (Math.abs(countdown - timeLeft) > 0.01) {
-        setCountdown(timeLeft);
-      }
+      setCountdown(timeLeft);
     };
 
     calculateCountdown();
     const timer = setInterval(calculateCountdown, 16);
 
     return () => clearInterval(timer);
-  }, [currentPool, countdown]);
+  }, [currentPool]);
   
-  // Trigger reload when countdown reaches 0
+  // Trigger reload when countdown reaches 0 - only once per pool
   useEffect(() => {
     if (countdown <= 0 && currentPool) {
+      // Wait 3 seconds for pool to finalize then reload
       const reloadTimer = setTimeout(() => {
         loadPoolData();
         loadPoolHistory();
-      }, 2000);
+      }, 3000);
       
       return () => clearTimeout(reloadTimer);
     }
-  }, [countdown, currentPool]);
+  }, [countdown > 0, currentPool?.id]);
 
   const getOdds = () => {
     const timeElapsed = 60 - countdown;
