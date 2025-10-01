@@ -68,12 +68,12 @@ const ExchangeNew = () => {
   };
 
   const handleAmountChange = (value: string) => {
-    // Remove all non-numeric characters except dot
-    const cleanValue = value.replace(/[^\d.]/g, '');
+    // Remove all non-numeric characters
+    const cleanValue = value.replace(/[^\d]/g, '');
     
-    // Validate max amount (1 million)
+    // Validate max amount (1 billion)
     const numValue = parseFloat(cleanValue);
-    if (numValue > 1000000) return;
+    if (numValue > 1000000000) return;
     
     setFromAmount(cleanValue);
     // 1:1 conversion rate
@@ -82,8 +82,8 @@ const ExchangeNew = () => {
 
   const formatNumber = (value: string) => {
     if (!value) return '';
-    // Just return the raw value without formatting while typing
-    return value;
+    // Add thousands separator
+    return parseInt(value).toLocaleString('pt-BR');
   };
 
   const handleSwapDirection = () => {
@@ -426,16 +426,23 @@ const ExchangeNew = () => {
             </Button>
             
             {fastMarketsButtonVisible && (
-              <Button
-                asChild
-                className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 hover:from-[#ff2389]/90 hover:to-[#ff2389]/70 hover:shadow-[0_0_30px_rgba(255,35,137,0.6)] transition-all duration-300 animate-pulse-118bpm"
-                size="lg"
-              >
-                <a href="/fast" className="flex items-center gap-2">
-                  <Zap className="w-5 h-5" />
-                  Experimente Fast Markets
-                </a>
-              </Button>
+              <div className="relative group w-full">
+                {/* Glow effect */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#00ff90] via-[#00d9ff] to-[#ff2389] rounded-2xl opacity-75 group-hover:opacity-100 blur-lg animate-pulse transition-all duration-300"></div>
+                
+                {/* Button */}
+                <Button
+                  asChild
+                  className="relative w-full h-16 text-xl font-bold bg-gradient-to-r from-[#00ff90] to-[#00d9ff] text-black hover:scale-105 transform transition-all duration-300 shadow-2xl border-2 border-white/30 backdrop-blur-sm"
+                  size="lg"
+                >
+                  <a href="/fast" className="flex items-center justify-center gap-3">
+                    <Zap className="w-7 h-7 animate-bounce" />
+                    Fast Markets
+                    <Zap className="w-7 h-7 animate-bounce" style={{ animationDelay: '150ms' }} />
+                  </a>
+                </Button>
+              </div>
             )}
             
             {showSuccessNotification && (

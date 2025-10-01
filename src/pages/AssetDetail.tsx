@@ -4,6 +4,7 @@ import { ArrowLeft, TrendingUp, TrendingDown, Clock, DollarSign } from 'lucide-r
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { LivePriceChart } from '@/components/markets/LivePriceChart';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -202,13 +203,15 @@ const AssetDetail = () => {
           </div>
         </div>
 
-        {/* Live Price Chart */}
-        <div className="mb-6">
-          <LivePriceChart 
-            assetSymbol={currentPool.asset_symbol} 
-            assetName={currentPool.asset_name} 
-          />
-        </div>
+        {/* Live Price Chart - Only for crypto category */}
+        {currentPool.category === 'cripto' && (
+          <div className="mb-6">
+            <LivePriceChart 
+              assetSymbol={currentPool.asset_symbol} 
+              assetName={currentPool.asset_name} 
+            />
+          </div>
+        )}
 
         {/* Current Pool Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -236,9 +239,23 @@ const AssetDetail = () => {
                 </div>
               )}
 
+              {/* Gold Pass Style Reward Card */}
+              <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl mt-4">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-shimmer"></div>
+                <div className="relative z-10 text-center">
+                  <span className="text-xs font-semibold text-yellow-500/80 tracking-wide">RECOMPENSA POTENCIAL</span>
+                  <div className="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent mt-1">
+                    {currentPool.base_odds}x suas moedas
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-2 pt-4">
                 <Button
-                  onClick={() => handleBet('subiu')}
+                  onClick={() => {
+                    handleBet('subiu');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   disabled={currentPool.paused || countdown <= 15}
                   className="bg-[#00ff90] hover:bg-[#00ff90]/90 text-black"
                 >
@@ -246,7 +263,10 @@ const AssetDetail = () => {
                   SUBIU
                 </Button>
                 <Button
-                  onClick={() => handleBet('desceu')}
+                  onClick={() => {
+                    handleBet('desceu');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   disabled={currentPool.paused || countdown <= 15}
                   className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white"
                 >
@@ -257,12 +277,36 @@ const AssetDetail = () => {
             </CardContent>
           </Card>
 
-          {/* Stats */}
+          {/* Stats & Order Book Aggression */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Estatísticas</CardTitle>
+              <CardTitle className="text-lg">Agressão do Order Book</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Odds Bar - similar to market odds */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm font-medium mb-2">
+                  <span className="text-[#00ff90]">SUBIU</span>
+                  <span className="text-[#ff2389]">DESCEU</span>
+                </div>
+                <div className="relative h-8 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className="absolute left-0 top-0 h-full bg-[#00ff90] transition-all duration-500"
+                    style={{ width: '50%' }}
+                  />
+                  <div 
+                    className="absolute right-0 top-0 h-full bg-[#ff2389] transition-all duration-500"
+                    style={{ width: '50%' }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-between px-4 text-sm font-bold">
+                    <span className="text-black">50%</span>
+                    <span className="text-white">50%</span>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Odds Base</span>
                 <span className="font-semibold">{currentPool.base_odds}x</span>

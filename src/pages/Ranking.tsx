@@ -211,23 +211,38 @@ const Ranking = () => {
             {/* User Progress Bar */}
             {profile && (
               <div className="mb-6 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
-                <h3 className="text-lg font-semibold mb-2">Seu Progresso</h3>
+                <div className="flex items-center gap-4 mb-4">
+                  <Avatar className="w-16 h-16 border-2 border-primary/30">
+                    <AvatarImage src={profile.profile_pic_url} alt={profile.nome} />
+                    <AvatarFallback className="bg-primary/20 text-primary text-lg">
+                      {profile.nome?.split(' ').map(n => n[0]).join('') || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-lg">{profile.nome}</h3>
+                    {profile.username && (
+                      <p className="text-sm text-muted-foreground">@{profile.username}</p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-primary">
+                      {profile.saldo_moeda.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Rioz</div>
+                  </div>
+                </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span>Nível atual: <span className="font-semibold text-primary">{getUserLevelProgress(profile.saldo_moeda).current}</span></span>
-                    <span>Saldo: <span className="font-semibold">{profile.saldo_moeda.toLocaleString()} RZ</span></span>
+                    <span>Progresso: <span className="font-semibold">{Math.round(getUserLevelProgress(profile.saldo_moeda).progress)}%</span></span>
                   </div>
                   
                   {getUserLevelProgress(profile.saldo_moeda).nextLevel && (
                      <>
-                       <div className="flex items-center justify-between text-sm text-muted-foreground">
-                         <span>Progresso para Mestre (500K)</span>
-                         <span>{Math.round(getUserLevelProgress(profile.saldo_moeda).progress)}%</span>
-                       </div>
-                      <Progress 
-                        value={getUserLevelProgress(profile.saldo_moeda).progress} 
-                        className="h-3"
-                      />
+                       <Progress 
+                         value={getUserLevelProgress(profile.saldo_moeda).progress} 
+                         className="h-3"
+                       />
                        <div className="text-xs text-muted-foreground">
                          Faltam {(500000 - profile.saldo_moeda).toLocaleString()} RZ para atingir Mestre
                        </div>
