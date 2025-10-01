@@ -26,51 +26,99 @@ serve(async (req) => {
 
     console.log('Processing pool result and payouts for pool:', poolId, 'result:', result);
 
-    // Process each winning bet with proper crediting
-    for (const bet of winningBets) {
-      const payoutAmount = Math.floor(bet.amount_rioz * bet.odds);
+    // Get ALL bets for this pool (winners and losers)
+    const { data: allBets, error: betsError } = await supabaseClient
+      .from('fast_pool_bets')
+      .select('*')
+      .eq('pool_id', poolId)
+      .eq('processed', false);
+
+    if (betsError) {
+      console.error('Error fetching all bets:', betsError);
+      throw betsError;
+    }
+
+    // Process each bet - winners get credited, losers get loss recorded
+    for (const bet of (allBets || [])) {
+      const isWinner = bet.side === result;
       
-      // Update user balance - credit the winnings
-      const { error: balanceError } = await supabaseClient.rpc('increment_balance', {
-        user_id: bet.user_id,
-        amount: payoutAmount
-      });
-
-      if (balanceError) {
-        console.error('Error updating balance for user:', bet.user_id, balanceError);
-        continue;
-      }
-
-      // Register winning transaction in wallet_transactions
-      const { error: transactionError } = await supabaseClient
-        .from('wallet_transactions')
-        .insert({
-          id: `fast_win_${poolId}_${bet.id}_${Date.now()}`,
+      if (isWinner) {
+        // Calculate payout using the recorded odds from when bet was placed
+        const payoutAmount = Math.floor(bet.amount_rioz * bet.odds);
+        
+        // Update user balance - credit the winnings
+        const { error: balanceError } = await supabaseClient.rpc('increment_balance', {
           user_id: bet.user_id,
-          tipo: 'credito',
-          valor: payoutAmount,
-          descricao: `Fast Market - Vitória - ${bet.side === 'subiu' ? 'Subiu' : 'Desceu'}`,
-          market_id: poolId
+          amount: payoutAmount
         });
 
-      if (transactionError) {
-        console.error('Error creating transaction record:', transactionError);
+        if (balanceError) {
+          console.error('Error updating balance for user:', bet.user_id, balanceError);
+          continue;
+        }
+
+        // Register winning transaction in wallet_transactions
+        const { error: transactionError } = await supabaseClient
+          .from('wallet_transactions')
+          .insert({
+            id: `fast_win_${poolId}_${bet.id}_${Date.now()}`,
+            user_id: bet.user_id,
+            tipo: 'credito',
+            valor: payoutAmount,
+            descricao: `Fast Market - Vitória - ${bet.side === 'subiu' ? 'Subiu' : 'Desceu'}`,
+            market_id: poolId
+          });
+
+        if (transactionError) {
+          console.error('Error creating transaction record:', transactionError);
+        }
+
+        // Mark bet as processed with payout amount
+        const { error: betError } = await supabaseClient
+          .from('fast_pool_bets')
+          .update({ 
+            processed: true, 
+            payout_amount: payoutAmount 
+          })
+          .eq('id', bet.id);
+
+        if (betError) {
+          console.error('Error updating bet:', bet.id, betError);
+        }
+
+        console.log(`Winner: Paid ${payoutAmount} RZ to user ${bet.user_id} for bet ${bet.id}`);
+      } else {
+        // User lost - record the loss in wallet_transactions
+        const { error: lossTransactionError } = await supabaseClient
+          .from('wallet_transactions')
+          .insert({
+            id: `fast_loss_${poolId}_${bet.id}_${Date.now()}`,
+            user_id: bet.user_id,
+            tipo: 'debito',
+            valor: bet.amount_rioz,
+            descricao: `Fast Market - Derrota - ${bet.side === 'subiu' ? 'Subiu' : 'Desceu'}`,
+            market_id: poolId
+          });
+
+        if (lossTransactionError) {
+          console.error('Error creating loss transaction record:', lossTransactionError);
+        }
+
+        // Mark bet as processed with no payout
+        const { error: betError } = await supabaseClient
+          .from('fast_pool_bets')
+          .update({ 
+            processed: true, 
+            payout_amount: 0 
+          })
+          .eq('id', bet.id);
+
+        if (betError) {
+          console.error('Error updating losing bet:', bet.id, betError);
+        }
+
+        console.log(`Loser: Recorded loss of ${bet.amount_rioz} RZ for user ${bet.user_id} on bet ${bet.id}`);
       }
-
-      // Mark bet as processed with payout amount
-      const { error: betError } = await supabaseClient
-        .from('fast_pool_bets')
-        .update({ 
-          processed: true, 
-          payout_amount: payoutAmount 
-        })
-        .eq('id', bet.id);
-
-      if (betError) {
-        console.error('Error updating bet:', bet.id, betError);
-      }
-
-      console.log(`Paid ${payoutAmount} RZ to user ${bet.user_id} for bet ${bet.id}`);
     }
 
     // Store the result in fast_pool_results for all categories

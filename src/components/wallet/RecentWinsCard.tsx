@@ -16,62 +16,30 @@ export const RecentWinsCard = () => {
   const { user } = useAuth();
 
   const { data: recentWins = [], isLoading } = useQuery({
-    queryKey: ['recent-wins', user?.id],
+    queryKey: ['fast-markets-transactions', user?.id],
     queryFn: async (): Promise<WinRecord[]> => {
       if (!user?.id) return [];
       
-      // Get winning orders (completed with profit)
-      const { data: winningOrders, error: ordersError } = await supabase
-        .from('orders')
-        .select(`
-          id,
-          market_id,
-          quantidade_moeda,
-          created_at,
-          cashout_amount,
-          markets!inner(titulo)
-        `)
-        .eq('user_id', user.id)
-        .eq('status', 'ganhou')
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (ordersError) throw ordersError;
-
-      const orderWins = (winningOrders || []).map(order => ({
-        id: order.id,
-        market_id: order.market_id,
-        amount: (order.cashout_amount || 0) - order.quantidade_moeda,
-        created_at: order.created_at,
-        market_title: (order.markets as any)?.titulo || 'Mercado'
-      }));
-
-      // Get Fast Markets winnings from wallet_transactions
-      const { data: fastWins, error: fastError } = await supabase
+      // Get Fast Markets final results only (victories and defeats)
+      const { data: fastTransactions, error: fastError } = await supabase
         .from('wallet_transactions')
         .select('*')
         .eq('user_id', user.id)
-        .eq('tipo', 'credito')
-        .like('descricao', 'Fast Market - Vitória%')
+        .or('descricao.like.Fast Market - Vitória%,descricao.like.Fast Market - Derrota%')
         .order('created_at', { ascending: false })
         .limit(10);
 
       if (fastError) throw fastError;
 
-      const fastWinRecords = (fastWins || []).map(tx => ({
+      const fastRecords = (fastTransactions || []).map(tx => ({
         id: tx.id,
         market_id: tx.market_id || 'fast-market',
-        amount: tx.valor,
+        amount: tx.tipo === 'credito' ? tx.valor : -tx.valor, // Negative for losses
         created_at: tx.created_at,
-        market_title: tx.descricao.replace('Fast Market - Vitória - ', '')
+        market_title: tx.descricao.replace('Fast Market - Vitória - ', '').replace('Fast Market - Derrota - ', '')
       }));
 
-      // Combine and sort all wins
-      const allWins = [...orderWins, ...fastWinRecords]
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-        .slice(0, 5);
-
-      return allWins;
+      return fastRecords;
     },
     enabled: !!user?.id,
   });
@@ -79,11 +47,11 @@ export const RecentWinsCard = () => {
   const totalWins = recentWins.reduce((sum, win) => sum + win.amount, 0);
 
   return (
-    <Card className="bg-gradient-to-br from-success/5 to-success/10 border-success/20">
+    <Card className="bg-gradient-to-br from-[#ff2389]/5 to-[#ff2389]/10 border-[#ff2389]/20">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-success">
+        <CardTitle className="flex items-center gap-2 text-[#ff2389]">
           <Trophy className="w-5 h-5" />
-          Últimos Ganhos
+          Fast Markets
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -97,21 +65,21 @@ export const RecentWinsCard = () => {
           <div className="text-center py-8">
             <Trophy className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
             <p className="text-sm text-muted-foreground">
-              Nenhuma vitória recente
+              Nenhuma transação recente
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              Continue apostando para ver seus ganhos aqui!
+              Participe dos Fast Markets para ver seus resultados aqui!
             </p>
           </div>
         ) : (
           <>
-            <div className="bg-success/10 rounded-lg p-4 mb-4">
+            <div className={`rounded-lg p-4 mb-4 ${totalWins >= 0 ? 'bg-[#00ff90]/10' : 'bg-[#ff2389]/10'}`}>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Total ganho (últimas 5)</span>
+                <span className="text-sm text-muted-foreground">Resultado Líquido</span>
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-success" />
-                  <span className="text-xl font-bold text-success">
-                    +{totalWins.toLocaleString()} RZ
+                  <TrendingUp className={`w-4 h-4 ${totalWins >= 0 ? 'text-[#00ff90]' : 'text-[#ff2389]'}`} />
+                  <span className={`text-xl font-bold ${totalWins >= 0 ? 'text-[#00ff90]' : 'text-[#ff2389]'}`}>
+                    {totalWins >= 0 ? '+' : ''}{totalWins.toLocaleString()} RZ
                   </span>
                 </div>
               </div>
@@ -121,7 +89,11 @@ export const RecentWinsCard = () => {
               {recentWins.map((win) => (
                 <div
                   key={win.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-card/50 border border-border/50 hover:border-success/30 transition-colors"
+                  className={`flex items-center justify-between p-3 rounded-lg bg-card/50 border transition-colors ${
+                    win.amount >= 0 
+                      ? 'border-[#00ff90]/30 hover:border-[#00ff90]/50' 
+                      : 'border-[#ff2389]/30 hover:border-[#ff2389]/50'
+                  }`}
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">
@@ -132,8 +104,8 @@ export const RecentWinsCard = () => {
                     </p>
                   </div>
                   <div className="text-right ml-4">
-                    <span className="text-sm font-bold text-success">
-                      +{win.amount.toLocaleString()} RZ
+                    <span className={`text-sm font-bold ${win.amount >= 0 ? 'text-[#00ff90]' : 'text-[#ff2389]'}`}>
+                      {win.amount >= 0 ? '+' : ''}{win.amount.toLocaleString()} RZ
                     </span>
                   </div>
                 </div>

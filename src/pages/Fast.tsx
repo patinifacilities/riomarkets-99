@@ -500,15 +500,15 @@ const Fast = () => {
         setOpinionNotifications(prev => prev.filter(n => n.id !== newNotification.id));
       }, 3000);
 
-      // Register transaction in wallet_transactions
+      // Register transaction in wallet_transactions as pending bet (not shown in Fast Markets card)
       await supabase
         .from('wallet_transactions')
         .insert({
-          id: `fast_bet_${Date.now()}_${user.id}`,
+          id: `fast_bet_pending_${Date.now()}_${user.id}`,
           user_id: user.id,
           tipo: 'debito',
           valor: betAmount,
-          descricao: `Fast Market - ${side === 'subiu' ? 'Subiu' : 'Desceu'} - ${pool.asset_name}`,
+          descricao: `Fast Market - Aposta Pendente - ${side === 'subiu' ? 'Subiu' : 'Desceu'} - ${pool.asset_name}`,
           market_id: poolId
         });
 
