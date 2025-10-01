@@ -382,12 +382,20 @@ const Fast = () => {
       if (bet && bet.processed && bet.payout_amount > 0) {
         playCoinSound();
         const winAmount = bet.payout_amount - bet.amount_rioz;
+        
+        // Show bottom-right notification
         toast({
           title: "🎉 Você ganhou!",
           description: `Parabéns! Você ganhou ${winAmount.toFixed(0)} RZ`,
           duration: 6000,
-          className: 'bg-[#00ff90]/10 border-[#00ff90]'
+          className: 'bg-[#00ff90]/10 border-[#00ff90] fixed bottom-4 right-4'
         });
+        
+        // Trigger header animation
+        const event = new CustomEvent('fastWinAnimation', { 
+          detail: { amount: winAmount } 
+        });
+        window.dispatchEvent(event);
       }
     } catch (error) {
       console.error('Error checking winnings:', error);

@@ -25,7 +25,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TickerBar } from '@/components/ui/ticker-bar';
 import { WalletHoverCard } from '@/components/wallet/WalletHoverCard';
 import { DarkModeToggle } from './DarkModeToggle';
@@ -58,6 +58,28 @@ const Header = () => {
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [walletHoverOpen, setWalletHoverOpen] = useState(false);
+
+  // Listen for fast market win animations
+  useEffect(() => {
+    const handleWinAnimation = (event: CustomEvent) => {
+      const target = document.getElementById('fast-winner-animation-target');
+      if (target) {
+        const winElement = document.createElement('div');
+        winElement.className = 'win-animation';
+        winElement.textContent = `+${event.detail.amount.toFixed(0)} RZ`;
+        target.appendChild(winElement);
+        
+        setTimeout(() => {
+          winElement.remove();
+        }, 2000);
+      }
+    };
+    
+    window.addEventListener('fastWinAnimation', handleWinAnimation as EventListener);
+    return () => {
+      window.removeEventListener('fastWinAnimation', handleWinAnimation as EventListener);
+    };
+  }, []);
 
   const navItems = [
     { href: '/fast', icon: Zap, label: 'Fast', special: 'pulse' },
@@ -379,7 +401,31 @@ const Header = () => {
                   
                   {/* Winner Balance Animation for Fast Markets */}
                   {location.pathname === '/fast' && (
-                    <div id="fast-winner-animation-target" className="absolute -top-8 left-1/2 transform -translate-x-1/2 pointer-events-none z-50"></div>
+                    <div id="fast-winner-animation-target" className="absolute -top-8 left-1/2 transform -translate-x-1/2 pointer-events-none z-50">
+                      <style>{`
+                        @keyframes fadeInUp {
+                          0% {
+                            opacity: 0;
+                            transform: translateY(10px);
+                          }
+                          50% {
+                            opacity: 1;
+                            transform: translateY(-20px);
+                          }
+                          100% {
+                            opacity: 0;
+                            transform: translateY(-40px);
+                          }
+                        }
+                        .win-animation {
+                          animation: fadeInUp 2s ease-out forwards;
+                          font-size: 1.5rem;
+                          font-weight: bold;
+                          color: #00ff90;
+                          text-shadow: 0 0 10px rgba(0, 255, 144, 0.5);
+                        }
+                      `}</style>
+                    </div>
                   )}
                 </div>
                 

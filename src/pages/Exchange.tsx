@@ -24,12 +24,25 @@ const ExchangeNew = () => {
   const [swapDirection, setSwapDirection] = useState<'brl-to-rioz' | 'rioz-to-brl'>('brl-to-rioz');
   const [loading, setLoading] = useState(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [fastMarketsButtonVisible, setFastMarketsButtonVisible] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
       fetchBalances();
     }
   }, [user?.id]);
+  
+  // Show Fast Markets button for 30 seconds after successful conversion
+  useEffect(() => {
+    if (showSuccessNotification) {
+      setFastMarketsButtonVisible(true);
+      const timer = setTimeout(() => {
+        setFastMarketsButtonVisible(false);
+      }, 30000); // 30 seconds
+      
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessNotification]);
 
   const fetchBalances = async () => {
     if (!user?.id) return;
@@ -286,7 +299,7 @@ const ExchangeNew = () => {
                     placeholder="0"
                     value={formatNumber(fromAmount)}
                     onChange={(e) => handleAmountChange(e.target.value)}
-                    className="pl-32 pr-4 h-40 text-right text-[200px] leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
+                    className="pl-32 pr-4 h-32 text-right text-[200px] leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
                   />
                 </div>
                 {fromAmount && parseFloat(fromAmount.replace(/[^\d.]/g, '')) > fromBalance && (
@@ -376,7 +389,7 @@ const ExchangeNew = () => {
                   placeholder="0"
                   value={formatNumber(toAmount)}
                   readOnly
-                  className="pl-32 pr-4 h-40 text-right text-[200px] leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
+                  className="pl-32 pr-4 h-32 text-right text-[200px] leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:caret-[#00ff90] selection:bg-[#00ff90]/30"
                 />
               </div>
             </div>
@@ -421,18 +434,20 @@ const ExchangeNew = () => {
                     <div className="text-muted-foreground text-xs mt-0.5">Seus saldos foram atualizados</div>
                   </div>
                 </div>
-                
-                <Button
-                  asChild
-                  className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 hover:from-[#ff2389]/90 hover:to-[#ff2389]/70 animate-pulse-continuous-60s"
-                  size="lg"
-                >
-                  <a href="/fast" className="flex items-center gap-2">
-                    <Zap className="w-5 h-5" />
-                    Experimente Fast Markets
-                  </a>
-                </Button>
               </>
+            )}
+            
+            {fastMarketsButtonVisible && (
+              <Button
+                asChild
+                className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 hover:from-[#ff2389]/90 hover:to-[#ff2389]/70 animate-pulse"
+                size="lg"
+              >
+                <a href="/fast" className="flex items-center gap-2">
+                  <Zap className="w-5 h-5" />
+                  Experimente Fast Markets
+                </a>
+              </Button>
             )}
           </CardContent>
         </Card>

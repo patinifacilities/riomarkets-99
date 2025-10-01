@@ -112,14 +112,13 @@ export const FastPoolExpandedModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
         className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border-border"
-        hideCloseButton={false}
       >
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold mb-2">
             {pool.asset_name}
           </DialogTitle>
           <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">{pool.question}</p>
+            <p className="text-base font-bold text-center text-foreground">{pool.question}</p>
             <div className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground">Preço atual:</span>
               <span className="font-semibold text-primary">${pool.opening_price.toLocaleString()}</span>
