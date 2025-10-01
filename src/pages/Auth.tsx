@@ -877,6 +877,7 @@ const Auth = () => {
                       setIsLogin(!isLogin);
                       setError('');
                       setShowForgotPassword(false);
+                      setCurrentStep(0);
                     }}
                     className="text-primary hover:underline focus:outline-none focus:underline"
                     aria-label={isLogin ? "Criar nova conta" : "Entrar na sua conta"}
