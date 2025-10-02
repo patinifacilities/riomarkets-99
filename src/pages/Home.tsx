@@ -152,47 +152,42 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
-      {/* Category Pills Hero */}
-      <div className="border-b border-border/20">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {topicFilters.map((topic, index) => {
-              const gradients = [
-                'from-pink-400 to-pink-600',
-                'from-cyan-400 to-cyan-600', 
-                'from-purple-400 to-purple-600',
-                'from-green-400 to-green-600',
-                'from-yellow-400 to-yellow-600',
-                'from-red-400 to-red-600',
-                'from-blue-400 to-blue-600'
-              ];
-              const IconComponent = topic.Icon;
-              const isSelected = selectedTopics.includes(topic.id);
-              
-              return (
-                <button
-                  key={topic.id}
-                  onClick={() => handleTopicSelect(topic.id)}
-                  className={cn(
-                    "flex-shrink-0 w-48 h-32 rounded-2xl bg-gradient-to-br p-4 relative overflow-hidden transition-all",
-                    gradients[index % gradients.length],
-                    isSelected ? "ring-2 ring-white scale-105" : "opacity-80 hover:opacity-100"
-                  )}
-                >
-                  <div className="relative z-10">
-                    <h3 className="text-lg font-bold text-white mb-2">{topic.label}</h3>
-                  </div>
-                  <IconComponent className="absolute bottom-3 right-3 w-16 h-16 text-white/30" />
-                </button>
-              );
-            })}
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-b from-primary/10 to-background border-b border-border">
+        <div className="container mx-auto px-4 py-16">
+          <div className="max-w-4xl mx-auto text-center space-y-6">
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Mercados Preditivos de Notícias do Brasil
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              Aposte em suas opiniões sobre política, economia, esportes e muito mais. 
+              Ganhe recompensas compartilhando suas previsões sobre eventos futuros.
+            </p>
+            <div className="flex gap-4 justify-center items-center pt-4">
+              <Button 
+                size="lg" 
+                className="bg-[#00ff90] text-gray-900 hover:bg-[#00ff90]/90 font-semibold px-8 transition-all hover:scale-105"
+                onClick={() => navigate('/auth')}
+              >
+                <Sparkles className="w-5 h-5 mr-2" />
+                Explorar Mercados
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                onClick={() => navigate('/auth')}
+              >
+                <UserPlus className="w-5 h-5 mr-2" />
+                Criar Conta
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-8">
         {/* Search and Filters */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
