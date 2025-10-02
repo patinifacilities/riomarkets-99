@@ -22,6 +22,7 @@ export function adaptMarketFromDB(dbMarket: any): MarketWithRecompensas {
     ...dbMarket,
     recompensas,
     odds: dbMarket.odds, // preserva original para compatibilidade
+    image_url: dbMarket.image_url, // adiciona image_url
   };
 }
 
