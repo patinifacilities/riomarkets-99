@@ -103,7 +103,7 @@ const TransactionsToolbar = ({ onExport, className }: TransactionsToolbarProps) 
                 variant={filters.from ? "secondary" : "outline"}
                 size="sm"
                 onClick={() => handleQuickDateFilter(7)}
-                className="whitespace-nowrap bg-card-secondary"
+                className="whitespace-nowrap text-white border-white"
               >
                 Últimos 7 dias
               </Button>
@@ -111,7 +111,7 @@ const TransactionsToolbar = ({ onExport, className }: TransactionsToolbarProps) 
                 variant={filters.from && !dateRange.from ? "secondary" : "outline"}
                 size="sm"
                 onClick={() => handleQuickDateFilter(30)}
-                className="whitespace-nowrap bg-card-secondary"
+                className="whitespace-nowrap text-white border-white"
               >
                 Últimos 30 dias
               </Button>
@@ -119,7 +119,7 @@ const TransactionsToolbar = ({ onExport, className }: TransactionsToolbarProps) 
                 variant={filters.from && !dateRange.from ? "secondary" : "outline"}
                 size="sm"
                 onClick={() => handleQuickDateFilter(90)}
-                className="whitespace-nowrap bg-card-secondary"
+                className="whitespace-nowrap text-white border-white"
               >
                 Últimos 90 dias
               </Button>

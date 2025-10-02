@@ -372,7 +372,7 @@ const Auth = () => {
                 Mercados Preditivos
               </div>
               <div>
-                <TypewriterText
+              <TypewriterText
                   baseText=""
                   texts={[
                     "para Análise Estratégica",
@@ -381,7 +381,7 @@ const Auth = () => {
                     "Rápidos"
                   ]}
                   customColors={{
-                    "Rápidos": "#ff2389"
+                    "Rápidos": "#00ff90"
                   }}
                   className="text-2xl font-bold"
                   typingSpeed={100}

@@ -66,21 +66,11 @@ const WalletPage = () => {
       
       <div className="container mx-auto px-4 py-6">
         {/* Mobile header - Show only on mobile */}
-        <div className="md:hidden mb-6 flex items-center justify-between">
-          <img 
-            src="/assets/rio-markets-logo.png" 
-            alt="Rio Markets" 
-            className="h-8 w-auto" 
-          />
-          <Button
-            onClick={() => setShowDepositModal(true)}
-            variant="default"
-            size="sm"
-            className="gap-2"
-          >
-            <DollarSign className="w-4 h-4" />
-            Depositar
-          </Button>
+        <div className="md:hidden mb-6">
+          <h1 className="text-2xl font-bold flex items-center gap-3">
+            <Wallet className="w-7 h-7" />
+            Carteira
+          </h1>
         </div>
         
         {/* Desktop header - Show only on desktop */}

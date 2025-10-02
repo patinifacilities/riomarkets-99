@@ -488,7 +488,7 @@ const Header = () => {
                            console.error('Erro ao fazer logout:', error);
                          }
                        }}
-                       className="flex items-center gap-2 text-red-600 focus:text-red-600 cursor-pointer"
+                       className="flex items-center gap-2 text-red-600 hover:text-red-600 cursor-pointer"
                      >
                        <LogOut className="w-4 h-4" />
                        Sair

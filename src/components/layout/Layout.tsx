@@ -5,6 +5,7 @@ import { Footer } from './Footer';
 import { RianaChat } from '@/components/chat/RianaChat';
 import { ComplianceBanner } from '@/components/compliance/ComplianceBanner';
 import { OnboardingModal } from '@/components/onboarding/OnboardingModal';
+import BottomNavigation from './BottomNavigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useOnboarding } from '@/stores/useOnboarding';
@@ -63,13 +64,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen bg-background">
       {!shouldHideHeaderFooter && <Header />}
-      <main className="flex-1 min-h-0">
+      <main className={`flex-1 min-h-0 ${isMobile ? 'pb-16' : ''}`}>
         {children}
       </main>
       {!shouldHideFooter && <Footer />}
       {!shouldHideHeaderFooter && <ComplianceBanner variant="sticky" />}
       {!shouldHideHeaderFooter && <OnboardingModal />}
       {!shouldHideHeaderFooter && <RianaChat />}
+      {isMobile && !shouldHideHeaderFooter && <BottomNavigation />}
     </div>
   );
 };
