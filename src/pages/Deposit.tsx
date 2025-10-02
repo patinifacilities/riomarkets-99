@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Checkbox } from "@/components/ui/checkbox";
+import { PixPaymentModal } from "@/components/wallet/PixPaymentModal";
 
 export default function Deposit() {
   const navigate = useNavigate();
@@ -26,6 +27,8 @@ export default function Deposit() {
     cpf: '',
   });
   const [saveCard, setSaveCard] = useState(false);
+  const [showPixModal, setShowPixModal] = useState(false);
+  const [pixData, setPixData] = useState<{ qrCode?: string; qrCodeText?: string } | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -128,23 +131,22 @@ export default function Deposit() {
         setIsProcessing(false);
         return;
       } else if (method === "pix") {
-        // Create PIX payment request
-        const { data, error } = await supabase.functions.invoke("process-fiat-request", {
-          body: {
-            amount: numericAmount,
-            type: "deposit",
-            gateway: "pix",
-          },
+        // Generate PIX payment via Abacatepay
+        const { data, error } = await supabase.functions.invoke("generate-pix-payment", {
+          body: { amount: numericAmount },
         });
 
         if (error) throw error;
 
-        toast.success("PIX gerado com sucesso!", {
-          description: "Use o código para realizar o pagamento.",
-        });
-
-        // You could navigate to a PIX payment page or show a modal with the code
-        console.log("PIX Data:", data);
+        if (data?.success) {
+          setPixData({
+            qrCode: data.qrCode,
+            qrCodeText: data.qrCodeText,
+          });
+          setShowPixModal(true);
+        } else {
+          throw new Error("Failed to generate PIX payment");
+        }
       } else if (method === "apple") {
         toast.info("Apple Pay em breve!", {
           description: "Esta opção estará disponível em breve.",
@@ -473,6 +475,19 @@ export default function Deposit() {
           </p>
         </div>
       </div>
+
+      {/* PIX Payment Modal */}
+      <PixPaymentModal
+        open={showPixModal}
+        onOpenChange={setShowPixModal}
+        amount={formatCurrencyDisplay(amount)}
+        qrCode={pixData?.qrCode}
+        qrCodeText={pixData?.qrCodeText}
+        onSuccess={() => {
+          setShowPixModal(false);
+          navigate('/wallet');
+        }}
+      />
     </div>
   );
 }

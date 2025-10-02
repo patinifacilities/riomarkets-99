@@ -15,10 +15,12 @@ interface PixPaymentModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   amount: string;
+  qrCode?: string;
+  qrCodeText?: string;
   onSuccess?: () => void;
 }
 
-export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPaymentModalProps) => {
+export const PixPaymentModal = ({ open, onOpenChange, amount, qrCode, qrCodeText, onSuccess }: PixPaymentModalProps) => {
   const [copied, setCopied] = useState(false);
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes in seconds
   const { toast } = useToast();
@@ -54,8 +56,8 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  // Generate mock PIX code (in real app, this would come from payment processor)
-  const pixCode = `00020126580014br.gov.bcb.pix013636c92c2b-3a13-4d1c-b7ee-${Date.now()}520400005303986540${amount.replace(/\D/g, '')}.005802BR5915RioMarkets LTDA6009SAO PAULO62070503***6304`;
+  // Use provided PIX code or fallback to mock code
+  const pixCode = qrCodeText || `00020126580014br.gov.bcb.pix013636c92c2b-3a13-4d1c-b7ee-${Date.now()}520400005303986540${amount.replace(/\D/g, '')}.005802BR5915RioMarkets LTDA6009SAO PAULO62070503***6304`;
 
   const handleCopyCode = async () => {
     try {
@@ -108,15 +110,19 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
             </span>
           </div>
 
-          {/* QR Code Placeholder */}
+          {/* QR Code */}
           <div className="flex justify-center">
-            <div className="w-48 h-48 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/20">
-              <div className="text-center">
-                <QrCode className="w-16 h-16 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">QR Code PIX</p>
-                <p className="text-xs text-muted-foreground">R$ {amount}</p>
+            {qrCode ? (
+              <img src={qrCode} alt="QR Code PIX" className="w-48 h-48 rounded-lg border-2 border-border" />
+            ) : (
+              <div className="w-48 h-48 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/20">
+                <div className="text-center">
+                  <QrCode className="w-16 h-16 mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">QR Code PIX</p>
+                  <p className="text-xs text-muted-foreground">R$ {amount}</p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* PIX Code */}

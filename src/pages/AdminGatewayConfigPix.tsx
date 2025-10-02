@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
@@ -34,6 +35,8 @@ const AdminGatewayConfigPix = () => {
 
   const [config, setConfig] = useState({
     enabled: true,
+    provider: 'abacatepay',
+    apiKey: '',
     pixKey: 'exemplo@pix.com.br',
     feePercent: 0,
     minAmount: 1,
@@ -127,23 +130,42 @@ const AdminGatewayConfigPix = () => {
               </CardContent>
             </Card>
 
-            {/* Configurações PIX */}
+            {/* Provedor e API */}
             <Card className="bg-card-secondary border-border-secondary">
               <CardHeader>
-                <CardTitle>Configurações PIX</CardTitle>
+                <CardTitle>Provedor de Pagamento</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="pixKey">Chave PIX</Label>
+                  <Label htmlFor="provider">Provedor PIX</Label>
+                  <Select value={config.provider} onValueChange={(value) => setConfig(prev => ({ ...prev, provider: value }))}>
+                    <SelectTrigger id="provider">
+                      <SelectValue placeholder="Selecione o provedor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="abacatepay">Abacatepay</SelectItem>
+                      <SelectItem value="mercadopago">Mercado Pago (Em breve)</SelectItem>
+                      <SelectItem value="pagseguro">PagSeguro (Em breve)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Sistema de pagamentos PIX utilizado
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="apiKey">API Key</Label>
                   <Input
-                    id="pixKey"
-                    type="text"
-                    value={config.pixKey}
-                    onChange={(e) => setConfig(prev => ({ ...prev, pixKey: e.target.value }))}
-                    placeholder="Sua chave PIX (email, CPF, telefone ou chave aleatória)"
+                    id="apiKey"
+                    type="password"
+                    value={config.apiKey}
+                    onChange={(e) => setConfig(prev => ({ ...prev, apiKey: e.target.value }))}
+                    placeholder="Sua API Key do provedor"
                   />
                   <p className="text-sm text-muted-foreground mt-1">
-                    Esta chave será usada para receber os pagamentos PIX
+                    {config.provider === 'abacatepay' && 'Obtida no painel da Abacatepay'}
+                    {config.provider === 'mercadopago' && 'Obtida no painel do Mercado Pago'}
+                    {config.provider === 'pagseguro' && 'Obtida no painel do PagSeguro'}
                   </p>
                 </div>
 
