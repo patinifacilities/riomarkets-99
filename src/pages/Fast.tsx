@@ -945,8 +945,8 @@ const Fast = () => {
           </p>
           
           {/* Category Selector */}
-          <div className="flex justify-center items-center mb-6">
-            <div className="flex gap-2 p-1 bg-muted rounded-xl">
+          <div className="flex justify-center items-center mb-6 overflow-x-auto scrollbar-hide">
+            <div className="flex gap-2 p-1 bg-muted rounded-xl min-w-min">
               {categoryOptions.map((category) => (
                 <Button
                   key={category.value}
@@ -954,7 +954,8 @@ const Fast = () => {
                   size="lg"
                   onClick={() => setSelectedCategory(category.value)}
                   className={cn(
-                    "transition-all duration-75 font-bold rounded-xl px-10 py-6 text-base",
+                    "transition-all duration-75 font-bold rounded-xl text-base flex-shrink-0",
+                    "px-4 py-3 md:px-10 md:py-6",
                     selectedCategory === category.value 
                       ? "shadow-lg border-2 scale-105" 
                       : "hover:bg-muted-foreground/10"

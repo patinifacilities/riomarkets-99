@@ -276,17 +276,17 @@ const Header = () => {
           {isMobile && !isLoggedIn && (
             <div className="flex items-center flex-1 relative">
               <Link to="/">
-                <div className="relative h-7 min-w-[120px]">
+                <div className="relative h-10 min-w-[140px]">
                   <img 
                     src={logoImageWhite}
                     alt="Rio Markets" 
-                    className="absolute h-7 w-auto object-contain transition-opacity duration-300" 
+                    className="absolute h-10 w-auto object-contain transition-opacity duration-300" 
                     style={{ opacity: resolvedTheme === 'light' ? 0 : 1 }}
                   />
                   <img 
                     src={logoImageBlack}
                     alt="Rio Markets" 
-                    className="absolute h-7 w-auto object-contain transition-opacity duration-300" 
+                    className="absolute h-10 w-auto object-contain transition-opacity duration-300" 
                     style={{ opacity: resolvedTheme === 'light' ? 1 : 0 }}
                   />
                 </div>

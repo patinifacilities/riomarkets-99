@@ -55,6 +55,16 @@ const Auth = () => {
   
   const totalSteps = 5; // Total registration steps
 
+  // Preload logos for faster rendering
+  useEffect(() => {
+    const preloadImage = (src: string) => {
+      const img = new Image();
+      img.src = src;
+    };
+    preloadImage(new URL('../assets/rio-white-logo-new.png', import.meta.url).href);
+    preloadImage('/assets/rio-black-logo.png');
+  }, []);
+
   useEffect(() => {
     let mounted = true;
     
@@ -92,10 +102,11 @@ const Auth = () => {
         if (event === 'SIGNED_IN' && session?.user) {
           console.log('Login successful, redirecting to home...');
           navigate('/', { replace: true });
-          // Trigger onboarding after navigation
+          // Scroll to top of page after navigation
           setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             openOnFirstVisit();
-          }, 500);
+          }, 100);
         }
         
         // Handle sign out - stay on auth page

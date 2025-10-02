@@ -255,12 +255,12 @@ const Home = () => {
         <div className="flex flex-col gap-6">
           {/* Topic Filters - Infinite Loop Side Scroller */}
           <div>
-            <div className="relative overflow-visible py-4">
-              {/* Fade overlays - lower z-index */}
-              <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background via-background/80 to-transparent z-[5] pointer-events-none"></div>
-              <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background via-background/80 to-transparent z-[5] pointer-events-none"></div>
+            <div className="relative overflow-hidden py-4">
+              {/* Fade overlays */}
+              <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none"></div>
+              <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none"></div>
               
-              <div className="overflow-x-auto scrollbar-hide scroll-smooth relative z-[10]" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              <div className="overflow-x-auto scrollbar-hide scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 <div className="flex gap-4 pb-2 min-w-max animate-infinite-scroll hover:pause">
                   {/* First set of topics */}
                   {topicFilters.map((topic, index) => {
@@ -274,11 +274,11 @@ const Home = () => {
                         onClick={() => handleTopicSelect(topic.id)}
                         className={cn(
                           "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap relative",
-                          "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg overflow-visible",
+                          "transition-all duration-300 border-2 shadow-lg",
                           "animate-fade-in",
                           isSelected
-                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50 animate-pulse-gentle z-[30]' 
-                            : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm hover:z-[20] z-[15]'
+                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50 hover:brightness-110' 
+                            : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm hover:scale-105'
                         )}
                         style={{ animationDelay: `${index * 50}ms` }}
                       >
@@ -317,11 +317,11 @@ const Home = () => {
                         onClick={() => handleTopicSelect(topic.id)}
                         className={cn(
                           "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap relative",
-                          "transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-2 shadow-lg overflow-visible",
+                          "transition-all duration-300 border-2 shadow-lg",
                           "animate-fade-in",
                           isSelected
-                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50 z-[30]' 
-                            : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm hover:z-[20] z-[15]'
+                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground shadow-primary/30 scale-105 border-primary/50 hover:brightness-110' 
+                            : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm hover:scale-105'
                         )}
                         style={{ animationDelay: `${(index + topicFilters.length) * 50}ms` }}
                       >
