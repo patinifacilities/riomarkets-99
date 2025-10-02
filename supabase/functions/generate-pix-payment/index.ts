@@ -60,8 +60,8 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        frequency: 'one-time',
-        methods: ['pix'],
+        frequency: 'ONE_TIME',
+        methods: ['PIX'],
         products: [{
           externalId: `deposit-${user.id}-${Date.now()}`,
           name: 'Depósito RIOZ Markets',

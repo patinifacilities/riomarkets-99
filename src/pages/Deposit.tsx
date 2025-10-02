@@ -458,12 +458,13 @@ export default function Deposit() {
           <Button
             onClick={() => handleDeposit("apple")}
             disabled={!amount || parseFloat(amount) / 100 < 5 || isProcessing}
-            className="w-full h-14 text-lg font-semibold mt-3 bg-black text-white shadow-lg border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 transition-opacity duration-200"
+            className="group w-full h-14 text-lg font-semibold mt-3 bg-black text-white shadow-lg border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 relative overflow-hidden"
           >
-            <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
+            <span className="absolute inset-0 bg-white transform translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500 ease-out" />
+            <svg className="w-10 h-10 relative z-10 transition-colors duration-500 group-hover:text-black" viewBox="0 0 24 24" fill="currentColor">
               <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
             </svg>
-            Apple Pay
+            <span className="relative z-10 transition-colors duration-500 group-hover:text-black">Apple Pay</span>
           </Button>
         )}
 
