@@ -157,9 +157,17 @@ const Header = () => {
                         }}
                       >
                         <Avatar className="h-12 w-12 ring-2 ring-primary/20">
-                          <AvatarFallback className="bg-primary text-primary-foreground">
-                            {profile.nome ? profile.nome.charAt(0).toUpperCase() : 'U'}
-                          </AvatarFallback>
+                          {profile.profile_pic_url ? (
+                            <img 
+                              src={profile.profile_pic_url} 
+                              alt={profile.nome || 'Usuário'} 
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <AvatarFallback className="bg-primary text-primary-foreground">
+                              {profile.nome ? profile.nome.charAt(0).toUpperCase() : 'U'}
+                            </AvatarFallback>
+                          )}
                         </Avatar>
                         <div>
                           <p className="text-sm font-medium">{profile.nome || 'Usuário'}</p>
@@ -258,7 +266,7 @@ const Header = () => {
                           navigate('/auth');
                         }}
                         variant="ghost"
-                        className="w-full justify-start gap-3 h-12 text-red-400 hover:text-red-300 hover:bg-red-950/20"
+                        className="w-full justify-start gap-3 h-12 text-white hover:text-white/80 hover:bg-muted/20"
                       >
                         <LogOut className="w-5 h-5" />
                         Sair
@@ -379,7 +387,6 @@ const Header = () => {
             {/* Mobile menu */}
             {isMobile && isLoggedIn ? (
               <div className="flex items-center gap-2">
-                <DarkModeToggle />
                 <Link to="/wallet">
                   <Button 
                     variant="ghost" 
@@ -402,6 +409,10 @@ const Header = () => {
                   <Plus className="w-4 h-4" />
                   Depositar
                 </Button>
+                
+                {/* Dark Mode Toggle */}
+                <DarkModeToggle />
+                
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button 
@@ -430,7 +441,7 @@ const Header = () => {
                       Suporte
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={signOut}>
+                    <DropdownMenuItem onClick={signOut} className="text-white hover:text-white/80">
                       <LogOut className="mr-2 h-4 w-4" />
                       Sair
                     </DropdownMenuItem>
@@ -492,7 +503,7 @@ const Header = () => {
                   )}
                 </div>
                 
-                  {/* Deposit Button */}
+                 {/* Deposit Button */}
                 <Button 
                   variant="default" 
                   size="sm"
@@ -540,7 +551,7 @@ const Header = () => {
                            console.error('Erro ao fazer logout:', error);
                          }
                        }}
-                       className="flex items-center gap-2 text-red-600 hover:text-red-600 cursor-pointer"
+                       className="flex items-center gap-2 text-white hover:text-white/80 cursor-pointer"
                      >
                        <LogOut className="w-4 h-4" />
                        Sair

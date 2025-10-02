@@ -101,27 +101,27 @@ const WalletPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
           {/* Mobile Order - Cards Reordered */}
           <div className="lg:hidden space-y-4">
-            {/* Expandable RIOZ Balance Card */}
+            {/* 1. Expandable RIOZ Balance Card */}
             <ExpandableRiozCard 
               currentBalance={currentBalance}
               totalInOrders={totalInOrders}
               brlBalance={brlBalance}
             />
             
-            {/* Balance Donut Chart */}
-            <BalanceDonutChart />
-            
-            {/* Order History */}
+            {/* 2. Order History (Suas Opiniões Abertas) */}
             <OrderHistoryCard onRefresh={() => {
               refetchProfile();
               refetchTransactions();
               fetchBalance();
             }} />
             
-            {/* Recent Wins */}
+            {/* 3. Balance Donut Chart (Distribuição de saldo) */}
+            <BalanceDonutChart />
+            
+            {/* 4. Recent Wins (Fast Markets / Ganhos Recentes) */}
             <RecentWinsCard />
             
-            {/* Completed Orders - Last */}
+            {/* 5. Completed Orders (Opiniões Concluídas) - Last */}
             <CompletedOrdersCard />
           </div>
           

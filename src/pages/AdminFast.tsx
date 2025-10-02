@@ -360,8 +360,8 @@ const AdminFast = () => {
       
       <div className="flex-1 lg:ml-0 min-w-0">
         <div className="max-w-full mx-auto px-4 py-8">
-          <div className="flex items-center justify-between mb-8">
-            <div>
+          <div className="flex flex-col md:flex-row items-center md:items-start justify-between mb-8 gap-4">
+            <div className="text-center md:text-left">
               <Link to="/admin" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-2">
                 <ArrowLeft className="w-4 h-4" />
                 Voltar
@@ -371,7 +371,7 @@ const AdminFast = () => {
                 Gerenciar pools rápidos e configurações gerais
               </p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
               <div className="flex items-center gap-4 bg-card/50 px-6 py-3 rounded-lg border border-border">
                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z" stroke="#ff2389" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="#ff2389"/>
@@ -392,12 +392,12 @@ const AdminFast = () => {
                   />
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button onClick={() => navigate('/admin/fast/api-config')} variant="outline" className="gap-2">
+              <div className="flex items-center gap-2 justify-center w-full md:w-auto">
+                <Button onClick={() => navigate('/admin/fast/api-config')} variant="outline" className="gap-2 flex-1 md:flex-initial">
                   <Settings className="w-4 h-4" />
                   APIs
                 </Button>
-                <Button onClick={() => navigate('/admin/fast/algorithm')} className="gap-2 bg-[#ff2389] hover:bg-[#ff2389]/90 text-white">
+                <Button onClick={() => navigate('/admin/fast/algorithm')} className="gap-2 bg-[#ff2389] hover:bg-[#ff2389]/90 text-white flex-1 md:flex-initial">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
                   </svg>
