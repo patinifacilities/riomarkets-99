@@ -166,8 +166,36 @@ const AssetDetail = () => {
     }
   };
 
-  // Adjust opening price at 3 seconds after pool start (57 seconds remaining) - REMOVED
-  // This is now handled immediately after pool creation in the edge function
+  // Dynamic opening_price adjustment in first 3 seconds
+  useEffect(() => {
+    if (!currentPool) return;
+
+    const startTime = new Date(currentPool.round_start_time).getTime();
+    const now = Date.now();
+    const elapsedSinceStart = (now - startTime) / 1000; // seconds
+
+    // Only adjust in first 3 seconds
+    if (elapsedSinceStart < 3 && elapsedSinceStart >= 0) {
+      const adjustTimer = setInterval(async () => {
+        try {
+          await supabase.functions.invoke('manage-fast-pools', {
+            body: {
+              action: 'adjust_opening_price',
+              poolId: currentPool.id
+            }
+          });
+          loadPoolData(); // Reload to get updated opening_price
+        } catch (error) {
+          console.error('Error adjusting opening price:', error);
+        }
+      }, 500); // Adjust every 500ms during first 3 seconds
+
+      // Clear after 3 seconds
+      setTimeout(() => clearInterval(adjustTimer), 3000 - (elapsedSinceStart * 1000));
+
+      return () => clearInterval(adjustTimer);
+    }
+  }, [currentPool?.id]);
 
   useEffect(() => {
     if (!currentPool) return;
@@ -184,7 +212,7 @@ const AssetDetail = () => {
         setTimeout(() => {
           loadPoolData();
           loadPoolHistory();
-        }, 800); // Wait 800ms for pool to finalize
+        }, 500); // Reduced to 500ms for faster pool creation
       }
     };
 
@@ -467,19 +495,18 @@ const AssetDetail = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 relative">
-      {/* Opinion Notifications - Floating on top */}
-      <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
-        {opinionNotifications.map((notification, index) => (
+      {/* Opinion Notifications - Bottom right above Riana chat */}
+      <div className="fixed bottom-24 right-6 z-50 pointer-events-none space-y-2">
+        {opinionNotifications.map((notification) => (
           <div
             key={notification.id}
-            className={`mb-2 px-6 py-3 rounded-full font-semibold text-sm shadow-lg animate-fade-in pointer-events-auto ${
+            className={`px-6 py-3 rounded-full font-semibold text-sm shadow-lg animate-fade-in pointer-events-auto ${
               notification.side === 'subiu'
                 ? 'bg-[#00ff90] text-black'
                 : 'bg-[#ff2389] text-white'
             }`}
             style={{
-              animation: 'fade-in 0.3s ease-out, fade-out 0.3s ease-out 2.7s',
-              top: `${index * 60}px`
+              animation: 'fade-in 0.3s ease-out, fade-out 0.3s ease-out 2.7s'
             }}
           >
             {notification.text}

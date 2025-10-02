@@ -168,25 +168,30 @@ const AdminAlgorithm = () => {
           <div className="grid gap-6">
             {/* Algorithm Type Switch */}
             <Card className="relative overflow-hidden border-[#ff2389]" style={{ backgroundColor: '#ff2389' }}>
-              <div className="absolute inset-0 opacity-40">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.3),transparent_50%)] animate-pulse" style={{ animationDuration: '3s' }} />
-                <div className="absolute top-0 left-1/4 w-32 h-32 bg-white/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '2s' }} />
-                <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-white/15 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s', animationDelay: '1s' }} />
+              <div className="absolute inset-0 opacity-50">
+                {/* Animated gradient orbs */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-white/20 animate-pulse" style={{ animationDuration: '3s' }} />
+                <div className="absolute top-0 left-1/4 w-32 h-32 bg-white/30 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '2s' }} />
+                <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-white/25 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-white/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s', animationDelay: '1s' }} />
+                {/* Moving particles effect */}
+                <div className="absolute top-1/4 left-1/3 w-2 h-2 bg-white/60 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
+                <div className="absolute bottom-1/3 right-1/4 w-2 h-2 bg-white/60 rounded-full animate-ping" style={{ animationDuration: '2.5s', animationDelay: '0.7s' }} />
+                <div className="absolute top-2/3 left-2/3 w-2 h-2 bg-white/60 rounded-full animate-ping" style={{ animationDuration: '3.5s', animationDelay: '1.2s' }} />
               </div>
               <CardHeader className="relative">
-                <CardTitle className="flex items-center gap-2 text-gray-900">
-                  <Zap className="w-5 h-5" />
+                <CardTitle className="flex items-center gap-2 text-white drop-shadow-lg">
+                  <Zap className="w-5 h-5 animate-pulse" style={{ animationDuration: '2s' }} />
                   Tipo de Algoritmo
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 relative">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <Label htmlFor="algorithm-type" className="text-base font-semibold text-gray-900">
+                    <Label htmlFor="algorithm-type" className="text-base font-semibold text-white drop-shadow">
                       {algorithmConfig.algorithm_type === 'price_based' ? 'Algoritmo 2 (Baseado em Preço)' : 'Algoritmo 1 (Dinâmico)'}
                     </Label>
-                    <p className="text-sm text-gray-800">
+                    <p className="text-sm text-white/90 drop-shadow">
                       {algorithmConfig.algorithm_type === 'price_based' 
                         ? 'Odds ajustados baseados na diferença entre opening_price e current_price'
                         : 'Odds decrescem conforme o tempo do pool passa'}
@@ -199,7 +204,7 @@ const AdminAlgorithm = () => {
                       ...algorithmConfig,
                       algorithm_type: checked ? 'price_based' : 'dynamic'
                     })}
-                    className="data-[state=checked]:bg-gray-900 data-[state=unchecked]:bg-white"
+                    className="data-[state=checked]:bg-white data-[state=unchecked]:bg-gray-900 border-2 border-white"
                   />
                 </div>
               </CardContent>

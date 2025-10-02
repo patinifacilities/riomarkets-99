@@ -398,22 +398,21 @@ const Fast = () => {
     loadPoolHistory();
   }, [loadCurrentPools, loadPoolHistory, selectedCategory]);
 
-  // Adjust opening prices at 3 seconds after pool start (57 seconds remaining)
+  // Dynamic opening_price adjustment in first 3 seconds
   useEffect(() => {
     if (!currentPools || currentPools.length === 0) return;
 
-    const adjustTime = 3000; // 3 seconds after start
     const timers: NodeJS.Timeout[] = [];
+    const intervals: NodeJS.Timeout[] = [];
 
     currentPools.forEach(pool => {
       const startTime = new Date(pool.round_start_time).getTime();
-      const adjustAtTime = startTime + adjustTime;
       const now = Date.now();
-      const timeUntilAdjust = adjustAtTime - now;
+      const elapsedSinceStart = (now - startTime) / 1000; // seconds
 
-      if (timeUntilAdjust > 0 && timeUntilAdjust <= 60000) {
-        const timer = setTimeout(async () => {
-          console.log(`🔄 Adjusting opening price for pool ${pool.id} at 57 seconds remaining...`);
+      // Only adjust in first 3 seconds
+      if (elapsedSinceStart < 3 && elapsedSinceStart >= 0) {
+        const adjustInterval = setInterval(async () => {
           try {
             await supabase.functions.invoke('manage-fast-pools', {
               body: {
@@ -421,19 +420,28 @@ const Fast = () => {
                 poolId: pool.id
               }
             });
-            // Reload pools to get updated opening prices
-            loadCurrentPools();
+            loadCurrentPools(); // Reload to get updated opening_prices
           } catch (error) {
             console.error('Error adjusting opening price:', error);
           }
-        }, timeUntilAdjust);
+        }, 500); // Adjust every 500ms during first 3 seconds
 
-        timers.push(timer);
+        intervals.push(adjustInterval);
+
+        // Clear after 3 seconds
+        const clearTimer = setTimeout(() => {
+          clearInterval(adjustInterval);
+        }, 3000 - (elapsedSinceStart * 1000));
+
+        timers.push(clearTimer);
       }
     });
 
-    return () => timers.forEach(timer => clearTimeout(timer));
-  }, [currentPools, loadCurrentPools]);
+    return () => {
+      timers.forEach(timer => clearTimeout(timer));
+      intervals.forEach(interval => clearInterval(interval));
+    };
+  }, [currentPools.map(p => p.id).join(',')]); // Only re-run when pool IDs change
 
   // Countdown timer with smooth updates
   useEffect(() => {
@@ -475,7 +483,7 @@ const Fast = () => {
       // Reset user bets for current pools
       setUserPoolBets({});
       
-      // Reload immediately - no artificial delay
+      // Immediate reload - no delays for faster pool creation
       loadCurrentPools();
       loadPoolHistory();
       
@@ -738,7 +746,7 @@ const Fast = () => {
       setClickedPool({ id: poolId, side });
       setTimeout(() => setClickedPool(null), 400);
 
-      // Add new opinion notification with button color
+      // Add new opinion notification with button color - bottom right above Riana
       const newNotification = {
         id: Date.now().toString(),
         text: 'Opinião registrada',

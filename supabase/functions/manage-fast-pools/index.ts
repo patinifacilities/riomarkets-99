@@ -451,12 +451,32 @@ async function adjustOpeningPrice(supabase: any, poolId: string) {
   // Get pool data
   const { data: pool, error: poolError } = await supabase
     .from('fast_pools')
-    .select('asset_symbol')
+    .select('asset_symbol, round_start_time')
     .eq('id', poolId)
     .single();
 
   if (poolError) throw poolError;
   if (!pool) throw new Error('Pool not found');
+
+  // Check if pool is still within first 3 seconds
+  const startTime = new Date(pool.round_start_time).getTime();
+  const now = Date.now();
+  const elapsedSinceStart = (now - startTime) / 1000; // seconds
+
+  if (elapsedSinceStart > 3) {
+    return new Response(
+      JSON.stringify({ 
+        success: false,
+        message: 'Pool is already past the 3-second adjustment window'
+      }),
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
+      }
+    );
+  }
 
   // Get current real-time price for this asset
   const { data: marketData } = await supabase.functions.invoke('get-market-data', {
@@ -465,7 +485,7 @@ async function adjustOpeningPrice(supabase: any, poolId: string) {
   
   const currentPrice = marketData?.prices?.[pool.asset_symbol] || getFallbackPriceForSymbol(pool.asset_symbol);
 
-  console.log(`Adjusting opening price for pool ${poolId} to ${currentPrice}`);
+  console.log(`🔄 Adjusting opening price for pool ${poolId} to ${currentPrice} (${elapsedSinceStart.toFixed(2)}s elapsed)`);
 
   // Update the opening price to the current real-time price
   const { error: updateError } = await supabase
@@ -481,7 +501,8 @@ async function adjustOpeningPrice(supabase: any, poolId: string) {
     JSON.stringify({ 
       success: true,
       pool_id: poolId,
-      new_opening_price: currentPrice
+      new_opening_price: currentPrice,
+      elapsed_seconds: elapsedSinceStart
     }),
     { 
       headers: { 
