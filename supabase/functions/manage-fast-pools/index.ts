@@ -138,7 +138,7 @@ async function createSynchronizedPools(supabase: any, category = 'crypto') {
   // Get algorithm configuration
   const { data: algorithmConfig } = await supabase
     .from('fast_pool_algorithm_config')
-    .select('pool_duration_seconds, odds_start, odds_end, odds_curve_intensity, lockout_time_seconds, max_odds, min_odds')
+    .select('pool_duration_seconds, odds_start, odds_end, odds_curve_intensity, lockout_time_seconds, max_odds, min_odds, algorithm_type, algo2_odds_high, algo2_odds_low')
     .order('updated_at', { ascending: false })
     .limit(1)
     .single();
@@ -480,7 +480,7 @@ async function createAllCategoriesPools(supabase: any) {
   // Get algorithm configuration
   const { data: algorithmConfig } = await supabase
     .from('fast_pool_algorithm_config')
-    .select('pool_duration_seconds, odds_start, odds_end, odds_curve_intensity, lockout_time_seconds, max_odds, min_odds')
+    .select('pool_duration_seconds, odds_start, odds_end, odds_curve_intensity, lockout_time_seconds, max_odds, min_odds, algorithm_type, algo2_odds_high, algo2_odds_low')
     .order('updated_at', { ascending: false })
     .limit(1)
     .single();

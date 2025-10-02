@@ -156,7 +156,11 @@ const AdminAlgorithm = () => {
           <div className="grid gap-6">
             {/* Algorithm Type Switch */}
             <Card className="relative overflow-hidden bg-gradient-to-br from-[#ff2389] to-[#ff2389]/80 border-[#ff2389]">
-              <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent animate-pulse" />
+              <div className="absolute inset-0 opacity-30">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-white/10 animate-pulse" style={{ animationDuration: '3s' }} />
+                <div className="absolute top-0 -left-4 w-24 h-24 bg-white/10 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '2s' }} />
+                <div className="absolute bottom-0 -right-4 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
+              </div>
               <CardHeader className="relative">
                 <CardTitle className="flex items-center gap-2 text-gray-900">
                   <Zap className="w-5 h-5" />

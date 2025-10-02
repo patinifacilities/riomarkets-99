@@ -492,15 +492,19 @@ const Fast = () => {
     pool_duration_seconds: 60,
     lockout_time_seconds: 2,
     odds_start: 1.80,
-    odds_end: 1.10
+    odds_end: 1.10,
+    algorithm_type: 'dynamic' as 'dynamic' | 'price_based',
+    algo2_odds_high: 1.90,
+    algo2_odds_low: 1.10
   });
+  const [currentPrices, setCurrentPrices] = React.useState<Record<string, number>>({});
 
   React.useEffect(() => {
     const loadAlgorithmConfig = async () => {
       try {
         const { data } = await supabase
           .from('fast_pool_algorithm_config')
-          .select('pool_duration_seconds, lockout_time_seconds, odds_start, odds_end')
+          .select('pool_duration_seconds, lockout_time_seconds, odds_start, odds_end, algorithm_type, algo2_odds_high, algo2_odds_low')
           .order('updated_at', { ascending: false })
           .limit(1)
           .maybeSingle();
@@ -510,7 +514,10 @@ const Fast = () => {
             pool_duration_seconds: data.pool_duration_seconds,
             lockout_time_seconds: data.lockout_time_seconds,
             odds_start: Number(data.odds_start),
-            odds_end: Number(data.odds_end)
+            odds_end: Number(data.odds_end),
+            algorithm_type: (data.algorithm_type === 'price_based' ? 'price_based' : 'dynamic') as 'dynamic' | 'price_based',
+            algo2_odds_high: Number(data.algo2_odds_high || 1.90),
+            algo2_odds_low: Number(data.algo2_odds_low || 1.10)
           });
         }
       } catch (error) {
@@ -522,25 +529,56 @@ const Fast = () => {
   }, []);
 
   // Calculate dynamic odds based on countdown and algorithm config
-  const getOdds = () => {
+  const getOdds = (side?: 'subiu' | 'desceu', pool?: FastPool) => {
+    // Algorithm 2: Price-based
+    if (algorithmConfig.algorithm_type === 'price_based' && pool && currentPrices[pool.id] > 0) {
+      const openingPrice = pool.opening_price;
+      const currentPrice = currentPrices[pool.id];
+      const priceDiff = currentPrice - openingPrice;
+      
+      // Base odds assignment
+      let baseOddsUp = algorithmConfig.algo2_odds_low;
+      let baseOddsDown = algorithmConfig.algo2_odds_high;
+      
+      if (openingPrice < currentPrice) {
+        // Price went up: favor down bets
+        baseOddsUp = algorithmConfig.algo2_odds_low;
+        baseOddsDown = algorithmConfig.algo2_odds_high;
+      } else if (openingPrice > currentPrice) {
+        // Price went down: favor up bets
+        baseOddsUp = algorithmConfig.algo2_odds_high;
+        baseOddsDown = algorithmConfig.algo2_odds_low;
+      }
+      
+      // Adjust odds as price approaches opening price
+      const maxDeviation = Math.abs(openingPrice * 0.01); // 1% of opening price
+      const currentDeviation = Math.abs(priceDiff);
+      const adjustmentFactor = Math.max(0, 1 - (currentDeviation / maxDeviation));
+      
+      const midPoint = (algorithmConfig.algo2_odds_high + algorithmConfig.algo2_odds_low) / 2;
+      
+      const oddsUp = baseOddsUp + (midPoint - baseOddsUp) * adjustmentFactor;
+      const oddsDown = baseOddsDown + (midPoint - baseOddsDown) * adjustmentFactor;
+      
+      return side === 'subiu' ? oddsUp : oddsDown;
+    }
+    
+    // Algorithm 1: Dynamic time-based
     const duration = algorithmConfig.pool_duration_seconds;
     const lockout = algorithmConfig.lockout_time_seconds;
     const oddsStart = algorithmConfig.odds_start;
     const oddsEnd = algorithmConfig.odds_end;
     
     const timeElapsed = duration - countdown;
-    const effectiveTime = duration - lockout; // Time before lockout
+    const effectiveTime = duration - lockout;
     
     if (timeElapsed >= effectiveTime) {
-      // During lockout period
       return oddsEnd;
     }
     
-    // Calculate progress through the effective time
     const progress = timeElapsed / effectiveTime;
     const oddsDiff = oddsStart - oddsEnd;
     
-    // Linear decrease from start to end odds
     return Math.max(oddsEnd, oddsStart - (progress * oddsDiff));
   };
 
@@ -646,7 +684,7 @@ const Fast = () => {
     }
 
     try {
-      const currentOdds = getOdds();
+      const currentOdds = getOdds(side, pool);
       const potentialWinnings = Math.floor(betAmount * currentOdds);
       
       // Deduct bet amount from user balance
@@ -1013,12 +1051,15 @@ const Fast = () => {
                     {pool.asset_name}
                   </CardTitle>
                   
-                  <p className="text-sm text-muted-foreground mb-2">{pool.question}</p>
-                  
+                   <p className="text-sm text-muted-foreground mb-2">{pool.question}</p>
+                   
                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                      <span className="bg-muted/50 px-2 py-1 rounded">{pool.asset_symbol}</span>
                      <span>•</span>
-                     <PoolPriceDisplay assetSymbol={pool.asset_symbol} />
+                     <PoolPriceDisplay 
+                       assetSymbol={pool.asset_symbol} 
+                       onPriceChange={(price) => setCurrentPrices(prev => ({ ...prev, [pool.id]: price }))}
+                     />
                    </div>
                 </CardHeader>
 
@@ -1144,11 +1185,11 @@ const Fast = () => {
                           : ''
                       } bg-[#00ff90] hover:bg-[#00ff90]/90 text-black`}
                     >
-                      <div className="flex items-center justify-between w-full px-1">
+                       <div className="flex items-center justify-between w-full px-1">
                         <ArrowUp className="w-4 h-4" />
                         <span>Subir</span>
                            <span className="text-xs opacity-80">
-                            x{getOdds().toFixed(2)}
+                            x{getOdds('subiu', pool).toFixed(2)}
                           </span>
                       </div>
                     </Button>
@@ -1169,7 +1210,7 @@ const Fast = () => {
                         <ArrowDown className="w-4 h-4" />
                         <span>Descer</span>
                          <span className="text-xs opacity-80">
-                           x{getOdds().toFixed(2)}
+                           x{getOdds('desceu', pool).toFixed(2)}
                          </span>
                       </div>
                     </Button>

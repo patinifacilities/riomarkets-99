@@ -264,34 +264,44 @@ const AssetDetail = () => {
   }, []);
 
   const getOdds = (side?: 'subiu' | 'desceu') => {
-    if (algorithmConfig.algorithm_type === 'price_based' && currentPool) {
+    // Algorithm 2: Price-based
+    if (algorithmConfig.algorithm_type === 'price_based' && currentPool && currentPrice > 0) {
       const openingPrice = currentPool.opening_price || 0;
       
-      if (openingPrice === 0 || currentPrice === 0) {
+      if (openingPrice === 0) {
         return algorithmConfig.algo2_odds_high;
       }
 
       const priceDiff = currentPrice - openingPrice;
-      const diffPercent = Math.abs(priceDiff / openingPrice);
-
-      if (side === 'subiu') {
-        if (openingPrice < currentPrice) {
-          return Math.max(algorithmConfig.algo2_odds_low, algorithmConfig.algo2_odds_low + (diffPercent * 2));
-        } else {
-          return Math.min(algorithmConfig.algo2_odds_high, algorithmConfig.algo2_odds_high - (diffPercent * 2));
-        }
-      } else if (side === 'desceu') {
-        if (openingPrice > currentPrice) {
-          return Math.max(algorithmConfig.algo2_odds_low, algorithmConfig.algo2_odds_low + (diffPercent * 2));
-        } else {
-          return Math.min(algorithmConfig.algo2_odds_high, algorithmConfig.algo2_odds_high - (diffPercent * 2));
-        }
+      
+      // Base odds assignment
+      let baseOddsUp = algorithmConfig.algo2_odds_low;
+      let baseOddsDown = algorithmConfig.algo2_odds_high;
+      
+      if (openingPrice < currentPrice) {
+        // Price went up: favor down bets
+        baseOddsUp = algorithmConfig.algo2_odds_low;
+        baseOddsDown = algorithmConfig.algo2_odds_high;
+      } else if (openingPrice > currentPrice) {
+        // Price went down: favor up bets
+        baseOddsUp = algorithmConfig.algo2_odds_high;
+        baseOddsDown = algorithmConfig.algo2_odds_low;
       }
       
-      return (algorithmConfig.algo2_odds_high + algorithmConfig.algo2_odds_low) / 2;
+      // Adjust odds as price approaches opening price
+      const maxDeviation = Math.abs(openingPrice * 0.01); // 1% of opening price
+      const currentDeviation = Math.abs(priceDiff);
+      const adjustmentFactor = Math.max(0, 1 - (currentDeviation / maxDeviation));
+      
+      const midPoint = (algorithmConfig.algo2_odds_high + algorithmConfig.algo2_odds_low) / 2;
+      
+      const oddsUp = baseOddsUp + (midPoint - baseOddsUp) * adjustmentFactor;
+      const oddsDown = baseOddsDown + (midPoint - baseOddsDown) * adjustmentFactor;
+      
+      return side === 'subiu' ? oddsUp : oddsDown;
     }
 
-    // Dynamic algorithm (original)
+    // Algorithm 1: Dynamic time-based
     const duration = algorithmConfig.pool_duration_seconds;
     const lockout = algorithmConfig.lockout_time_seconds;
     const oddsStart = algorithmConfig.odds_start;
