@@ -171,66 +171,45 @@ const Home = () => {
       <div className="relative z-10">
       {/* Hero Section - Trading Aligned */}
       <section className="relative min-h-[42vh] md:min-h-[52vh] flex flex-col items-center justify-center bg-[color:var(--bg-app)] overflow-hidden">
-        {/* Modern Animated Background with Golden Shine */}
+        {/* Modern Clean Background */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {/* Base gradient */}
-          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/98 to-background/95" />
           
-          {/* Gradient mesh animation */}
+          {/* Subtle gradient orbs */}
           <div 
-            className="absolute inset-0 opacity-20"
+            className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-10"
             style={{
-              backgroundImage: `
-                radial-gradient(ellipse at 30% 40%, hsl(var(--primary) / 0.2) 0%, transparent 60%),
-                radial-gradient(ellipse at 70% 70%, hsl(var(--primary) / 0.15) 0%, transparent 60%),
-                radial-gradient(ellipse at 50% 90%, hsl(var(--primary) / 0.12) 0%, transparent 50%)
-              `,
-              animation: 'meshFloat 25s ease-in-out infinite'
+              background: 'radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)',
+              animation: 'float 20s ease-in-out infinite'
+            }}
+          />
+          <div 
+            className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-10"
+            style={{
+              background: 'radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)',
+              animation: 'float 25s ease-in-out infinite reverse'
             }}
           />
           
-          {/* Golden Shine Animation - passes every 7 seconds */}
+          {/* Subtle grid pattern */}
           <div 
-            className="absolute bottom-0 left-0 w-full h-48"
+            className="absolute inset-0 opacity-[0.015]"
             style={{
-              background: 'linear-gradient(90deg, transparent 0%, rgba(255, 215, 0, 0) 45%, rgba(255, 215, 0, 0.3) 50%, rgba(255, 215, 0, 0) 55%, transparent 100%)',
-              animation: 'goldenShine 7s ease-in-out infinite',
-              filter: 'blur(20px)'
+              backgroundImage: `linear-gradient(hsl(var(--primary)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)`,
+              backgroundSize: '50px 50px'
             }}
           />
-          
-          {/* Floating particles */}
-          <div className="absolute top-[15%] left-[25%] w-1.5 h-1.5 rounded-full bg-primary/50 animate-float" />
-          <div className="absolute top-[70%] right-[35%] w-2 h-2 rounded-full bg-[#00ff90]/40 animate-float-delayed" />
-          <div className="absolute bottom-[30%] left-[45%] w-1.5 h-1.5 rounded-full bg-[#ff2389]/40 animate-pulse-gentle" />
-          <div className="absolute top-[50%] right-[10%] w-1 h-1 rounded-full bg-primary/60 animate-float" />
         </div>
         
         {/* Animation keyframes */}
         <style>{`
-          @keyframes meshFloat {
+          @keyframes float {
             0%, 100% {
-              transform: translate(0, 0) scale(1);
-            }
-            33% {
-              transform: translate(30px, -30px) scale(1.05);
-            }
-            66% {
-              transform: translate(-20px, 20px) scale(0.95);
-            }
-          }
-          
-          @keyframes goldenShine {
-            0% {
-              transform: translateX(-100%);
-              opacity: 0;
+              transform: translate(0, 0);
             }
             50% {
-              opacity: 1;
-            }
-            100% {
-              transform: translateX(200%);
-              opacity: 0;
+              transform: translate(30px, -30px);
             }
           }
         `}</style>

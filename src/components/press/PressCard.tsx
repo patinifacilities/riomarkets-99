@@ -44,28 +44,28 @@ export function PressCard({ article }: PressCardProps) {
         
         <div className="relative">
           {/* Header with Relevance and Vehicle */}
-          <div className="p-4 pb-2 flex items-start justify-between">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-primary/10 to-primary/5 text-primary border border-primary/20 shadow-sm">
+          <div className="p-3 pb-1.5 flex items-start justify-between">
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-gradient-to-r from-primary/10 to-primary/5 text-primary border border-primary/20 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
               Alta Relevância
             </div>
             
             {article.logo_url ? (
-              <div className="h-6 flex items-center">
+              <div className="h-5 flex items-center">
                 <LazyImage
                   src={article.logo_url}
                   alt={`Logo do ${article.vehicle}`}
-                  className="h-full w-auto object-contain bg-white/95 rounded-md px-2 py-0.5 shadow-sm"
+                  className="h-full w-auto object-contain bg-white/95 rounded-md px-1.5 py-0.5 shadow-sm"
                   placeholder={
-                    <div className="h-6 w-14 bg-muted rounded-md flex items-center justify-center">
+                    <div className="h-5 w-12 bg-muted rounded-md flex items-center justify-center">
                       <span className="text-xs text-muted-foreground">{article.vehicle}</span>
                     </div>
                   }
                 />
               </div>
             ) : (
-              <div className="h-6 flex items-center">
-                <div className="bg-white/95 rounded-md px-2 py-0.5 text-black text-xs font-semibold shadow-sm">
+              <div className="h-5 flex items-center">
+                <div className="bg-white/95 rounded-md px-1.5 py-0.5 text-black text-xs font-semibold shadow-sm">
                   {article.vehicle}
                 </div>
               </div>
@@ -73,29 +73,29 @@ export function PressCard({ article }: PressCardProps) {
           </div>
 
           {/* Content */}
-          <div className="px-4 pb-4 space-y-2">
-            <h3 className="text-base font-bold leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+          <div className="px-3 pb-3 space-y-1.5">
+            <h3 className="text-sm font-bold leading-tight line-clamp-2 group-hover:text-primary transition-colors">
               {article.title}
             </h3>
             
             {article.summary && (
-              <p className="text-sm text-muted-foreground/90 line-clamp-2 leading-relaxed">
+              <p className="text-xs text-muted-foreground/90 line-clamp-2 leading-relaxed">
                 {article.summary}
               </p>
             )}
             
-            <div className="flex items-center justify-between pt-2 border-t border-border/30">
-              <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
+            <div className="flex items-center justify-between pt-1 border-t border-border/30">
+              <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                <div className="w-1 h-1 rounded-full bg-primary/60" />
                 {article.vehicle}
               </div>
               <span className="text-xs text-muted-foreground/80">{formatDate(article.published_at)}</span>
             </div>
             
             {/* Read More Indicator */}
-            <div className="flex items-center gap-2 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity pt-1">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity pt-0.5">
               <span>Ler mais</span>
-              <ExternalLink className="w-3.5 h-3.5" />
+              <ExternalLink className="w-3 h-3" />
             </div>
           </div>
         </div>

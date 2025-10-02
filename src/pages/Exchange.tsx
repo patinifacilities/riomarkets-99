@@ -427,12 +427,13 @@ const ExchangeNew = () => {
             {fastMarketsButtonVisible && (
               <div className="relative group w-full">
                 {/* Glow effect */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-[#00ff90] via-[#00d9ff] to-[#ff2389] rounded-2xl opacity-75 group-hover:opacity-100 blur-lg animate-pulse transition-all duration-300"></div>
+                <div className="absolute -inset-1 rounded-2xl opacity-75 group-hover:opacity-100 blur-lg animate-pulse transition-all duration-300" style={{ background: '#ff2389' }}></div>
                 
                 {/* Button */}
                 <Button
                   asChild
-                  className="relative w-full h-16 text-xl font-bold bg-gradient-to-r from-[#00ff90] to-[#00d9ff] text-black hover:scale-105 transform transition-all duration-300 shadow-2xl border-2 border-white/30 backdrop-blur-sm"
+                  className="relative w-full h-16 text-xl font-bold text-white transform transition-all duration-300 shadow-2xl border-2 border-white/30 backdrop-blur-sm"
+                  style={{ background: '#ff2389' }}
                   size="lg"
                 >
                   <a href="/fast" className="flex items-center justify-center gap-3">
@@ -445,11 +446,13 @@ const ExchangeNew = () => {
             )}
             
             {showSuccessNotification && (
-              <div className="bg-gradient-to-r from-[#00ff90]/20 to-[#00ff90]/10 border-2 border-[#00ff90] px-6 py-4 rounded-xl text-sm font-medium animate-scale-in flex items-center gap-3 shadow-lg">
-                <CheckCircle2 className="w-6 h-6 text-[#00ff90]" />
-                <div>
-                  <div className="text-[#00ff90] font-bold text-base">Conversão realizada!</div>
-                  <div className="text-muted-foreground text-xs mt-0.5">Seus saldos foram atualizados</div>
+              <div className="px-6 py-5 rounded-2xl animate-scale-in flex items-center gap-4 border-2 border-[#00ff90]/30 shadow-2xl backdrop-blur-sm" style={{ background: 'linear-gradient(135deg, rgba(0, 255, 144, 0.05), rgba(0, 255, 144, 0.02))' }}>
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#00ff90]/20 flex items-center justify-center">
+                  <CheckCircle2 className="w-7 h-7 text-[#00ff90]" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-[#00ff90] font-bold text-lg mb-1">Conversão realizada!</div>
+                  <div className="text-muted-foreground text-sm">Seus saldos foram atualizados com sucesso</div>
                 </div>
               </div>
             )}
