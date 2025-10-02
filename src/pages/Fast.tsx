@@ -942,7 +942,7 @@ const Fast = () => {
           
           {/* Category Selector */}
           <div className="flex justify-center items-center mb-6 overflow-x-auto scrollbar-hide px-2">
-            <div className="flex gap-1 md:gap-2 p-1 bg-muted rounded-xl w-full md:min-w-min justify-center">
+            <div className="flex gap-1 md:gap-2 p-1 bg-muted rounded-xl w-full md:w-auto md:inline-flex justify-start md:justify-center">
               {categoryOptions.map((category) => (
                 <Button
                   key={category.value}
