@@ -391,22 +391,22 @@ const Fast = () => {
     loadPoolHistory();
   }, [loadCurrentPools, loadPoolHistory, selectedCategory]);
 
-  // Adjust opening prices when lockout ends
+  // Adjust opening prices at 3 seconds after pool start (57 seconds remaining)
   useEffect(() => {
     if (!currentPools || currentPools.length === 0) return;
 
-    const lockoutTime = 15000; // 15 seconds default lockout
+    const adjustTime = 3000; // 3 seconds after start
     const timers: NodeJS.Timeout[] = [];
 
     currentPools.forEach(pool => {
       const startTime = new Date(pool.round_start_time).getTime();
-      const lockoutEndTime = startTime + lockoutTime;
+      const adjustAtTime = startTime + adjustTime;
       const now = Date.now();
-      const timeUntilLockoutEnd = lockoutEndTime - now;
+      const timeUntilAdjust = adjustAtTime - now;
 
-      if (timeUntilLockoutEnd > 0 && timeUntilLockoutEnd <= lockoutTime) {
+      if (timeUntilAdjust > 0 && timeUntilAdjust <= 60000) {
         const timer = setTimeout(async () => {
-          console.log(`🔄 Adjusting opening price for pool ${pool.id} after lockout...`);
+          console.log(`🔄 Adjusting opening price for pool ${pool.id} at 57 seconds remaining...`);
           try {
             await supabase.functions.invoke('manage-fast-pools', {
               body: {
@@ -419,14 +419,14 @@ const Fast = () => {
           } catch (error) {
             console.error('Error adjusting opening price:', error);
           }
-        }, timeUntilLockoutEnd);
+        }, timeUntilAdjust);
 
         timers.push(timer);
       }
     });
 
     return () => timers.forEach(timer => clearTimeout(timer));
-  }, [currentPools]);
+  }, [currentPools, loadCurrentPools]);
 
   // Countdown timer with smooth updates
   useEffect(() => {
@@ -483,7 +483,7 @@ const Fast = () => {
   // Load algorithm config for dynamic odds calculation
   const [algorithmConfig, setAlgorithmConfig] = React.useState({
     pool_duration_seconds: 60,
-    lockout_time_seconds: 15,
+    lockout_time_seconds: 5,
     odds_start: 1.80,
     odds_end: 1.10
   });

@@ -158,19 +158,19 @@ const AssetDetail = () => {
     }
   };
 
-  // Adjust opening price when lockout ends
+  // Adjust opening price at 3 seconds after pool start (57 seconds remaining)
   useEffect(() => {
     if (!currentPool) return;
 
     const startTime = new Date(currentPool.round_start_time).getTime();
-    const lockoutTime = 15000; // 15 seconds default lockout
-    const lockoutEndTime = startTime + lockoutTime;
+    const adjustTime = 3000; // 3 seconds after start (57 seconds remaining)
+    const adjustAtTime = startTime + adjustTime;
     const now = Date.now();
-    const timeUntilLockoutEnd = lockoutEndTime - now;
+    const timeUntilAdjust = adjustAtTime - now;
 
-    if (timeUntilLockoutEnd > 0 && timeUntilLockoutEnd <= lockoutTime) {
+    if (timeUntilAdjust > 0 && timeUntilAdjust <= 60000) {
       const timer = setTimeout(async () => {
-        console.log('🔄 Adjusting opening price after lockout...');
+        console.log('🔄 Adjusting opening price at 57 seconds remaining...');
         try {
           await supabase.functions.invoke('manage-fast-pools', {
             body: {
@@ -183,7 +183,7 @@ const AssetDetail = () => {
         } catch (error) {
           console.error('Error adjusting opening price:', error);
         }
-      }, timeUntilLockoutEnd);
+      }, timeUntilAdjust);
 
       return () => clearTimeout(timer);
     }
@@ -217,7 +217,7 @@ const AssetDetail = () => {
   // Load algorithm config for dynamic odds calculation
   const [algorithmConfig, setAlgorithmConfig] = useState({
     pool_duration_seconds: 60,
-    lockout_time_seconds: 15,
+    lockout_time_seconds: 5,
     odds_start: 1.80,
     odds_end: 1.10
   });
@@ -288,10 +288,10 @@ const AssetDetail = () => {
     }
 
     // Check if countdown is in lockout period
-    if (countdown <= 15) {
+    if (countdown <= 5) {
       toast({
         title: "Opiniões bloqueadas",
-        description: "Não é possível opinar nos últimos 15 segundos",
+        description: "Não é possível opinar nos últimos 5 segundos",
         variant: "destructive"
       });
       return;
