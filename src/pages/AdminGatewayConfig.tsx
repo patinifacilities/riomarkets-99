@@ -80,6 +80,7 @@ const AdminGatewayConfig = () => {
   };
 
   const [config, setConfig] = useState<any>(gatewayConfigs[gatewayId as keyof typeof gatewayConfigs]?.settings || {});
+  const [gatewayName, setGatewayName] = useState(gatewayConfigs[gatewayId as keyof typeof gatewayConfigs]?.name || '');
 
   // Security check
   if (authLoading || profileLoading) {
@@ -139,6 +140,16 @@ const AdminGatewayConfig = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="gatewayName">Nome do Gateway</Label>
+                  <Input 
+                    id="gatewayName"
+                    value={gatewayName} 
+                    onChange={(e) => setGatewayName(e.target.value)}
+                    placeholder="Nome do gateway"
+                  />
+                </div>
+
                 <div className="flex items-center justify-between">
                   <div>
                     <Label className="text-base font-medium">Gateway Ativo</Label>

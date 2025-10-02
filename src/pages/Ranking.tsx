@@ -361,12 +361,20 @@ const Ranking = () => {
                       {user.username && (
                         <span className="text-xs text-muted-foreground">@{user.username}</span>
                       )}
+                      {getLevelBadge(user.nivel)}
                       {isGoldPass && (
-                        <Badge className="bg-gradient-to-r from-amber-400 to-yellow-600 text-black border-0 shadow-lg text-xs px-2 py-0">
-                          ⭐ Gold
+                        <Badge 
+                          className="text-xs"
+                          style={{
+                            background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                            color: '#000',
+                            fontWeight: 'bold',
+                            border: 'none'
+                          }}
+                        >
+                          Gold Pass
                         </Badge>
                       )}
-                      {getLevelBadge(user.nivel)}
                     </div>
                     {user.analises_certas !== undefined && (
                       <div className="text-xs text-muted-foreground">

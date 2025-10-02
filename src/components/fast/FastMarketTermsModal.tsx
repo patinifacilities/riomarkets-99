@@ -32,19 +32,27 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <div className="flex justify-center mb-4">
-            <img 
-              src={rioLogoFast} 
-              alt="Rio Markets" 
-              className="h-12 w-auto" 
+      <DialogContent className="max-w-2xl max-h-[85vh] md:max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="flex flex-col items-center gap-4 pb-4 border-b flex-shrink-0 px-6 pt-6">
+          <div className="relative w-20 h-20 md:w-24 md:h-24">
+            <img
+              src="/assets/rio-markets-logo.png"
+              alt="Rio Markets"
+              className="w-full h-full object-contain"
             />
           </div>
-          <DialogTitle className="flex items-center justify-center gap-2 text-[#ff2389] text-center mb-6">
-            <Zap className="w-6 h-6" />
-            Fast Markets
-          </DialogTitle>
+          <div className="flex items-center gap-2">
+            <DialogTitle className="text-2xl md:text-3xl font-black">Fast Markets</DialogTitle>
+            <div 
+              className="w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center animate-pulse"
+              style={{ backgroundColor: '#ff2389' }}
+            >
+              <Zap className="w-4 h-4 md:w-5 md:h-5 text-white" />
+            </div>
+          </div>
+        </DialogHeader>
+
+        <div className="flex-1 overflow-y-auto px-6 py-4">
           <DialogDescription asChild>
             <div className="space-y-4 text-foreground">
               <div className="space-y-3 text-sm">
@@ -87,49 +95,50 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
               </div>
             </div>
           </DialogDescription>
-        </DialogHeader>
 
-        <div className="space-y-3">
-          <div className="flex items-center space-x-2 p-4 bg-muted/20 rounded-lg">
-            <Checkbox 
-              id="non-cancellable" 
-              checked={hasAcceptedNonCancellable}
-              onCheckedChange={(checked) => setHasAcceptedNonCancellable(checked === true)}
-            />
-            <label
-              htmlFor="non-cancellable"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer text-foreground"
-            >
-              Entendo que opiniões enviadas no Fast Markets não podem ser canceladas.
-            </label>
-          </div>
+          <div className="space-y-3 mt-4">
+            <div className="flex items-center space-x-2 p-4 bg-muted/20 rounded-lg">
+              <Checkbox 
+                id="non-cancellable" 
+                checked={hasAcceptedNonCancellable}
+                onCheckedChange={(checked) => setHasAcceptedNonCancellable(checked === true)}
+              />
+              <label
+                htmlFor="non-cancellable"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer text-foreground"
+              >
+                Entendo que opiniões enviadas no Fast Markets não podem ser canceladas.
+              </label>
+            </div>
 
-          <div className="flex items-center space-x-2 p-4 bg-muted/20 rounded-lg">
-            <Checkbox 
-              id="terms" 
-              checked={hasAcceptedTerms}
-              onCheckedChange={(checked) => setHasAcceptedTerms(checked === true)}
-            />
-            <label
-              htmlFor="terms"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-            >
-              Li e aceito os termos. Entendo os riscos dos Fast Markets.
-            </label>
+            <div className="flex items-center space-x-2 p-4 bg-muted/20 rounded-lg">
+              <Checkbox 
+                id="terms" 
+                checked={hasAcceptedTerms}
+                onCheckedChange={(checked) => setHasAcceptedTerms(checked === true)}
+              />
+              <label
+                htmlFor="terms"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              >
+                Li e aceito os termos. Entendo os riscos dos Fast Markets.
+              </label>
+            </div>
           </div>
         </div>
 
-        <DialogFooter className="flex gap-3">
+        <DialogFooter className="flex gap-3 flex-shrink-0 border-t px-6 py-4">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
+            className="flex-1 text-sm md:text-base"
           >
             Voltar
           </Button>
           <Button
             onClick={handleAccept}
             disabled={!hasAcceptedNonCancellable || !hasAcceptedTerms}
-            className="bg-[#00ff90] hover:bg-[#00ff90]/90 text-black"
+            className="flex-1 bg-[#00ff90] hover:bg-[#00ff90]/90 text-black text-sm md:text-base"
           >
             Aceitar e Continuar
           </Button>

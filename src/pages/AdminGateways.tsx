@@ -17,6 +17,12 @@ const AdminGateways = () => {
   const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showAddGatewayModal, setShowAddGatewayModal] = useState(false);
+  const [gatewayStatuses, setGatewayStatuses] = useState<Record<string, boolean>>({
+    pix: true,
+    stripe: false,
+    mercadopago: true,
+    crypto: true
+  });
 
   // Security check
   if (authLoading || profileLoading) {
@@ -35,7 +41,7 @@ const AdminGateways = () => {
     {
       id: 'pix',
       name: 'PIX',
-      status: true,
+      status: gatewayStatuses.pix,
       description: 'Sistema de pagamentos instantâneos do Brasil',
       icon: <Globe className="w-5 h-5" />,
       fees: '0%',
@@ -46,7 +52,7 @@ const AdminGateways = () => {
     {
       id: 'stripe',
       name: 'Stripe',
-      status: false,
+      status: gatewayStatuses.stripe,
       description: 'Gateway internacional para cartões de crédito',
       icon: <CreditCard className="w-5 h-5" />,
       fees: '3.9% + R$ 0,39',
@@ -57,7 +63,7 @@ const AdminGateways = () => {
     {
       id: 'mercadopago',
       name: 'Mercado Pago',
-      status: true,
+      status: gatewayStatuses.mercadopago,
       description: 'Gateway brasileiro multiplataforma',
       icon: <Shield className="w-5 h-5" />,
       fees: '4.99%',
@@ -68,18 +74,7 @@ const AdminGateways = () => {
     {
       id: 'crypto',
       name: 'Crypto',
-      status: true,
-      description: 'Gateway para pagamentos em criptomoedas',
-      icon: <BarChart3 className="w-5 h-5" />,
-      fees: '4.99%',
-      limits: 'R$ 1,00 - R$ 25.000,00',
-      conversionRate: 96.8,
-      usage: 10
-    },
-    {
-      id: 'crypto',
-      name: 'Crypto',
-      status: true,
+      status: gatewayStatuses.crypto,
       description: 'Gateway para pagamentos em criptomoedas',
       icon: <Shield className="w-5 h-5" />,
       fees: '1.5%',
@@ -152,7 +147,15 @@ const AdminGateways = () => {
                         </p>
                       </div>
                     </div>
-                    <Switch checked={gateway.status} />
+                    <Switch 
+                      checked={gateway.status} 
+                      onCheckedChange={(checked) => {
+                        setGatewayStatuses(prev => ({
+                          ...prev,
+                          [gateway.id]: checked
+                        }));
+                      }}
+                    />
                   </div>
                 </CardHeader>
                 <CardContent>
