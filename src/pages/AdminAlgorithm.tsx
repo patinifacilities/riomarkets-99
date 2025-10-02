@@ -34,9 +34,18 @@ const AdminAlgorithm = () => {
     algo2_odds_low: 1.10
   });
 
+  const [initialConfig, setInitialConfig] = useState(algorithmConfig);
+  const [hasChanges, setHasChanges] = useState(false);
+
   useEffect(() => {
     loadAlgorithmConfig();
   }, []);
+
+  // Check if config has changed
+  useEffect(() => {
+    const changed = JSON.stringify(algorithmConfig) !== JSON.stringify(initialConfig);
+    setHasChanges(changed);
+  }, [algorithmConfig, initialConfig]);
 
   const loadAlgorithmConfig = async () => {
     try {
@@ -50,7 +59,7 @@ const AdminAlgorithm = () => {
       if (error) throw error;
 
       if (data) {
-        setAlgorithmConfig({
+        const config = {
           pool_duration_seconds: data.pool_duration_seconds,
           odds_start: Number(data.odds_start),
           odds_end: Number(data.odds_end),
@@ -61,7 +70,10 @@ const AdminAlgorithm = () => {
           algorithm_type: data.algorithm_type || 'dynamic',
           algo2_odds_high: Number(data.algo2_odds_high || 1.90),
           algo2_odds_low: Number(data.algo2_odds_low || 1.10)
-        });
+        };
+        setAlgorithmConfig(config);
+        setInitialConfig(config);
+        setHasChanges(false);
       }
     } catch (error) {
       console.error('Error loading algorithm config:', error);
@@ -155,11 +167,12 @@ const AdminAlgorithm = () => {
 
           <div className="grid gap-6">
             {/* Algorithm Type Switch */}
-            <Card className="relative overflow-hidden bg-gradient-to-br from-[#ff2389] to-[#ff2389]/80 border-[#ff2389]">
-              <div className="absolute inset-0 opacity-30">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-white/10 animate-pulse" style={{ animationDuration: '3s' }} />
-                <div className="absolute top-0 -left-4 w-24 h-24 bg-white/10 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '2s' }} />
-                <div className="absolute bottom-0 -right-4 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
+            <Card className="relative overflow-hidden bg-gradient-to-br from-[#ff2389] via-[#ff2389] to-[#ff2389]/70 border-[#ff2389]">
+              <div className="absolute inset-0 opacity-40">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.3),transparent_50%)] animate-pulse" style={{ animationDuration: '3s' }} />
+                <div className="absolute top-0 left-1/4 w-32 h-32 bg-white/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '2s' }} />
+                <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-white/15 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s', animationDelay: '1s' }} />
               </div>
               <CardHeader className="relative">
                 <CardTitle className="flex items-center gap-2 text-gray-900">
@@ -377,23 +390,25 @@ const AdminAlgorithm = () => {
             </Card>
 
             {/* Save Button */}
-            <div className="flex gap-3">
-              <Button
-                onClick={handleSave}
-                disabled={saving}
-                className="gap-2"
-              >
-                <Save className="w-4 h-4" />
-                {saving ? 'Salvando...' : 'Salvar Configurações'}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={loadAlgorithmConfig}
-                disabled={saving}
-              >
-                Resetar
-              </Button>
-            </div>
+            {hasChanges && (
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  {saving ? 'Salvando...' : 'Salvar Configurações'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={loadAlgorithmConfig}
+                  disabled={saving}
+                >
+                  Resetar
+                </Button>
+              </div>
+            )}
             </>
             ) : (
               <>
@@ -517,23 +532,25 @@ const AdminAlgorithm = () => {
                 </Card>
 
                 {/* Save Button */}
-                <div className="flex gap-3">
-                  <Button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="gap-2"
-                  >
-                    <Save className="w-4 h-4" />
-                    {saving ? 'Salvando...' : 'Salvar Configurações'}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={loadAlgorithmConfig}
-                    disabled={saving}
-                  >
-                    Resetar
-                  </Button>
-                </div>
+                {hasChanges && (
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={handleSave}
+                      disabled={saving}
+                      className="gap-2"
+                    >
+                      <Save className="w-4 h-4" />
+                      {saving ? 'Salvando...' : 'Salvar Configurações'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={loadAlgorithmConfig}
+                      disabled={saving}
+                    >
+                      Resetar
+                    </Button>
+                  </div>
+                )}
               </>
             )}
           </div>

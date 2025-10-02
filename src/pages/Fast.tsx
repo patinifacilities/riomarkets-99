@@ -526,6 +526,27 @@ const Fast = () => {
     };
     
     loadAlgorithmConfig();
+
+    // Subscribe to algorithm config changes for real-time updates
+    const channel = supabase
+      .channel('algorithm-config-changes-fast')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'fast_pool_algorithm_config'
+        },
+        () => {
+          console.log('🔄 Algorithm config changed, reloading...');
+          loadAlgorithmConfig();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Calculate dynamic odds based on countdown and algorithm config
@@ -1172,14 +1193,14 @@ const Fast = () => {
                    </div>
 
                    {/* Opinion Buttons */}
-                  <div className="grid grid-cols-2 gap-2">
+                   <div className="grid grid-cols-2 gap-2">
                     <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleBet(pool.id, 'subiu');
                       }}
-                      disabled={countdown <= 15}
-                      className={`h-12 text-sm font-semibold transition-all duration-300 ${
+                      disabled={countdown <= algorithmConfig.lockout_time_seconds}
+                      className={`h-12 text-sm font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
                         clickedPool?.id === pool.id && clickedPool?.side === 'subiu'
                           ? 'scale-[1.02] shadow-lg shadow-[#00ff90]/30 ring-2 ring-[#00ff90]/50 animate-pulse'
                           : ''
@@ -1199,8 +1220,8 @@ const Fast = () => {
                         e.stopPropagation();
                         handleBet(pool.id, 'desceu');
                       }}
-                      disabled={countdown <= 15}
-                      className={`h-12 text-sm font-semibold transition-all duration-300 ${
+                      disabled={countdown <= algorithmConfig.lockout_time_seconds}
+                      className={`h-12 text-sm font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
                         clickedPool?.id === pool.id && clickedPool?.side === 'desceu'
                           ? 'scale-[1.02] shadow-lg shadow-[#ff2389]/30 ring-2 ring-[#ff2389]/50 animate-pulse'
                           : ''
@@ -1216,7 +1237,7 @@ const Fast = () => {
                     </Button>
                   </div>
 
-                   {countdown <= 15 && (
+                   {countdown <= algorithmConfig.lockout_time_seconds && countdown > 0 && (
                      <div className="text-center text-xs text-muted-foreground">
                        Opiniões bloqueadas
                      </div>

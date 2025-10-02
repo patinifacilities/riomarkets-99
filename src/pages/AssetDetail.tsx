@@ -261,6 +261,27 @@ const AssetDetail = () => {
     };
     
     loadAlgorithmConfig();
+
+    // Subscribe to algorithm config changes for real-time updates
+    const channel = supabase
+      .channel('algorithm-config-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'fast_pool_algorithm_config'
+        },
+        () => {
+          console.log('🔄 Algorithm config changed, reloading...');
+          loadAlgorithmConfig();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const getOdds = (side?: 'subiu' | 'desceu') => {
@@ -615,8 +636,8 @@ const AssetDetail = () => {
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     onClick={() => handleBet('subiu')}
-                    disabled={countdown <= 2}
-                    className="h-12 text-sm font-semibold bg-[#00ff90] hover:bg-[#00ff90]/90 text-black"
+                    disabled={countdown <= algorithmConfig.lockout_time_seconds}
+                    className="h-12 text-sm font-semibold bg-[#00ff90] hover:bg-[#00ff90]/90 text-black disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <div className="flex items-center justify-between w-full px-1">
                       <ArrowUp className="w-4 h-4" />
@@ -629,8 +650,8 @@ const AssetDetail = () => {
                   
                   <Button
                     onClick={() => handleBet('desceu')}
-                    disabled={countdown <= 2}
-                    className="h-12 text-sm font-semibold bg-[#ff2389] hover:bg-[#ff2389]/90 text-white"
+                    disabled={countdown <= algorithmConfig.lockout_time_seconds}
+                    className="h-12 text-sm font-semibold bg-[#ff2389] hover:bg-[#ff2389]/90 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <div className="flex items-center justify-between w-full px-1">
                       <ArrowDown className="w-4 h-4" />
@@ -643,7 +664,7 @@ const AssetDetail = () => {
                 </div>
               )}
 
-              {countdown <= 2 && countdown > 0 && (
+              {countdown <= algorithmConfig.lockout_time_seconds && countdown > 0 && (
                 <div className="text-center text-xs text-muted-foreground">
                   Opiniões bloqueadas
                 </div>
