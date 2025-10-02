@@ -113,12 +113,12 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, qrCode, qrCodeText
           {/* QR Code */}
           <div className="flex justify-center">
             {qrCode ? (
-              <img src={qrCode} alt="QR Code PIX" className="w-48 h-48 rounded-lg border-2 border-border" />
+              <img src={qrCode} alt="QR Code PIX" className="w-48 h-48 rounded-lg border-2 border-border object-contain bg-white p-2" />
             ) : (
               <div className="w-48 h-48 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/20">
                 <div className="text-center">
                   <QrCode className="w-16 h-16 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">QR Code PIX</p>
+                  <p className="text-sm text-muted-foreground">Gerando QR Code...</p>
                   <p className="text-xs text-muted-foreground">R$ {amount}</p>
                 </div>
               </div>

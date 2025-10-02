@@ -171,7 +171,7 @@ export default function Deposit() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20 pb-8 px-4">
+    <div className="min-h-screen bg-background pt-12 md:pt-20 pb-8 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
