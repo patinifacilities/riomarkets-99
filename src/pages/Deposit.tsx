@@ -431,7 +431,10 @@ export default function Deposit() {
             className={`p-6 cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-primary/50 ${
               selectedMethod === "pix" ? "border-primary border-2 bg-primary/5" : ""
             }`}
-            onClick={() => setSelectedMethod("pix")}
+            onClick={() => {
+              setSelectedMethod("pix");
+              setShowCardForm(false);
+            }}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -454,31 +457,31 @@ export default function Deposit() {
               )}
             </div>
           </Card>
+
+          {/* Apple Pay - Coming Soon */}
+          <Card className="p-6 opacity-60 cursor-not-allowed">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 border border-gray-600">
+                  <Smartphone className="w-6 h-6 text-gray-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-base">Apple Pay</h3>
+                  <p className="text-sm text-muted-foreground">Em breve</p>
+                </div>
+              </div>
+            </div>
+          </Card>
         </div>
 
-        {/* Deposit Button */}
-        {!showCardForm && (
+        {/* Deposit Button - Only show when PIX is selected and card form is not shown */}
+        {selectedMethod === "pix" && !showCardForm && (
           <Button
-            onClick={() => selectedMethod && handleDeposit(selectedMethod)}
-            disabled={!amount || parseFloat(amount) / 100 < 5 || isProcessing || !selectedMethod}
-            className="w-full h-14 text-lg font-semibold mt-8 bg-[#00ff90] hover:bg-[#00ff90]/90 text-gray-800 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => handleDeposit("pix")}
+            disabled={isProcessing || !amount || parseFloat(amount) / 100 < 5}
+            className="w-full h-14 text-lg font-semibold mt-6 bg-primary hover:bg-primary/90"
           >
             {isProcessing ? "Processando..." : "Continuar com Depósito"}
-          </Button>
-        )}
-
-        {/* Apple Pay Button */}
-        {!showCardForm && (
-          <Button
-            onClick={() => handleDeposit("apple")}
-            disabled={!amount || parseFloat(amount) / 100 < 5 || isProcessing}
-            className="group w-full h-14 text-lg font-semibold mt-3 bg-black text-white shadow-lg border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 relative overflow-hidden"
-          >
-            <span className="absolute inset-0 bg-white transform translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500 ease-out" />
-            <svg className="w-10 h-10 relative z-10 transition-colors duration-500 group-hover:text-black" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-            </svg>
-            <span className="relative z-10 transition-colors duration-500 group-hover:text-black">Apple Pay</span>
           </Button>
         )}
 

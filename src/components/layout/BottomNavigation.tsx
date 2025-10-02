@@ -19,7 +19,7 @@ const BottomNavigation = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden pb-[env(safe-area-inset-bottom)]">
-      <div className="flex items-center justify-between px-6 h-16 relative">
+      <div className="grid grid-cols-5 items-center h-16 relative">
         {visibleItems.map((item, index) => {
           const isActive = item.href === '/' 
             ? (location.pathname === '/' || location.pathname.startsWith('/market/'))
@@ -30,7 +30,7 @@ const BottomNavigation = () => {
               <Link
                 key={item.href}
                 to={item.href}
-                className="flex flex-col items-center justify-center absolute left-1/2 -translate-x-1/2 -top-3"
+                className="flex flex-col items-center justify-center col-start-3 absolute left-1/2 -translate-x-1/2 -top-3"
               >
                 <div 
                   className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
@@ -48,6 +48,9 @@ const BottomNavigation = () => {
             );
           }
 
+          // Position items: first two on left, last two on right
+          const gridColumn = index < 2 ? index + 1 : index + 2;
+
           return (
             <Link
               key={item.href}
@@ -56,9 +59,9 @@ const BottomNavigation = () => {
                 "flex flex-col items-center justify-center h-full gap-1 transition-colors",
                 isActive 
                   ? "text-primary" 
-                  : "text-muted-foreground hover:text-foreground",
-                index === 0 ? "mr-auto" : index === visibleItems.length - 1 ? "ml-auto" : ""
+                  : "text-muted-foreground hover:text-foreground"
               )}
+              style={{ gridColumn }}
             >
               <item.icon className="w-5 h-5" />
               <span className="text-xs font-medium">
