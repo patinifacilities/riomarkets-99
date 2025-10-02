@@ -40,13 +40,12 @@ export const LivePriceChart = ({ assetSymbol, assetName, poolStartPrice, onPrice
   const [dataSource, setDataSource] = useState<'binance' | 'api'>('binance');
 
   // Set initialPrice to poolStartPrice when it's provided (pool start reference)
-  // This will reset the chart when a new pool starts or opening_price is adjusted
+  // When poolStartPrice changes continuously (tracking current price), update smoothly
   useEffect(() => {
     if (poolStartPrice && poolStartPrice > 0) {
       console.log('📊 Chart: Updating opening price line to', poolStartPrice);
       setInitialPrice(poolStartPrice);
-      // Clear old data when new pool starts to show fresh reference
-      setPriceData([]);
+      // Don't clear data - let the line move smoothly
     }
   }, [poolStartPrice]);
 

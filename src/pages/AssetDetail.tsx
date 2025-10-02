@@ -714,7 +714,12 @@ const AssetDetail = () => {
           <LivePriceChart 
             assetSymbol={currentPool.asset_symbol} 
             assetName={currentPool.asset_name}
-            poolStartPrice={currentPool.opening_price}
+            poolStartPrice={
+              // Between pools or first 3 seconds: follow current price
+              countdown <= 0 || countdown >= 57 
+                ? currentPrice 
+                : currentPool.opening_price // After 3s: use fixed opening_price
+            }
             onPriceChange={setCurrentPrice}
           />
         </div>
