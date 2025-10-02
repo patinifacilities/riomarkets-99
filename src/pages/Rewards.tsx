@@ -73,19 +73,22 @@ export default function Rewards() {
 
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-gradient-to-b from-background via-background to-primary/5 px-4 pb-32">
-      <div className="text-center space-y-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-2xl shadow-yellow-500/30">
-          <Gift className="w-8 h-8 text-white" />
+      <div className="text-center space-y-3 max-w-md">
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 shadow-2xl shadow-yellow-500/50" style={{
+          animation: 'golden-fade 2s ease-in-out infinite',
+          backgroundSize: '200% 200%'
+        }}>
+          <Gift className="w-10 h-10 text-white" />
         </div>
-        <h1 className="text-4xl font-black bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent tracking-tight">
+        <h1 className="text-3xl font-black bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent tracking-tight">
           Recompensas Diárias
         </h1>
-        <p className="text-xl text-muted-foreground font-semibold">Disponível em breve</p>
+        <p className="text-lg text-muted-foreground font-semibold">Disponível em breve</p>
         
         <div className="pt-2">
           <Button 
             onClick={() => navigate('/')}
-            className="bg-white text-black font-bold px-8 py-3 text-base rounded-xl shadow-lg transition-shadow"
+            className="bg-white text-black font-bold px-6 py-2 text-sm rounded-xl shadow-lg"
           >
             Ver Mercados
           </Button>

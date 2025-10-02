@@ -173,6 +173,15 @@ export default function Deposit() {
   return (
     <div className="min-h-screen bg-background pt-12 md:pt-20 pb-8 px-4">
       <div className="max-w-2xl mx-auto">
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <img 
+            src="/assets/rio-markets-logo.png"
+            alt="Rio Markets Logo" 
+            className="h-12 w-auto"
+          />
+        </div>
+
         {/* Header */}
         <div className="mb-8">
           <Button
@@ -404,7 +413,7 @@ export default function Deposit() {
                 <Button
                   onClick={handleCardFormSubmit}
                   disabled={isProcessing}
-                  className="w-full h-12 text-base font-semibold bg-[#00ff90] hover:bg-[#00ff90]/90 text-gray-800"
+                  className="w-full h-12 text-base font-semibold bg-white hover:bg-gray-100 text-gray-800"
                 >
                   {isProcessing ? "Processando..." : `Pagar R$ ${formatCurrencyDisplay(amount)}`}
                 </Button>

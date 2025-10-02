@@ -761,7 +761,7 @@ const Fast = () => {
         <style>{`
           footer { display: none !important; }
         `}</style>
-        <div className="fixed inset-0 bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center overflow-hidden">
+        <div className="fixed inset-0 bg-background flex items-center justify-center overflow-hidden">
           <div className="text-center">
             <div className="w-32 h-32 rounded-full bg-[#ff2389]/5 flex items-center justify-center mx-auto mb-4">
               <Zap className="w-16 h-16 text-[#ff2389]" style={{

@@ -338,7 +338,10 @@ const Ranking = () => {
                 Nenhum usuário encontrado
               </div>
             ) : (
-              filteredUsers.map((user, index) => (
+              filteredUsers.map((user, index) => {
+              const isGoldPass = index === 0 || index === 1 || index === 8; // 1º, 2º e 9º
+              
+              return (
               <div key={`${user.id}-${index}`} className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-card/50 transition-all">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary font-bold text-sm">
@@ -357,6 +360,11 @@ const Ranking = () => {
                       <h3 className="font-semibold text-sm">{user.nome}</h3>
                       {user.username && (
                         <span className="text-xs text-muted-foreground">@{user.username}</span>
+                      )}
+                      {isGoldPass && (
+                        <Badge className="bg-gradient-to-r from-amber-400 to-yellow-600 text-black border-0 shadow-lg text-xs px-2 py-0">
+                          ⭐ Gold
+                        </Badge>
                       )}
                       {getLevelBadge(user.nivel)}
                     </div>
@@ -377,7 +385,8 @@ const Ranking = () => {
                   )}
                 </div>
               </div>
-            )))}
+            );
+            }))}
           </CardContent>
         </Card>
       </div>
