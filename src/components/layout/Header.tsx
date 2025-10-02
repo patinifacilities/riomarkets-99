@@ -23,6 +23,7 @@ import { useState, useEffect } from 'react';
 import { TickerBar } from '@/components/ui/ticker-bar';
 import { DarkModeToggle } from './DarkModeToggle';
 import { AddBrlModal } from '@/components/exchange/AddBrlModal';
+import { cn } from '@/lib/utils';
 
 import logoImageWhite from '@/assets/rio-markets-logo-new.png';
 import logoImageBlack from '@/assets/rio-markets-logo-light.png';
@@ -36,6 +37,38 @@ const Header = () => {
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const [showDepositModal, setShowDepositModal] = useState(false);
   const { resolvedTheme } = useTheme();
+  const [scrollingDown, setScrollingDown] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  // Pre-load both logos for smooth transition
+  useEffect(() => {
+    const preloadImage = (src: string) => {
+      const img = new Image();
+      img.src = src;
+    };
+    preloadImage(logoImageWhite);
+    preloadImage(logoImageBlack);
+  }, []);
+
+  // Handle scroll direction for mobile logo/wallet button toggle
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        // Scrolling down
+        setScrollingDown(true);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up
+        setScrollingDown(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   // Pre-load both logos for smooth transition
   useEffect(() => {
@@ -376,14 +409,43 @@ const Header = () => {
 
         {/* Desktop User Menu */}
           <div className="flex items-center gap-3">
-            {/* Mobile wallet view logo or user menu */}
-            {isMobile && location.pathname === '/wallet' && isLoggedIn ? (
-              <div className="flex items-center">
-                <img 
-                  src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
-                  alt="Rio Markets" 
-                  className="h-7 w-auto" 
-                />
+            {/* Mobile - Show logo when scrolling down OR wallet button when scrolling up (only when logged in and not on wallet page) */}
+            {isMobile && isLoggedIn && location.pathname !== '/wallet' ? (
+              <div className="flex items-center gap-2">
+                {/* Logo - fades in when scrolling down */}
+                <div 
+                  className={cn(
+                    "transition-opacity duration-300",
+                    scrollingDown ? "opacity-100" : "opacity-0 pointer-events-none absolute"
+                  )}
+                >
+                  <img 
+                    src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
+                    alt="Rio Markets" 
+                    className="h-7 w-auto" 
+                  />
+                </div>
+
+                {/* Wallet Button - fades out when scrolling down */}
+                <Link 
+                  to="/wallet"
+                  className={cn(
+                    "transition-opacity duration-300",
+                    scrollingDown ? "opacity-0 pointer-events-none absolute" : "opacity-100"
+                  )}
+                >
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="gap-2 bg-primary/10 border border-primary/30 text-primary rounded-xl hover:bg-primary/10"
+                  >
+                    <Wallet className="w-4 h-4" />
+                    {profile?.saldo_moeda >= 1000 
+                      ? Math.floor(profile.saldo_moeda).toLocaleString('pt-BR') 
+                      : (profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                    } RZ
+                  </Button>
+                </Link>
               </div>
             ) : isMobile && !isLoggedIn ? (
               <Link to="/auth">
@@ -394,8 +456,8 @@ const Header = () => {
               </Link>
             ) : isLoggedIn ? (
               <>
-                {/* Wallet Balance */}
-                <div className="relative overflow-visible">
+                {/* Wallet Balance - Desktop only */}
+                <div className="relative overflow-visible hidden md:block">
                   <Link to="/wallet">
                     <Button 
                       variant="ghost" 

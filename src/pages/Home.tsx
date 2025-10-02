@@ -181,7 +181,7 @@ const Home = () => {
           
           <div className="text-center mb-6 md:mb-8">
             {/* Logo above mercados preditivos on mobile */}
-            <div className="md:hidden mb-6 flex justify-center">
+            <div className="md:hidden mb-6 mt-4 flex justify-center">
               <img 
                 src={rioLogo} 
                 alt="Rio Markets Logo" 

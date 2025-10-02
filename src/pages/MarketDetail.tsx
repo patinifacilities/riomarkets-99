@@ -264,7 +264,7 @@ const MarketDetail = () => {
                         />
                       </div>
                     
-                    {selectedOption && (
+                     {selectedOption && betAmount > 0 && (
                      <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">
                        <div className="text-sm text-muted-foreground mb-2">Opção selecionada:</div>
                        <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>

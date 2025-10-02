@@ -117,15 +117,19 @@ const WalletPage = () => {
           
           {/* Right Column - Charts and History */}
           <div className="lg:col-span-1 space-y-4">
-            {/* Balance Donut Chart - Show first on mobile */}
-            <BalanceDonutChart />
+            {/* Balance Donut Chart - Mobile: first, Desktop: normal order */}
+            <div className="block lg:order-2">
+              <BalanceDonutChart />
+            </div>
             
-            {/* Order History */}
-            <OrderHistoryCard onRefresh={() => {
-              refetchProfile();
-              refetchTransactions();
-              fetchBalance();
-            }} />
+            {/* Order History - Mobile: last, Desktop: normal order */}
+            <div className="block lg:order-1">
+              <OrderHistoryCard onRefresh={() => {
+                refetchProfile();
+                refetchTransactions();
+                fetchBalance();
+              }} />
+            </div>
           </div>
         </div>
 
