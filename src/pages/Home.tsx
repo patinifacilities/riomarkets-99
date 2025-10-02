@@ -152,99 +152,133 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Compact Hero */}
-      <div className="border-b border-border/40">
-        <div className="container mx-auto px-4 py-8 md:py-12">
-          <div className="max-w-4xl">
-            <h1 className="text-3xl md:text-5xl font-bold mb-3 text-foreground">
-              Mercados de Predição
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Aposte em eventos futuros. Ganhe em <span className="text-primary font-semibold">RIOZ</span>.
-            </p>
+    <div className="min-h-screen bg-[#0a0a0a]">
+      {/* Category Pills Hero */}
+      <div className="border-b border-border/20">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            {topicFilters.map((topic, index) => {
+              const gradients = [
+                'from-pink-400 to-pink-600',
+                'from-cyan-400 to-cyan-600', 
+                'from-purple-400 to-purple-600',
+                'from-green-400 to-green-600',
+                'from-yellow-400 to-yellow-600',
+                'from-red-400 to-red-600',
+                'from-blue-400 to-blue-600'
+              ];
+              const IconComponent = topic.Icon;
+              const isSelected = selectedTopics.includes(topic.id);
+              
+              return (
+                <button
+                  key={topic.id}
+                  onClick={() => handleTopicSelect(topic.id)}
+                  className={cn(
+                    "flex-shrink-0 w-48 h-32 rounded-2xl bg-gradient-to-br p-4 relative overflow-hidden transition-all",
+                    gradients[index % gradients.length],
+                    isSelected ? "ring-2 ring-white scale-105" : "opacity-80 hover:opacity-100"
+                  )}
+                >
+                  <div className="relative z-10">
+                    <h3 className="text-lg font-bold text-white mb-2">{topic.label}</h3>
+                  </div>
+                  <IconComponent className="absolute bottom-3 right-3 w-16 h-16 text-white/30" />
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-6">
-        {/* Filters Bar */}
-        <div className="flex flex-col gap-4 mb-6">
-          {/* Search and Sort */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar mercados..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-card/50 border-border/60 focus:border-primary/60"
-              />
-            </div>
-            
-            <Select value={sortBy} onValueChange={handleSortChange}>
-              <SelectTrigger className="w-[180px] bg-card/50 border-border/60">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="recentes">Mais Recentes</SelectItem>
-                <SelectItem value="populares">Mais Populares</SelectItem>
-                <SelectItem value="liquidez">Maior Liquidez</SelectItem>
-                <SelectItem value="prazo">Encerrando Primeiro</SelectItem>
-              </SelectContent>
-            </Select>
+        {/* Search and Filters */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+            <Input
+              placeholder="Search markets"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-12 h-12 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-500 rounded-xl"
+            />
           </div>
+        </div>
 
-          {/* Topic Filters */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {topicFilters.map((topic) => {
-              const isSelected = selectedTopics.includes(topic.id);
-              const IconComponent = topic.Icon;
-              return (
-                <button
-                  key={topic.id}
-                  onClick={() => handleTopicSelect(topic.id)}
-                  className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all",
-                    isSelected
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card/50 hover:bg-card border border-border/60 hover:border-primary/40"
-                  )}
-                >
-                  <IconComponent className="w-4 h-4" />
-                  {topic.label}
-                  {isSelected && (
-                    <X 
-                      className="w-3 h-3" 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveTopic(topic.id);
-                      }}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Status Filters */}
-          <div className="flex gap-2">
-            {statusFilters.map(filter => (
-              <button
-                key={filter.id}
-                onClick={() => handleStatusSelect(filter.id)}
-                className={cn(
-                  "px-4 py-2 rounded-lg text-sm font-medium transition-all",
-                  selectedStatus.includes(filter.id)
-                    ? "bg-primary/20 text-primary border border-primary/40"
-                    : "bg-card/30 hover:bg-card/50 text-muted-foreground border border-border/40"
-                )}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
+        {/* Filter Pills */}
+        <div className="flex gap-3 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+          <button
+            onClick={() => handleSortChange('recentes')}
+            className={cn(
+              "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
+              sortBy === 'recentes'
+                ? "bg-white text-black"
+                : "bg-[#1a1a1a] text-gray-400 hover:text-white border border-[#2a2a2a]"
+            )}
+          >
+            <BarChart3 className="w-4 h-4" />
+            Newest
+          </button>
+          
+          <button
+            onClick={() => handleSortChange('populares')}
+            className={cn(
+              "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
+              sortBy === 'populares'
+                ? "bg-white text-black"
+                : "bg-[#1a1a1a] text-gray-400 hover:text-white border border-[#2a2a2a]"
+            )}
+          >
+            <Zap className="w-4 h-4" />
+            Trending
+          </button>
+          
+          <button
+            onClick={() => handleSortChange('liquidez')}
+            className={cn(
+              "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
+              sortBy === 'liquidez'
+                ? "bg-white text-black"
+                : "bg-[#1a1a1a] text-gray-400 hover:text-white border border-[#2a2a2a]"
+            )}
+          >
+            <Target className="w-4 h-4" />
+            Volume
+          </button>
+          
+          <button
+            onClick={() => handleSortChange('prazo')}
+            className={cn(
+              "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all",
+              sortBy === 'prazo'
+                ? "bg-white text-black"
+                : "bg-[#1a1a1a] text-gray-400 hover:text-white border border-[#2a2a2a]"
+            )}
+          >
+            Ending
+          </button>
+          
+          <Select value={selectedStatus[0] || 'active'} onValueChange={(val) => setSelectedStatus([val])}>
+            <SelectTrigger className="w-[120px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a]">
+              <SelectItem value="active">Open</SelectItem>
+              <SelectItem value="ending">Ending</SelectItem>
+              <SelectItem value="closed">Closed</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Select value="all">
+            <SelectTrigger className="w-[140px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectValue placeholder="All Tokens" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a]">
+              <SelectItem value="all">All Tokens</SelectItem>
+              <SelectItem value="rioz">RIOZ</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Markets Grid */}

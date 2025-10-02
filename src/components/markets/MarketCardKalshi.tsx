@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bookmark, Share2, Clock, Flame } from 'lucide-react';
+import { Bookmark, Share2, Clock, Users, TrendingUp } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Market } from '@/types';
 import BetModal from './BetModal';
@@ -10,7 +10,6 @@ import { useMarketRewards } from '@/hooks/useMarketRewards';
 import { useMarketStats } from '@/hooks/useMarketStats';
 import { useIsWatched, useToggleWatchlist } from '@/hooks/useWatchlist';
 import { formatVolume, formatTimeLeft } from '@/lib/format';
-import { getPlaceholderThumbnail } from '@/lib/market-utils';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -35,18 +34,6 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   const isWatched = useIsWatched(market.id);
   const toggleWatchlist = useToggleWatchlist();
   const { toast } = useToast();
-
-  const getCategoryDisplayName = (categoria: string) => {
-    const displayNames: Record<string, string> = {
-      'economia': 'Economia',
-      'politica': 'Política', 
-      'esportes': 'Esportes',
-      'entretenimento': 'Entretenimento',
-      'tecnologia': 'Tecnologia',
-      'clima': 'Clima'
-    };
-    return displayNames[categoria] || categoria.charAt(0).toUpperCase() + categoria.slice(1);
-  };
 
   const handleBetClick = (e: React.MouseEvent, opcao: string) => {
     e.preventDefault();
@@ -125,135 +112,111 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   const yesPercentage = yesOption?.chance || 50;
   const noPercentage = noOption?.chance || 50;
 
+  // Gradient backgrounds based on category
+  const categoryGradients: Record<string, string> = {
+    'economia': 'from-green-600/20 via-green-500/10 to-transparent',
+    'politica': 'from-purple-600/20 via-purple-500/10 to-transparent',
+    'esportes': 'from-cyan-600/20 via-cyan-500/10 to-transparent',
+    'entretenimento': 'from-yellow-600/20 via-yellow-500/10 to-transparent',
+    'tecnologia': 'from-blue-600/20 via-blue-500/10 to-transparent',
+    'clima': 'from-red-600/20 via-red-500/10 to-transparent'
+  };
+
+  const gradient = categoryGradients[market.categoria] || 'from-gray-600/20 via-gray-500/10 to-transparent';
+
   return (
     <>
       <div className={cn(
-        "bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-200 dark:bg-card bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm relative",
+        "bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl overflow-hidden hover:border-[#3a3a3a] transition-all duration-200 group",
         className
       )}>
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5 pointer-events-none"></div>
-        <Link to={`/market/${market.id}`} className="block relative z-10">
-          {/* Header */}
-          <div 
-            className="p-4 pb-3 cursor-pointer" 
-            onClick={() => navigate(`/market/${market.id}`)}
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <div 
-                  className="w-10 h-10 rounded-sm flex items-center justify-center flex-shrink-0 relative p-1"
-                  style={{
-                    backgroundColor: market.icon_url ? 'transparent' : '#00ff90'
-                  }}
-                >
-                  {market.icon_url ? (
-                    <img 
-                      src={market.icon_url}
-                      alt={`Ícone do mercado: ${market.titulo}`}
-                      className="w-full h-full object-contain"
-                    />
-                  ) : market.thumbnail_url ? (
-                    <img 
-                      src={market.thumbnail_url}
-                      alt={`Thumbnail do mercado: ${market.titulo}`}
-                      className="w-full h-full object-cover rounded-sm"
-                    />
-                  ) : null}
-                  {showHotIcon && (
-                    <div className="absolute -top-2 -right-2 bg-gradient-to-br from-orange-400 via-red-500 to-pink-600 rounded-full p-1.5 shadow-lg shadow-orange-500/50 animate-pulse-glow">
-                      <Flame className="w-4 h-4 text-white animate-fire-flicker" />
-                    </div>
-                  )}
+        <Link to={`/market/${market.id}`} className="block">
+          {/* Image Header with Gradient Overlay */}
+          <div className={cn("relative h-40 overflow-hidden bg-gradient-to-br", gradient)}>
+            {market.thumbnail_url && (
+              <img 
+                src={market.thumbnail_url}
+                alt={market.titulo}
+                className="w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-transparent to-transparent" />
+            
+            {/* USDC Badge or In-Play */}
+            <div className="absolute top-3 left-3">
+              <Badge className="bg-blue-600/90 text-white border-0 backdrop-blur-sm">
+                <div className="w-4 h-4 rounded-full bg-white mr-1.5 flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-blue-600">R</span>
                 </div>
-                <Badge variant="secondary" className="text-xs px-2 py-1 bg-muted text-muted-foreground rounded-full">
-                  {getCategoryDisplayName(market.categoria)}
-                </Badge>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={handleBookmarkClick}
-                  className="p-1 rounded hover:bg-gray-100 transition-colors"
-                >
-                  <Bookmark className={cn("w-4 h-4", isWatched ? "fill-current text-green-600" : "text-gray-400")} />
-                </button>
-                <button 
-                  onClick={handleShareClick}
-                  className="p-1 rounded hover:bg-gray-100 transition-colors"
-                >
-                  <Share2 className="w-4 h-4 text-gray-400" />
-                </button>
-              </div>
+                RIOZ
+              </Badge>
             </div>
+          </div>
 
+          {/* Content */}
+          <div className="p-5">
             {/* Title */}
-            <h3 className="text-sm font-medium text-foreground line-clamp-2 leading-tight mb-3">
+            <h3 className="text-base font-semibold text-white mb-4 line-clamp-2 leading-snug group-hover:text-primary transition-colors">
               {market.titulo}
             </h3>
 
-            {/* Prediction Buttons - Kalshi Style */}
-            <div className="grid grid-cols-2 gap-2 mb-3">
+            {/* Probability Bar with Gradient */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
+                <span className="font-medium">{Math.round(yesPercentage)}%</span>
+                <span className="font-medium">{Math.round(noPercentage)}%</span>
+              </div>
+              <div className="h-2 bg-[#2a2a2a] rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-cyan-400 to-pink-500 transition-all duration-300"
+                  style={{ width: `${yesPercentage}%` }}
+                />
+              </div>
+            </div>
+
+            {/* YES/NO Buttons */}
+            <div className="grid grid-cols-2 gap-3 mb-4">
               <Button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/market/${market.id}`);
-                }}
+                onClick={(e) => handleBetClick(e, 'sim')}
                 disabled={market.status !== 'aberto'}
-                style={{ backgroundColor: '#00ff9020', borderColor: '#00ff90', color: '#00ff90' }}
-                className="h-12 rounded-xl border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80 w-full"
+                className="h-11 bg-teal-900/40 hover:bg-teal-900/60 text-teal-400 border border-teal-700/50 rounded-xl font-semibold transition-all"
               >
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-semibold">SIM</span>
-                  <span className="text-xs opacity-80">{(market.odds?.sim || 1.5).toFixed(1)}X</span>
-                </div>
+                YES
               </Button>
               
               <Button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/market/${market.id}`);
-                }}
+                onClick={(e) => handleBetClick(e, 'não')}
                 disabled={market.status !== 'aberto'}
-                style={{ backgroundColor: '#ff238920', borderColor: '#ff2389', color: '#ff2389' }}
-                className="h-12 rounded-xl border text-sm font-medium transition-colors relative overflow-hidden hover:opacity-80 w-full"
+                className="h-11 bg-purple-900/40 hover:bg-purple-900/60 text-purple-400 border border-purple-700/50 rounded-xl font-semibold transition-all"
               >
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-semibold">NÃO</span>
-                  <span className="text-xs opacity-80">{(market.odds?.não || market.odds?.nao || 1.5).toFixed(1)}X</span>
-                </div>
+                NO
               </Button>
             </div>
 
-            {/* Odds Progress Bar - Below buttons */}
-            <div className="mb-3">
-              <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                <span>SIM {Math.round(yesPercentage)}%</span>
-                <span>NÃO {Math.round(noPercentage)}%</span>
+            {/* Footer Stats */}
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
+                  <div className="flex -space-x-1.5">
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border border-[#1a1a1a]" />
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 border border-[#1a1a1a]" />
+                  </div>
+                  <span className="ml-1">+{stats?.participantes || 13}</span>
+                </div>
+                
+                <div className="flex items-center gap-1">
+                  <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                  <span>{formatVolume(detailedPool?.totalPool || stats?.vol_total || 0)}</span>
+                </div>
               </div>
-              <div className="h-1 bg-muted rounded-full overflow-hidden flex">
-                <div 
-                  className="h-full bg-[#00ff90] transition-all duration-300"
-                  style={{ width: `${yesPercentage}%` }}
-                />
-                <div 
-                  className="h-full bg-[#ff2389] transition-all duration-300"
-                  style={{ width: `${noPercentage}%` }}
-                />
+              
+              <div className="flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" />
+                <span>{formatTimeLeft(market.end_date)}</span>
               </div>
             </div>
           </div>
         </Link>
-
-        {/* Footer */}
-        <div className="px-4 pb-3 border-t border-border">
-          <div className="flex items-center justify-between text-xs text-muted-foreground pt-3">
-            <div className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              <span>{formatTimeLeft(market.end_date)}</span>
-            </div>
-            <span>Vol: {formatVolume(detailedPool?.totalPool || stats?.vol_total || 0)}</span>
-          </div>
-        </div>
       </div>
 
       <BetModal
