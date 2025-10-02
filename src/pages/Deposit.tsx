@@ -136,16 +136,21 @@ export default function Deposit() {
           body: { amount: numericAmount },
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error("PIX generation error:", error);
+          throw error;
+        }
+
+        console.log("PIX data received:", data);
 
         if (data?.success) {
           setPixData({
-            qrCode: data.qrCode,
-            qrCodeText: data.qrCodeText,
+            qrCode: data.payment?.qrCode || data.qrCode,
+            qrCodeText: data.payment?.qrCodeText || data.qrCodeText,
           });
           setShowPixModal(true);
         } else {
-          throw new Error("Failed to generate PIX payment");
+          throw new Error(data?.error || "Failed to generate PIX payment");
         }
       } else if (method === "apple") {
         toast.info("Apple Pay em breve!", {

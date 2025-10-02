@@ -113,7 +113,17 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, qrCode, qrCodeText
           {/* QR Code */}
           <div className="flex justify-center">
             {qrCode ? (
-              <img src={qrCode} alt="QR Code PIX" className="w-48 h-48 rounded-lg border-2 border-border object-contain bg-white p-2" />
+              <div className="w-48 h-48 rounded-lg border-2 border-border overflow-hidden bg-white p-2">
+                <img 
+                  src={qrCode} 
+                  alt="QR Code PIX" 
+                  className="w-full h-full object-contain" 
+                  onError={(e) => {
+                    console.error("QR Code image failed to load:", qrCode);
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
             ) : (
               <div className="w-48 h-48 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/20">
                 <div className="text-center">

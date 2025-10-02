@@ -19,8 +19,8 @@ const BottomNavigation = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden pb-[env(safe-area-inset-bottom)]">
-      <div className="flex items-center justify-around px-4 h-16 relative">
-        {visibleItems.map((item) => {
+      <div className="flex items-center justify-between px-6 h-16 relative">
+        {visibleItems.map((item, index) => {
           const isActive = item.href === '/' 
             ? (location.pathname === '/' || location.pathname.startsWith('/market/'))
             : location.pathname === item.href;
@@ -36,7 +36,7 @@ const BottomNavigation = () => {
                   className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
                   style={{ 
                     backgroundColor: '#ff2389',
-                    animation: 'fastButtonSpin 7s linear infinite'
+                    animation: 'fastButtonSpin 7s linear infinite, spin 1s ease-in-out 0s 1'
                   }}
                 >
                   <item.icon className="w-6 h-6 text-white animate-[fastIconPulse_7s_ease-in-out_infinite]" />
@@ -53,10 +53,11 @@ const BottomNavigation = () => {
               key={item.href}
               to={item.href}
               className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors",
+                "flex flex-col items-center justify-center h-full gap-1 transition-colors",
                 isActive 
                   ? "text-primary" 
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+                index === 0 ? "mr-auto" : index === visibleItems.length - 1 ? "ml-auto" : ""
               )}
             >
               <item.icon className="w-5 h-5" />

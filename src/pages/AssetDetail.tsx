@@ -145,11 +145,12 @@ const AssetDetail = () => {
 
       if (error) throw error;
       
-      // Remove duplicates by ID
+      // Remove duplicates by both ID and pool_id to ensure uniqueness
       const uniqueResults = new Map();
       (data || []).forEach((item: any) => {
-        if (!uniqueResults.has(item.id)) {
-          uniqueResults.set(item.id, {
+        const key = `${item.id}-${item.pool_id}`;
+        if (!uniqueResults.has(key)) {
+          uniqueResults.set(key, {
             ...item,
             result: item.result as 'subiu' | 'desceu' | 'manteve',
             asset_symbol: assetSymbol,
