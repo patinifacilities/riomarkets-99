@@ -10,6 +10,9 @@ import { useMarkets } from '@/hooks/useMarkets';
 import { track } from '@/lib/analytics';
 import { Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { TypewriterText } from '@/components/ui/TypewriterText';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -151,38 +154,93 @@ const Home = () => {
     setSelectedStatus(prev => prev.filter(id => id !== statusId));
   };
 
+  // Get top 3 markets by volume
+  const topMarketsByVolume = useMemo(() => {
+    return [...markets]
+      .sort((a, b) => {
+        // Since opcoes is string[], we can't use total_apostado. Use market id as fallback
+        return b.id.localeCompare(a.id);
+      })
+      .slice(0, 3);
+  }, [markets]);
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
+      {/* Hero Carousel Section */}
       <div className="bg-gradient-to-b from-primary/10 to-background border-b border-border">
         <div className="container mx-auto px-4 py-16">
-          <div className="max-w-4xl mx-auto text-center space-y-6">
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              Mercados Preditivos de Notícias do Brasil
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Aposte em suas opiniões sobre política, economia, esportes e muito mais. 
-              Ganhe recompensas compartilhando suas previsões sobre eventos futuros.
-            </p>
-            <div className="flex gap-4 justify-center items-center pt-4">
-              <Button 
-                size="lg" 
-                className="bg-[#00ff90] text-gray-900 hover:bg-[#00ff90]/90 font-semibold px-8 transition-all hover:scale-105"
-                onClick={() => navigate('/auth')}
-              >
-                <Sparkles className="w-5 h-5 mr-2" />
-                Explorar Mercados
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                onClick={() => navigate('/auth')}
-              >
-                <UserPlus className="w-5 h-5 mr-2" />
-                Criar Conta
-              </Button>
-            </div>
-          </div>
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            plugins={[
+              Autoplay({
+                delay: 7000,
+              }),
+            ]}
+            className="w-full max-w-5xl mx-auto"
+          >
+            <CarouselContent>
+              {/* Slide 1: Title with Typewriter */}
+              <CarouselItem>
+                <div className="text-center space-y-6 py-8">
+                  <div className="text-4xl md:text-6xl font-bold">
+                    <TypewriterText
+                      baseText="Mercados Preditivos"
+                      texts={[
+                        "para Análise Estratégica",
+                        "baseados em Dados",
+                        "com Transparência Total",
+                        "Rápidos"
+                      ]}
+                      customColors={{
+                        "Rápidos": "#00ff90"
+                      }}
+                      className="text-4xl md:text-6xl font-bold"
+                      typingSpeed={100}
+                      deletingSpeed={50}
+                      pauseDuration={2000}
+                    />
+                  </div>
+                  <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+                    Ganhe recompensas compartilhando suas previsões sobre eventos futuros.
+                  </p>
+                  <div className="flex gap-4 justify-center items-center pt-4">
+                    <Button 
+                      size="lg" 
+                      className="bg-[#00ff90] text-gray-900 hover:bg-[#00ff90]/90 font-semibold px-8 transition-all hover:scale-105"
+                      onClick={() => navigate('/auth')}
+                    >
+                      <Sparkles className="w-5 h-5 mr-2" />
+                      Explorar Mercados
+                    </Button>
+                    <Button 
+                      size="lg" 
+                      variant="outline"
+                      onClick={() => navigate('/auth')}
+                    >
+                      <UserPlus className="w-5 h-5 mr-2" />
+                      Criar Conta
+                    </Button>
+                  </div>
+                </div>
+              </CarouselItem>
+
+              {/* Slides 2-4: Top 3 Markets */}
+              {topMarketsByVolume.map((market) => (
+                <CarouselItem key={market.id}>
+                  <div className="flex justify-center py-8">
+                    <div className="w-full max-w-2xl scale-125 transform">
+                      <MarketCardKalshi market={market} />
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
         </div>
       </div>
 

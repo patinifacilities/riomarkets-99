@@ -112,17 +112,8 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   const yesPercentage = yesOption?.chance || 50;
   const noPercentage = noOption?.chance || 50;
 
-  // Gradient backgrounds based on category
-  const categoryGradients: Record<string, string> = {
-    'economia': 'from-green-600/20 via-green-500/10 to-transparent',
-    'politica': 'from-purple-600/20 via-purple-500/10 to-transparent',
-    'esportes': 'from-cyan-600/20 via-cyan-500/10 to-transparent',
-    'entretenimento': 'from-yellow-600/20 via-yellow-500/10 to-transparent',
-    'tecnologia': 'from-blue-600/20 via-blue-500/10 to-transparent',
-    'clima': 'from-red-600/20 via-red-500/10 to-transparent'
-  };
-
-  const gradient = categoryGradients[market.categoria] || 'from-gray-600/20 via-gray-500/10 to-transparent';
+  // Uniform background for all cards
+  const cardBackground = 'bg-[#1a1a1a]';
 
   return (
     <>
@@ -131,16 +122,16 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
         className
       )}>
         <Link to={`/market/${market.id}`} className="block">
-          {/* Image Header with Gradient Overlay */}
-          <div className={cn("relative h-40 overflow-hidden bg-gradient-to-br", gradient)}>
-            {market.thumbnail_url && (
+          {/* Image Header */}
+          <div className="relative h-40 overflow-hidden bg-[#2a2a2a]">
+            {(market.thumbnail_url || market.image_url || market.photo_url) && (
               <img 
-                src={market.thumbnail_url}
+                src={market.thumbnail_url || market.image_url || market.photo_url}
                 alt={market.titulo}
-                className="w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity"
+                className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
               />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/60 via-transparent to-transparent" />
             
             {/* USDC Badge or In-Play */}
             <div className="absolute top-3 left-3">
@@ -160,16 +151,26 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
               {market.titulo}
             </h3>
 
-            {/* Probability Bar with Gradient */}
+            {/* Probability Bar */}
             <div className="mb-4">
               <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
-                <span className="font-medium">{Math.round(yesPercentage)}%</span>
-                <span className="font-medium">{Math.round(noPercentage)}%</span>
+                <span className="font-medium">Sim {Math.round(yesPercentage)}%</span>
+                <span className="font-medium">{Math.round(noPercentage)}% Não</span>
               </div>
-              <div className="h-2 bg-[#2a2a2a] rounded-full overflow-hidden">
+              <div className="h-2 bg-[#2a2a2a] rounded-full overflow-hidden flex">
                 <div 
-                  className="h-full bg-gradient-to-r from-cyan-400 to-pink-500 transition-all duration-300"
-                  style={{ width: `${yesPercentage}%` }}
+                  className="transition-all duration-300"
+                  style={{ 
+                    width: `${yesPercentage}%`,
+                    backgroundColor: '#00ff90'
+                  }}
+                />
+                <div 
+                  className="transition-all duration-300"
+                  style={{ 
+                    width: `${noPercentage}%`,
+                    backgroundColor: '#ff2389'
+                  }}
                 />
               </div>
             </div>
