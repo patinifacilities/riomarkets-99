@@ -1,4 +1,4 @@
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Cookie } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useComplianceBannerSafe } from '@/stores/useComplianceBanner';
 import { LEGAL_URLS, COMPLIANCE_MESSAGES } from '@/lib/legal';
@@ -59,12 +59,12 @@ export function ComplianceBanner({ variant = 'sticky' }: ComplianceBannerProps) 
     <Wrapper>
       <div
         role="region"
-        aria-label="aviso de compliance e segurança"
-        className="no-motion mx-auto max-w-6xl mb-4 mx-4 rounded-2xl border border-primary/30 bg-zinc-950/90 backdrop-blur px-4 sm:px-6"
+        aria-label="aviso de cookies"
+        className="no-motion mx-auto max-w-6xl mb-20 md:mb-8 mx-4 rounded-2xl border border-primary/30 bg-zinc-950/90 backdrop-blur px-4 sm:px-6"
       >
         <div className="flex flex-col sm:flex-row items-center gap-3 py-3">
           <div className="flex items-center gap-2 text-zinc-200">
-            <ShieldCheck 
+            <Cookie 
               className="h-5 w-5 text-primary" 
               aria-hidden="true" 
             />
@@ -74,16 +74,6 @@ export function ComplianceBanner({ variant = 'sticky' }: ComplianceBannerProps) 
           </div>
 
           <div className="flex items-center gap-4 text-xs text-zinc-400">
-            <a 
-              href={LEGAL_URLS.como_funciona}
-              onClick={(e) => {
-                handleLinkClick('como_funciona', e.currentTarget.href);
-              }}
-              className="hover:text-primary underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
-              aria-label="saiba como funciona a plataforma"
-            >
-              como funciona
-            </a>
             <a 
               href={LEGAL_URLS.termos}
               onClick={(e) => {
@@ -103,16 +93,6 @@ export function ComplianceBanner({ variant = 'sticky' }: ComplianceBannerProps) 
               aria-label="consulte nossa política de privacidade"
             >
               privacidade
-            </a>
-            <a 
-              href={LEGAL_URLS.compliance}
-              onClick={(e) => {
-                handleLinkClick('compliance', e.currentTarget.href);
-              }}
-              className="hover:text-primary underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
-              aria-label="veja informações sobre compliance"
-            >
-              compliance
             </a>
           </div>
 

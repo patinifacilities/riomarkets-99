@@ -325,42 +325,55 @@ const MarketDetail = () => {
                        </div>
                      )}
                      
-                        {selectedOption && betAmount && betAmount > 0 && (
-                          <div className="w-full mt-4">
-                            <SliderConfirm
+                         {selectedOption && betAmount && betAmount > 0 && (
+                           <div className="w-full mt-4" data-confirm-area>
+                             <SliderConfirm
                               selectedOption={selectedOption}
                               disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
                               onProgressChange={(progress) => setSliderProgress(progress)}
-                           onConfirm={async () => {
-                             if (!authUser?.id) {
-                               toast({
-                                 title: "Erro",
-                                 description: "Você precisa estar logado para opinar",
-                                 variant: "destructive",
-                               });
-                               return;
-                             }
+                            onConfirm={async () => {
+                              if (!authUser?.id) {
+                                toast({
+                                  title: "Erro",
+                                  description: "Você precisa estar logado para opinar",
+                                  variant: "destructive",
+                                });
+                                return;
+                              }
 
-                           try {
-                             const recompensa = market.odds?.[selectedOption] || 1.5;
-                             
-                             // Insert into market_order_book_pools for pool-specific orderbook
-                             const { error: orderBookError } = await supabase
-                               .from('market_order_book_pools')
-                               .insert({
-                                 market_id: market.id,
-                                 user_id: authUser.id,
-                                 side: selectedOption,
-                                 quantity: betAmount,
-                                 price: recompensa,
-                                 status: 'filled',
-                                 filled_at: new Date().toISOString()
-                               });
+                            try {
+                              const recompensa = market.odds?.[selectedOption] || 1.5;
+                              
+                              // Insert into market_order_book_pools for pool-specific orderbook
+                              const { error: orderBookError } = await supabase
+                                .from('market_order_book_pools')
+                                .insert({
+                                  market_id: market.id,
+                                  user_id: authUser.id,
+                                  side: selectedOption,
+                                  quantity: betAmount,
+                                  price: recompensa,
+                                  status: 'filled',
+                                  filled_at: new Date().toISOString()
+                                });
 
-                             if (orderBookError) throw orderBookError;
+                              if (orderBookError) throw orderBookError;
 
-                               toast({
-                                 title: "Opinião registrada!",
+                                // Add shrink animation to confirmation area
+                                const confirmArea = document.querySelector('[data-confirm-area]');
+                                if (confirmArea) {
+                                  confirmArea.classList.add('animate-scale-out');
+                                  setTimeout(() => {
+                                    setSelectedOption('');
+                                    setBetAmount(0);
+                                  }, 200);
+                                } else {
+                                  setSelectedOption('');
+                                  setBetAmount(0);
+                                }
+
+                                toast({
+                                  title: "✓ Opinião enviada!",
                                  description: `Você opinou ${selectedOption.toUpperCase()} com ${betAmount} RIOZ`,
                                  className: "fixed bottom-24 md:bottom-4 right-4 rounded-2xl z-50"
                                });

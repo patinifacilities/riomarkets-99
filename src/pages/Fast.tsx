@@ -380,14 +380,6 @@ const Fast = () => {
                       'border-gray-500 bg-gray-50 dark:bg-gray-900/20'
           });
         }, 500);
-        
-        // Clear result after 3 seconds
-        setTimeout(() => {
-          setPoolResults(prev => ({
-            ...prev,
-            [selectedCategory]: null
-          }));
-        }, 3000);
       }
     }
   }, [lastPoolIds, poolHistory, selectedCategory, toast]);
