@@ -65,7 +65,26 @@ const WalletPage = () => {
       )}
       
       <div className="container mx-auto px-4 py-6">
-        <div className="mb-8 flex items-center justify-between">
+        {/* Mobile header - Show only on mobile */}
+        <div className="md:hidden mb-6 flex items-center justify-between">
+          <img 
+            src="/assets/rio-markets-logo.png" 
+            alt="Rio Markets" 
+            className="h-8 w-auto" 
+          />
+          <Button
+            onClick={() => setShowDepositModal(true)}
+            variant="default"
+            size="sm"
+            className="gap-2"
+          >
+            <DollarSign className="w-4 h-4" />
+            Depositar
+          </Button>
+        </div>
+        
+        {/* Desktop header - Show only on desktop */}
+        <div className="hidden md:flex mb-8 items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
               <Wallet className="w-8 h-8" />
@@ -99,16 +118,16 @@ const WalletPage = () => {
               brlBalance={brlBalance}
             />
             
-            {/* Recent Wins - Full Width */}
-            <RecentWinsCard />
-            
             {/* Completed Orders - Full Width */}
             <CompletedOrdersCard />
+            
+            {/* Recent Wins - Full Width */}
+            <RecentWinsCard />
           </div>
           
           {/* Right Column - Charts and History */}
           <div className="lg:col-span-1 space-y-4">
-            {/* Balance Donut Chart */}
+            {/* Balance Donut Chart - Show first on mobile */}
             <BalanceDonutChart />
             
             {/* Order History */}

@@ -47,11 +47,11 @@ export function OnboardingStep({ step, className = "" }: OnboardingStepProps) {
         {content.tip && (
           <div className={`border rounded-lg p-3 mt-4 ${
             content.id === 3 
-              ? 'bg-[#ff2389]/5 border-[#ff2389]/20' 
+              ? 'bg-[#ff2389]/5 border-[#ff2389]/20 dark:bg-[#ff2389]/5 dark:border-[#ff2389]/20 light:bg-gray-100 light:border-gray-300' 
               : 'bg-primary/5 border-primary/20'
           }`}>
             <p className={`text-sm font-medium ${
-              content.id === 3 ? 'text-white' : 'text-primary'
+              content.id === 3 ? 'text-white dark:text-white light:text-gray-700' : 'text-primary'
             }`}>
               {content.id === 3 ? '' : '💡 '}{content.tip}
             </p>

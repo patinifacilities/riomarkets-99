@@ -954,8 +954,8 @@ const Fast = () => {
                   size="lg"
                   onClick={() => setSelectedCategory(category.value)}
                   className={cn(
-                    "transition-all duration-75 font-bold rounded-xl text-base flex-shrink-0",
-                    "px-4 py-3 md:px-10 md:py-6",
+                    "transition-all duration-75 font-bold rounded-xl flex-shrink-0",
+                    "px-2 py-2 text-xs md:px-10 md:py-6 md:text-base",
                     selectedCategory === category.value 
                       ? "shadow-lg border-2 scale-105" 
                       : "hover:bg-muted-foreground/10"
@@ -966,8 +966,9 @@ const Fast = () => {
                     borderColor: category.bgColor
                   } : {}}
                 >
-                  <span className="mr-1">{category.icon}</span>
-                  {category.label}
+                  <span className="mr-1 text-sm md:text-base">{category.icon}</span>
+                  <span className="hidden sm:inline">{category.label}</span>
+                  <span className="sm:hidden">{category.label.slice(0, 3)}</span>
                 </Button>
               ))}
             </div>

@@ -148,7 +148,13 @@ const Header = () => {
                       {/* User Info Section */}
                   {isLoggedIn && profile && (
                     <div className="border-b border-border pb-4 mb-4">
-                      <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-primary/20">
+                      <div 
+                        className="flex items-center gap-3 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-primary/20 cursor-pointer hover:bg-primary/15 transition-colors"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          navigate('/profile');
+                        }}
+                      >
                         <Avatar className="h-12 w-12 ring-2 ring-primary/20">
                           <AvatarFallback className="bg-primary text-primary-foreground">
                             {profile.nome ? profile.nome.charAt(0).toUpperCase() : 'U'}
