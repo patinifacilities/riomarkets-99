@@ -43,6 +43,7 @@ import Terms from '@/pages/Terms';
 import Privacy from '@/pages/Privacy';
 import FAQ from '@/pages/FAQ';
 import Cookies from '@/pages/Cookies';
+import Rewards from '@/pages/Rewards';
 import NotFound from '@/pages/NotFound';
 import { Toaster } from '@/components/ui/sonner';
 import { track } from '@/lib/analytics';
@@ -92,6 +93,7 @@ function App() {
             <Route path="/admin/gateway-config/:gatewayId" element={<AdminGatewayConfig />} />
             <Route path="/admin/gateways-saque" element={<AdminGatewaysSaque />} />
           <Route path="/opinioes" element={<Opinioes />} />
+          <Route path="/rewards" element={<Rewards />} />
           <Route path="/fiat-requests" element={<FiatRequests />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />

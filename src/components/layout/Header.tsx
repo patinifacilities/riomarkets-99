@@ -1,4 +1,4 @@
-import { TrendingUp, Wallet, Trophy, Settings, LogOut, User, LogIn, Receipt, Newspaper, ArrowRightLeft, Menu, Plus, UserCircle, Zap, ArrowLeft, HelpCircle } from 'lucide-react';
+import { TrendingUp, Wallet, Trophy, Settings, LogOut, User, LogIn, Receipt, Newspaper, ArrowRightLeft, Menu, Plus, UserCircle, Zap, ArrowLeft, HelpCircle, Gift } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
@@ -97,6 +97,7 @@ const Header = () => {
     { href: '/wallet', icon: Wallet, label: 'Carteira', authRequired: true },
     { href: '/transactions', icon: Receipt, label: 'Transações', authRequired: true },
     { href: '/exchange', icon: ArrowRightLeft, label: 'Exchange', authRequired: true },
+    { href: '/rewards', icon: Gift, label: 'Recompensas', authRequired: true },
     { href: '/ranking', icon: Trophy, label: 'Ranking' },
     { href: '/press', icon: Newspaper, label: 'Notícias' },
     { href: '/admin', icon: Settings, label: 'Admin', adminRequired: true }

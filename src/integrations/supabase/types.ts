@@ -1314,6 +1314,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_login_streaks: {
+        Row: {
+          created_at: string
+          current_streak: number
+          id: string
+          last_login_date: string | null
+          longest_streak: number
+          total_logins: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_login_date?: string | null
+          longest_streak?: number
+          total_logins?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_login_date?: string | null
+          longest_streak?: number
+          total_logins?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_rankings: {
         Row: {
           accuracy_percent: number
@@ -1365,6 +1398,33 @@ export type Database = {
           updated_at?: string
           user_id?: string
           win_streak?: number
+        }
+        Relationships: []
+      }
+      user_rewards_claimed: {
+        Row: {
+          claimed_at: string
+          id: string
+          reward_amount: number
+          reward_type: string
+          streak_at_claim: number
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          id?: string
+          reward_amount: number
+          reward_type: string
+          streak_at_claim: number
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string
+          id?: string
+          reward_amount?: number
+          reward_type?: string
+          streak_at_claim?: number
+          user_id?: string
         }
         Relationships: []
       }
@@ -1519,6 +1579,14 @@ export type Database = {
           success: boolean
         }[]
       }
+      claim_daily_reward: {
+        Args: {
+          p_reward_amount: number
+          p_reward_type: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
       cleanup_expired_limit_orders: {
         Args: Record<PropertyKey, never>
         Returns: number
@@ -1670,6 +1738,15 @@ export type Database = {
       update_rate_price: {
         Args: { p_price: number; p_symbol: string }
         Returns: undefined
+      }
+      update_user_login_streak: {
+        Args: { p_user_id: string }
+        Returns: {
+          can_claim_30_day: boolean
+          can_claim_7_day: boolean
+          current_streak: number
+          is_new_login: boolean
+        }[]
       }
       validate_accounting_reconciliation: {
         Args: Record<PropertyKey, never>
