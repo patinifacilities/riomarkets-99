@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { TrendingUp, Wallet, Trophy, User, Zap, ArrowRightLeft } from 'lucide-react';
+import { TrendingUp, Wallet, Trophy, User, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -11,7 +11,6 @@ const BottomNavigation = () => {
     { href: '/', icon: TrendingUp, label: 'Mercados' },
     { href: '/wallet', icon: Wallet, label: 'Carteira', authRequired: true },
     { href: '/fast', icon: Zap, label: 'Fast', authRequired: true, isFast: true },
-    { href: '/exchange', icon: TrendingUp, label: 'Exchange', authRequired: true },
     { href: '/ranking', icon: Trophy, label: 'Ranking' },
     { href: '/profile', icon: User, label: 'Perfil', authRequired: true }
   ];
@@ -34,10 +33,13 @@ const BottomNavigation = () => {
                 className="flex flex-col items-center justify-center absolute left-1/2 -translate-x-1/2 -top-3"
               >
                 <div 
-                  className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg animate-[spin_7s_linear_infinite]"
-                  style={{ backgroundColor: '#ff2389' }}
+                  className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+                  style={{ 
+                    backgroundColor: '#ff2389',
+                    animation: 'fastButtonSpin 7s linear infinite'
+                  }}
                 >
-                  <item.icon className="w-6 h-6 text-white" />
+                  <item.icon className="w-6 h-6 text-white animate-[fastIconPulse_7s_ease-in-out_infinite]" />
                 </div>
                 <span className="text-xs font-medium text-foreground mt-1">
                   {item.label}

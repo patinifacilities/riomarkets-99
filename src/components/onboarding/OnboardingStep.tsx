@@ -27,6 +27,10 @@ export function OnboardingStep({ step, className = "" }: OnboardingStepProps) {
           <div className="w-16 h-16 rounded-full bg-[#ff2389]/10 flex items-center justify-center animate-pulse">
             <IconComponent className="w-8 h-8 text-[#ff2389]" />
           </div>
+        ) : content.id === 4 ? (
+          <div className="w-16 h-16 rounded-full bg-gradient-to-r from-yellow-500 via-yellow-600 to-amber-600 flex items-center justify-center shadow-lg shadow-yellow-500/50 animate-[golden-glow_2s_ease-in-out_infinite]">
+            <IconComponent className="w-8 h-8 text-white" />
+          </div>
         ) : (
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
             <IconComponent className="w-8 h-8 text-primary" />
@@ -35,7 +39,7 @@ export function OnboardingStep({ step, className = "" }: OnboardingStepProps) {
       </div>
       
       <div className="space-y-3">
-        <h3 className={`text-xl font-semibold ${content.id === 3 ? 'text-[#ff2389]' : 'text-foreground'}`}>
+        <h3 className={`text-xl font-semibold ${content.id === 3 || content.id === 4 ? 'text-primary' : 'text-foreground'}`}>
           {content.title}
         </h3>
         

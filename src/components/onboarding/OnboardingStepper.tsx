@@ -9,6 +9,7 @@ export function OnboardingStepper({
   totalSteps, 
   className = "" 
 }: OnboardingStepperProps) {
+  const isPinkStep = currentStep === 3;
   const isGoldenStep = currentStep === 4;
   
   return (
@@ -24,7 +25,9 @@ export function OnboardingStepper({
           <div
             key={step}
             className={`h-1.5 flex-1 rounded transition-all duration-500 ${
-              isGoldenStep && isActive
+              isPinkStep && isActive && step === 3
+                ? 'bg-[#ff2389]' 
+                : isGoldenStep && isActive
                 ? 'bg-gradient-to-r from-yellow-500 via-yellow-600 to-amber-600 shadow-lg shadow-yellow-500/50' 
                 : isActive 
                 ? 'bg-primary' 

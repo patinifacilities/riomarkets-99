@@ -90,28 +90,32 @@ const Fast = () => {
       label: 'Cripto', 
       bgColor: '#FF6101',
       icon: '₿',
-      textColor: '#fff'
+      textColor: '#fff',
+      iconGap: 'gap-1'
     },
     { 
       value: 'commodities', 
       label: 'Commod', 
       bgColor: '#FFD800',
       icon: '🛢️',
-      textColor: '#000'
+      textColor: '#000',
+      iconGap: 'gap-0.5'
     },
     { 
       value: 'forex', 
       label: 'Forex', 
       bgColor: '#ff2389',
       icon: '$',
-      textColor: '#fff'
+      textColor: '#fff',
+      iconGap: 'gap-1'
     },
     { 
       value: 'stocks', 
       label: 'Ações', 
       bgColor: '#00ff90',
       icon: '📈',
-      textColor: '#000'
+      textColor: '#000',
+      iconGap: 'gap-0.5'
     }
   ];
 
@@ -958,9 +962,11 @@ const Fast = () => {
                     borderColor: category.bgColor
                   } : {}}
                 >
-                  <span className="mr-0.5 text-sm md:text-base">{category.icon}</span>
-                  <span className="hidden sm:inline">{category.label === 'Commodities' ? 'Commod' : category.label}</span>
-                  <span className="sm:hidden">{category.label.slice(0, 3)}</span>
+                  <div className={cn("flex items-center", category.iconGap || "gap-1")}>
+                    <span className="text-sm md:text-base">{category.icon}</span>
+                    <span className="hidden sm:inline">{category.label === 'Commodities' ? 'Commod' : category.label}</span>
+                    <span className="sm:hidden">{category.label.slice(0, 3)}</span>
+                  </div>
                 </Button>
               ))}
             </div>

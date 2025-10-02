@@ -363,6 +363,37 @@
       filter: brightness(1.2);
     }
   }
+
+  @keyframes fastButtonSpin {
+    0%, 85.71% {
+      transform: rotate(0deg);
+    }
+    85.72%, 92.86% {
+      transform: rotate(360deg);
+    }
+    92.87%, 100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes fastIconPulse {
+    0%, 85.71% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    92.86% {
+      transform: scale(1.2);
+      opacity: 0.8;
+    }
+    96.43% {
+      transform: scale(0.9);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
 }
 
 @layer base {
