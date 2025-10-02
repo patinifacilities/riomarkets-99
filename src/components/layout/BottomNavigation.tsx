@@ -8,10 +8,10 @@ const BottomNavigation = () => {
   const { user } = useAuth();
 
   const navItems = [
-    { href: '/', icon: TrendingUp, label: 'Mercados' },
-    { href: '/ranking', icon: Trophy, label: 'Ranking' },
-    { href: '/fast', icon: Zap, label: 'Fast', authRequired: true, isFast: true },
     { href: '/wallet', icon: Wallet, label: 'Carteira', authRequired: true },
+    { href: '/', icon: TrendingUp, label: 'Mercados' },
+    { href: '/fast', icon: Zap, label: 'Fast', authRequired: true, isFast: true },
+    { href: '/ranking', icon: Trophy, label: 'Ranking' },
     { href: '/profile', icon: User, label: 'Perfil', authRequired: true }
   ];
 
@@ -53,10 +53,15 @@ const BottomNavigation = () => {
             );
           }
 
-          // Calculate grid position: items swapped - Ranking(0), Carteira(1), Fast(center), items 3,4 in cols 4,5
-          // After swap: Carteira is index 0, Ranking is index 1
+          // New order: Carteira(0), Mercados(1), Fast(center), Ranking(3), Perfil(4)
           const gridColumn = index < 2 ? index + 1 : index + 2;
-          const additionalClasses = index === 1 ? 'justify-self-start' : index === 0 ? 'justify-self-start ml-[-20px]' : index === 3 ? 'justify-self-start' : index === 4 ? 'justify-self-end' : '';
+          
+          // Position adjustments for better spacing
+          let additionalClasses = '';
+          if (index === 0) additionalClasses = 'justify-self-start ml-[-8px]'; // Carteira - closer to Fast
+          else if (index === 1) additionalClasses = 'justify-self-end mr-2'; // Mercados - not cut off
+          else if (index === 3) additionalClasses = 'justify-self-start ml-2'; // Ranking
+          else if (index === 4) additionalClasses = 'justify-self-end'; // Perfil
 
           return (
             <Link
