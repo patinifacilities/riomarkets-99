@@ -189,28 +189,8 @@ async function createSynchronizedPools(supabase: any, category = 'crypto') {
 
   if (error) throw error;
 
-  // IMMEDIATELY after creating pools, get real-time prices
-  console.log('📊 Fetching real-time prices for pools...');
-  const { data: marketData } = await supabase.functions.invoke('get-market-data', {
-    body: { symbols }
-  });
-
-  const prices = marketData?.prices || {};
-  
-  // Update each pool with the real-time price immediately
-  for (const pool of pools) {
-    const realPrice = prices[pool.asset_symbol];
-    if (realPrice) {
-      await supabase
-        .from('fast_pools')
-        .update({ opening_price: realPrice })
-        .eq('id', pool.id);
-      
-      console.log(`✅ Pool ${pool.id} (${pool.asset_symbol}) opening_price set to ${realPrice} (real-time)`);
-    } else {
-      console.log(`⚠️ Pool ${pool.id} (${pool.asset_symbol}) using fallback price ${pool.opening_price}`);
-    }
-  }
+  // Return pools IMMEDIATELY - the frontend will adjust opening_price in first 3 seconds
+  console.log(`✅ Created ${pools.length} pools instantly - opening_price will be adjusted dynamically`);
 
   return pools;
 }
@@ -587,7 +567,6 @@ async function createAllCategoriesPools(supabase: any) {
     }
   }
 
-  // Insert all pools at once
   const { data: pools, error } = await supabase
     .from('fast_pools')
     .insert(allPoolsToInsert)
@@ -598,29 +577,8 @@ async function createAllCategoriesPools(supabase: any) {
     throw error;
   }
 
-  // IMMEDIATELY after creating pools, get real-time prices for all symbols
-  console.log('📊 Fetching real-time prices for all pools...');
-  const { data: marketData } = await supabase.functions.invoke('get-market-data', {
-    body: { symbols: allSymbols }
-  });
+  // Return pools IMMEDIATELY - the frontend will adjust opening_price in first 3 seconds
+  console.log(`✅ Created ${pools?.length} pools instantly across all categories - opening_price will be adjusted dynamically`);
 
-  const prices = marketData?.prices || {};
-  
-  // Update each pool with the real-time price immediately
-  for (const pool of pools) {
-    const realPrice = prices[pool.asset_symbol];
-    if (realPrice) {
-      await supabase
-        .from('fast_pools')
-        .update({ opening_price: realPrice })
-        .eq('id', pool.id);
-      
-      console.log(`✅ Pool ${pool.id} (${pool.asset_symbol}) opening_price set to ${realPrice} (real-time)`);
-    } else {
-      console.log(`⚠️ Pool ${pool.id} (${pool.asset_symbol}) using fallback price ${pool.opening_price}`);
-    }
-  }
-
-  console.log(`Created ${pools?.length} pools across all categories with real-time prices`);
   return pools;
 }
