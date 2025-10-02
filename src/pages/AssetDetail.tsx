@@ -289,11 +289,12 @@ const AssetDetail = () => {
 
   const getOdds = (side?: 'subiu' | 'desceu') => {
     // Algorithm 2: Price-based
-    if (algorithmConfig.algorithm_type === 'price_based' && currentPool && currentPrice > 0) {
+    if (algorithmConfig.algorithm_type === 'price_based' && currentPool) {
       const openingPrice = currentPool.opening_price || 0;
       
-      if (openingPrice === 0) {
-        return algorithmConfig.algo2_odds_high;
+      // Se não temos preços ainda, retorne odds padrão
+      if (openingPrice === 0 || currentPrice === 0) {
+        return algorithmConfig.algo2_odds_low;
       }
 
       const priceDiff = currentPrice - openingPrice;

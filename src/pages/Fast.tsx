@@ -560,9 +560,15 @@ const Fast = () => {
   // Calculate dynamic odds based on countdown and algorithm config
   const getOdds = (side?: 'subiu' | 'desceu', pool?: FastPool) => {
     // Algorithm 2: Price-based
-    if (algorithmConfig.algorithm_type === 'price_based' && pool && currentPrices[pool.id] > 0) {
-      const openingPrice = pool.opening_price;
-      const currentPrice = currentPrices[pool.id];
+    if (algorithmConfig.algorithm_type === 'price_based' && pool) {
+      const openingPrice = pool.opening_price || 0;
+      const currentPrice = currentPrices[pool.id] || 0;
+      
+      // Se não temos preços ainda, retorne odds padrão
+      if (openingPrice === 0 || currentPrice === 0) {
+        return algorithmConfig.algo2_odds_low;
+      }
+      
       const priceDiff = currentPrice - openingPrice;
       
       // Base odds assignment
