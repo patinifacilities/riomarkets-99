@@ -37,38 +37,6 @@ const Header = () => {
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
   const [showDepositModal, setShowDepositModal] = useState(false);
   const { resolvedTheme } = useTheme();
-  const [scrollingDown, setScrollingDown] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
-
-  // Pre-load both logos for smooth transition
-  useEffect(() => {
-    const preloadImage = (src: string) => {
-      const img = new Image();
-      img.src = src;
-    };
-    preloadImage(logoImageWhite);
-    preloadImage(logoImageBlack);
-  }, []);
-
-  // Handle scroll direction for mobile logo/wallet button toggle
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      if (currentScrollY > lastScrollY && currentScrollY > 50) {
-        // Scrolling down
-        setScrollingDown(true);
-      } else if (currentScrollY < lastScrollY) {
-        // Scrolling up
-        setScrollingDown(false);
-      }
-      
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
 
   // Pre-load both logos for smooth transition
   useEffect(() => {
@@ -407,33 +375,12 @@ const Header = () => {
             })}
           </nav>
 
-        {/* Desktop User Menu */}
           <div className="flex items-center gap-3">
-            {/* Mobile - Show logo when scrolling down OR wallet button when scrolling up (only when logged in and not on wallet page) */}
-            {isMobile && isLoggedIn && location.pathname !== '/wallet' ? (
+            {/* Mobile menu */}
+            {isMobile && isLoggedIn ? (
               <div className="flex items-center gap-2">
-                {/* Logo - fades in when scrolling down */}
-                <div 
-                  className={cn(
-                    "transition-opacity duration-300",
-                    scrollingDown ? "opacity-100" : "opacity-0 pointer-events-none absolute"
-                  )}
-                >
-                  <img 
-                    src={resolvedTheme === 'light' ? logoImageBlack : logoImageWhite} 
-                    alt="Rio Markets" 
-                    className="h-7 w-auto" 
-                  />
-                </div>
-
-                {/* Wallet Button - fades out when scrolling down */}
-                <Link 
-                  to="/wallet"
-                  className={cn(
-                    "transition-opacity duration-300",
-                    scrollingDown ? "opacity-0 pointer-events-none absolute" : "opacity-100"
-                  )}
-                >
+                <DarkModeToggle />
+                <Link to="/wallet">
                   <Button 
                     variant="ghost" 
                     size="sm"
@@ -446,6 +393,49 @@ const Header = () => {
                     } RZ
                   </Button>
                 </Link>
+                <Button 
+                  variant="default" 
+                  size="sm"
+                  onClick={() => setShowDepositModal(true)}
+                  className="gap-2 shadow-success rounded-xl bg-[#00FF91] text-black hover:bg-[#00FF91]/90"
+                >
+                  <Plus className="w-4 h-4" />
+                  Depositar
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="gap-2 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary hover:text-primary rounded-full p-2 overflow-hidden"
+                    >
+                      <UserCircle className="w-6 h-6" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onClick={() => navigate('/profile')}>
+                      <User className="mr-2 h-4 w-4" />
+                      Perfil
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/wallet')}>
+                      <Wallet className="mr-2 h-4 w-4" />
+                      Carteira
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/transactions')}>
+                      <Receipt className="mr-2 h-4 w-4" />
+                      Transações
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/support')}>
+                      <HelpCircle className="mr-2 h-4 w-4" />
+                      Suporte
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={signOut}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sair
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             ) : isMobile && !isLoggedIn ? (
               <Link to="/auth">

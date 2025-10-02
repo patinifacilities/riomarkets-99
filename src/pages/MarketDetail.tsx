@@ -218,23 +218,7 @@ const MarketDetail = () => {
                   
                    <div className="space-y-4">
                       {(userProfile?.saldo_moeda || 0) > 0 ? (
-                        <>
-                          <div>
-                            <Label htmlFor="bet-amount-mobile" className="text-sm font-medium">
-                              Quantidade
-                            </Label>
-                            <Input
-                              id="bet-amount-mobile"
-                              type="number"
-                              placeholder="Digite a quantidade..."
-                              value={betAmount || ''}
-                              onChange={(e) => setBetAmount(Number(e.target.value) || 0)}
-                              min="5"
-                              max={userProfile?.saldo_moeda || 0}
-                              className="mt-2"
-                            />
-                          </div>
-                        </>
+                        <></>
                       ) : (
                         <div className="p-4 bg-muted/50 rounded-lg text-center">
                           <p className="text-sm text-muted-foreground mb-3">
@@ -407,14 +391,25 @@ const MarketDetail = () => {
               />
             </div>
 
-            {/* Open Opinions Card */}
-            <OpenOpinionsCardDetail 
-              marketId={market.id}
-              onOrderCancelled={() => {
-                refetchMarket();
-                // Optionally refetch user profile to update balance
-              }}
-            />
+            {/* Mobile: Open Opinions Card - Last position */}
+            <div className="lg:hidden">
+              <OpenOpinionsCard 
+                marketId={market.id}
+                onOrderCancelled={() => {
+                  refetchMarket();
+                }}
+              />
+            </div>
+
+            {/* Desktop: Open Opinions Card Detail */}
+            <div className="hidden lg:block">
+              <OpenOpinionsCardDetail 
+                marketId={market.id}
+                onOrderCancelled={() => {
+                  refetchMarket();
+                }}
+              />
+            </div>
 
             {/* Probability Chart */}
             <ProbabilityChart 
@@ -514,13 +509,6 @@ const MarketDetail = () => {
               })}
             </div>
 
-            {/* Open Opinions Card */}
-            <OpenOpinionsCard 
-              marketId={market.id}
-              onOrderCancelled={() => {
-                refetchMarket();
-              }}
-            />
           </div>
 
             {/* User Info Panel - Desktop */}

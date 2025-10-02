@@ -240,7 +240,7 @@ const MarketCard = ({ market }: MarketCardProps) => {
               </Button>
               <Button
                 size="sm"
-                className="bg-[#FF1493] hover:bg-[#FF1493]/90 text-white font-medium py-2 px-3 rounded-lg hover:shadow-[0_0_20px_rgba(255,20,147,0.4)]"
+                className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-medium py-2 px-3 rounded-lg hover:shadow-[0_0_20px_rgba(255,35,137,0.5)] transition-all duration-300"
                 onMouseEnter={() => setHoveredCard(market.id)}
                 onMouseLeave={() => setHoveredCard(null)}
                 onClick={(e) => {

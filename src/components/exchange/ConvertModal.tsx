@@ -254,7 +254,7 @@ export const ConvertModal = ({ open, onOpenChange, onSuccess }: ConvertModalProp
             </Button>
             <Button 
               onClick={handleConvert}
-              disabled={loading || !amount || parseInt(amount) <= 0}
+              disabled={loading || !amount || parseFloat(amount) <= 0}
               variant={activeTab === 'buy' ? 'default' : 'destructive'}
               className="flex-1"
             >

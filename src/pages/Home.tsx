@@ -274,22 +274,15 @@ const Home = () => {
                         onClick={() => handleTopicSelect(topic.id)}
                         className={cn(
                           "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap relative overflow-visible",
-                          "transition-all duration-500 ease-out border-2 shadow-lg",
+                          "transition-all duration-300 ease-out border-2",
                           isSelected
-                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary text-primary-foreground shadow-xl shadow-primary/30 scale-110 border-primary/50 hover:brightness-110 hover:scale-[1.15]' 
-                            : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm hover:scale-105 hover:shadow-xl'
+                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary text-primary-foreground shadow-[0_0_20px_rgba(0,255,145,0.4)] border-primary ring-2 ring-primary/30 ring-offset-2 ring-offset-background scale-105' 
+                            : 'border-border/60 text-foreground hover:border-primary/60 hover:shadow-[0_0_15px_rgba(0,255,145,0.2)] bg-card/90 backdrop-blur-sm hover:scale-105'
                         )}
-                        style={{ animationDelay: `${index * 50}ms` }}
                       >
-                        {isSelected && (
-                          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent animate-shimmer rounded-xl" />
-                        )}
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 hover:rotate-12 hover:scale-110 relative overflow-hidden ${
-                          isSelected ? 'bg-primary-foreground/20' : ''
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 relative ${
+                          isSelected ? 'bg-primary-foreground/20' : 'bg-muted/50'
                         }`}>
-                          {!isSelected && (
-                            <div className={`absolute inset-0 opacity-40 ${animationClass}`}></div>
-                          )}
                           <IconComponent className="w-6 h-6 relative z-10" />
                         </div>
                         <span className="text-base relative z-10">{topic.label}</span>

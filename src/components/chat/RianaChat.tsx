@@ -128,7 +128,7 @@ export function RianaChat() {
       {/* Floating button */}
       <button
         onClick={toggle}
-        className="fixed bottom-5 right-5 z-40 rounded-full px-5 py-3 text-primary-foreground font-semibold
+        className="fixed bottom-20 md:bottom-5 right-5 z-40 rounded-full px-5 py-3 text-primary-foreground font-semibold
                    bg-primary shadow-[0_0_30px_hsl(var(--primary)/0.35)]
                    hover:opacity-90 hover:shadow-[0_0_40px_hsl(var(--primary)/0.5)] 
                    focus:outline-none focus-visible:ring-2 focus-visible:ring-primary
@@ -144,7 +144,7 @@ export function RianaChat() {
         <div 
           role="dialog" 
           aria-label="Chat com a Riana"
-          className="fixed bottom-20 right-5 z-40 w-[min(92vw,380px)] overflow-hidden rounded-2xl
+          className="fixed bottom-32 md:bottom-20 right-5 z-40 w-[min(92vw,380px)] overflow-hidden rounded-2xl
                      border border-[color:var(--border-soft)] bg-[#14161A] text-white shadow-2xl
                      animate-in slide-in-from-bottom-4 fade-in duration-300"
         >
