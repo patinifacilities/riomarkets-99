@@ -72,14 +72,14 @@ export default function Rewards() {
   const monthlyProgress = Math.min((currentStreak / 30) * 100, 100);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background via-background to-primary/5 px-4 py-8 md:pb-32 pb-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background via-background to-primary/5 px-4 pt-16 pb-24">
       <div className="text-center space-y-3 max-w-md">
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 shadow-2xl shadow-yellow-500/50 animate-[golden-glow_2s_ease-in-out_infinite]" style={{
           backgroundSize: '200% 200%'
         }}>
           <Gift className="w-10 h-10 text-white" />
         </div>
-        <h1 className="text-3xl font-black bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent tracking-tight">
+        <h1 className="text-3xl font-semibold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent tracking-tight">
           Recompensas Diárias
         </h1>
         <p className="text-lg text-muted-foreground font-semibold">Disponível em breve</p>

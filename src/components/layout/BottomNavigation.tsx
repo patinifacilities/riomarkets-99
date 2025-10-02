@@ -9,9 +9,9 @@ const BottomNavigation = () => {
 
   const navItems = [
     { href: '/', icon: TrendingUp, label: 'Mercados' },
-    { href: '/wallet', icon: Wallet, label: 'Carteira', authRequired: true },
-    { href: '/fast', icon: Zap, label: 'Fast', authRequired: true, isFast: true },
     { href: '/ranking', icon: Trophy, label: 'Ranking' },
+    { href: '/fast', icon: Zap, label: 'Fast', authRequired: true, isFast: true },
+    { href: '/wallet', icon: Wallet, label: 'Carteira', authRequired: true },
     { href: '/profile', icon: User, label: 'Perfil', authRequired: true }
   ];
 
@@ -53,8 +53,9 @@ const BottomNavigation = () => {
             );
           }
 
-          // Calculate grid position: items 0,1 go in cols 1,2; items 2,3 go in cols 4,5 (col 3 is Fast)
+          // Calculate grid position: items 0,1 go closer to edges; items 3,4 go in cols 4,5 (col 3 is Fast)
           const gridColumn = index < 2 ? index + 1 : index + 2;
+          const additionalClasses = index === 0 ? 'justify-self-start' : index === 1 ? 'justify-self-end' : index === 3 ? 'justify-self-start' : index === 4 ? 'justify-self-end' : '';
 
           return (
             <Link
@@ -62,6 +63,7 @@ const BottomNavigation = () => {
               to={item.href}
               className={cn(
                 "flex flex-col items-center justify-center h-full gap-1 transition-colors",
+                additionalClasses,
                 isActive 
                   ? "text-primary" 
                   : "text-muted-foreground hover:text-foreground"

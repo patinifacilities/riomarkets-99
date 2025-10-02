@@ -183,7 +183,12 @@ export default function Deposit() {
           <img 
             src="/assets/rio-markets-logo.png"
             alt="Rio Markets Logo" 
-            className="h-12 w-auto"
+            className="h-12 w-auto dark:hidden"
+          />
+          <img 
+            src="/assets/rio-white-logo.png"
+            alt="Rio Markets Logo" 
+            className="h-12 w-auto hidden dark:block"
           />
         </div>
 
@@ -458,31 +463,29 @@ export default function Deposit() {
             </div>
           </Card>
 
-          {/* Apple Pay - Coming Soon */}
-          <Card className="p-6 opacity-60 cursor-not-allowed">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 border border-gray-600">
-                  <Smartphone className="w-6 h-6 text-gray-400" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-base">Apple Pay</h3>
-                  <p className="text-sm text-muted-foreground">Em breve</p>
-                </div>
-              </div>
-            </div>
-          </Card>
         </div>
 
         {/* Deposit Button - Only show when PIX is selected and card form is not shown */}
         {selectedMethod === "pix" && !showCardForm && (
-          <Button
-            onClick={() => handleDeposit("pix")}
-            disabled={isProcessing || !amount || parseFloat(amount) / 100 < 5}
-            className="w-full h-14 text-lg font-semibold mt-6 bg-primary hover:bg-primary/90"
-          >
-            {isProcessing ? "Processando..." : "Continuar com Depósito"}
-          </Button>
+          <>
+            <Button
+              onClick={() => handleDeposit("pix")}
+              disabled={isProcessing || !amount || parseFloat(amount) / 100 < 5}
+              className="w-full h-14 text-lg font-semibold mt-6 bg-primary hover:bg-primary/90"
+            >
+              {isProcessing ? "Processando..." : "Continuar com Depósito"}
+            </Button>
+            
+            {/* Apple Pay Button */}
+            <Button
+              onClick={() => handleDeposit("apple")}
+              disabled={true}
+              className="w-full h-14 text-lg font-semibold mt-3 bg-gray-800 hover:bg-gray-700 text-white opacity-60 cursor-not-allowed"
+            >
+              <Smartphone className="w-5 h-5 mr-2" />
+              Apple Pay (Em breve)
+            </Button>
+          </>
         )}
 
         {/* Security Notice */}
