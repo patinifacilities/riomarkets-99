@@ -171,11 +171,29 @@ const Home = () => {
       <div className="relative z-10">
       {/* Hero Section - Trading Aligned */}
       <section className="relative min-h-[42vh] md:min-h-[52vh] flex flex-col items-center justify-center bg-[color:var(--bg-app)] overflow-hidden">
-        {/* Animated Background - Only in hero section */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#ff2389]/5 rounded-full blur-3xl animate-float-delayed" />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/3 rounded-full blur-3xl animate-pulse-gentle" />
+        {/* Aurora Borealis Background */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Base gradient layers */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent opacity-60" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00ff90]/10 to-transparent opacity-40 animate-pulse-continuous-60s" />
+          
+          {/* Aurora waves */}
+          <div className="absolute top-0 left-0 w-full h-full">
+            <div className="absolute top-[20%] left-[-10%] w-[120%] h-[40%] bg-gradient-to-r from-transparent via-[#00ff90]/20 to-transparent blur-3xl animate-[wave_15s_ease-in-out_infinite] origin-center" 
+                 style={{ animationDelay: '0s' }} />
+            <div className="absolute top-[30%] left-[-15%] w-[130%] h-[35%] bg-gradient-to-r from-transparent via-primary/15 to-transparent blur-3xl animate-[wave_20s_ease-in-out_infinite] origin-center" 
+                 style={{ animationDelay: '-5s' }} />
+            <div className="absolute top-[40%] left-[-5%] w-[110%] h-[30%] bg-gradient-to-r from-transparent via-[#ff2389]/10 to-transparent blur-3xl animate-[wave_18s_ease-in-out_infinite] origin-center" 
+                 style={{ animationDelay: '-10s' }} />
+          </div>
+          
+          {/* Shimmer effect */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-transparent animate-shimmer" />
+          
+          {/* Floating particles */}
+          <div className="absolute top-[10%] left-[20%] w-2 h-2 rounded-full bg-[#00ff90]/40 animate-float" />
+          <div className="absolute top-[60%] right-[30%] w-3 h-3 rounded-full bg-primary/30 animate-float-delayed" />
+          <div className="absolute bottom-[20%] left-[40%] w-2 h-2 rounded-full bg-[#ff2389]/30 animate-pulse-gentle" />
         </div>
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
           

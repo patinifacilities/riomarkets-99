@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
@@ -168,18 +169,24 @@ const Withdraw = () => {
             )}
           </div>
 
-          {/* Quick Amount Buttons */}
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            {[100, 500, 1000].map((value) => (
-              <Button
-                key={value}
-                variant="outline"
-                onClick={() => setAmount((value * 100).toString())}
-                className="h-12 font-semibold hover:bg-primary/10 hover:border-primary"
-              >
-                R$ {value}
-              </Button>
-            ))}
+          {/* Amount Slider */}
+          <div className="space-y-4 mb-4">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Valor do saque</span>
+              <span className="font-bold text-primary">R$ {numericAmount.toFixed(2)}</span>
+            </div>
+            <Slider
+              value={[numericAmount]}
+              min={0}
+              max={(profile?.saldo_moeda || 0) / 100}
+              step={1}
+              onValueChange={(values) => setAmount((values[0] * 100).toString())}
+              className="w-full"
+            />
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>R$ 0,00</span>
+              <span>R$ {((profile?.saldo_moeda || 0) / 100).toFixed(2)}</span>
+            </div>
           </div>
         </Card>
 

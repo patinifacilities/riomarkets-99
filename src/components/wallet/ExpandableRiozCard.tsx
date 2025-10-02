@@ -21,7 +21,7 @@ export const ExpandableRiozCard = ({ currentBalance, totalInOrders, brlBalance }
             <CardContent className="p-6 w-full">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground text-left">Saldo RIOZ Coin</p>
+                  <p className="text-sm text-muted-foreground text-left">Saldo disponível Rioz Coin</p>
                   <div className="flex items-center gap-2">
                     <p className="text-2xl font-bold text-white">
                       {(currentBalance || 0).toLocaleString('pt-BR')} RZ

@@ -539,13 +539,13 @@ const Header = () => {
                      </Button>
                    </DropdownMenuTrigger>
                    <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild className="hover:bg-[#00ff90]/10 focus:bg-[#00ff90]/10">
                     <Link to="/profile" className="flex items-center gap-2">
                       <User className="w-4 h-4" />
                       Meu Perfil
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild className="hover:bg-[#00ff90]/10 focus:bg-[#00ff90]/10">
                     <Link to="/transactions" className="flex items-center gap-2">
                       <Receipt className="w-4 h-4" />
                       Transações
@@ -561,7 +561,7 @@ const Header = () => {
                            console.error('Erro ao fazer logout:', error);
                          }
                        }}
-                       className="flex items-center gap-2 text-white hover:text-white/80 cursor-pointer"
+                       className="flex items-center gap-2 text-white hover:text-white/80 cursor-pointer hover:bg-transparent focus:bg-transparent"
                      >
                        <LogOut className="w-4 h-4" />
                        Sair

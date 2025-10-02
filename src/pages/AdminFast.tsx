@@ -468,22 +468,70 @@ const AdminFast = () => {
                   Nenhum ativo configurado
                 </div>
               ) : (
-                pools
-                  .sort((a, b) => {
-                    // Paused assets go to the top
-                    if (a.paused && !b.paused) return -1;
-                    if (!a.paused && b.paused) return 1;
-                    return 0;
-                  })
-                  .map(asset => (
-                  <AssetConfigCard 
-                    key={asset.id} 
-                    asset={asset} 
-                    onUpdate={fetchGeneralPoolConfigs}
-                    onTogglePause={handleTogglePause}
-                    getCategoryColor={getCategoryColor}
-                  />
-                ))
+                (() => {
+                  // Group pools by category
+                  const groupedPools = pools.reduce((acc, pool) => {
+                    const category = pool.category || 'outros';
+                    if (!acc[category]) {
+                      acc[category] = [];
+                    }
+                    acc[category].push(pool);
+                    return acc;
+                  }, {} as Record<string, typeof pools>);
+
+                  // Sort pools within each category
+                  Object.keys(groupedPools).forEach(category => {
+                    groupedPools[category].sort((a, b) => {
+                      if (a.paused && !b.paused) return -1;
+                      if (!a.paused && b.paused) return 1;
+                      return 0;
+                    });
+                  });
+
+                  // Category labels
+                  const categoryLabels: Record<string, string> = {
+                    commodities: 'Commodities',
+                    crypto: 'Criptomoedas',
+                    forex: 'Forex',
+                    stocks: 'Ações',
+                    outros: 'Outros'
+                  };
+
+                  return Object.entries(groupedPools).map(([category, categoryPools]) => (
+                    <details key={category} className="group" open>
+                      <summary className="cursor-pointer list-none p-4 rounded-lg bg-card hover:bg-card/80 transition-colors border border-border">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-3 h-3 rounded-full ${getCategoryColor(category).split(' ')[0]}`} />
+                            <h3 className="text-lg font-bold">{categoryLabels[category] || category}</h3>
+                            <span className="text-sm text-muted-foreground">
+                              ({categoryPools.length} {categoryPools.length === 1 ? 'ativo' : 'ativos'})
+                            </span>
+                          </div>
+                          <svg 
+                            className="w-5 h-5 transition-transform group-open:rotate-180" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </summary>
+                      <div className="mt-3 space-y-3 pl-6">
+                        {categoryPools.map(asset => (
+                          <AssetConfigCard 
+                            key={asset.id} 
+                            asset={asset} 
+                            onUpdate={fetchGeneralPoolConfigs}
+                            onTogglePause={handleTogglePause}
+                            getCategoryColor={getCategoryColor}
+                          />
+                        ))}
+                      </div>
+                    </details>
+                  ));
+                })()
               )}
             </CardContent>
           </Card>
