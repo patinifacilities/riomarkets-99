@@ -372,7 +372,8 @@ const Ranking = () => {
                             border: 'none'
                           }}
                         >
-                          Gold Pass
+                          <span className="hidden sm:inline">Gold Pass</span>
+                          <span className="sm:hidden">Gold</span>
                         </Badge>
                       )}
                     </div>

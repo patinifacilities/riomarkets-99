@@ -19,7 +19,7 @@ const BottomNavigation = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden pb-[env(safe-area-inset-bottom)]">
-      <div className="flex items-center justify-around px-2 h-16 relative">
+      <div className="flex items-center justify-between px-6 h-16 relative">
         {visibleItems.map((item) => {
           const isActive = item.href === '/' 
             ? (location.pathname === '/' || location.pathname.startsWith('/market/'))
@@ -33,10 +33,10 @@ const BottomNavigation = () => {
                 className="flex flex-col items-center justify-center absolute left-1/2 -translate-x-1/2 -top-3"
               >
                 <div 
-                  className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+                  className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg animate-[spin_7s_linear_infinite]"
                   style={{ backgroundColor: '#ff2389' }}
                 >
-                  <item.icon className="w-6 h-6 text-white animate-pulse" />
+                  <item.icon className="w-6 h-6 text-white" />
                 </div>
                 <span className="text-xs font-medium text-foreground mt-1">
                   {item.label}

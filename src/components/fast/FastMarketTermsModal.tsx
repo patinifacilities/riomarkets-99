@@ -36,7 +36,7 @@ export const FastMarketTermsModal = ({ open, onOpenChange, onAccept }: FastMarke
         <DialogHeader className="flex flex-col items-center gap-4 pb-4 border-b flex-shrink-0 px-6 pt-6">
           <div className="relative w-20 h-20 md:w-24 md:h-24">
             <img
-              src="/assets/rio-markets-logo.png"
+              src={rioLogoFast}
               alt="Rio Markets"
               className="w-full h-full object-contain"
             />

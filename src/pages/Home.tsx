@@ -266,21 +266,6 @@ const Home = () => {
             </OnboardingTrigger>
           </div>
 
-          {/* Strip de confiança */}
-          <div className="flex flex-wrap justify-center items-center gap-6 mt-8 text-sm text-[color:var(--text-secondary)]">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#00FF91]"></div>
-              <span>Alta Liquidez</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#00FF91]"></div>
-              <span>100% Legalizado</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#00FF91]"></div>
-              <span>Você no Controle</span>
-              </div>
-            </div>
             
           </div>
         </section>

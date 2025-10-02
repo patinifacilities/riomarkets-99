@@ -46,8 +46,8 @@ export const TickerBar = () => {
 
   return (
     <div className="bg-card border-b border-border overflow-hidden relative">
-      <div className="ticker-scroll whitespace-nowrap py-2 flex">
-        {[...tickerItems, ...tickerItems, ...tickerItems].map((item, index) => (
+      <div className="ticker-scroll whitespace-nowrap py-2 flex animate-ticker-scroll-mobile md:animate-ticker-scroll">
+        {[...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems].map((item, index) => (
           <div key={index} className="flex items-center gap-6 text-sm mx-8 flex-shrink-0">
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-muted-foreground font-medium">MERCADO:</span>
