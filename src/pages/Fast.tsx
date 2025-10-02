@@ -398,51 +398,6 @@ const Fast = () => {
     loadPoolHistory();
   }, [loadCurrentPools, loadPoolHistory, selectedCategory]);
 
-  // Dynamic opening_price adjustment in first 3 seconds
-  useEffect(() => {
-    if (!currentPools || currentPools.length === 0) return;
-
-    const timers: NodeJS.Timeout[] = [];
-    const intervals: NodeJS.Timeout[] = [];
-
-    currentPools.forEach(pool => {
-      const startTime = new Date(pool.round_start_time).getTime();
-      const now = Date.now();
-      const elapsedSinceStart = (now - startTime) / 1000; // seconds
-
-      // Only adjust in first 3 seconds
-      if (elapsedSinceStart < 3 && elapsedSinceStart >= 0) {
-        const adjustInterval = setInterval(async () => {
-          try {
-            await supabase.functions.invoke('manage-fast-pools', {
-              body: {
-                action: 'adjust_opening_price',
-                poolId: pool.id
-              }
-            });
-            loadCurrentPools(); // Reload to get updated opening_prices
-          } catch (error) {
-            console.error('Error adjusting opening price:', error);
-          }
-        }, 500); // Adjust every 500ms during first 3 seconds
-
-        intervals.push(adjustInterval);
-
-        // Clear after 3 seconds
-        const clearTimer = setTimeout(() => {
-          clearInterval(adjustInterval);
-        }, 3000 - (elapsedSinceStart * 1000));
-
-        timers.push(clearTimer);
-      }
-    });
-
-    return () => {
-      timers.forEach(timer => clearTimeout(timer));
-      intervals.forEach(interval => clearInterval(interval));
-    };
-  }, [currentPools.map(p => p.id).join(',')]); // Only re-run when pool IDs change
-
   // Countdown timer with smooth updates
   useEffect(() => {
     if (!currentPools.length || countdown <= 0) return;
