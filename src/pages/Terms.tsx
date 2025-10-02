@@ -1,9 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, FileText } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTheme } from 'next-themes';
+import riozLogoWhite from '@/assets/rio-markets-logo-white.png';
+import riozLogoBlack from '@/assets/rio-markets-logo-black.png';
 
 const Terms = () => {
+  const { resolvedTheme } = useTheme();
+
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
       <div className="container mx-auto px-4 py-8">
@@ -13,13 +18,19 @@ const Terms = () => {
               <ArrowLeft className="w-4 h-4" />
               Voltar
             </Link>
-            <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-              <FileText className="w-8 h-8" />
-              Termos de Uso
-            </h1>
-            <p className="text-muted-foreground">
-              Última atualização: {new Date().toLocaleDateString('pt-BR')}
-            </p>
+            <div className="flex flex-col items-center text-center mb-6">
+              <img 
+                src={resolvedTheme === 'light' ? riozLogoBlack : riozLogoWhite} 
+                alt="Rio Markets Logo" 
+                className="h-12 w-auto mb-4"
+              />
+              <h1 className="text-3xl font-bold mb-2">
+                Termos de Uso
+              </h1>
+              <p className="text-muted-foreground">
+                Última atualização: {new Date().toLocaleDateString('pt-BR')}
+              </p>
+            </div>
           </div>
 
           <div className="space-y-6">
@@ -155,20 +166,6 @@ const Terms = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-secondary-glass border-border/50">
-              <CardHeader>
-                <CardTitle>10. Contato</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground">
-                  Se você tiver dúvidas sobre estes Termos de Uso, entre em contato conosco:
-                </p>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>Email: legal@riomarkets.com</li>
-                  <li>Endereço: Rio de Janeiro, RJ, Brasil</li>
-                </ul>
-              </CardContent>
-            </Card>
           </div>
 
           <div className="mt-8 text-center">

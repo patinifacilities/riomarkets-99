@@ -304,7 +304,6 @@ const ExchangeNew = () => {
                 </div>
                 {fromAmount && parseFloat(fromAmount.replace(/[^\d.]/g, '')) > fromBalance && (
                   <div className="flex items-center justify-center gap-2 text-sm font-medium px-4 py-2 rounded-lg border-2" style={{ color: '#ff2389', backgroundColor: 'rgba(255, 35, 137, 0.1)', borderColor: 'rgba(255, 35, 137, 0.3)' }}>
-                    <span className="text-lg">⚠️</span>
                     <span>Saldo insuficiente</span>
                   </div>
                 )}

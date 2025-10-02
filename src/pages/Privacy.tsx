@@ -1,9 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Shield } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTheme } from 'next-themes';
+import riozLogoWhite from '@/assets/rio-markets-logo-white.png';
+import riozLogoBlack from '@/assets/rio-markets-logo-black.png';
 
 const Privacy = () => {
+  const { resolvedTheme } = useTheme();
+
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
       <div className="container mx-auto px-4 py-8">
@@ -13,13 +18,19 @@ const Privacy = () => {
               <ArrowLeft className="w-4 h-4" />
               Voltar
             </Link>
-            <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-              <Shield className="w-8 h-8" />
-              Política de Privacidade
-            </h1>
-            <p className="text-muted-foreground">
-              Última atualização: {new Date().toLocaleDateString('pt-BR')}
-            </p>
+            <div className="flex flex-col items-center text-center mb-6">
+              <img 
+                src={resolvedTheme === 'light' ? riozLogoBlack : riozLogoWhite} 
+                alt="Rio Markets Logo" 
+                className="h-12 w-auto mb-4"
+              />
+              <h1 className="text-3xl font-bold mb-2">
+                Política de Privacidade
+              </h1>
+              <p className="text-muted-foreground">
+                Última atualização: {new Date().toLocaleDateString('pt-BR')}
+              </p>
+            </div>
           </div>
 
           <div className="space-y-6">

@@ -81,7 +81,7 @@ export function Footer() {
               links={[
                 { label: 'Mercados', href: '/' },
                 { label: 'Ranking', href: '/ranking' },
-                { label: 'Rioz Coin', href: '/wallet' },
+                { label: 'Rioz Coin', href: '/exchange' },
               ]}
             />
             <FooterCol 
@@ -107,7 +107,7 @@ export function Footer() {
               Transparência
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              O Rio Markets não é casa de apostas. Plataforma de análises preditivas educativas, com liquidação transparente.
+              A Rio Markets não é casa de apostas. Plataforma de análises preditivas educativas, com liquidação transparente.
             </p>
             <Link 
               to="/faq#regulatorio"

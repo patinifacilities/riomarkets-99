@@ -40,6 +40,8 @@ import Opinioes from '@/pages/Opinioes';
 import FiatRequests from '@/pages/FiatRequests';
 import Terms from '@/pages/Terms';
 import Privacy from '@/pages/Privacy';
+import FAQ from '@/pages/FAQ';
+import Cookies from '@/pages/Cookies';
 import NotFound from '@/pages/NotFound';
 import { Toaster } from '@/components/ui/sonner';
 import { track } from '@/lib/analytics';
@@ -91,6 +93,8 @@ function App() {
           <Route path="/fiat-requests" element={<FiatRequests />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/cookies" element={<Cookies />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>

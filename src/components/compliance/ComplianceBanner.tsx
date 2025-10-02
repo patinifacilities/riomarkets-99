@@ -60,7 +60,7 @@ export function ComplianceBanner({ variant = 'sticky' }: ComplianceBannerProps) 
       <div
         role="region"
         aria-label="aviso de compliance e segurança"
-        className="no-motion mx-auto max-w-6xl border-t border-primary/30 bg-zinc-950/90 backdrop-blur px-4 sm:px-6"
+        className="no-motion mx-auto max-w-6xl mb-4 mx-4 rounded-2xl border border-primary/30 bg-zinc-950/90 backdrop-blur px-4 sm:px-6"
       >
         <div className="flex flex-col sm:flex-row items-center gap-3 py-3">
           <div className="flex items-center gap-2 text-zinc-200">
