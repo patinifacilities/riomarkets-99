@@ -181,14 +181,9 @@ export default function Deposit() {
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img 
-            src="/assets/rio-markets-logo.png"
+            src={new URL('@/assets/rio-white-logo-deposit.png', import.meta.url).href}
             alt="Rio Markets Logo" 
-            className="h-12 w-auto dark:hidden"
-          />
-          <img 
-            src="/assets/rio-white-logo.png"
-            alt="Rio Markets Logo" 
-            className="h-12 w-auto hidden dark:block"
+            className="h-12 w-auto"
           />
         </div>
 
@@ -480,7 +475,7 @@ export default function Deposit() {
             <button
               onClick={() => handleDeposit("apple")}
               disabled={isProcessing || !amount || parseFloat(amount) / 100 < 5}
-              className="group relative w-full h-14 text-lg font-semibold mt-3 bg-black text-white rounded-lg overflow-hidden transition-all duration-500 hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full h-14 text-lg font-semibold mt-3 bg-black text-white rounded-xl overflow-hidden transition-all duration-500 hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="absolute inset-0 bg-white transform -translate-x-full transition-transform duration-500 group-hover:translate-x-0"></span>
               <span className="relative z-10 flex items-center justify-center gap-2 transition-colors duration-500">

@@ -58,9 +58,9 @@ const BottomNavigation = () => {
           
           // Position adjustments for better spacing
           let additionalClasses = '';
-          if (index === 0) additionalClasses = 'justify-self-start ml-[-8px]'; // Carteira - closer to Fast
+          if (index === 0) additionalClasses = 'justify-self-start ml-[-12px]'; // Carteira - even closer to Fast
           else if (index === 1) additionalClasses = 'justify-self-end mr-2'; // Mercados - not cut off
-          else if (index === 3) additionalClasses = 'justify-self-start ml-2'; // Ranking
+          else if (index === 3) additionalClasses = 'justify-self-start ml-[-4px]'; // Ranking - closer to Fast
           else if (index === 4) additionalClasses = 'justify-self-end'; // Perfil
 
           return (
