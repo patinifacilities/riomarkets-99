@@ -171,27 +171,33 @@ const Home = () => {
       <div className="relative z-10">
       {/* Hero Section - Trading Aligned */}
       <section className="relative min-h-[42vh] md:min-h-[52vh] flex flex-col items-center justify-center bg-[color:var(--bg-app)] overflow-hidden">
-        {/* Modern Animated Background */}
+        {/* Modern Animated Background with Golden Shine */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {/* Gradient mesh background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-[#ff2389]/5" />
+          {/* Base gradient */}
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background/80" />
           
-          {/* Animated gradient orbs */}
-          <div className="absolute top-[10%] left-[10%] w-[500px] h-[500px] bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl animate-float opacity-60" />
-          <div className="absolute bottom-[20%] right-[15%] w-[400px] h-[400px] bg-gradient-to-tl from-[#ff2389]/20 to-transparent rounded-full blur-3xl animate-float-delayed opacity-50" />
-          <div className="absolute top-[40%] right-[20%] w-[350px] h-[350px] bg-gradient-to-br from-[#00ff90]/15 to-transparent rounded-full blur-3xl animate-pulse-gentle opacity-40" />
+          {/* Gradient mesh animation */}
+          <div 
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage: `
+                radial-gradient(ellipse at 30% 40%, hsl(var(--primary) / 0.2) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 70%, hsl(var(--primary) / 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 90%, hsl(var(--primary) / 0.12) 0%, transparent 50%)
+              `,
+              animation: 'meshFloat 25s ease-in-out infinite'
+            }}
+          />
           
-          {/* Grid pattern overlay */}
-          <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" 
-               style={{ 
-                 backgroundImage: 'linear-gradient(rgba(0,255,145,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,145,0.1) 1px, transparent 1px)',
-                 backgroundSize: '50px 50px'
-               }} />
-          
-          {/* Animated scan lines */}
-          <div className="absolute inset-0 opacity-[0.03]">
-            <div className="absolute w-full h-px bg-gradient-to-r from-transparent via-primary to-transparent animate-scan-line" />
-          </div>
+          {/* Golden Shine Animation - passes every 7 seconds */}
+          <div 
+            className="absolute bottom-0 left-0 w-full h-48"
+            style={{
+              background: 'linear-gradient(90deg, transparent 0%, rgba(255, 215, 0, 0) 45%, rgba(255, 215, 0, 0.3) 50%, rgba(255, 215, 0, 0) 55%, transparent 100%)',
+              animation: 'goldenShine 7s ease-in-out infinite',
+              filter: 'blur(20px)'
+            }}
+          />
           
           {/* Floating particles */}
           <div className="absolute top-[15%] left-[25%] w-1.5 h-1.5 rounded-full bg-primary/50 animate-float" />
@@ -199,6 +205,35 @@ const Home = () => {
           <div className="absolute bottom-[30%] left-[45%] w-1.5 h-1.5 rounded-full bg-[#ff2389]/40 animate-pulse-gentle" />
           <div className="absolute top-[50%] right-[10%] w-1 h-1 rounded-full bg-primary/60 animate-float" />
         </div>
+        
+        {/* Animation keyframes */}
+        <style>{`
+          @keyframes meshFloat {
+            0%, 100% {
+              transform: translate(0, 0) scale(1);
+            }
+            33% {
+              transform: translate(30px, -30px) scale(1.05);
+            }
+            66% {
+              transform: translate(-20px, 20px) scale(0.95);
+            }
+          }
+          
+          @keyframes goldenShine {
+            0% {
+              transform: translateX(-100%);
+              opacity: 0;
+            }
+            50% {
+              opacity: 1;
+            }
+            100% {
+              transform: translateX(200%);
+              opacity: 0;
+            }
+          }
+        `}</style>
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
           
           <div className="text-center mb-6 md:mb-8">

@@ -807,7 +807,7 @@ const Fast = () => {
   // Don't render pool cards if FAST is disabled
   if (!fastSystemEnabled) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="min-h-[100dvh] bg-gradient-to-b from-background via-background to-primary/5 pb-32">
         <div className="container mx-auto px-4 pt-8 pb-20">
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ff2389]/10 to-[#ff2389]/5 px-6 py-3 rounded-full border border-[#ff2389]/20 mb-4">
@@ -834,7 +834,7 @@ const Fast = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-[100dvh] bg-gradient-to-b from-background via-background to-primary/5 pb-32">
       {/* Hide elements on mobile and add animations */}
       <style>{`
         @media (max-width: 768px) {
