@@ -143,7 +143,7 @@ export function OnboardingModal() {
             ) : (
               <Button 
                 onClick={handleExplore}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-gradient-to-r from-yellow-500 via-yellow-600 to-amber-600 hover:from-yellow-600 hover:via-yellow-700 hover:to-amber-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-yellow-400/50"
               >
                 {ONBOARDING_MESSAGES.buttons.explore}
               </Button>

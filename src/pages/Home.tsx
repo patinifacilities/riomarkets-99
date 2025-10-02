@@ -219,7 +219,7 @@ const Home = () => {
                 document.getElementById('markets-section')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              ⭐ Explorar mercados
+              Explorar mercados
             </Button>
             <OnboardingTrigger 
               variant="outline" 

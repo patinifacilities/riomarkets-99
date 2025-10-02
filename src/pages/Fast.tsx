@@ -966,7 +966,7 @@ const Fast = () => {
                     borderColor: category.bgColor
                   } : {}}
                 >
-                  <span className="mr-1 text-sm md:text-base">{category.icon}</span>
+                  <span className="mr-0.5 text-sm md:text-base">{category.icon}</span>
                   <span className="hidden sm:inline">{category.label === 'Commodities' ? 'Commod' : category.label}</span>
                   <span className="sm:hidden">{category.label.slice(0, 3)}</span>
                 </Button>

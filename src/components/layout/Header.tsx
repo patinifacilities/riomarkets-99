@@ -22,7 +22,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useState, useEffect } from 'react';
 import { TickerBar } from '@/components/ui/ticker-bar';
 import { DarkModeToggle } from './DarkModeToggle';
-import { AddBrlModal } from '@/components/exchange/AddBrlModal';
 import { cn } from '@/lib/utils';
 
 import logoImageWhite from '@/assets/rio-markets-logo-new.png';
@@ -35,7 +34,6 @@ const Header = () => {
   const navigate = useNavigate();
   const { user, session, signOut, loading } = useAuth();
   const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
-  const [showDepositModal, setShowDepositModal] = useState(false);
   const { resolvedTheme } = useTheme();
 
   // Pre-load both logos for smooth transition
@@ -403,7 +401,7 @@ const Header = () => {
                 <Button 
                   variant="default" 
                   size="sm"
-                  onClick={() => setShowDepositModal(true)}
+                  onClick={() => navigate('/deposit')}
                   className="gap-2 shadow-success rounded-xl bg-[#00FF91] text-black hover:bg-[#00FF91]/90"
                 >
                   <Plus className="w-4 h-4" />
@@ -507,7 +505,7 @@ const Header = () => {
                 <Button 
                   variant="default" 
                   size="sm"
-                  onClick={() => setShowDepositModal(true)}
+                  onClick={() => navigate('/deposit')}
                   className="gap-2 shadow-success rounded-xl"
                 >
                   <Plus className="w-4 h-4" />
@@ -570,18 +568,6 @@ const Header = () => {
            </div>
         </div>
       </div>
-      
-      {/* Deposit Modal */}
-      {user && (
-        <AddBrlModal
-          open={showDepositModal}
-          onOpenChange={setShowDepositModal}
-          onSuccess={() => {
-            setShowDepositModal(false);
-            refetchProfile();
-          }}
-        />
-      )}
     </header>
     </>
   );

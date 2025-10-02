@@ -9,6 +9,7 @@ import Withdraw from '@/pages/Withdraw';
 import Exchange from '@/pages/Exchange';
 import Fast from '@/pages/Fast';
 import CardPayment from '@/pages/CardPayment';
+import Deposit from '@/pages/Deposit';
 import Transactions from '@/pages/Transactions';
 import Ranking from '@/pages/Ranking';
 import Press from '@/pages/Press';
@@ -65,6 +66,7 @@ function App() {
           <Route path="/fast" element={<Fast />} />
           <Route path="/exchange" element={<Exchange />} />
           <Route path="/card-payment" element={<CardPayment />} />
+          <Route path="/deposit" element={<Deposit />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/ranking" element={<Ranking />} />
           <Route path="/press" element={<Press />} />
