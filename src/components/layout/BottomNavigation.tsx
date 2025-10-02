@@ -19,7 +19,7 @@ const BottomNavigation = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden pb-[env(safe-area-inset-bottom)]">
-      <div className="grid grid-cols-5 items-center h-16 relative">
+      <div className="flex items-center justify-between px-2 h-16 relative">
         {visibleItems.map((item, index) => {
           const isActive = item.href === '/' 
             ? (location.pathname === '/' || location.pathname.startsWith('/market/'))
@@ -30,13 +30,13 @@ const BottomNavigation = () => {
               <Link
                 key={item.href}
                 to={item.href}
-                className="flex flex-col items-center justify-center col-start-3 absolute left-1/2 -translate-x-1/2 -top-3"
+                className="flex flex-col items-center justify-center absolute left-1/2 -translate-x-1/2 -top-3"
               >
                 <div 
-                  className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+                  className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg animate-pulse"
                   style={{ 
                     backgroundColor: '#ff2389',
-                    animation: 'fastButtonSpin 7s linear infinite, spin 1s ease-in-out 0s 1'
+                    animation: 'fastButtonSpin 7s linear infinite, pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
                   }}
                 >
                   <item.icon className="w-6 h-6 text-white animate-[fastIconPulse_7s_ease-in-out_infinite]" />
@@ -48,8 +48,13 @@ const BottomNavigation = () => {
             );
           }
 
-          // Position items: first two on left, last two on right
-          const gridColumn = index < 2 ? index + 1 : index + 2;
+          // Position first item (Mercados) on far left, second (Carteira) slightly right
+          // Position third item (Ranking) slightly left, fourth (Perfil) on far right
+          let positionClass = "";
+          if (index === 0) positionClass = "mr-auto"; // Mercados - far left
+          if (index === 1) positionClass = ""; // Carteira - will be positioned between left and center
+          if (index === 2) positionClass = ""; // Ranking - will be positioned between center and right
+          if (index === 3) positionClass = "ml-auto"; // Perfil - far right
 
           return (
             <Link
@@ -59,9 +64,9 @@ const BottomNavigation = () => {
                 "flex flex-col items-center justify-center h-full gap-1 transition-colors",
                 isActive 
                   ? "text-primary" 
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+                positionClass
               )}
-              style={{ gridColumn }}
             >
               <item.icon className="w-5 h-5" />
               <span className="text-xs font-medium">
