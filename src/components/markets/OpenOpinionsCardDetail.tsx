@@ -29,6 +29,11 @@ interface Order {
   quantidade_moeda: number;
   preco: number;
   created_at: string;
+  market_id?: string;
+}
+
+interface Market {
+  end_date: string;
 }
 
 export const OpenOpinionsCardDetail: React.FC<OpenOpinionsCardDetailProps> = ({
@@ -36,6 +41,7 @@ export const OpenOpinionsCardDetail: React.FC<OpenOpinionsCardDetailProps> = ({
   onOrderCancelled
 }) => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [markets, setMarkets] = useState<Record<string, Market>>({});
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -61,6 +67,23 @@ export const OpenOpinionsCardDetail: React.FC<OpenOpinionsCardDetailProps> = ({
       }
 
       setOrders(data || []);
+      
+      // Fetch market end dates for all orders
+      if (data && data.length > 0) {
+        const marketIds = [...new Set(data.map(o => o.market_id).filter(Boolean))];
+        const { data: marketsData, error: marketsError } = await supabase
+          .from('markets')
+          .select('id, end_date')
+          .in('id', marketIds);
+        
+        if (!marketsError && marketsData) {
+          const marketsMap: Record<string, Market> = {};
+          marketsData.forEach(m => {
+            marketsMap[m.id] = { end_date: m.end_date };
+          });
+          setMarkets(marketsMap);
+        }
+      }
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -83,8 +106,52 @@ export const OpenOpinionsCardDetail: React.FC<OpenOpinionsCardDetailProps> = ({
     };
   }, [user]);
 
-  const handleCancelOrder = async (orderId: string, orderAmount: number) => {
+  const canCancelOrder = (order: Order) => {
+    const market = order.market_id ? markets[order.market_id] : null;
+    if (!market) return { allowed: true, reason: null };
+    
+    const now = new Date();
+    const createdAt = new Date(order.created_at);
+    const endDate = new Date(market.end_date);
+    
+    // Calculate hours since order creation
+    const hoursSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+    
+    // Rule 1: Can't cancel after 24 hours from creation
+    if (hoursSinceCreation > 24) {
+      return { allowed: false, reason: '24h_passed' };
+    }
+    
+    // Rule 2: If bet was placed with less than 48h until market end, can't cancel
+    const hoursUntilEndAtCreation = (endDate.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+    if (hoursUntilEndAtCreation < 48) {
+      return { allowed: false, reason: 'pool_closing' };
+    }
+    
+    return { allowed: true, reason: null };
+  };
+
+  const handleCancelOrder = async (orderId: string, orderAmount: number, order: Order) => {
     if (!user) return;
+
+    const cancelCheck = canCancelOrder(order);
+    
+    if (!cancelCheck.allowed) {
+      if (cancelCheck.reason === '24h_passed') {
+        toast({
+          title: "Cancelamento não permitido",
+          description: "Só é possível cancelar uma opinião nas primeiras 24 horas.",
+          variant: "destructive",
+        });
+      } else if (cancelCheck.reason === 'pool_closing') {
+        toast({
+          title: "Cancelamento não permitido",
+          description: "Não é possível cancelar opiniões quando o pool está prestes a encerrar (menos de 48h).",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
 
     try {
       // Call the cancel bet function with 30% fee
@@ -232,7 +299,7 @@ export const OpenOpinionsCardDetail: React.FC<OpenOpinionsCardDetailProps> = ({
                   <AlertDialogFooter>
                     <AlertDialogCancel>Manter opinião</AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={() => handleCancelOrder(order.id, order.quantidade_moeda)}
+                      onClick={() => handleCancelOrder(order.id, order.quantidade_moeda, order)}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     >
                       Cancelar opinião

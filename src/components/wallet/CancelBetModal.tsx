@@ -11,13 +11,62 @@ interface CancelBetModalProps {
   onConfirm: () => void;
   orderId?: string;
   orderAmount?: number;
+  orderCreatedAt?: string;
+  marketEndDate?: string;
 }
 
-export const CancelBetModal = ({ open, onOpenChange, onConfirm, orderId, orderAmount }: CancelBetModalProps) => {
+export const CancelBetModal = ({ open, onOpenChange, onConfirm, orderId, orderAmount, orderCreatedAt, marketEndDate }: CancelBetModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  // Check if cancellation is allowed
+  const canCancel = (): { allowed: boolean; reason: string | null } => {
+    if (!orderCreatedAt || !marketEndDate) return { allowed: true, reason: null }; // Allow if dates not provided (backwards compatibility)
+    
+    const now = new Date();
+    const createdAt = new Date(orderCreatedAt);
+    const endDate = new Date(marketEndDate);
+    
+    // Calculate hours since order creation
+    const hoursSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+    
+    // Calculate hours until market end
+    const hoursUntilEnd = (endDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+    
+    // Rule 1: Can't cancel after 24 hours from creation
+    if (hoursSinceCreation > 24) {
+      return { allowed: false, reason: '24h_passed' };
+    }
+    
+    // Rule 2: If bet was placed with less than 48h until market end, can't cancel (pool about to close)
+    const hoursUntilEndAtCreation = (endDate.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+    if (hoursUntilEndAtCreation < 48) {
+      return { allowed: false, reason: 'pool_closing' };
+    }
+    
+    return { allowed: true, reason: null };
+  };
+
   const handleCancel = async () => {
+    const cancelCheck = canCancel();
+    
+    if (!cancelCheck.allowed) {
+      if (cancelCheck.reason === '24h_passed') {
+        toast({
+          title: "Cancelamento não permitido",
+          description: "Só é possível cancelar uma opinião nas primeiras 24 horas.",
+          variant: "destructive",
+        });
+      } else if (cancelCheck.reason === 'pool_closing') {
+        toast({
+          title: "Cancelamento não permitido",
+          description: "Não é possível cancelar opiniões quando o pool está prestes a encerrar (menos de 48h).",
+          variant: "destructive",
+        });
+      }
+      onOpenChange(false);
+      return;
+    }
     setIsLoading(true);
     try {
       if (orderId) {
