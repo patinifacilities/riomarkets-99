@@ -75,30 +75,33 @@ export default function Rewards() {
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 py-8 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2 mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 mb-4 animate-pulse">
-            <Gift className="w-8 h-8 text-white" />
+        <div className="text-center space-y-3 mb-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 mb-4 shadow-2xl shadow-yellow-500/30 relative">
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 animate-pulse opacity-50 blur-xl"></div>
+            <Gift className="w-10 h-10 text-white relative z-10" />
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-black bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent tracking-tight">
             Recompensas Diárias
           </h1>
-          <p className="text-muted-foreground">Faça login todos os dias e ganhe RIOZ!</p>
+          <p className="text-lg text-muted-foreground">Faça login todos os dias e ganhe RIOZ!</p>
         </div>
 
         {/* Current Streak Card */}
-        <Card className="border-2 border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-transparent">
+        <Card className="border-2 border-yellow-500/30 bg-gradient-to-br from-yellow-500/10 to-transparent backdrop-blur-sm shadow-xl hover:shadow-2xl hover:border-yellow-500/50 transition-all duration-300">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              <Flame className="w-6 h-6 text-yellow-500" />
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <div className="p-2 rounded-xl bg-yellow-500/20">
+                <Flame className="w-6 h-6 text-yellow-500" />
+              </div>
               Sequência Atual
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center">
-              <div className="text-6xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent mb-2">
+            <div className="text-center py-4">
+              <div className="text-7xl font-black bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent mb-3 drop-shadow-lg">
                 {currentStreak}
               </div>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-xl text-muted-foreground font-semibold">
                 {currentStreak === 1 ? 'dia consecutivo' : 'dias consecutivos'}
               </p>
             </div>
@@ -107,29 +110,29 @@ export default function Rewards() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="border-yellow-500/20">
+          <Card className="border-yellow-500/30 bg-gradient-to-br from-yellow-500/5 to-transparent hover:shadow-lg hover:border-yellow-500/50 transition-all duration-300">
             <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-full bg-yellow-500/10">
-                  <Trophy className="w-6 h-6 text-yellow-500" />
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 shadow-lg">
+                  <Trophy className="w-7 h-7 text-yellow-500" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Maior Sequência</p>
-                  <p className="text-2xl font-bold text-yellow-500">{longestStreak} dias</p>
+                  <p className="text-sm text-muted-foreground font-medium">Maior Sequência</p>
+                  <p className="text-3xl font-black text-yellow-500">{longestStreak} dias</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-yellow-500/20">
+          <Card className="border-yellow-500/30 bg-gradient-to-br from-yellow-500/5 to-transparent hover:shadow-lg hover:border-yellow-500/50 transition-all duration-300">
             <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-full bg-yellow-500/10">
-                  <Calendar className="w-6 h-6 text-yellow-500" />
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 shadow-lg">
+                  <Calendar className="w-7 h-7 text-yellow-500" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Total de Logins</p>
-                  <p className="text-2xl font-bold text-yellow-500">{totalLogins}</p>
+                  <p className="text-sm text-muted-foreground font-medium">Total de Logins</p>
+                  <p className="text-3xl font-black text-yellow-500">{totalLogins}</p>
                 </div>
               </div>
             </CardContent>
@@ -137,12 +140,12 @@ export default function Rewards() {
         </div>
 
         {/* 7 Day Reward */}
-        <Card className={`border-2 transition-all ${
+        <Card className={`border-2 transition-all duration-300 ${
           canClaim7Day 
-            ? 'border-yellow-500 shadow-lg shadow-yellow-500/20 animate-pulse' 
+            ? 'border-yellow-500 shadow-2xl shadow-yellow-500/40 animate-pulse scale-105' 
             : hasClaimed7Day
-            ? 'border-green-500/30 bg-green-500/5'
-            : 'border-border'
+            ? 'border-green-500/40 bg-gradient-to-br from-green-500/10 to-transparent'
+            : 'border-border hover:border-yellow-500/30 hover:shadow-lg'
         }`}>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
@@ -189,12 +192,12 @@ export default function Rewards() {
         </Card>
 
         {/* 30 Day Reward */}
-        <Card className={`border-2 transition-all ${
+        <Card className={`border-2 transition-all duration-300 ${
           canClaim30Day 
-            ? 'border-yellow-500 shadow-lg shadow-yellow-500/20 animate-pulse' 
+            ? 'border-yellow-500 shadow-2xl shadow-yellow-500/40 animate-pulse scale-105' 
             : hasClaimed30Day
-            ? 'border-green-500/30 bg-green-500/5'
-            : 'border-border'
+            ? 'border-green-500/40 bg-gradient-to-br from-green-500/10 to-transparent'
+            : 'border-border hover:border-yellow-500/30 hover:shadow-lg'
         }`}>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
@@ -241,20 +244,20 @@ export default function Rewards() {
         </Card>
 
         {/* Info Card */}
-        <Card className="border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-transparent">
+        <Card className="border-yellow-500/30 bg-gradient-to-br from-yellow-500/10 to-transparent backdrop-blur-sm">
           <CardContent className="pt-6">
-            <div className="space-y-3 text-sm text-muted-foreground">
-              <p className="flex items-start gap-2">
-                <span className="text-yellow-500 mt-0.5">•</span>
-                <span>Faça login todos os dias para manter sua sequência</span>
+            <div className="space-y-4 text-sm">
+              <p className="flex items-start gap-3 p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/20">
+                <span className="text-yellow-500 mt-0.5 text-lg">•</span>
+                <span className="text-foreground font-medium">Faça login todos os dias para manter sua sequência</span>
               </p>
-              <p className="flex items-start gap-2">
-                <span className="text-yellow-500 mt-0.5">•</span>
-                <span>Recompensas podem ser resgatadas apenas uma vez</span>
+              <p className="flex items-start gap-3 p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/20">
+                <span className="text-yellow-500 mt-0.5 text-lg">•</span>
+                <span className="text-foreground font-medium">Recompensas podem ser resgatadas apenas uma vez</span>
               </p>
-              <p className="flex items-start gap-2">
-                <span className="text-yellow-500 mt-0.5">•</span>
-                <span>Se você perder um dia, sua sequência será reiniciada</span>
+              <p className="flex items-start gap-3 p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/20">
+                <span className="text-yellow-500 mt-0.5 text-lg">•</span>
+                <span className="text-foreground font-medium">Se você perder um dia, sua sequência será reiniciada</span>
               </p>
             </div>
           </CardContent>
