@@ -769,14 +769,14 @@ const Fast = () => {
         <style>{`
           footer { display: none !important; }
         `}</style>
-        <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center">
-          <div className="text-center mx-auto">
-              <div className="w-32 h-32 rounded-full bg-[#ff2389]/5 flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-16 h-16 text-[#ff2389]" style={{
-                  animation: 'blink-118bpm 0.508s infinite'
-                }} />
-              </div>
-            <p className="text-muted-foreground text-center">Carregando Fast Markets...</p>
+        <div className="fixed inset-0 bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center overflow-hidden">
+          <div className="text-center">
+            <div className="w-32 h-32 rounded-full bg-[#ff2389]/5 flex items-center justify-center mx-auto mb-4">
+              <Zap className="w-16 h-16 text-[#ff2389]" style={{
+                animation: 'blink-118bpm 0.508s infinite'
+              }} />
+            </div>
+            <p className="text-muted-foreground">Carregando Fast Markets...</p>
             <style>{`
               @keyframes blink-118bpm {
                 0%, 100% { opacity: 1; }
@@ -955,7 +955,7 @@ const Fast = () => {
                   onClick={() => setSelectedCategory(category.value)}
                   className={cn(
                     "transition-all duration-75 font-bold rounded-xl flex-shrink-0",
-                    "px-2 py-2 text-xs md:px-10 md:py-6 md:text-base",
+                    "px-3 py-2 text-xs md:px-10 md:py-6 md:text-base",
                     selectedCategory === category.value 
                       ? "shadow-lg border-2 scale-105" 
                       : "hover:bg-muted-foreground/10"
@@ -967,7 +967,7 @@ const Fast = () => {
                   } : {}}
                 >
                   <span className="mr-1 text-sm md:text-base">{category.icon}</span>
-                  <span className="hidden sm:inline">{category.label}</span>
+                  <span className="hidden sm:inline">{category.label === 'Commodities' ? 'Commod' : category.label}</span>
                   <span className="sm:hidden">{category.label.slice(0, 3)}</span>
                 </Button>
               ))}

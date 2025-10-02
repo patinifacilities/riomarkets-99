@@ -113,40 +113,48 @@ const CardPayment = () => {
           Voltar
         </Button>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="w-6 h-6" />
-              Pagamento com {paymentMethod === 'card' ? 'Cartão de Crédito' : 'Cartão de Débito'}
+        <Card className="border-2 shadow-xl">
+          <CardHeader className="border-b bg-gradient-to-r from-background to-muted/20">
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <CreditCard className="w-6 h-6 text-primary" />
+              </div>
+              Pagamento Seguro
             </CardTitle>
-            <CardDescription>
-              Complete os dados do cartão para finalizar o depósito de R$ {amount}
+            <CardDescription className="text-base">
+              {paymentMethod === 'card' ? 'Cartão de Crédito' : 'Cartão de Débito'} • Depósito de R$ {amount}
             </CardDescription>
           </CardHeader>
           
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Card Preview */}
-              <div className="bg-gradient-to-br from-primary via-primary-glow to-accent p-6 rounded-2xl text-white shadow-xl">
-                <div className="flex justify-between items-start mb-8">
-                  <div className="w-12 h-8 bg-white/20 rounded"></div>
-                  <CreditCard className="w-8 h-8 opacity-50" />
-                </div>
-                <div className="space-y-4">
-                  <div className="text-2xl tracking-wider font-mono">
-                    {cardData.number || '•••• •••• •••• ••••'}
+              <div className="relative overflow-hidden bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 p-6 rounded-2xl text-white shadow-2xl">
+                {/* Golden/Grey animated effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/10 to-transparent animate-shimmer" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.1),transparent)]" />
+                
+                <div className="relative z-10">
+                  <div className="flex justify-between items-start mb-8">
+                    <div className="w-12 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded shadow-lg"></div>
+                    <CreditCard className="w-8 h-8 opacity-50" />
                   </div>
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <div className="text-xs opacity-70 mb-1">Nome do titular</div>
-                      <div className="text-sm font-medium uppercase">
-                        {cardData.name || 'NOME DO TITULAR'}
-                      </div>
+                  <div className="space-y-4">
+                    <div className="text-2xl tracking-wider font-mono drop-shadow-lg">
+                      {cardData.number || '•••• •••• •••• ••••'}
                     </div>
-                    <div>
-                      <div className="text-xs opacity-70 mb-1">Validade</div>
-                      <div className="text-sm font-medium">
-                        {cardData.expiry || 'MM/AA'}
+                    <div className="flex justify-between items-end">
+                      <div>
+                        <div className="text-xs opacity-70 mb-1">Nome do titular</div>
+                        <div className="text-sm font-medium uppercase drop-shadow">
+                          {cardData.name || 'NOME DO TITULAR'}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xs opacity-70 mb-1">Validade</div>
+                        <div className="text-sm font-medium">
+                          {cardData.expiry || 'MM/AA'}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -257,11 +265,14 @@ const CardPayment = () => {
                   </Label>
                 </div>
 
-                <div className="flex items-center gap-2 p-4 bg-muted/50 rounded-lg text-sm">
-                  <Lock className="w-4 h-4 text-success" />
-                  <span className="text-muted-foreground">
-                    Seus dados estão seguros e criptografados
-                  </span>
+                <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-success/10 to-primary/10 rounded-lg border border-success/20">
+                  <div className="p-2 rounded-full bg-success/20">
+                    <Lock className="w-5 h-5 text-success" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Pagamento 100% Seguro</p>
+                    <p className="text-xs text-muted-foreground">Criptografia SSL de nível bancário</p>
+                  </div>
                 </div>
               </div>
 
@@ -278,9 +289,19 @@ const CardPayment = () => {
                 <Button
                   type="submit"
                   disabled={isProcessing}
-                  className="w-full bg-gradient-primary hover:opacity-90"
+                  className="w-full bg-gradient-primary hover:opacity-90 shadow-lg text-lg py-6"
                 >
-                  {isProcessing ? 'Processando...' : `Pagar R$ ${amount}`}
+                  {isProcessing ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Processando pagamento...
+                    </span>
+                  ) : (
+                    <>
+                      <Lock className="w-5 h-5 mr-2" />
+                      Pagar R$ {amount}
+                    </>
+                  )}
                 </Button>
               </div>
             </form>

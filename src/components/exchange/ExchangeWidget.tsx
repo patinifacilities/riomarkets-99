@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useExchangeStore } from '@/stores/useExchangeStore';
 import { ExchangeService } from '@/services/exchange';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,13 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import { ArrowUpDown, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
+import { ArrowUpDown, TrendingUp, TrendingDown, Loader2, Zap } from 'lucide-react';
 import { track } from '@/lib/analytics';
 import { useToast } from '@/hooks/use-toast';
 import { ConfirmExchangeModal } from './ConfirmExchangeModal';
 
 export const ExchangeWidget = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { 
     rate, 
     balance, 
@@ -25,6 +27,7 @@ export const ExchangeWidget = () => {
   const [inputAmount, setInputAmount] = useState<string>('');
   const [inputCurrency, setInputCurrency] = useState<'BRL' | 'RIOZ'>('BRL');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showFastMarkets, setShowFastMarkets] = useState(false);
 
   // Calculate preview when inputs change
   const preview = useMemo(() => {
@@ -170,12 +173,27 @@ export const ExchangeWidget = () => {
       });
 
       toast({
-        title: "Conversão realizada!",
-        description: `${activeTab === 'buy_rioz' ? 'Compra' : 'Venda'} executada com sucesso.`,
+        title: "✨ Conversão realizada!",
+        description: (
+          <div className="flex flex-col gap-2">
+            <p className="font-medium">{activeTab === 'buy_rioz' ? 'Compra' : 'Venda'} executada com sucesso.</p>
+            <div className="flex items-center gap-2 text-sm">
+              <div className="w-2 h-2 rounded-full bg-[#00ff90] animate-pulse" />
+              <span>Saldo atualizado</span>
+            </div>
+          </div>
+        ),
+        className: "border-l-4 border-[#00ff90] bg-card/95 backdrop-blur",
       });
 
       setInputAmount('');
       setShowConfirmModal(false);
+      setShowFastMarkets(true);
+      
+      // Hide Fast Markets button after 10 seconds
+      setTimeout(() => {
+        setShowFastMarkets(false);
+      }, 10000);
     } catch (error) {
       track('exchange_failed', {
         side: activeTab,
@@ -263,13 +281,12 @@ export const ExchangeWidget = () => {
                   </div>
                   <div className="relative">
                     <Input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
                       placeholder="0.00"
                       value={inputAmount}
                       onChange={(e) => handleInputChange(e.target.value)}
-                      className="pr-16 text-lg"
-                      step={inputCurrency === 'BRL' ? '0.01' : '0.000001'}
-                      min="0"
+                      className="text-xl md:text-4xl font-bold text-center border-0 focus-visible:ring-0 shadow-none bg-transparent"
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">
                       {inputCurrency}
@@ -343,13 +360,12 @@ export const ExchangeWidget = () => {
                   </div>
                   <div className="relative">
                     <Input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
                       placeholder="0.00"
                       value={inputAmount}
                       onChange={(e) => handleInputChange(e.target.value)}
-                      className="pr-16 text-lg"
-                      step={inputCurrency === 'BRL' ? '0.01' : '0.000001'}
-                      min="0"
+                      className="text-xl md:text-4xl font-bold text-center border-0 focus-visible:ring-0 shadow-none bg-transparent"
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">
                       {inputCurrency}
@@ -439,6 +455,18 @@ export const ExchangeWidget = () => {
               'Vender Rioz'
             )}
           </Button>
+
+          {/* Fast Markets Button - Appears after successful conversion */}
+          {showFastMarkets && (
+            <Button
+              onClick={() => navigate('/fast')}
+              className="w-full relative overflow-hidden group bg-gradient-to-r from-[#ff2389] via-[#ff2389] to-primary hover:opacity-90 transition-all animate-pulse-glow"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+              <Zap className="w-4 h-4 mr-2 relative z-10" />
+              <span className="relative z-10">Explorar Fast Markets</span>
+            </Button>
+          )}
         </CardContent>
       </Card>
       

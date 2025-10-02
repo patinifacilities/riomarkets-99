@@ -124,18 +124,6 @@ const TransactionsToolbar = ({ onExport, className }: TransactionsToolbarProps) 
                 Últimos 90 dias
               </Button>
             </div>
-
-            {/* Type Filter */}
-            <Select value={filters.type || 'todos'} onValueChange={handleTypeFilter}>
-              <SelectTrigger className="w-[140px] bg-card-secondary" aria-label="Filtrar por tipo">
-                <SelectValue placeholder="Tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos</SelectItem>
-                <SelectItem value="credito">Entradas</SelectItem>
-                <SelectItem value="debito">Saídas</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Active Filters Badge Only */}
