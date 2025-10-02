@@ -80,24 +80,13 @@ export const UserEditModal = ({ user, open, onOpenChange, onSuccess }: UserEditM
 
     setIsLoading(true);
     try {
-      // Create transaction record
-      const { error: transactionError } = await supabase
-        .from('wallet_transactions')
-        .insert({
-          id: crypto.randomUUID(),
-          user_id: user.id,
-          tipo: adjustAmount > 0 ? 'credito' : 'debito',
-          valor: Math.abs(adjustAmount),
-          descricao: `Ajuste administrativo: ${adjustAmount > 0 ? '+' : '-'}${Math.abs(adjustAmount)} Rioz Coin`
-        });
-
-      if (transactionError) throw transactionError;
-
-      // Update user profile balance using the increment_balance function
-      const { error: updateError } = await supabase.rpc('increment_balance', {
-        user_id: user.id,
-        amount: adjustAmount
-      });
+      // Update user profile balance directly
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ 
+          saldo_moeda: user.saldo_moeda + adjustAmount 
+        })
+        .eq('id', user.id);
 
       if (updateError) throw updateError;
 

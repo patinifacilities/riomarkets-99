@@ -53,9 +53,10 @@ const BottomNavigation = () => {
             );
           }
 
-          // Calculate grid position: items 0,1 go closer to edges; items 3,4 go in cols 4,5 (col 3 is Fast)
+          // Calculate grid position: items swapped - Ranking(0), Carteira(1), Fast(center), items 3,4 in cols 4,5
+          // After swap: Carteira is index 0, Ranking is index 1
           const gridColumn = index < 2 ? index + 1 : index + 2;
-          const additionalClasses = index === 0 ? 'justify-self-start' : index === 1 ? 'justify-self-end' : index === 3 ? 'justify-self-start' : index === 4 ? 'justify-self-end' : '';
+          const additionalClasses = index === 1 ? 'justify-self-start' : index === 0 ? 'justify-self-start ml-[-20px]' : index === 3 ? 'justify-self-start' : index === 4 ? 'justify-self-end' : '';
 
           return (
             <Link
