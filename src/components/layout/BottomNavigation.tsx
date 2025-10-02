@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { TrendingUp, Wallet, Trophy, User, Zap } from 'lucide-react';
+import { TrendingUp, Wallet, Trophy, User, Zap, ArrowRightLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -11,6 +11,7 @@ const BottomNavigation = () => {
     { href: '/', icon: TrendingUp, label: 'Mercados' },
     { href: '/wallet', icon: Wallet, label: 'Carteira', authRequired: true },
     { href: '/fast', icon: Zap, label: 'Fast', authRequired: true, isFast: true },
+    { href: '/exchange', icon: TrendingUp, label: 'Exchange', authRequired: true },
     { href: '/ranking', icon: Trophy, label: 'Ranking' },
     { href: '/profile', icon: User, label: 'Perfil', authRequired: true }
   ];
@@ -19,7 +20,7 @@ const BottomNavigation = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden pb-[env(safe-area-inset-bottom)]">
-      <div className="flex items-center justify-between px-6 h-16 relative">
+      <div className="flex items-center justify-around px-4 h-16 relative">
         {visibleItems.map((item) => {
           const isActive = item.href === '/' 
             ? (location.pathname === '/' || location.pathname.startsWith('/market/'))

@@ -352,6 +352,17 @@
   .text-primary-neon {
     color: hsl(var(--success));
   }
+
+  @keyframes golden-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.4);
+      filter: brightness(1);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.8), 0 0 60px rgba(255, 215, 0, 0.6);
+      filter: brightness(1.2);
+    }
+  }
 }
 
 @layer base {

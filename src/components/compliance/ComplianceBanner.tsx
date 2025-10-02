@@ -60,20 +60,18 @@ export function ComplianceBanner({ variant = 'sticky' }: ComplianceBannerProps) 
       <div
         role="region"
         aria-label="aviso de cookies"
-        className="no-motion mx-auto max-w-6xl mb-20 md:mb-8 mx-4 rounded-2xl border border-primary/30 bg-zinc-950/90 backdrop-blur px-4 sm:px-6"
+        className="no-motion mx-auto max-w-6xl mb-20 md:mb-8 mx-4 rounded-2xl border border-primary/30 bg-zinc-950/90 backdrop-blur px-3 py-2 sm:px-4 sm:py-2.5"
       >
-        <div className="flex flex-col sm:flex-row items-center gap-3 py-3">
-          <div className="flex items-center gap-2 text-zinc-200">
-            <Cookie 
-              className="h-5 w-5 text-primary" 
-              aria-hidden="true" 
-            />
-            <p className="text-sm leading-snug">
-              {COMPLIANCE_MESSAGES.default}
-            </p>
-          </div>
+        <div className="flex flex-row items-center gap-2 sm:gap-3">
+          <Cookie 
+            className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" 
+            aria-hidden="true" 
+          />
+          <p className="text-xs sm:text-sm leading-snug text-zinc-200 flex-1">
+            {COMPLIANCE_MESSAGES.default}
+          </p>
 
-          <div className="flex items-center gap-4 text-xs text-zinc-400">
+          <div className="hidden sm:flex items-center gap-3 text-xs text-zinc-400">
             <a 
               href={LEGAL_URLS.termos}
               onClick={(e) => {
@@ -82,7 +80,7 @@ export function ComplianceBanner({ variant = 'sticky' }: ComplianceBannerProps) 
               className="hover:text-primary underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
               aria-label="leia nossos termos de uso"
             >
-              termos de uso
+              termos
             </a>
             <a 
               href={LEGAL_URLS.privacidade}
@@ -96,12 +94,11 @@ export function ComplianceBanner({ variant = 'sticky' }: ComplianceBannerProps) 
             </a>
           </div>
 
-          <div className="flex-1" />
-
           <Button
             onClick={handleAcknowledge}
+            size="sm"
             aria-label="entendi as informações de compliance e segurança"
-            className="bg-primary text-primary-foreground hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+            className="bg-primary text-primary-foreground hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2 flex-shrink-0"
           >
             Entendi
           </Button>

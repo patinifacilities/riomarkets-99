@@ -925,7 +925,7 @@ const Fast = () => {
         
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ff2389]/10 to-[#ff2389]/5 px-6 py-3 rounded-full border border-[#ff2389]/20 mb-4">
+          <div className="inline-flex items-center gap-1 md:gap-2 bg-gradient-to-r from-[#ff2389]/10 to-[#ff2389]/5 px-6 py-3 rounded-full border border-[#ff2389]/20 mb-4">
             <Zap className="w-5 h-5 text-[#ff2389] animate-pulse" />
             <span className="text-[#ff2389] font-semibold tracking-wide">FAST MARKETS</span>
           </div>

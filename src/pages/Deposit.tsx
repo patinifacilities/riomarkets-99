@@ -413,7 +413,7 @@ export default function Deposit() {
                 <Button
                   onClick={handleCardFormSubmit}
                   disabled={isProcessing}
-                  className="w-full h-12 text-base font-semibold bg-white hover:bg-gray-100 text-gray-800"
+                  className="w-full h-12 text-base font-semibold bg-white hover:bg-gray-100 text-black"
                 >
                   {isProcessing ? "Processando..." : `Pagar R$ ${formatCurrencyDisplay(amount)}`}
                 </Button>
