@@ -397,8 +397,10 @@ const AdminFast = () => {
                   <Settings className="w-4 h-4" />
                   APIs
                 </Button>
-                <Button onClick={() => navigate('/admin/fast/algorithm')} variant="outline" className="gap-2">
-                  <TrendingUp className="w-4 h-4" />
+                <Button onClick={() => navigate('/admin/fast/algorithm')} className="gap-2 bg-[#ff2389] hover:bg-[#ff2389]/90 text-white">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+                  </svg>
                   Algoritmo
                 </Button>
               </div>

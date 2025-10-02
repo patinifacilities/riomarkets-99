@@ -155,20 +155,21 @@ const AdminAlgorithm = () => {
 
           <div className="grid gap-6">
             {/* Algorithm Type Switch */}
-            <Card className="bg-card-secondary border-border-secondary">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <Card className="relative overflow-hidden bg-gradient-to-br from-[#ff2389] to-[#ff2389]/80 border-[#ff2389]">
+              <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent animate-pulse" />
+              <CardHeader className="relative">
+                <CardTitle className="flex items-center gap-2 text-gray-900">
                   <Zap className="w-5 h-5" />
                   Tipo de Algoritmo
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 relative">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <Label htmlFor="algorithm-type" className="text-base font-semibold">
+                    <Label htmlFor="algorithm-type" className="text-base font-semibold text-gray-900">
                       {algorithmConfig.algorithm_type === 'price_based' ? 'Algoritmo 2 (Baseado em Preço)' : 'Algoritmo 1 (Dinâmico)'}
                     </Label>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-gray-800">
                       {algorithmConfig.algorithm_type === 'price_based' 
                         ? 'Odds ajustados baseados na diferença entre opening_price e current_price'
                         : 'Odds decrescem conforme o tempo do pool passa'}
@@ -181,6 +182,7 @@ const AdminAlgorithm = () => {
                       ...algorithmConfig,
                       algorithm_type: checked ? 'price_based' : 'dynamic'
                     })}
+                    className="data-[state=checked]:bg-gray-900 data-[state=unchecked]:bg-white"
                   />
                 </div>
               </CardContent>
@@ -391,6 +393,59 @@ const AdminAlgorithm = () => {
             </>
             ) : (
               <>
+                {/* Pool Duration - Also for Algorithm 2 */}
+                <Card className="bg-card-secondary border-border-secondary">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="w-5 h-5" />
+                  Duração do Pool
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="pool-duration">Duração (segundos)</Label>
+                  <Input
+                    id="pool-duration"
+                    type="number"
+                    min="30"
+                    max="300"
+                    value={algorithmConfig.pool_duration_seconds}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setAlgorithmConfig({ 
+                        ...algorithmConfig, 
+                        pool_duration_seconds: value === '' ? 60 : parseInt(value) 
+                      });
+                    }}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Tempo total de cada pool em segundos (padrão: 60s)
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="lockout-time">Tempo de Bloqueio (segundos)</Label>
+                  <Input
+                    id="lockout-time"
+                    type="number"
+                    min="5"
+                    max="30"
+                    value={algorithmConfig.lockout_time_seconds}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setAlgorithmConfig({ 
+                        ...algorithmConfig, 
+                        lockout_time_seconds: value === '' ? 15 : parseInt(value) 
+                      });
+                    }}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Tempo antes do fim do pool onde apostas são bloqueadas (padrão: 15s)
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
                 {/* Algorithm 2 - Price Based */}
                 <Card className="bg-card-secondary border-border-secondary">
                   <CardHeader>
