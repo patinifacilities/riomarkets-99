@@ -7,16 +7,24 @@ interface BetSliderProps {
   balance: number;
   onAmountChange: (amount: number) => void;
   estimatedReward: number;
+  storageKey?: string;
 }
 
-export const BetSlider = ({ balance, onAmountChange, estimatedReward }: BetSliderProps) => {
-  const [percentage, setPercentage] = useState([0]);
+export const BetSlider = ({ balance, onAmountChange, estimatedReward, storageKey = 'betSliderPercentage' }: BetSliderProps) => {
+  const [percentage, setPercentage] = useState(() => {
+    const saved = localStorage.getItem(storageKey);
+    return saved ? [parseInt(saved)] : [0];
+  });
   
   const currentAmount = Math.floor((percentage[0] / 100) * balance);
 
   useEffect(() => {
     onAmountChange(currentAmount);
   }, [currentAmount, onAmountChange]);
+
+  useEffect(() => {
+    localStorage.setItem(storageKey, percentage[0].toString());
+  }, [percentage, storageKey]);
 
   const handlePercentageClick = (percent: number) => {
     setPercentage([percent]);

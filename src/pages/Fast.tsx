@@ -56,8 +56,15 @@ const Fast = () => {
   const [currentPools, setCurrentPools] = useState<FastPool[]>([]);
   const [poolHistory, setPoolHistory] = useState<Record<string, FastPoolResult[]>>({});
   const [countdown, setCountdown] = useState(60);
-  const [betAmount, setBetAmount] = useState(100);
+  const [betAmount, setBetAmount] = useState(() => {
+    const saved = localStorage.getItem('fastBetAmount');
+    return saved ? parseInt(saved) : 100;
+  });
   const [clickedPool, setClickedPool] = useState<{id: string, side: string} | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('fastBetAmount', betAmount.toString());
+  }, [betAmount]);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [selectedPool, setSelectedPool] = useState<string | null>(null);
   const [poolHistoryOpen, setPoolHistoryOpen] = useState(false);

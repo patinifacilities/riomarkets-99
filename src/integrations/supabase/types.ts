@@ -223,6 +223,9 @@ export type Database = {
       }
       fast_pool_algorithm_config: {
         Row: {
+          algo2_odds_high: number | null
+          algo2_odds_low: number | null
+          algorithm_type: string | null
           id: string
           lockout_time_seconds: number
           max_odds: number
@@ -235,6 +238,9 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          algo2_odds_high?: number | null
+          algo2_odds_low?: number | null
+          algorithm_type?: string | null
           id?: string
           lockout_time_seconds?: number
           max_odds?: number
@@ -247,6 +253,9 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          algo2_odds_high?: number | null
+          algo2_odds_low?: number | null
+          algorithm_type?: string | null
           id?: string
           lockout_time_seconds?: number
           max_odds?: number

@@ -50,11 +50,18 @@ const AssetDetail = () => {
   const [poolHistory, setPoolHistory] = useState<FastPoolResult[]>([]);
   const [countdown, setCountdown] = useState(60);
   const [loading, setLoading] = useState(true);
-  const [betAmount, setBetAmount] = useState(100);
+  const [betAmount, setBetAmount] = useState(() => {
+    const saved = localStorage.getItem('assetDetailBetAmount');
+    return saved ? parseInt(saved) : 100;
+  });
   const [selectedResult, setSelectedResult] = useState<FastPoolResult | null>(null);
   const [resultModalOpen, setResultModalOpen] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+
+  useEffect(() => {
+    localStorage.setItem('assetDetailBetAmount', betAmount.toString());
+  }, [betAmount]);
 
   useEffect(() => {
     loadPoolData();
@@ -219,15 +226,20 @@ const AssetDetail = () => {
     pool_duration_seconds: 60,
     lockout_time_seconds: 2,
     odds_start: 1.80,
-    odds_end: 1.10
+    odds_end: 1.10,
+    algorithm_type: 'dynamic',
+    algo2_odds_high: 1.90,
+    algo2_odds_low: 1.10
   });
+
+  const [currentPrice, setCurrentPrice] = useState<number>(0);
 
   useEffect(() => {
     const loadAlgorithmConfig = async () => {
       try {
         const { data } = await supabase
           .from('fast_pool_algorithm_config')
-          .select('pool_duration_seconds, lockout_time_seconds, odds_start, odds_end')
+          .select('*')
           .order('updated_at', { ascending: false })
           .limit(1)
           .maybeSingle();
@@ -237,7 +249,10 @@ const AssetDetail = () => {
             pool_duration_seconds: data.pool_duration_seconds,
             lockout_time_seconds: data.lockout_time_seconds,
             odds_start: Number(data.odds_start),
-            odds_end: Number(data.odds_end)
+            odds_end: Number(data.odds_end),
+            algorithm_type: data.algorithm_type || 'dynamic',
+            algo2_odds_high: Number(data.algo2_odds_high || 1.90),
+            algo2_odds_low: Number(data.algo2_odds_low || 1.10)
           });
         }
       } catch (error) {
@@ -248,7 +263,35 @@ const AssetDetail = () => {
     loadAlgorithmConfig();
   }, []);
 
-  const getOdds = () => {
+  const getOdds = (side?: 'subiu' | 'desceu') => {
+    if (algorithmConfig.algorithm_type === 'price_based' && currentPool) {
+      const openingPrice = currentPool.opening_price || 0;
+      
+      if (openingPrice === 0 || currentPrice === 0) {
+        return algorithmConfig.algo2_odds_high;
+      }
+
+      const priceDiff = currentPrice - openingPrice;
+      const diffPercent = Math.abs(priceDiff / openingPrice);
+
+      if (side === 'subiu') {
+        if (openingPrice < currentPrice) {
+          return Math.max(algorithmConfig.algo2_odds_low, algorithmConfig.algo2_odds_low + (diffPercent * 2));
+        } else {
+          return Math.min(algorithmConfig.algo2_odds_high, algorithmConfig.algo2_odds_high - (diffPercent * 2));
+        }
+      } else if (side === 'desceu') {
+        if (openingPrice > currentPrice) {
+          return Math.max(algorithmConfig.algo2_odds_low, algorithmConfig.algo2_odds_low + (diffPercent * 2));
+        } else {
+          return Math.min(algorithmConfig.algo2_odds_high, algorithmConfig.algo2_odds_high - (diffPercent * 2));
+        }
+      }
+      
+      return (algorithmConfig.algo2_odds_high + algorithmConfig.algo2_odds_low) / 2;
+    }
+
+    // Dynamic algorithm (original)
     const duration = algorithmConfig.pool_duration_seconds;
     const lockout = algorithmConfig.lockout_time_seconds;
     const oddsStart = algorithmConfig.odds_start;
@@ -322,7 +365,7 @@ const AssetDetail = () => {
       }
 
       // Calculate odds first
-      const odds = getOdds();
+      const odds = getOdds(side);
       console.log('📊 Calculated odds:', odds);
 
       // Create bet first (deduct later to ensure atomicity)
@@ -562,35 +605,35 @@ const AssetDetail = () => {
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     onClick={() => handleBet('subiu')}
-                    disabled={countdown <= 15}
+                    disabled={countdown <= 2}
                     className="h-12 text-sm font-semibold bg-[#00ff90] hover:bg-[#00ff90]/90 text-black"
                   >
                     <div className="flex items-center justify-between w-full px-1">
                       <ArrowUp className="w-4 h-4" />
                       <span>Subir</span>
                       <span className="text-xs opacity-80">
-                        x{getOdds().toFixed(2)}
+                        x{getOdds('subiu').toFixed(2)}
                       </span>
                     </div>
                   </Button>
                   
                   <Button
                     onClick={() => handleBet('desceu')}
-                    disabled={countdown <= 15}
+                    disabled={countdown <= 2}
                     className="h-12 text-sm font-semibold bg-[#ff2389] hover:bg-[#ff2389]/90 text-white"
                   >
                     <div className="flex items-center justify-between w-full px-1">
                       <ArrowDown className="w-4 h-4" />
                       <span>Descer</span>
                       <span className="text-xs opacity-80">
-                        x{getOdds().toFixed(2)}
+                        x{getOdds('desceu').toFixed(2)}
                       </span>
                     </div>
                   </Button>
                 </div>
               )}
 
-              {countdown <= 15 && countdown > 0 && (
+              {countdown <= 2 && countdown > 0 && (
                 <div className="text-center text-xs text-muted-foreground">
                   Opiniões bloqueadas
                 </div>
@@ -605,6 +648,7 @@ const AssetDetail = () => {
             assetSymbol={currentPool.asset_symbol} 
             assetName={currentPool.asset_name}
             poolStartPrice={currentPool.opening_price}
+            onPriceChange={setCurrentPrice}
           />
         </div>
 

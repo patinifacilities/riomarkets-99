@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { ArrowLeft, Save, TrendingUp, Clock, Target } from 'lucide-react';
+import { ArrowLeft, Save, TrendingUp, Clock, Target, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useToast } from '@/hooks/use-toast';
@@ -25,9 +26,12 @@ const AdminAlgorithm = () => {
     odds_start: 1.80,
     odds_end: 1.10,
     odds_curve_intensity: 0.60,
-    lockout_time_seconds: 15,
+    lockout_time_seconds: 2,
     max_odds: 5.00,
-    min_odds: 1.05
+    min_odds: 1.05,
+    algorithm_type: 'dynamic',
+    algo2_odds_high: 1.90,
+    algo2_odds_low: 1.10
   });
 
   useEffect(() => {
@@ -53,7 +57,10 @@ const AdminAlgorithm = () => {
           odds_curve_intensity: Number(data.odds_curve_intensity),
           lockout_time_seconds: data.lockout_time_seconds,
           max_odds: Number(data.max_odds),
-          min_odds: Number(data.min_odds)
+          min_odds: Number(data.min_odds),
+          algorithm_type: data.algorithm_type || 'dynamic',
+          algo2_odds_high: Number(data.algo2_odds_high || 1.90),
+          algo2_odds_low: Number(data.algo2_odds_low || 1.10)
         });
       }
     } catch (error) {
@@ -147,8 +154,42 @@ const AdminAlgorithm = () => {
           </div>
 
           <div className="grid gap-6">
-            {/* Pool Duration */}
+            {/* Algorithm Type Switch */}
             <Card className="bg-card-secondary border-border-secondary">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="w-5 h-5" />
+                  Tipo de Algoritmo
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label htmlFor="algorithm-type" className="text-base font-semibold">
+                      {algorithmConfig.algorithm_type === 'price_based' ? 'Algoritmo 2 (Baseado em Preço)' : 'Algoritmo 1 (Dinâmico)'}
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {algorithmConfig.algorithm_type === 'price_based' 
+                        ? 'Odds ajustados baseados na diferença entre opening_price e current_price'
+                        : 'Odds decrescem conforme o tempo do pool passa'}
+                    </p>
+                  </div>
+                  <Switch
+                    id="algorithm-type"
+                    checked={algorithmConfig.algorithm_type === 'price_based'}
+                    onCheckedChange={(checked) => setAlgorithmConfig({
+                      ...algorithmConfig,
+                      algorithm_type: checked ? 'price_based' : 'dynamic'
+                    })}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {algorithmConfig.algorithm_type === 'dynamic' ? (
+              <>
+                {/* Pool Duration */}
+                <Card className="bg-card-secondary border-border-secondary">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Clock className="w-5 h-5" />
@@ -347,6 +388,95 @@ const AdminAlgorithm = () => {
                 Resetar
               </Button>
             </div>
+            </>
+            ) : (
+              <>
+                {/* Algorithm 2 - Price Based */}
+                <Card className="bg-card-secondary border-border-secondary">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="w-5 h-5" />
+                      Configuração de Odds - Algoritmo 2
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="p-4 bg-muted/20 rounded-lg space-y-2">
+                      <p className="text-sm font-medium">Lógica do Algoritmo 2:</p>
+                      <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                        <li>Se opening_price {'<'} current_price: Subir = {algorithmConfig.algo2_odds_low}x, Descer = {algorithmConfig.algo2_odds_high}x</li>
+                        <li>Se opening_price {'>'} current_price: Subir = {algorithmConfig.algo2_odds_high}x, Descer = {algorithmConfig.algo2_odds_low}x</li>
+                        <li>Os odds se ajustam conforme o current_price se aproxima do opening_price</li>
+                      </ul>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between mb-2">
+                        <Label>Odds Alto</Label>
+                        <span className="text-lg font-bold text-primary">
+                          {algorithmConfig.algo2_odds_high.toFixed(2)}x
+                        </span>
+                      </div>
+                      <Slider
+                        value={[algorithmConfig.algo2_odds_high]}
+                        onValueChange={([value]) => setAlgorithmConfig({ 
+                          ...algorithmConfig, 
+                          algo2_odds_high: value 
+                        })}
+                        min={1.50}
+                        max={3.00}
+                        step={0.05}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Odds atribuído ao lado desfavorecido (padrão: 1.90x)
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between mb-2">
+                        <Label>Odds Baixo</Label>
+                        <span className="text-lg font-bold text-primary">
+                          {algorithmConfig.algo2_odds_low.toFixed(2)}x
+                        </span>
+                      </div>
+                      <Slider
+                        value={[algorithmConfig.algo2_odds_low]}
+                        onValueChange={([value]) => setAlgorithmConfig({ 
+                          ...algorithmConfig, 
+                          algo2_odds_low: value 
+                        })}
+                        min={1.05}
+                        max={1.50}
+                        step={0.05}
+                        className="w-full"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Odds atribuído ao lado favorecido (padrão: 1.10x)
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Save Button */}
+                <div className="flex gap-3">
+                  <Button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="gap-2"
+                  >
+                    <Save className="w-4 h-4" />
+                    {saving ? 'Salvando...' : 'Salvar Configurações'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={loadAlgorithmConfig}
+                    disabled={saving}
+                  >
+                    Resetar
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
