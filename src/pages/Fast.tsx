@@ -570,13 +570,13 @@ const Fast = () => {
       let baseOddsDown = algorithmConfig.algo2_odds_high;
       
       if (openingPrice < currentPrice) {
-        // Price went up: favor down bets
-        baseOddsUp = algorithmConfig.algo2_odds_low;
-        baseOddsDown = algorithmConfig.algo2_odds_high;
+        // Preço SUBIU: Apostar "subir" = continuar tendência = menor odd (1.10)
+        baseOddsUp = algorithmConfig.algo2_odds_low;      // Subir = 1.10X
+        baseOddsDown = algorithmConfig.algo2_odds_high;  // Descer = 1.90X
       } else if (openingPrice > currentPrice) {
-        // Price went down: favor up bets
-        baseOddsUp = algorithmConfig.algo2_odds_high;
-        baseOddsDown = algorithmConfig.algo2_odds_low;
+        // Preço DESCEU: Apostar "descer" = continuar tendência = menor odd (1.10)
+        baseOddsUp = algorithmConfig.algo2_odds_high;    // Subir = 1.90X
+        baseOddsDown = algorithmConfig.algo2_odds_low;   // Descer = 1.10X
       }
       
       // Adjust odds as price approaches opening price
