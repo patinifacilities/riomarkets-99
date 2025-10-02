@@ -217,7 +217,7 @@ const AssetDetail = () => {
   // Load algorithm config for dynamic odds calculation
   const [algorithmConfig, setAlgorithmConfig] = useState({
     pool_duration_seconds: 60,
-    lockout_time_seconds: 5,
+    lockout_time_seconds: 2,
     odds_start: 1.80,
     odds_end: 1.10
   });
@@ -288,10 +288,10 @@ const AssetDetail = () => {
     }
 
     // Check if countdown is in lockout period
-    if (countdown <= 5) {
+    if (countdown <= 2) {
       toast({
         title: "Opiniões bloqueadas",
-        description: "Não é possível opinar nos últimos 5 segundos",
+        description: "Não é possível opinar nos últimos 2 segundos",
         variant: "destructive"
       });
       return;

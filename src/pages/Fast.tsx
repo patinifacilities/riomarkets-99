@@ -483,7 +483,7 @@ const Fast = () => {
   // Load algorithm config for dynamic odds calculation
   const [algorithmConfig, setAlgorithmConfig] = React.useState({
     pool_duration_seconds: 60,
-    lockout_time_seconds: 5,
+    lockout_time_seconds: 2,
     odds_start: 1.80,
     odds_end: 1.10
   });

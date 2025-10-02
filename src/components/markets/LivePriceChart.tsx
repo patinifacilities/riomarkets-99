@@ -284,7 +284,7 @@ export const LivePriceChart = ({ assetSymbol, assetName, poolStartPrice }: LiveP
         </div>
         
         <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-          <span>Mín: ${minPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          <span>Início: ${(poolStartPrice || minPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-[#ff2389] animate-pulse" />
             <span className="font-semibold">{dataSource === 'binance' ? 'BINANCE LIVE' : 'API LIVE'}</span>
