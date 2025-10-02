@@ -148,15 +148,10 @@ async function createSynchronizedPools(supabase: any, category = 'crypto') {
   // Get pool configurations with custom names
   const poolConfigs = await getPoolConfigurationsWithCustomNames(supabase, category);
   
-  // Get real market prices IMMEDIATELY for all symbols
+  // Get symbols for price fetch
   const symbols = poolConfigs.map(config => config.symbol);
-  const { data: marketData } = await supabase.functions.invoke('get-market-data', {
-    body: { symbols }
-  });
-
-  const prices = marketData?.prices || {};
   
-  // Create pools with current time and prices
+  // Create pools with timing FIRST, then update prices immediately
   const now = new Date();
   const endTime = new Date(now.getTime() + (poolDuration * 1000));
 
@@ -172,14 +167,14 @@ async function createSynchronizedPools(supabase: any, category = 'crypto') {
   // Use algorithm base_odds if available, otherwise default
   const baseOdds = algorithmConfig?.odds_start || 1.65;
 
-  // Create all 3 pools with synchronized timing
+  // Create all 3 pools with synchronized timing and temporary fallback prices
   const poolsToInsert = poolConfigs.map((config, index) => ({
     round_number: nextRoundNumber,
     asset_symbol: config.symbol,
     asset_name: config.name,
     question: config.question,
     category: category,
-    opening_price: prices[config.symbol] || config.fallbackPrice,
+    opening_price: config.fallbackPrice, // Temporary fallback price
     round_start_time: now.toISOString(),
     round_end_time: endTime.toISOString(),
     base_odds: baseOdds,
@@ -193,6 +188,29 @@ async function createSynchronizedPools(supabase: any, category = 'crypto') {
     .select();
 
   if (error) throw error;
+
+  // IMMEDIATELY after creating pools, get real-time prices
+  console.log('📊 Fetching real-time prices for pools...');
+  const { data: marketData } = await supabase.functions.invoke('get-market-data', {
+    body: { symbols }
+  });
+
+  const prices = marketData?.prices || {};
+  
+  // Update each pool with the real-time price immediately
+  for (const pool of pools) {
+    const realPrice = prices[pool.asset_symbol];
+    if (realPrice) {
+      await supabase
+        .from('fast_pools')
+        .update({ opening_price: realPrice })
+        .eq('id', pool.id);
+      
+      console.log(`✅ Pool ${pool.id} (${pool.asset_symbol}) opening_price set to ${realPrice} (real-time)`);
+    } else {
+      console.log(`⚠️ Pool ${pool.id} (${pool.asset_symbol}) using fallback price ${pool.opening_price}`);
+    }
+  }
 
   return pools;
 }
@@ -493,15 +511,8 @@ async function createAllCategoriesPools(supabase: any) {
     const poolConfigs = getPoolConfigurations(category);
     poolConfigs.forEach(config => allSymbols.push(config.symbol));
   }
-
-  // Get real market prices IMMEDIATELY for all symbols at once
-  const { data: marketData } = await supabase.functions.invoke('get-market-data', {
-    body: { symbols: allSymbols }
-  });
-
-  const prices = marketData?.prices || {};
   
-  // Create pools with current time
+  // Create pools with timing FIRST
   const now = new Date();
   const endTime = new Date(now.getTime() + (poolDuration * 1000));
 
@@ -533,7 +544,7 @@ async function createAllCategoriesPools(supabase: any) {
   // Use algorithm base_odds if available, otherwise default
   const baseOdds = algorithmConfig?.odds_start || 1.65;
 
-  // Create pools for all categories with same timing
+  // Create pools for all categories with same timing and temporary fallback prices
   for (const category of categories) {
     const poolConfigs = getPoolConfigurations(category);
     
@@ -545,7 +556,7 @@ async function createAllCategoriesPools(supabase: any) {
         asset_name: customConfig?.name || config.name,
         question: customConfig?.question || config.question,
         category: category,
-        opening_price: prices[config.symbol] || config.fallbackPrice,
+        opening_price: config.fallbackPrice, // Temporary fallback price
         round_start_time: now.toISOString(),
         round_end_time: endTime.toISOString(),
         base_odds: baseOdds,
@@ -566,6 +577,29 @@ async function createAllCategoriesPools(supabase: any) {
     throw error;
   }
 
-  console.log(`Created ${pools?.length} pools across all categories`);
+  // IMMEDIATELY after creating pools, get real-time prices for all symbols
+  console.log('📊 Fetching real-time prices for all pools...');
+  const { data: marketData } = await supabase.functions.invoke('get-market-data', {
+    body: { symbols: allSymbols }
+  });
+
+  const prices = marketData?.prices || {};
+  
+  // Update each pool with the real-time price immediately
+  for (const pool of pools) {
+    const realPrice = prices[pool.asset_symbol];
+    if (realPrice) {
+      await supabase
+        .from('fast_pools')
+        .update({ opening_price: realPrice })
+        .eq('id', pool.id);
+      
+      console.log(`✅ Pool ${pool.id} (${pool.asset_symbol}) opening_price set to ${realPrice} (real-time)`);
+    } else {
+      console.log(`⚠️ Pool ${pool.id} (${pool.asset_symbol}) using fallback price ${pool.opening_price}`);
+    }
+  }
+
+  console.log(`Created ${pools?.length} pools across all categories with real-time prices`);
   return pools;
 }

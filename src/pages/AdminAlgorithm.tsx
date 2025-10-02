@@ -167,7 +167,7 @@ const AdminAlgorithm = () => {
 
           <div className="grid gap-6">
             {/* Algorithm Type Switch */}
-            <Card className="relative overflow-hidden bg-gradient-to-br from-[#ff2389] via-[#ff2389] to-[#ff2389]/70 border-[#ff2389]">
+            <Card className="relative overflow-hidden border-[#ff2389]" style={{ backgroundColor: '#ff2389' }}>
               <div className="absolute inset-0 opacity-40">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.3),transparent_50%)] animate-pulse" style={{ animationDuration: '3s' }} />
                 <div className="absolute top-0 left-1/4 w-32 h-32 bg-white/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '2s' }} />

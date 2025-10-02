@@ -56,6 +56,7 @@ const AssetDetail = () => {
   });
   const [selectedResult, setSelectedResult] = useState<FastPoolResult | null>(null);
   const [resultModalOpen, setResultModalOpen] = useState(false);
+  const [opinionNotifications, setOpinionNotifications] = useState<{id: string, text: string, side?: 'subiu' | 'desceu', timestamp: number}[]>([]);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -165,36 +166,8 @@ const AssetDetail = () => {
     }
   };
 
-  // Adjust opening price at 3 seconds after pool start (57 seconds remaining)
-  useEffect(() => {
-    if (!currentPool) return;
-
-    const startTime = new Date(currentPool.round_start_time).getTime();
-    const adjustTime = 3000; // 3 seconds after start (57 seconds remaining)
-    const adjustAtTime = startTime + adjustTime;
-    const now = Date.now();
-    const timeUntilAdjust = adjustAtTime - now;
-
-    if (timeUntilAdjust > 0 && timeUntilAdjust <= 60000) {
-      const timer = setTimeout(async () => {
-        console.log('🔄 Adjusting opening price at 57 seconds remaining...');
-        try {
-          await supabase.functions.invoke('manage-fast-pools', {
-            body: {
-              action: 'adjust_opening_price',
-              poolId: currentPool.id
-            }
-          });
-          // Reload pool to get updated opening price
-          loadPoolData();
-        } catch (error) {
-          console.error('Error adjusting opening price:', error);
-        }
-      }, timeUntilAdjust);
-
-      return () => clearTimeout(timer);
-    }
-  }, [currentPool]);
+  // Adjust opening price at 3 seconds after pool start (57 seconds remaining) - REMOVED
+  // This is now handled immediately after pool creation in the edge function
 
   useEffect(() => {
     if (!currentPool) return;
@@ -433,6 +406,20 @@ const AssetDetail = () => {
 
       console.log('✅ Bet placed successfully!');
 
+      // Add opinion notification
+      const newNotification = {
+        id: Date.now().toString(),
+        text: 'Opinião registrada',
+        side: side,
+        timestamp: Date.now()
+      };
+      setOpinionNotifications(prev => [...prev, newNotification]);
+      
+      // Remove notification after 3 seconds
+      setTimeout(() => {
+        setOpinionNotifications(prev => prev.filter(n => n.id !== newNotification.id));
+      }, 3000);
+
       // Show toast notification
       toast({
         title: "✅ Opinião registrada!",
@@ -480,6 +467,26 @@ const AssetDetail = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 relative">
+      {/* Opinion Notifications - Floating on top */}
+      <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+        {opinionNotifications.map((notification, index) => (
+          <div
+            key={notification.id}
+            className={`mb-2 px-6 py-3 rounded-full font-semibold text-sm shadow-lg animate-fade-in pointer-events-auto ${
+              notification.side === 'subiu'
+                ? 'bg-[#00ff90] text-black'
+                : 'bg-[#ff2389] text-white'
+            }`}
+            style={{
+              animation: 'fade-in 0.3s ease-out, fade-out 0.3s ease-out 2.7s',
+              top: `${index * 60}px`
+            }}
+          >
+            {notification.text}
+          </div>
+        ))}
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Link to="/fast" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6">
           <ArrowLeft className="w-4 h-4" />
