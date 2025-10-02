@@ -35,9 +35,10 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
       
       setPosition(newPosition);
       
-      // Report progress to parent
+      // Report progress to parent immediately
       if (onProgressChange && maxPosition > 0) {
-        onProgressChange(newPosition / maxPosition);
+        const currentProgress = newPosition / maxPosition;
+        onProgressChange(currentProgress);
       }
       
       // Check if threshold is reached
@@ -162,19 +163,21 @@ export const SliderConfirm = ({ onConfirm, disabled = false, className, text = "
     >
       {/* Progress fill with dynamic color */}
       <div 
-        className="absolute inset-0 transition-none rounded-full"
+        className="absolute inset-0 rounded-full"
         style={{
           background: fillColor,
           width: `${Math.min(progress * 100, 100)}%`,
+          transition: 'none'
         }}
       />
       
       {/* Background text */}
       <div className="absolute inset-0 flex items-center justify-center z-10">
         <span 
-          className="text-sm font-medium transition-none"
+          className="text-sm font-medium"
           style={{
-            color: progress > 0 && selectedOption === 'sim' ? '#374151' : 'white'
+            color: progress > 0.1 && selectedOption === 'sim' ? '#374151' : 'white',
+            transition: 'none'
           }}
         >
           {text}

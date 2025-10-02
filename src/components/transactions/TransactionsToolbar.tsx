@@ -98,7 +98,7 @@ const TransactionsToolbar = ({ onExport, className }: TransactionsToolbarProps) 
             </div>
 
             {/* Date Range Filter */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 justify-center">
               <Button
                 variant={filters.from ? "secondary" : "outline"}
                 size="sm"

@@ -94,7 +94,7 @@ const Fast = () => {
     },
     { 
       value: 'commodities', 
-      label: window.innerWidth <= 768 ? 'Commod' : 'Commodities', 
+      label: 'Commod', 
       bgColor: '#FFD800',
       icon: '🛢️',
       textColor: '#000'
@@ -945,8 +945,8 @@ const Fast = () => {
           </p>
           
           {/* Category Selector */}
-          <div className="flex justify-center items-center mb-6 overflow-x-auto scrollbar-hide">
-            <div className="flex gap-2 p-1 bg-muted rounded-xl min-w-min">
+          <div className="flex justify-center items-center mb-6 overflow-x-auto scrollbar-hide px-2">
+            <div className="flex gap-1 md:gap-2 p-1 bg-muted rounded-xl min-w-min">
               {categoryOptions.map((category) => (
                 <Button
                   key={category.value}
@@ -955,7 +955,7 @@ const Fast = () => {
                   onClick={() => setSelectedCategory(category.value)}
                   className={cn(
                     "transition-all duration-75 font-bold rounded-xl flex-shrink-0",
-                    "px-4 py-2 text-xs md:px-10 md:py-6 md:text-base",
+                    "px-2 py-2 text-xs md:px-10 md:py-6 md:text-base",
                     selectedCategory === category.value 
                       ? "shadow-lg border-2 scale-105" 
                       : "hover:bg-muted-foreground/10"

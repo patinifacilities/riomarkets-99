@@ -99,8 +99,34 @@ const WalletPage = () => {
 
         {/* Main Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-          {/* Left Column - Balance Cards */}
-          <div className="lg:col-span-2 space-y-4">
+          {/* Mobile Order - Cards Reordered */}
+          <div className="lg:hidden space-y-4">
+            {/* Expandable RIOZ Balance Card */}
+            <ExpandableRiozCard 
+              currentBalance={currentBalance}
+              totalInOrders={totalInOrders}
+              brlBalance={brlBalance}
+            />
+            
+            {/* Balance Donut Chart */}
+            <BalanceDonutChart />
+            
+            {/* Order History */}
+            <OrderHistoryCard onRefresh={() => {
+              refetchProfile();
+              refetchTransactions();
+              fetchBalance();
+            }} />
+            
+            {/* Recent Wins */}
+            <RecentWinsCard />
+            
+            {/* Completed Orders - Last */}
+            <CompletedOrdersCard />
+          </div>
+          
+          {/* Desktop Layout */}
+          <div className="hidden lg:block lg:col-span-2 space-y-4">
             {/* Expandable RIOZ Balance Card - Full Width */}
             <ExpandableRiozCard 
               currentBalance={currentBalance}
@@ -115,21 +141,17 @@ const WalletPage = () => {
             <RecentWinsCard />
           </div>
           
-          {/* Right Column - Charts and History */}
-          <div className="lg:col-span-1 space-y-4">
-            {/* Balance Donut Chart - Mobile: first, Desktop: normal order */}
-            <div className="block lg:order-2">
-              <BalanceDonutChart />
-            </div>
+          {/* Desktop Right Column - Charts and History */}
+          <div className="hidden lg:block lg:col-span-1 space-y-4">
+            {/* Balance Donut Chart */}
+            <BalanceDonutChart />
             
-            {/* Order History - Mobile: last, Desktop: normal order */}
-            <div className="block lg:order-1">
-              <OrderHistoryCard onRefresh={() => {
-                refetchProfile();
-                refetchTransactions();
-                fetchBalance();
-              }} />
-            </div>
+            {/* Order History */}
+            <OrderHistoryCard onRefresh={() => {
+              refetchProfile();
+              refetchTransactions();
+              fetchBalance();
+            }} />
           </div>
         </div>
 
