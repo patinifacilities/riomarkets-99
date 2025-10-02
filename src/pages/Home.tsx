@@ -171,29 +171,33 @@ const Home = () => {
       <div className="relative z-10">
       {/* Hero Section - Trading Aligned */}
       <section className="relative min-h-[42vh] md:min-h-[52vh] flex flex-col items-center justify-center bg-[color:var(--bg-app)] overflow-hidden">
-        {/* Aurora Borealis Background */}
+        {/* Modern Animated Background */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {/* Base gradient layers */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent opacity-60" />
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00ff90]/10 to-transparent opacity-40 animate-pulse-continuous-60s" />
+          {/* Gradient mesh background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-[#ff2389]/5" />
           
-          {/* Aurora waves */}
-          <div className="absolute top-0 left-0 w-full h-full">
-            <div className="absolute top-[20%] left-[-10%] w-[120%] h-[40%] bg-gradient-to-r from-transparent via-[#00ff90]/20 to-transparent blur-3xl animate-[wave_15s_ease-in-out_infinite] origin-center" 
-                 style={{ animationDelay: '0s' }} />
-            <div className="absolute top-[30%] left-[-15%] w-[130%] h-[35%] bg-gradient-to-r from-transparent via-primary/15 to-transparent blur-3xl animate-[wave_20s_ease-in-out_infinite] origin-center" 
-                 style={{ animationDelay: '-5s' }} />
-            <div className="absolute top-[40%] left-[-5%] w-[110%] h-[30%] bg-gradient-to-r from-transparent via-[#ff2389]/10 to-transparent blur-3xl animate-[wave_18s_ease-in-out_infinite] origin-center" 
-                 style={{ animationDelay: '-10s' }} />
+          {/* Animated gradient orbs */}
+          <div className="absolute top-[10%] left-[10%] w-[500px] h-[500px] bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl animate-float opacity-60" />
+          <div className="absolute bottom-[20%] right-[15%] w-[400px] h-[400px] bg-gradient-to-tl from-[#ff2389]/20 to-transparent rounded-full blur-3xl animate-float-delayed opacity-50" />
+          <div className="absolute top-[40%] right-[20%] w-[350px] h-[350px] bg-gradient-to-br from-[#00ff90]/15 to-transparent rounded-full blur-3xl animate-pulse-gentle opacity-40" />
+          
+          {/* Grid pattern overlay */}
+          <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" 
+               style={{ 
+                 backgroundImage: 'linear-gradient(rgba(0,255,145,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,145,0.1) 1px, transparent 1px)',
+                 backgroundSize: '50px 50px'
+               }} />
+          
+          {/* Animated scan lines */}
+          <div className="absolute inset-0 opacity-[0.03]">
+            <div className="absolute w-full h-px bg-gradient-to-r from-transparent via-primary to-transparent animate-scan-line" />
           </div>
           
-          {/* Shimmer effect */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-transparent animate-shimmer" />
-          
           {/* Floating particles */}
-          <div className="absolute top-[10%] left-[20%] w-2 h-2 rounded-full bg-[#00ff90]/40 animate-float" />
-          <div className="absolute top-[60%] right-[30%] w-3 h-3 rounded-full bg-primary/30 animate-float-delayed" />
-          <div className="absolute bottom-[20%] left-[40%] w-2 h-2 rounded-full bg-[#ff2389]/30 animate-pulse-gentle" />
+          <div className="absolute top-[15%] left-[25%] w-1.5 h-1.5 rounded-full bg-primary/50 animate-float" />
+          <div className="absolute top-[70%] right-[35%] w-2 h-2 rounded-full bg-[#00ff90]/40 animate-float-delayed" />
+          <div className="absolute bottom-[30%] left-[45%] w-1.5 h-1.5 rounded-full bg-[#ff2389]/40 animate-pulse-gentle" />
+          <div className="absolute top-[50%] right-[10%] w-1 h-1 rounded-full bg-primary/60 animate-float" />
         </div>
         <div className="container mx-auto px-4 py-12 md:px-8 md:py-16 h-full flex flex-col justify-center relative z-10">
           
@@ -291,17 +295,23 @@ const Home = () => {
                         key={topic.id}
                         onClick={() => handleTopicSelect(topic.id)}
                         className={cn(
-                          "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap relative overflow-visible",
-                          "transition-all duration-300 ease-out border-2",
+                          "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap relative overflow-hidden",
+                          "transition-all duration-500 ease-out border-2",
                           isSelected
-                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary text-primary-foreground shadow-[0_0_20px_rgba(0,255,145,0.4)] border-primary ring-2 ring-primary/30 ring-offset-2 ring-offset-background scale-105' 
+                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary text-primary-foreground shadow-[0_0_25px_rgba(0,255,145,0.5)] border-primary scale-110 animate-pulse-gentle' 
                             : 'border-border/60 text-foreground hover:border-primary/60 hover:shadow-[0_0_15px_rgba(0,255,145,0.2)] bg-card/90 backdrop-blur-sm hover:scale-105'
                         )}
                       >
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 relative ${
-                          isSelected ? 'bg-primary-foreground/20' : 'bg-muted/50'
+                        {isSelected && (
+                          <>
+                            <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/10 to-transparent animate-shimmer" />
+                            <div className="absolute inset-0 bg-primary/20 blur-xl" />
+                          </>
+                        )}
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 relative z-10 ${
+                          isSelected ? 'bg-primary-foreground/20 scale-110' : 'bg-muted/50'
                         }`}>
-                          <IconComponent className="w-6 h-6 relative z-10" />
+                          <IconComponent className="w-6 h-6" />
                         </div>
                         <span className="text-base relative z-10">{topic.label}</span>
                         {isSelected && (
@@ -326,24 +336,23 @@ const Home = () => {
                         key={`${topic.id}-duplicate`}
                         onClick={() => handleTopicSelect(topic.id)}
                         className={cn(
-                          "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap relative overflow-visible",
-                          "transition-all duration-500 ease-out border-2 shadow-lg",
+                          "flex items-center gap-3 px-6 py-4 rounded-xl text-base font-bold whitespace-nowrap relative overflow-hidden",
+                          "transition-all duration-500 ease-out border-2",
                           isSelected
-                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary text-primary-foreground shadow-xl shadow-primary/30 scale-110 border-primary/50 hover:brightness-110 hover:scale-[1.15]' 
-                            : 'border-border/60 text-foreground hover:border-primary/60 hover:bg-primary/10 hover:shadow-primary/20 bg-card/90 backdrop-blur-sm hover:scale-105 hover:shadow-xl'
+                            ? 'bg-gradient-to-r from-primary via-primary/90 to-primary text-primary-foreground shadow-[0_0_25px_rgba(0,255,145,0.5)] border-primary scale-110 animate-pulse-gentle' 
+                            : 'border-border/60 text-foreground hover:border-primary/60 hover:shadow-[0_0_15px_rgba(0,255,145,0.2)] bg-card/90 backdrop-blur-sm hover:scale-105'
                         )}
-                        style={{ animationDelay: `${(index + topicFilters.length) * 50}ms` }}
                       >
                         {isSelected && (
-                          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent animate-shimmer rounded-xl" />
+                          <>
+                            <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/10 to-transparent animate-shimmer" />
+                            <div className="absolute inset-0 bg-primary/20 blur-xl" />
+                          </>
                         )}
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 hover:rotate-12 hover:scale-110 relative overflow-hidden ${
-                          isSelected ? 'bg-primary-foreground/20' : ''
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 relative z-10 ${
+                          isSelected ? 'bg-primary-foreground/20 scale-110' : 'bg-muted/50'
                         }`}>
-                          {!isSelected && (
-                            <div className={`absolute inset-0 opacity-40 ${animationClass}`}></div>
-                          )}
-                          <IconComponent className="w-6 h-6 relative z-10" />
+                          <IconComponent className="w-6 h-6" />
                         </div>
                         <span className="text-base">{topic.label}</span>
                         {isSelected && (

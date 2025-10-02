@@ -242,6 +242,15 @@ const AdminFast = () => {
     try {
       const isPausing = !pool.paused;
       
+      // Update UI immediately for instant feedback
+      setPools(prevPools => 
+        prevPools.map(p => 
+          p.asset_symbol === pool.asset_symbol 
+            ? { ...p, paused: isPausing }
+            : p
+        )
+      );
+      
       // If pausing, refund users first
       if (isPausing) {
         toast({
@@ -304,6 +313,8 @@ const AdminFast = () => {
         description: "Falha ao pausar/retomar pool",
         variant: "destructive"
       });
+      // Revert optimistic update on error
+      fetchGeneralPoolConfigs();
     }
   };
 

@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, Settings, Users, FileText, Newspaper, DollarSign, Activity, 
-  CreditCard, Banknote, Wallet, Menu, LogOut, Zap
+  CreditCard, Banknote, Wallet, Menu, LogOut, Zap, Gift
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -89,6 +89,12 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
       title: 'Logs', 
       icon: Activity, 
       path: '/admin/logs'
+    },
+    { 
+      title: 'Recompensas', 
+      icon: Gift, 
+      path: '/admin/rewards',
+      color: 'text-yellow-500 hover:text-yellow-400'
     }
   ];
 

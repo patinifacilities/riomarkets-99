@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import Home from '@/pages/Home';
@@ -49,6 +49,8 @@ import { Toaster } from '@/components/ui/sonner';
 import { track } from '@/lib/analytics';
 import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorModal';
 
+const AdminRewards = lazy(() => import('@/pages/AdminRewards'));
+
 function App() {
   useEffect(() => {
     // Track page view
@@ -92,6 +94,7 @@ function App() {
             <Route path="/admin/fast/algorithm" element={<AdminAlgorithm />} />
             <Route path="/admin/gateway-config/:gatewayId" element={<AdminGatewayConfig />} />
             <Route path="/admin/gateways-saque" element={<AdminGatewaysSaque />} />
+            <Route path="/admin/rewards" element={<AdminRewards />} />
           <Route path="/opinioes" element={<Opinioes />} />
           <Route path="/rewards" element={<Rewards />} />
           <Route path="/fiat-requests" element={<FiatRequests />} />

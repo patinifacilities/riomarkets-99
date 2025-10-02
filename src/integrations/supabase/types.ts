@@ -1153,6 +1153,42 @@ export type Database = {
           },
         ]
       }
+      reward_milestones: {
+        Row: {
+          created_at: string | null
+          days_required: number
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          reward_amount: number
+          reward_description: string | null
+          reward_title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          days_required: number
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          reward_amount: number
+          reward_description?: string | null
+          reward_title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          days_required?: number
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          reward_amount?: number
+          reward_description?: string | null
+          reward_title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       settings: {
         Row: {
           cashout_fee_percent: number | null

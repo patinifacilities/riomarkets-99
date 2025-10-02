@@ -210,6 +210,15 @@
     }
   }
 
+  @keyframes scan-line {
+    0% { transform: translateY(-100vh); }
+    100% { transform: translateY(100vh); }
+  }
+
+  .animate-scan-line {
+    animation: scan-line 8s linear infinite;
+  }
+
   /* Ticker animation */
   @keyframes scroll-right {
     0% {
