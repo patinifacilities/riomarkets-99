@@ -942,7 +942,7 @@ const Fast = () => {
           
           {/* Category Selector */}
           <div className="flex justify-center items-center mb-6 overflow-x-auto scrollbar-hide px-2">
-            <div className="flex gap-1 md:gap-2 p-1 bg-muted rounded-xl w-full md:w-auto md:inline-flex justify-start md:justify-center">
+            <div className="flex gap-1 md:gap-2 p-1 bg-muted rounded-xl w-full md:w-auto md:inline-flex justify-between md:justify-center">
               {categoryOptions.map((category) => (
                 <Button
                   key={category.value}
@@ -950,8 +950,8 @@ const Fast = () => {
                   size="lg"
                   onClick={() => setSelectedCategory(category.value)}
                   className={cn(
-                    "transition-all duration-75 font-bold rounded-xl flex-shrink-0",
-                    "px-4 py-2 text-xs md:px-10 md:py-6 md:text-base",
+                    "transition-all duration-75 font-bold rounded-xl flex-1 md:flex-initial",
+                    "px-2 py-2 text-xs md:px-10 md:py-6 md:text-base",
                     selectedCategory === category.value 
                       ? "shadow-lg border-2 scale-105" 
                       : "hover:bg-muted-foreground/10"
@@ -962,10 +962,10 @@ const Fast = () => {
                     borderColor: category.bgColor
                   } : {}}
                 >
-                  <div className={cn("flex items-center", category.iconGap || "gap-1")}>
+                  <div className={cn("flex items-center justify-center", category.iconGap || "gap-1")}>
                     <span className="text-sm md:text-base">{category.icon}</span>
                     <span className="hidden sm:inline">{category.label === 'Commodities' ? 'Commod' : category.label}</span>
-                    <span className="sm:hidden">{category.label.slice(0, 3)}</span>
+                    <span className="sm:hidden text-[10px]">{category.label === 'Commodities' ? 'Com' : category.label.slice(0, 5)}</span>
                   </div>
                 </Button>
               ))}
