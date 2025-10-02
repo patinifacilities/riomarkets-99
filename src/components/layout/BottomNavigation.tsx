@@ -19,8 +19,8 @@ const BottomNavigation = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden pb-[env(safe-area-inset-bottom)]">
-      <div className="flex items-center justify-between px-2 h-16 relative">
-        {visibleItems.map((item, index) => {
+      <div className="flex items-center justify-around px-4 h-16 relative">
+        {visibleItems.map((item) => {
           const isActive = item.href === '/' 
             ? (location.pathname === '/' || location.pathname.startsWith('/market/'))
             : location.pathname === item.href;
@@ -48,24 +48,15 @@ const BottomNavigation = () => {
             );
           }
 
-          // Position first item (Mercados) on far left, second (Carteira) slightly right
-          // Position third item (Ranking) slightly left, fourth (Perfil) on far right
-          let positionClass = "";
-          if (index === 0) positionClass = "mr-auto"; // Mercados - far left
-          if (index === 1) positionClass = ""; // Carteira - will be positioned between left and center
-          if (index === 2) positionClass = ""; // Ranking - will be positioned between center and right
-          if (index === 3) positionClass = "ml-auto"; // Perfil - far right
-
           return (
             <Link
               key={item.href}
               to={item.href}
               className={cn(
-                "flex flex-col items-center justify-center h-full gap-1 transition-colors",
+                "flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors",
                 isActive 
                   ? "text-primary" 
-                  : "text-muted-foreground hover:text-foreground",
-                positionClass
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               <item.icon className="w-5 h-5" />

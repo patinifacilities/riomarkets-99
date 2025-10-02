@@ -43,6 +43,7 @@ export interface Market {
   market_type?: MarketType;
   icon_url?: string;
   photo_url?: string;
+  image_url?: string;
 }
 
 export interface MarketOption {

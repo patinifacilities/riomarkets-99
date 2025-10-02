@@ -79,27 +79,16 @@ const MarketCard = ({ market }: MarketCardProps) => {
           </div>
         </div>
 
-        {/* Market Icon */}
-        {market.icon_url && (
-          <div className="flex justify-center mb-2">
-            <div className="w-16 h-16 rounded-full overflow-hidden bg-muted flex items-center justify-center">
-              <img 
-                src={market.icon_url} 
-                alt={`${market.titulo} icon`}
-                className="w-full h-full object-cover"
-              />
-            </div>
+        {/* Market Image - Only show if image_url exists */}
+        {market.image_url && (
+          <div className="aspect-[16/7] rounded-lg overflow-hidden bg-muted">
+            <img 
+              src={market.image_url} 
+              alt={market.titulo}
+              className="w-full h-full object-cover"
+            />
           </div>
         )}
-
-        {/* Market Image */}
-        <div className="aspect-[16/7] rounded-lg overflow-hidden bg-muted">
-          <img 
-            src={market.thumbnail_url || `https://picsum.photos/400/175?random=${market.id}`} 
-            alt={market.titulo}
-            className="w-full h-full object-cover"
-          />
-        </div>
 
         {/* Title */}
         <Link to={`/market/${market.id}`} className="block">
