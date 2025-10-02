@@ -197,13 +197,54 @@ const AdminAlgorithm = () => {
                         : 'Odds decrescem conforme o tempo do pool passa'}
                     </p>
                   </div>
-                  <Switch
+                   <Switch
                     id="algorithm-type"
                     checked={algorithmConfig.algorithm_type === 'price_based'}
-                    onCheckedChange={(checked) => setAlgorithmConfig({
-                      ...algorithmConfig,
-                      algorithm_type: checked ? 'price_based' : 'dynamic'
-                    })}
+                    onCheckedChange={async (checked) => {
+                      const newConfig = {
+                        ...algorithmConfig,
+                        algorithm_type: checked ? 'price_based' : 'dynamic'
+                      };
+                      setAlgorithmConfig(newConfig);
+                      
+                      // Auto-save immediately when algorithm type changes
+                      try {
+                        const { data: existing } = await supabase
+                          .from('fast_pool_algorithm_config')
+                          .select('id')
+                          .order('updated_at', { ascending: false })
+                          .limit(1)
+                          .single();
+
+                        if (existing) {
+                          await supabase
+                            .from('fast_pool_algorithm_config')
+                            .update(newConfig)
+                            .eq('id', existing.id);
+                        } else {
+                          await supabase
+                            .from('fast_pool_algorithm_config')
+                            .insert([newConfig]);
+                        }
+
+                        toast({
+                          title: "Algoritmo atualizado",
+                          description: "As configurações foram aplicadas imediatamente aos pools ativos",
+                          duration: 2000,
+                        });
+                        
+                        // Update initial config to reflect saved state
+                        setInitialConfig(newConfig);
+                        setHasChanges(false);
+                      } catch (error) {
+                        console.error('Error auto-saving algorithm:', error);
+                        toast({
+                          title: "Erro ao salvar",
+                          description: "Não foi possível salvar as configurações",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
                     className="data-[state=checked]:bg-white data-[state=unchecked]:bg-gray-900 border-2 border-white"
                   />
                 </div>

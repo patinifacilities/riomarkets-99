@@ -78,7 +78,9 @@ const AssetDetail = () => {
           table: 'fast_pools',
           filter: `asset_symbol=eq.${assetSymbol}`
         },
-        () => {
+        (payload) => {
+          console.log('🔄 Pool update detected:', payload);
+          // Reload immediately when pool is updated (including opening_price adjustments)
           loadPoolData();
           loadPoolHistory();
         }
