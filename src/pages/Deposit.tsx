@@ -1,21 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, CreditCard, DollarSign, Smartphone } from "lucide-react";
+import { ArrowLeft, CreditCard, Lock, Save, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Deposit() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { session } = useAuth();
+  const { session, user, loading } = useAuth();
   const [amount, setAmount] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<"card" | "pix" | "apple" | null>(null);
+  const [showCardForm, setShowCardForm] = useState(false);
+  const [cardData, setCardData] = useState({
+    number: '',
+    name: '',
+    expiry: '',
+    cvv: '',
+    cpf: '',
+  });
+  const [saveCard, setSaveCard] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      toast.error("Você precisa estar logado para fazer um depósito");
+      navigate("/auth");
+    }
+  }, [user, loading, navigate]);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^\d]/g, "");
@@ -29,6 +46,62 @@ export default function Deposit() {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
+  };
+
+  const formatCardNumber = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    const formatted = numbers.match(/.{1,4}/g)?.join(' ') || numbers;
+    return formatted.slice(0, 19);
+  };
+
+  const formatExpiry = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 2) return numbers;
+    return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}`;
+  };
+
+  const formatCPF = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 11) {
+      return numbers
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    }
+    return value;
+  };
+
+  const handleCardFormSubmit = async () => {
+    if (!cardData.number || !cardData.name || !cardData.expiry || !cardData.cvv || !cardData.cpf) {
+      toast.error("Por favor, preencha todos os campos do cartão");
+      return;
+    }
+
+    if (cardData.cpf.replace(/\D/g, '').length !== 11) {
+      toast.error("Por favor, insira um CPF válido");
+      return;
+    }
+
+    setIsProcessing(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const numericAmount = parseFloat(amount) / 100;
+      toast.success("Pagamento processado!", {
+        description: `Depósito de R$ ${numericAmount.toFixed(2)} realizado com sucesso.`,
+      });
+
+      if (saveCard) {
+        toast.success("Cartão salvo para futuros pagamentos");
+      }
+      
+      navigate('/wallet');
+    } catch (error) {
+      toast.error("Erro no pagamento. Tente novamente.");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleDeposit = async (method: "card" | "pix" | "apple") => {
@@ -51,13 +124,9 @@ export default function Deposit() {
 
     try {
       if (method === "card") {
-        // Navigate to card payment page
-        navigate("/card-payment", {
-          state: {
-            amount: numericAmount,
-            returnPath: location.pathname,
-          },
-        });
+        setShowCardForm(true);
+        setIsProcessing(false);
+        return;
       } else if (method === "pix") {
         // Create PIX payment request
         const { data, error } = await supabase.functions.invoke("process-fiat-request", {
@@ -91,6 +160,14 @@ export default function Deposit() {
     }
   };
 
+  if (loading) {
+    return null;
+  }
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-background pt-20 pb-8 px-4">
       <div className="max-w-2xl mx-auto">
@@ -104,7 +181,7 @@ export default function Deposit() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
           </Button>
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
             Adicionar Saldo
           </h1>
           <p className="text-muted-foreground">
@@ -144,7 +221,7 @@ export default function Deposit() {
 
           {/* Quick Amount Buttons */}
           <div className="grid grid-cols-3 gap-2 mb-4">
-            {[10, 50, 100].map((value) => (
+            {[100, 500, 1000].map((value) => (
               <Button
                 key={value}
                 variant="outline"
@@ -170,8 +247,8 @@ export default function Deposit() {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 border border-violet-500/30">
-                  <CreditCard className="w-6 h-6 text-violet-400" />
+                <div className="p-3 rounded-xl bg-gray-800 border border-gray-700">
+                  <CreditCard className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-base">Cartão de Crédito/Débito</h3>
@@ -182,6 +259,152 @@ export default function Deposit() {
                 <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
               )}
             </div>
+
+            {/* Expanded Card Form */}
+            {selectedMethod === "card" && showCardForm && (
+              <div className="mt-6 pt-6 border-t border-border space-y-4 animate-scale-in">
+                {/* Card Preview */}
+                <div className="relative overflow-hidden bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 p-6 rounded-2xl text-white shadow-2xl">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/10 to-transparent" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.1),transparent)]" />
+                  
+                  <div className="relative z-10">
+                    <div className="flex justify-between items-start mb-8">
+                      <div className="w-12 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded shadow-lg"></div>
+                      <CreditCard className="w-8 h-8 opacity-50" />
+                    </div>
+                    <div className="space-y-4">
+                      <div className="text-xl tracking-wider font-mono drop-shadow-lg">
+                        {cardData.number || '•••• •••• •••• ••••'}
+                      </div>
+                      <div className="flex justify-between items-end">
+                        <div>
+                          <div className="text-xs opacity-70 mb-1">Nome do titular</div>
+                          <div className="text-sm font-medium uppercase drop-shadow">
+                            {cardData.name || 'NOME DO TITULAR'}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-xs opacity-70 mb-1">Validade</div>
+                          <div className="text-sm font-medium">
+                            {cardData.expiry || 'MM/AA'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Form Fields */}
+                <div>
+                  <Label htmlFor="cardNumber">Número do cartão</Label>
+                  <Input
+                    id="cardNumber"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="1234 5678 9012 3456"
+                    value={cardData.number}
+                    onChange={(e) => setCardData(prev => ({ 
+                      ...prev, 
+                      number: formatCardNumber(e.target.value) 
+                    }))}
+                    maxLength={19}
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="cardName">Nome do titular</Label>
+                  <Input
+                    id="cardName"
+                    type="text"
+                    placeholder="Nome como está no cartão"
+                    value={cardData.name}
+                    onChange={(e) => setCardData(prev => ({ 
+                      ...prev, 
+                      name: e.target.value.toUpperCase() 
+                    }))}
+                    className="mt-1"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="expiry">Validade</Label>
+                    <Input
+                      id="expiry"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="MM/AA"
+                      value={cardData.expiry}
+                      onChange={(e) => setCardData(prev => ({ 
+                        ...prev, 
+                        expiry: formatExpiry(e.target.value) 
+                      }))}
+                      maxLength={5}
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="cvv">CVV</Label>
+                    <Input
+                      id="cvv"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="123"
+                      value={cardData.cvv}
+                      onChange={(e) => setCardData(prev => ({ 
+                        ...prev, 
+                        cvv: e.target.value.replace(/\D/g, '').slice(0, 4) 
+                      }))}
+                      maxLength={4}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="cpf">CPF do titular</Label>
+                  <Input
+                    id="cpf"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="000.000.000-00"
+                    value={cardData.cpf}
+                    onChange={(e) => setCardData(prev => ({ 
+                      ...prev, 
+                      cpf: formatCPF(e.target.value) 
+                    }))}
+                    maxLength={14}
+                    className="mt-1"
+                  />
+                </div>
+
+                <div className="flex items-center space-x-2 pt-2">
+                  <Checkbox 
+                    id="saveCard" 
+                    checked={saveCard}
+                    onCheckedChange={(checked) => setSaveCard(checked as boolean)}
+                  />
+                  <Label 
+                    htmlFor="saveCard" 
+                    className="text-sm font-normal cursor-pointer flex items-center gap-2"
+                  >
+                    <Save className="w-4 h-4" />
+                    Salvar cartão para futuros pagamentos
+                  </Label>
+                </div>
+
+                <Button
+                  onClick={handleCardFormSubmit}
+                  disabled={isProcessing}
+                  className="w-full h-12 text-base font-semibold bg-[#00ff90] hover:bg-[#00ff90]/90 text-gray-800"
+                >
+                  {isProcessing ? "Processando..." : `Pagar R$ ${formatCurrencyDisplay(amount)}`}
+                </Button>
+              </div>
+            )}
           </Card>
 
           {/* PIX */}
@@ -215,28 +438,33 @@ export default function Deposit() {
         </div>
 
         {/* Deposit Button */}
-        <Button
-          onClick={() => selectedMethod && handleDeposit(selectedMethod)}
-          disabled={!amount || parseFloat(amount) / 100 < 5 || isProcessing || !selectedMethod}
-          className="w-full h-14 text-lg font-semibold mt-8 bg-gradient-to-r from-yellow-500 via-yellow-600 to-amber-600 hover:from-yellow-600 hover:via-yellow-700 hover:to-amber-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-yellow-400/50 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isProcessing ? "Processando..." : "Continuar com Depósito"}
-        </Button>
+        {!showCardForm && (
+          <Button
+            onClick={() => selectedMethod && handleDeposit(selectedMethod)}
+            disabled={!amount || parseFloat(amount) / 100 < 5 || isProcessing || !selectedMethod}
+            className="w-full h-14 text-lg font-semibold mt-8 bg-[#00ff90] hover:bg-[#00ff90]/90 text-gray-800 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isProcessing ? "Processando..." : "Continuar com Depósito"}
+          </Button>
+        )}
 
         {/* Apple Pay Button */}
-        <Button
-          onClick={() => handleDeposit("apple")}
-          disabled={!amount || parseFloat(amount) / 100 < 5 || isProcessing}
-          className="w-full h-14 text-lg font-semibold mt-3 bg-black hover:bg-black/90 text-white shadow-lg hover:shadow-xl transition-all duration-200 border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-          </svg>
-          {isProcessing ? "Processando..." : "Pagar com Apple Pay"}
-        </Button>
+        {!showCardForm && (
+          <Button
+            onClick={() => handleDeposit("apple")}
+            disabled={!amount || parseFloat(amount) / 100 < 5 || isProcessing}
+            className="w-full h-14 text-lg font-semibold mt-3 bg-black hover:bg-black/90 text-white shadow-lg hover:shadow-xl transition-all duration-200 border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+          >
+            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+            </svg>
+            Apple Pay
+          </Button>
+        )}
 
         {/* Security Notice */}
-        <div className="mt-6 p-4 rounded-lg bg-muted/50 border border-border">
+        <div className="mt-6 p-4 rounded-lg bg-muted/50 border border-border flex items-center justify-center gap-3">
+          <Lock className="w-5 h-5 text-muted-foreground" />
           <p className="text-sm text-muted-foreground text-center">
             Seus dados estão protegidos com criptografia de ponta a ponta
           </p>
