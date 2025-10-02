@@ -213,13 +213,13 @@ const Home = () => {
           {/* CTAs duplos */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-6 md:mt-8">
             <Button 
-              className="bg-[#00FF91] text-black hover:brightness-110 h-12 px-8 text-base font-semibold"
+              className="bg-gradient-to-r from-yellow-500 via-yellow-600 to-amber-600 hover:from-yellow-600 hover:via-yellow-700 hover:to-amber-700 text-white font-semibold h-12 px-8 text-base shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-yellow-400/50"
               onClick={() => {
                 track('hero_cta_click', { cta_type: 'explore_markets' });
                 document.getElementById('markets-section')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              Explorar mercados
+              ⭐ Explorar mercados
             </Button>
             <OnboardingTrigger 
               variant="outline" 

@@ -90,11 +90,11 @@ const AdminGateways = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex overflow-x-hidden">
       <AdminSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       
-      <div className="flex-1 lg:ml-0">
-        <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="flex-1 lg:ml-0 overflow-x-hidden">
+        <div className="max-w-6xl mx-auto px-4 py-8 overflow-x-hidden">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <Link to="/admin" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-2">
