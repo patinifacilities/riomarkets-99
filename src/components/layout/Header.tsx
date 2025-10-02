@@ -148,33 +148,44 @@ const Header = () => {
                   {isLoggedIn && profile && (
                     <div className="border-b border-border pb-4 mb-4">
                       <div 
-                        className="flex items-center gap-3 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-primary/20 cursor-pointer hover:bg-primary/15 transition-colors"
+                        className="relative overflow-hidden rounded-xl cursor-pointer group"
                         onClick={() => {
                           setMobileMenuOpen(false);
                           navigate('/profile');
                         }}
                       >
-                        <Avatar className="h-12 w-12 ring-2 ring-primary/20">
-                          {profile.profile_pic_url ? (
-                            <img 
-                              src={profile.profile_pic_url} 
-                              alt={profile.nome || 'Usuário'} 
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <AvatarFallback className="bg-primary text-primary-foreground">
-                              {profile.nome ? profile.nome.charAt(0).toUpperCase() : 'U'}
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
-                        <div>
-                          <p className="text-sm font-medium">{profile.nome || 'Usuário'}</p>
-                          <p className="text-sm text-muted-foreground capitalize">{profile.nivel || 'iniciante'}</p>
-                          <div className="text-xs text-primary font-medium mt-1">
-                            {profile.saldo_moeda >= 1000 
-                              ? Math.floor(profile.saldo_moeda).toLocaleString('pt-BR') 
-                              : (profile.saldo_moeda || 0).toLocaleString('pt-BR')
-                            } RZ
+                        {/* Animated gradient background */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-accent/20 opacity-70 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-transparent animate-shimmer" />
+                        
+                        {/* Content */}
+                        <div className="relative p-4 flex items-center gap-3">
+                          <Avatar className="h-14 w-14 ring-2 ring-primary/30 ring-offset-2 ring-offset-background">
+                            {profile.profile_pic_url ? (
+                              <img 
+                                src={profile.profile_pic_url} 
+                                alt={profile.nome || 'Usuário'} 
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-primary-foreground text-lg font-bold">
+                                {profile.nome ? profile.nome.charAt(0).toUpperCase() : 'U'}
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
+                          <div className="flex-1">
+                            <p className="text-base font-bold text-foreground">{profile.nome || 'Usuário'}</p>
+                            <p className="text-xs text-muted-foreground capitalize font-medium">{profile.nivel || 'iniciante'}</p>
+                            <div className="mt-1.5 flex items-center gap-1.5">
+                              <div className="px-2 py-0.5 rounded-full bg-primary/20 border border-primary/30">
+                                <span className="text-xs text-primary font-bold">
+                                  {profile.saldo_moeda >= 1000 
+                                    ? Math.floor(profile.saldo_moeda).toLocaleString('pt-BR') 
+                                    : (profile.saldo_moeda || 0).toLocaleString('pt-BR')
+                                  } RZ
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>

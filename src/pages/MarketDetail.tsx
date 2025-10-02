@@ -325,12 +325,12 @@ const MarketDetail = () => {
                        </div>
                      )}
                      
-                         {selectedOption && betAmount && betAmount > 0 && (
-                           <div className="w-full mt-4" data-confirm-area>
-                             <SliderConfirm
-                              selectedOption={selectedOption}
-                              disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
-                              onProgressChange={(progress) => setSliderProgress(progress)}
+                     {selectedOption && betAmount > 0 && (
+                       <div className="w-full mt-4 block" data-confirm-area>
+                         <SliderConfirm
+                          selectedOption={selectedOption}
+                          disabled={market.status !== 'aberto' || !selectedOption || betAmount <= 0}
+                          onProgressChange={(progress) => setSliderProgress(progress)}
                             onConfirm={async () => {
                               if (!authUser?.id) {
                                 toast({

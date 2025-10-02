@@ -173,7 +173,7 @@ export const ExchangeWidget = () => {
       });
 
       toast({
-        title: "✨ Conversão realizada!",
+        title: "✅ Conversão realizada com sucesso!",
         description: (
           <div className="flex flex-col gap-2">
             <p className="font-medium">{activeTab === 'buy_rioz' ? 'Compra' : 'Venda'} executada com sucesso.</p>
@@ -183,7 +183,7 @@ export const ExchangeWidget = () => {
             </div>
           </div>
         ),
-        className: "border-l-4 border-[#00ff90] bg-card/95 backdrop-blur",
+        className: "border-l-4 border-[#00ff90] bg-gradient-to-r from-[#00ff90]/10 to-transparent backdrop-blur",
       });
 
       setInputAmount('');
@@ -201,7 +201,7 @@ export const ExchangeWidget = () => {
       });
 
       toast({
-        title: "Erro na conversão",
+        title: "❌ Erro na conversão",
         description: error instanceof Error ? error.message : 'Erro desconhecido',
         variant: "destructive",
       });
@@ -460,11 +460,11 @@ export const ExchangeWidget = () => {
           {showFastMarkets && (
             <Button
               onClick={() => navigate('/fast')}
-              className="w-full relative overflow-hidden group bg-gradient-to-r from-[#ff2389] via-[#ff2389] to-primary hover:opacity-90 transition-all animate-pulse-glow"
+              className="w-full relative overflow-hidden group bg-gradient-to-r from-[#ff2389] via-[#ff2389] to-[#ff2389] hover:opacity-90 transition-all border-2 border-[#ff2389]/50 shadow-lg shadow-[#ff2389]/20"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
-              <Zap className="w-4 h-4 mr-2 relative z-10" />
-              <span className="relative z-10">Explorar Fast Markets</span>
+              <Zap className="w-4 h-4 mr-2 relative z-10 text-white" />
+              <span className="relative z-10 font-semibold text-white">Explorar Fast Markets</span>
             </Button>
           )}
         </CardContent>

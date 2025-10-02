@@ -85,16 +85,24 @@ const WalletPage = () => {
             </p>
           </div>
           
-          <Button
-            onClick={() => navigate('/withdraw')}
-            variant="default"
-            size="sm"
-            className="gap-2"
-            disabled={profile?.is_blocked}
-          >
-            <DollarSign className="w-4 h-4" />
-            Saque
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              className="bg-gradient-to-r from-yellow-500 via-yellow-600 to-amber-600 hover:from-yellow-600 hover:via-yellow-700 hover:to-amber-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-yellow-400/50"
+              onClick={() => navigate('/profile')}
+            >
+              <span className="relative z-10">Upgrade para Gold Pass</span>
+            </Button>
+            <Button
+              onClick={() => navigate('/withdraw')}
+              variant="default"
+              size="sm"
+              className="gap-2"
+              disabled={profile?.is_blocked}
+            >
+              <DollarSign className="w-4 h-4" />
+              Saque
+            </Button>
+          </div>
         </div>
 
         {/* Main Grid Layout */}
@@ -121,8 +129,16 @@ const WalletPage = () => {
             {/* 4. Recent Wins (Fast Markets / Ganhos Recentes) */}
             <RecentWinsCard />
             
-            {/* 5. Completed Orders (Opiniões Concluídas) - Last */}
+            {/* 5. Completed Orders (Opiniões Concluídas) */}
             <CompletedOrdersCard />
+            
+            {/* 6. Gold Pass Button - Mobile only */}
+            <Button 
+              className="w-full bg-gradient-to-r from-yellow-500 via-yellow-600 to-amber-600 hover:from-yellow-600 hover:via-yellow-700 hover:to-amber-700 text-white font-semibold py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-yellow-400/50"
+              onClick={() => navigate('/profile')}
+            >
+              <span className="relative z-10">Upgrade para Gold Pass</span>
+            </Button>
           </div>
           
           {/* Desktop Layout */}
