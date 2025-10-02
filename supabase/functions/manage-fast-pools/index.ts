@@ -33,6 +33,9 @@ serve(async (req) => {
       case 'finalize_pool':
         const { poolId } = requestBody;
         return await finalizePool(supabase, poolId);
+      case 'adjust_opening_price':
+        const { poolId: adjustPoolId } = requestBody;
+        return await adjustOpeningPrice(supabase, adjustPoolId);
       default:
         throw new Error('Invalid action');
     }
@@ -424,6 +427,51 @@ function getFallbackPriceForSymbol(symbol: string): number {
     'AMZN': 185.25
   };
   return fallbackPrices[symbol as keyof typeof fallbackPrices] || 100;
+}
+
+async function adjustOpeningPrice(supabase: any, poolId: string) {
+  // Get pool data
+  const { data: pool, error: poolError } = await supabase
+    .from('fast_pools')
+    .select('asset_symbol')
+    .eq('id', poolId)
+    .single();
+
+  if (poolError) throw poolError;
+  if (!pool) throw new Error('Pool not found');
+
+  // Get current real-time price for this asset
+  const { data: marketData } = await supabase.functions.invoke('get-market-data', {
+    body: { symbols: [pool.asset_symbol] }
+  });
+  
+  const currentPrice = marketData?.prices?.[pool.asset_symbol] || getFallbackPriceForSymbol(pool.asset_symbol);
+
+  console.log(`Adjusting opening price for pool ${poolId} to ${currentPrice}`);
+
+  // Update the opening price to the current real-time price
+  const { error: updateError } = await supabase
+    .from('fast_pools')
+    .update({
+      opening_price: currentPrice
+    })
+    .eq('id', poolId);
+
+  if (updateError) throw updateError;
+
+  return new Response(
+    JSON.stringify({ 
+      success: true,
+      pool_id: poolId,
+      new_opening_price: currentPrice
+    }),
+    { 
+      headers: { 
+        ...corsHeaders, 
+        'Content-Type': 'application/json' 
+      } 
+    }
+  );
 }
 
 async function createAllCategoriesPools(supabase: any) {

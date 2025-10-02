@@ -158,6 +158,37 @@ const AssetDetail = () => {
     }
   };
 
+  // Adjust opening price when lockout ends
+  useEffect(() => {
+    if (!currentPool) return;
+
+    const startTime = new Date(currentPool.round_start_time).getTime();
+    const lockoutTime = 15000; // 15 seconds default lockout
+    const lockoutEndTime = startTime + lockoutTime;
+    const now = Date.now();
+    const timeUntilLockoutEnd = lockoutEndTime - now;
+
+    if (timeUntilLockoutEnd > 0 && timeUntilLockoutEnd <= lockoutTime) {
+      const timer = setTimeout(async () => {
+        console.log('🔄 Adjusting opening price after lockout...');
+        try {
+          await supabase.functions.invoke('manage-fast-pools', {
+            body: {
+              action: 'adjust_opening_price',
+              poolId: currentPool.id
+            }
+          });
+          // Reload pool to get updated opening price
+          loadPoolData();
+        } catch (error) {
+          console.error('Error adjusting opening price:', error);
+        }
+      }, timeUntilLockoutEnd);
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentPool]);
+
   useEffect(() => {
     if (!currentPool) return;
 
