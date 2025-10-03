@@ -1216,6 +1216,36 @@ export type Database = {
         }
         Relationships: []
       }
+      slider_config: {
+        Row: {
+          custom_images: Json | null
+          id: string
+          selected_market_ids: string[] | null
+          slide_order: string[] | null
+          slider_delay_seconds: number | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          custom_images?: Json | null
+          id?: string
+          selected_market_ids?: string[] | null
+          slide_order?: string[] | null
+          slider_delay_seconds?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          custom_images?: Json | null
+          id?: string
+          selected_market_ids?: string[] | null
+          slide_order?: string[] | null
+          slider_delay_seconds?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       support_tickets: {
         Row: {
           admin_notes: string | null

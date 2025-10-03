@@ -1,21 +1,132 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, X, Image as ImageIcon, GripVertical } from 'lucide-react';
+import { ArrowLeft, Plus, X, Image as ImageIcon, GripVertical, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useMarkets } from '@/hooks/useMarkets';
 import { Checkbox } from '@/components/ui/checkbox';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { cn } from '@/lib/utils';
+
+interface CustomImage {
+  id: string;
+  url: string;
+  title: string;
+}
+
+interface SlideItem {
+  id: string;
+  type: 'market' | 'image';
+  marketId?: string;
+  imageUrl?: string;
+  title?: string;
+}
 
 const AdminSlider = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { data: markets = [] } = useMarkets('all');
   const [selectedMarkets, setSelectedMarkets] = useState<string[]>([]);
-  const [customImages, setCustomImages] = useState<Array<{ id: string; url: string; title: string }>>([]);
+  const [customImages, setCustomImages] = useState<CustomImage[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newImageTitle, setNewImageTitle] = useState('');
   const [sliderDelay, setSliderDelay] = useState(7);
+  const [slideOrder, setSlideOrder] = useState<SlideItem[]>([]);
+  const [configId, setConfigId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Load existing config
+  useEffect(() => {
+    loadSliderConfig();
+  }, []);
+
+  // Update slide order when markets or images change
+  useEffect(() => {
+    updateSlideOrder();
+  }, [selectedMarkets, customImages]);
+
+  const loadSliderConfig = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('slider_config')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setConfigId(data.id);
+        setSelectedMarkets(Array.isArray(data.selected_market_ids) ? data.selected_market_ids : []);
+        
+        const customImgs = Array.isArray(data.custom_images) 
+          ? (data.custom_images as unknown as CustomImage[])
+          : [];
+        setCustomImages(customImgs);
+        setSliderDelay(data.slider_delay_seconds || 7);
+        
+        // Reconstruct slide order
+        const orderIds = Array.isArray(data.slide_order) ? data.slide_order as string[] : [];
+        const order: SlideItem[] = orderIds.map((id: string) => {
+          if (id.startsWith('custom-')) {
+            const img = customImgs.find((i) => i.id === id);
+            return {
+              id,
+              type: 'image' as const,
+              imageUrl: img?.url,
+              title: img?.title
+            };
+          } else {
+            return {
+              id,
+              type: 'market' as const,
+              marketId: id
+            };
+          }
+        }).filter((item: SlideItem) => item.imageUrl || item.marketId);
+        
+        setSlideOrder(order);
+      }
+    } catch (error) {
+      console.error('Error loading slider config:', error);
+    }
+  };
+
+  const updateSlideOrder = () => {
+    const newOrder: SlideItem[] = [];
+    
+    // Add selected markets that aren't already in the order
+    selectedMarkets.forEach(marketId => {
+      if (!slideOrder.find(s => s.id === marketId)) {
+        newOrder.push({ id: marketId, type: 'market', marketId });
+      }
+    });
+    
+    // Add custom images that aren't already in the order
+    customImages.forEach(img => {
+      if (!slideOrder.find(s => s.id === img.id)) {
+        newOrder.push({ 
+          id: img.id, 
+          type: 'image', 
+          imageUrl: img.url, 
+          title: img.title 
+        });
+      }
+    });
+    
+    // Keep existing order and add new items
+    const existingValidItems = slideOrder.filter(item => 
+      (item.type === 'market' && selectedMarkets.includes(item.id)) ||
+      (item.type === 'image' && customImages.find(img => img.id === item.id))
+    );
+    
+    setSlideOrder([...existingValidItems, ...newOrder]);
+  };
 
   const handleToggleMarket = (marketId: string) => {
     setSelectedMarkets(prev => 
@@ -41,10 +152,63 @@ const AdminSlider = () => {
     setCustomImages(prev => prev.filter(img => img.id !== id));
   };
 
-  const handleSave = () => {
-    // TODO: Implement save to database
-    console.log('Selected markets:', selectedMarkets);
-    console.log('Custom images:', customImages);
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const slideOrderIds = slideOrder.map(s => s.id);
+      
+      const payload = {
+        selected_market_ids: selectedMarkets,
+        custom_images: customImages as any,
+        slider_delay_seconds: sliderDelay,
+        slide_order: slideOrderIds,
+        updated_at: new Date().toISOString()
+      };
+
+      let result;
+      if (configId) {
+        result = await supabase
+          .from('slider_config')
+          .update(payload)
+          .eq('id', configId);
+      } else {
+        result = await supabase
+          .from('slider_config')
+          .insert([payload])
+          .select()
+          .single();
+        
+        if (result.data) {
+          setConfigId(result.data.id);
+        }
+      }
+
+      if (result.error) throw result.error;
+
+      toast({
+        title: 'Sucesso!',
+        description: 'Configurações do slider salvas com sucesso.',
+      });
+    } catch (error) {
+      console.error('Error saving slider config:', error);
+      toast({
+        title: 'Erro',
+        description: 'Falha ao salvar configurações do slider.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const items = Array.from(slideOrder);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setSlideOrder(items);
   };
 
   return (
@@ -67,8 +231,9 @@ const AdminSlider = () => {
               </p>
             </div>
           </div>
-          <Button onClick={handleSave} className="bg-primary">
-            Salvar Alterações
+          <Button onClick={handleSave} className="bg-primary" disabled={isSaving}>
+            <Save className="h-4 w-4 mr-2" />
+            {isSaving ? 'Salvando...' : 'Salvar Alterações'}
           </Button>
         </div>
 
@@ -217,17 +382,79 @@ const AdminSlider = () => {
           </Card>
         </div>
 
-        {/* Preview Section */}
+        {/* Slide Order */}
         <Card>
           <CardHeader>
-            <CardTitle>Preview do Slider</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <GripVertical className="h-5 w-5" />
+              Ordem dos Slides ({slideOrder.length})
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-center p-8 bg-accent/30 rounded-lg border-2 border-dashed">
-              <p className="text-muted-foreground">
-                Preview será implementado em breve
+            <p className="text-sm text-muted-foreground mb-4">
+              Arraste para reordenar os slides que aparecerão no carrossel
+            </p>
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="slides">
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="space-y-2"
+                  >
+                    {slideOrder.map((slide, index) => {
+                      const market = slide.type === 'market' 
+                        ? markets.find(m => m.id === slide.marketId)
+                        : null;
+                      
+                      return (
+                        <Draggable key={slide.id} draggableId={slide.id} index={index}>
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className={cn(
+                                "flex items-center gap-3 p-3 rounded-lg border bg-card",
+                                snapshot.isDragging && "shadow-lg"
+                              )}
+                            >
+                              <GripVertical className="h-5 w-5 text-muted-foreground" />
+                              <div className="flex-1">
+                                {slide.type === 'market' && market ? (
+                                  <>
+                                    <p className="font-medium text-sm">{market.titulo}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      Mercado · {market.categoria}
+                                    </p>
+                                  </>
+                                ) : slide.type === 'image' ? (
+                                  <>
+                                    <p className="font-medium text-sm">{slide.title}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      Imagem Personalizada
+                                    </p>
+                                  </>
+                                ) : null}
+                              </div>
+                              <span className="text-xs text-muted-foreground">
+                                #{index + 1}
+                              </span>
+                            </div>
+                          )}
+                        </Draggable>
+                      );
+                    })}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+            {slideOrder.length === 0 && (
+              <p className="text-center text-sm text-muted-foreground py-8">
+                Selecione mercados ou adicione imagens para configurar o slider
               </p>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>

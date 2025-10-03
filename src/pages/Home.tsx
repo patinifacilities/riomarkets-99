@@ -15,6 +15,13 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import Autoplay from 'embla-carousel-autoplay';
 import { OnboardingTrigger } from '@/components/onboarding/OnboardingTrigger';
 import ProbabilityChart from '@/components/markets/ProbabilityChart';
+import { supabase } from '@/integrations/supabase/client';
+
+interface CustomImage {
+  id: string;
+  url: string;
+  title: string;
+}
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,8 +29,42 @@ const Home = () => {
   const [sortBy, setSortBy] = useState('recentes');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string[]>(['active']);
+  const [sliderMarketIds, setSliderMarketIds] = useState<string[]>([]);
+  const [sliderCustomImages, setSliderCustomImages] = useState<CustomImage[]>([]);
+  const [sliderDelay, setSliderDelay] = useState(7000);
+  const [slideOrder, setSlideOrder] = useState<string[]>([]);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Load slider configuration
+  useEffect(() => {
+    const loadSliderConfig = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('slider_config')
+          .select('*')
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+          setSliderMarketIds(Array.isArray(data.selected_market_ids) ? data.selected_market_ids : []);
+          const customImgs = Array.isArray(data.custom_images) 
+            ? (data.custom_images as unknown as CustomImage[])
+            : [];
+          setSliderCustomImages(customImgs);
+          setSliderDelay((data.slider_delay_seconds || 7) * 1000);
+          setSlideOrder(Array.isArray(data.slide_order) ? (data.slide_order as string[]) : []);
+        }
+      } catch (error) {
+        console.error('Error loading slider config:', error);
+      }
+    };
+
+    loadSliderConfig();
+  }, []);
   
   // Topic filters with modern Lucide icons
   const topicFilters = [
@@ -156,15 +197,39 @@ const Home = () => {
     setSelectedStatus(prev => prev.filter(id => id !== statusId));
   };
 
-  // Get top 3 markets by volume
-  const topMarketsByVolume = useMemo(() => {
-    return [...markets]
-      .sort((a, b) => {
-        // Since opcoes is string[], we can't use total_apostado. Use market id as fallback
-        return b.id.localeCompare(a.id);
+  // Get markets for slider based on admin configuration
+  const sliderMarkets = useMemo(() => {
+    if (sliderMarketIds.length === 0) {
+      // Fallback to top 3 if no config
+      return [...markets]
+        .sort((a, b) => b.id.localeCompare(a.id))
+        .slice(0, 3);
+    }
+    
+    // Filter markets based on selected IDs, preserving order
+    return sliderMarketIds
+      .map(id => markets.find(m => m.id === id))
+      .filter((m): m is NonNullable<typeof m> => m !== undefined);
+  }, [markets, sliderMarketIds]);
+
+  // Build ordered slides
+  const orderedSlides = useMemo(() => {
+    if (slideOrder.length === 0) {
+      return sliderMarkets.map(m => ({ type: 'market' as const, data: m }));
+    }
+
+    return slideOrder
+      .map(id => {
+        if (id.startsWith('custom-')) {
+          const img = sliderCustomImages.find(i => i.id === id);
+          return img ? { type: 'image' as const, data: img } : null;
+        } else {
+          const market = markets.find(m => m.id === id);
+          return market ? { type: 'market' as const, data: market } : null;
+        }
       })
-      .slice(0, 3);
-  }, [markets]);
+      .filter((s): s is NonNullable<typeof s> => s !== null);
+  }, [slideOrder, markets, sliderMarkets, sliderCustomImages]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -178,7 +243,7 @@ const Home = () => {
             }}
             plugins={[
               Autoplay({
-                delay: 7000,
+                delay: sliderDelay,
                 stopOnInteraction: false,
                 stopOnMouseEnter: false,
               }),
@@ -225,8 +290,32 @@ const Home = () => {
                 </div>
               </CarouselItem>
 
-              {/* Slides 2-4: Top 3 Markets - Hero Style */}
-              {topMarketsByVolume.map((market) => {
+              {/* Ordered Slides - Markets and Custom Images */}
+              {orderedSlides.map((slide, idx) => {
+                if (slide.type === 'image') {
+                  // Custom image slide
+                  const img = slide.data;
+                  return (
+                    <CarouselItem key={img.id}>
+                      <div className="relative h-[500px] w-full overflow-hidden rounded-2xl">
+                        <img 
+                          src={img.url} 
+                          alt={img.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+                        <div className="absolute bottom-8 left-8">
+                          <h2 className="text-4xl md:text-5xl font-bold text-white">
+                            {img.title}
+                          </h2>
+                        </div>
+                      </div>
+                    </CarouselItem>
+                  );
+                }
+                
+                // Market slide
+                const market = slide.data;
                 const yesOption = market.opcoes?.find((opt: any) => opt.toLowerCase().includes('sim') || opt.toLowerCase().includes('yes'));
                 const noOption = market.opcoes?.find((opt: any) => opt.toLowerCase().includes('não') || opt.toLowerCase().includes('no'));
                 
