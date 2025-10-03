@@ -167,7 +167,7 @@ export const FastPoolSlide = ({ onClick }: FastPoolSlideProps) => {
               className="bg-white text-[#ff2389] hover:bg-white/90 font-bold px-8 md:px-10 py-6 md:py-8 rounded-full text-lg md:text-xl transition-all hover:scale-110 shadow-2xl group-hover:shadow-white/50 w-full md:w-auto"
             >
               <Zap className="w-5 md:w-6 h-5 md:h-6 mr-2 fill-current" />
-              JOGAR AGORA
+              OPINAR AGORA
             </Button>
           </div>
         </div>

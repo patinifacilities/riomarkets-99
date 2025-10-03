@@ -217,16 +217,22 @@ const Home = () => {
       .filter((m): m is NonNullable<typeof m> => m !== undefined);
   }, [markets, sliderMarketIds]);
 
-  // Build ordered slides - Fast pool as LAST slide
+  // Build ordered slides - Respect admin order
   const orderedSlides = useMemo(() => {
-    const slides: Array<{ type: 'market' | 'image' | 'fast', data: any }> = [];
+    const slides: Array<{ type: 'market' | 'image' | 'fast' | 'text', data: any }> = [];
     
     if (slideOrder.length === 0) {
+      // Fallback: show markets only if no order configured
       slides.push(...sliderMarkets.map(m => ({ type: 'market' as const, data: m })));
     } else {
+      // Respect the order from admin panel
       const orderSlides = slideOrder
         .map(id => {
-          if (id.startsWith('custom-')) {
+          if (id === 'fast-card') {
+            return { type: 'fast' as const, data: null };
+          } else if (id === 'text-card') {
+            return { type: 'text' as const, data: null };
+          } else if (id.startsWith('custom-')) {
             const img = sliderCustomImages.find(i => i.id === id);
             return img ? { type: 'image' as const, data: img } : null;
           } else {
@@ -238,9 +244,6 @@ const Home = () => {
       
       slides.push(...orderSlides);
     }
-    
-    // Add fast pool slide as LAST
-    slides.push({ type: 'fast' as const, data: null });
     
     return slides;
   }, [slideOrder, markets, sliderMarkets, sliderCustomImages]);
@@ -285,57 +288,62 @@ const Home = () => {
             }}
             onMouseEnter={handleSlideClick}
           >
-            <CarouselContent className="py-8">
-              {/* Slide 1: Title with Typewriter - Mobile Optimized */}
-              <CarouselItem>
-                <div className="flex items-center justify-center min-h-[400px] px-4 sm:px-8">
-                  <div className="text-center space-y-6 sm:space-y-8 max-w-3xl">
-                    <div className="text-3xl sm:text-4xl md:text-6xl font-bold">
-                      <div className="mb-3 sm:mb-4 text-3xl sm:text-4xl md:text-6xl">Mercados Preditivos</div>
-                       <div className="text-3xl sm:text-4xl md:text-6xl">
-                        <TypewriterText
-                          baseText=""
-                          texts={[
-                            "para Análise Estratégica",
-                            "baseados em Dados",
-                            "com Transparência Total",
-                            "Rápidos"
-                          ]}
-                          customColors={{
-                            "Rápidos": "#ff2389"
-                          }}
-                          className="text-3xl sm:text-4xl md:text-6xl font-bold"
-                          typingSpeed={100}
-                          deletingSpeed={50}
-                          pauseDuration={2000}
-                        />
-                      </div>
-                    </div>
-                    <p className="text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-                      Ganhe recompensas compartilhando suas previsões sobre eventos futuros.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
-                      <Button 
-                        size="lg" 
-                        onClick={() => navigate('/fast')}
-                        className="gap-2 rounded-xl transition-all bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-[#ff2389] shadow-lg shadow-[#ff2389]/20 hover:shadow-[#ff2389]/40 hover:scale-105 animate-pulse w-full sm:w-auto font-semibold px-8"
-                      >
-                        <Zap className="w-5 h-5" />
-                        Explorar Fast
-                      </Button>
-                      <OnboardingTrigger size="lg" variant="outline" className="w-full sm:w-auto" />
-                    </div>
-                  </div>
-                </div>
-              </CarouselItem>
+            <CarouselContent className="py-4 md:py-8">
 
-              {/* Ordered Slides - Fast Pool, Markets and Custom Images */}
+              {/* Ordered Slides - Respecting Admin Order */}
               {orderedSlides.map((slide, idx) => {
                 if (slide.type === 'fast') {
                   // Fast pool slide
                   return (
-                    <CarouselItem key="fast-bitcoin">
+                    <CarouselItem key="fast-card">
                       <FastPoolSlide onClick={handleSlideClick} />
+                    </CarouselItem>
+                  );
+                }
+                
+                if (slide.type === 'text') {
+                  // Text/Buttons card (same as first slide)
+                  return (
+                    <CarouselItem key="text-card">
+                      <div className="flex items-center justify-center min-h-[300px] md:min-h-[400px] px-4 sm:px-8">
+                        <div className="text-center space-y-6 sm:space-y-8 max-w-3xl">
+                          <div className="text-3xl sm:text-4xl md:text-6xl font-bold">
+                            <div className="mb-3 sm:mb-4 text-3xl sm:text-4xl md:text-6xl">Mercados Preditivos</div>
+                             <div className="text-3xl sm:text-4xl md:text-6xl">
+                              <TypewriterText
+                                baseText=""
+                                texts={[
+                                  "para Análise Estratégica",
+                                  "baseados em Dados",
+                                  "com Transparência Total",
+                                  "Rápidos"
+                                ]}
+                                customColors={{
+                                  "Rápidos": "#ff2389"
+                                }}
+                                className="text-3xl sm:text-4xl md:text-6xl font-bold"
+                                typingSpeed={100}
+                                deletingSpeed={50}
+                                pauseDuration={2000}
+                              />
+                            </div>
+                          </div>
+                          <p className="text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
+                            Ganhe recompensas compartilhando suas previsões sobre eventos futuros.
+                          </p>
+                          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
+                            <Button 
+                              size="lg" 
+                              onClick={() => navigate('/fast')}
+                              className="gap-2 rounded-xl transition-all bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-[#ff2389] shadow-lg shadow-[#ff2389]/20 hover:shadow-[#ff2389]/40 hover:scale-105 animate-pulse w-full sm:w-auto font-semibold px-8"
+                            >
+                              <Zap className="w-5 h-5" />
+                              Explorar Fast
+                            </Button>
+                            <OnboardingTrigger size="lg" variant="outline" className="w-full sm:w-auto" />
+                          </div>
+                        </div>
+                      </div>
                     </CarouselItem>
                   );
                 }
@@ -346,7 +354,7 @@ const Home = () => {
                   return (
                     <CarouselItem key={img.id}>
                       <div 
-                        className="relative h-[500px] w-full overflow-hidden rounded-2xl cursor-pointer"
+                        className="relative h-[300px] md:h-[500px] w-full overflow-hidden rounded-2xl cursor-pointer"
                         onClick={handleSlideClick}
                       >
                         <img 

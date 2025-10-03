@@ -458,7 +458,7 @@ const AdminSlider = () => {
               Arraste para reordenar os slides que aparecerão no carrossel
             </p>
             <DragDropContext onDragEnd={handleDragEnd}>
-              <Droppable droppableId="slides">
+              <Droppable droppableId="slides" type="slide">
                 {(provided) => (
                   <div
                     {...provided.droppableProps}

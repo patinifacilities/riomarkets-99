@@ -59,7 +59,7 @@ const BottomNavigation = () => {
               to={item.href}
               className={cn(
                 "flex flex-col items-center justify-center h-full gap-1 transition-colors",
-                item.label === 'Mercados' && "mr-6",
+                item.label === 'Mercados' && "mr-8",
                 item.position === 'right' && "-mr-2",
                 isActive 
                   ? "text-primary" 

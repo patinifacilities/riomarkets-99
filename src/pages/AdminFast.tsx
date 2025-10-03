@@ -383,7 +383,7 @@ const AdminFast = () => {
               </p>
             </div>
             <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-            <div className="flex items-center gap-4 bg-card/50 px-6 py-3 rounded-lg border border-border">
+            <div className="flex items-center gap-4 bg-card/50 px-6 py-3 rounded-xl border border-border">
                 <svg className={`w-6 h-6 ${fastEnabled ? 'animate-pulse' : ''}`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z" stroke="#ff2389" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="#ff2389"/>
                 </svg>
@@ -399,7 +399,7 @@ const AdminFast = () => {
                     style={{
                       backgroundColor: fastEnabled ? '#ff2389' : undefined
                     }}
-                    className="scale-125 data-[state=unchecked]:bg-muted"
+                    className="scale-125 data-[state=unchecked]:bg-muted rounded-full"
                   />
                 </div>
               </div>
