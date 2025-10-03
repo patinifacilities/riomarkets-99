@@ -317,11 +317,11 @@ const Home = () => {
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
                       <Button 
                         size="lg" 
-                        className="bg-[#00ff90] text-gray-900 hover:bg-[#00ff90]/90 font-semibold px-8 transition-all hover:scale-105 w-full sm:w-auto"
-                        onClick={() => navigate('/auth')}
+                        onClick={() => navigate('/fast')}
+                        className="gap-2 rounded-xl transition-all bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-[#ff2389] shadow-lg shadow-[#ff2389]/20 hover:shadow-[#ff2389]/40 hover:scale-105 animate-pulse w-full sm:w-auto font-semibold px-8"
                       >
-                        <Sparkles className="w-5 h-5 mr-2" />
-                        Explorar Mercados
+                        <Zap className="w-5 h-5" />
+                        Explorar Fast
                       </Button>
                       <OnboardingTrigger size="lg" variant="outline" className="w-full sm:w-auto" />
                     </div>
@@ -462,7 +462,7 @@ const Home = () => {
                               className="bg-white text-black hover:bg-white/90 font-semibold px-8 py-6 rounded-full text-lg transition-all hover:scale-105 shadow-xl"
                             >
                               <Sparkles className="w-5 h-5 mr-2" />
-                              Predict
+                              Analisar
                             </Button>
                           </div>
                         </div>

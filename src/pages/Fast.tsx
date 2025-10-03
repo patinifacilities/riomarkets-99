@@ -1292,43 +1292,17 @@ const Fast = () => {
         </div>
 
         {/* Info Cards */}
-        <div className="max-w-4xl mx-auto mt-12 grid md:grid-cols-2 gap-6">
-          <Card className="bg-gradient-to-br from-primary/5 via-transparent to-transparent border-primary/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-primary">
-                <Zap className="w-5 h-5" />
-                Como Funciona
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="space-y-2">
-                <p>• Cada pool dura exatamente 60 segundos</p>
-                <p>• 3 pools simultâneos por categoria</p>
-                <p>• Opine se o ativo vai subir (SIM) ou descer (NÃO)</p>
-                <p>• Resultado baseado em dados reais de mercado</p>
-                <p>• Odds dinâmicas que diminuem com o tempo</p>
-                <p>• Apostas bloqueadas nos últimos 10 segundos</p>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="max-w-4xl mx-auto mt-12 flex justify-center">
+          <Button
+            onClick={() => setShowTermsModal(true)}
+            variant="outline"
+            size="lg"
+            className="gap-2 border-primary/20 hover:border-primary"
+          >
+            <Zap className="w-5 h-5" />
+            Como Funciona
+          </Button>
 
-          <Card className="bg-gradient-to-br from-[#ff2389]/5 via-transparent to-transparent border-[#ff2389]/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-[#ff2389]">
-                <BarChart3 className="w-5 h-5" />
-                Categorias Disponíveis
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="space-y-2">
-                <p>• <strong>Commodities:</strong> Petróleo, Ouro, Prata</p>
-                <p>• <strong>Cripto:</strong> Bitcoin, Ethereum, Solana</p>
-                <p>• <strong>Forex:</strong> BRL/USD, EUR/USD, JPY/USD</p>
-                <p>• <strong>Ações:</strong> Tesla, Apple, Amazon</p>
-                <p>• Todos sincronizados em tempo real</p>
-              </div>
-            </CardContent>
-          </Card>
         </div>
         
         
