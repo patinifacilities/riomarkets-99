@@ -396,10 +396,10 @@ const AdminFast = () => {
                     id="fast-toggle"
                     checked={fastEnabled}
                     onCheckedChange={handleToggleFast}
+                    className="scale-125 data-[state=unchecked]:bg-muted rounded-xl"
                     style={{
                       backgroundColor: fastEnabled ? '#ff2389' : undefined
                     }}
-                    className="scale-125 data-[state=unchecked]:bg-muted rounded-full"
                   />
                 </div>
               </div>

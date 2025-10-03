@@ -22,6 +22,11 @@ interface BrandingConfig {
   active_theme: string;
 }
 
+interface BrandingHistory {
+  config: BrandingConfig;
+  timestamp: number;
+}
+
 const THEMES = {
   theme1: {
     name: 'Tema Padrão (Rio)',
@@ -47,6 +52,7 @@ const AdminBranding = () => {
   const [saving, setSaving] = useState(false);
   const [config, setConfig] = useState<BrandingConfig | null>(null);
   const [uploading, setUploading] = useState<{[key: string]: boolean}>({});
+  const [history, setHistory] = useState<BrandingHistory[]>([]);
 
   useEffect(() => {
     if (user) {
@@ -64,7 +70,11 @@ const AdminBranding = () => {
         .single();
 
       if (error) throw error;
-      setConfig(data);
+      if (data) {
+        setConfig(data);
+        // Save initial state to history
+        setHistory([{ config: data, timestamp: Date.now() }]);
+      }
     } catch (error) {
       console.error('Error fetching branding config:', error);
     } finally {
@@ -116,6 +126,9 @@ const AdminBranding = () => {
     
     setSaving(true);
     try {
+      // Save current state to history before saving
+      setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
+      
       const { error } = await supabase
         .from('branding_config')
         .update({
@@ -145,6 +158,30 @@ const AdminBranding = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleUndo = () => {
+    if (history.length <= 1) {
+      toast({
+        title: 'Não há alterações para desfazer',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    // Remove current state and restore previous
+    const newHistory = [...history];
+    newHistory.pop(); // Remove current
+    const previous = newHistory[newHistory.length - 1];
+    
+    setConfig(previous.config);
+    setHistory(newHistory);
+    applyThemeToDocument(previous.config);
+    
+    toast({
+      title: 'Alterações desfeitas',
+      description: 'Configuração anterior restaurada.',
+    });
   };
 
   const handleLogoUpload = async (file: File, type: 'logo' | 'logo_white' | 'logo_black') => {
@@ -202,6 +239,9 @@ const AdminBranding = () => {
   const applyTheme = (themeName: 'theme1' | 'theme2') => {
     if (!config) return;
     
+    // Save current state to history
+    setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
+    
     const theme = THEMES[themeName];
     const newConfig = {
       ...config,
@@ -258,10 +298,16 @@ const AdminBranding = () => {
                 Gerencie as logos e cores da plataforma
               </p>
             </div>
-            <Button onClick={handleSave} disabled={saving} className="gap-2">
-              <Save className="w-4 h-4" />
-              {saving ? 'Salvando...' : 'Salvar Alterações'}
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={handleUndo} disabled={history.length <= 1} variant="outline" className="gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                Desfazer
+              </Button>
+              <Button onClick={handleSave} disabled={saving} className="gap-2">
+                <Save className="w-4 h-4" />
+                {saving ? 'Salvando...' : 'Salvar Alterações'}
+              </Button>
+            </div>
           </div>
 
           {/* Quick Theme Selection */}
@@ -300,6 +346,27 @@ const AdminBranding = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Logo Header (White) */}
+                <div className="space-y-2">
+                  <Label>Logo Header (fundo escuro)</Label>
+                  <div className="flex items-center gap-4">
+                    {config.logo_white_url && (
+                      <div className="bg-gray-800 p-2 rounded">
+                        <img src={config.logo_white_url} alt="Logo Header" className="h-12 object-contain" />
+                      </div>
+                    )}
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleLogoUpload(file, 'logo_white');
+                      }}
+                      disabled={uploading.logo_white}
+                    />
+                  </div>
+                </div>
+
                 {/* Logo Principal */}
                 <div className="space-y-2">
                   <Label>Logo Principal</Label>
@@ -315,27 +382,6 @@ const AdminBranding = () => {
                         if (file) handleLogoUpload(file, 'logo');
                       }}
                       disabled={uploading.logo}
-                    />
-                  </div>
-                </div>
-
-                {/* Logo Branca */}
-                <div className="space-y-2">
-                  <Label>Logo Branca (fundo escuro)</Label>
-                  <div className="flex items-center gap-4">
-                    {config.logo_white_url && (
-                      <div className="bg-gray-800 p-2 rounded">
-                        <img src={config.logo_white_url} alt="Logo White" className="h-12 object-contain" />
-                      </div>
-                    )}
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleLogoUpload(file, 'logo_white');
-                      }}
-                      disabled={uploading.logo_white}
                     />
                   </div>
                 </div>
@@ -429,13 +475,21 @@ const AdminBranding = () => {
                     <Input
                       type="color"
                       value={config.success_color}
-                      onChange={(e) => setConfig({ ...config, success_color: e.target.value })}
+                      onChange={(e) => {
+                        setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
+                        setConfig({ ...config, success_color: e.target.value });
+                        applyThemeToDocument({ ...config, success_color: e.target.value });
+                      }}
                       className="w-24 h-12"
                     />
                     <Input
                       type="text"
                       value={config.success_color}
-                      onChange={(e) => setConfig({ ...config, success_color: e.target.value })}
+                      onChange={(e) => {
+                        setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
+                        setConfig({ ...config, success_color: e.target.value });
+                        applyThemeToDocument({ ...config, success_color: e.target.value });
+                      }}
                       className="flex-1"
                     />
                   </div>

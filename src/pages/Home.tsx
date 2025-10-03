@@ -305,7 +305,7 @@ const Home = () => {
                   // Text/Buttons card (same as first slide)
                   return (
                     <CarouselItem key="text-card">
-                      <div className="flex items-center justify-center min-h-[300px] md:min-h-[400px] px-4 sm:px-8">
+                      <div className="flex items-center justify-center min-h-[300px] px-4 sm:px-8">
                         <div className="text-center space-y-6 sm:space-y-8 max-w-3xl">
                           <div className="text-3xl sm:text-4xl md:text-6xl font-bold">
                             <div className="mb-3 sm:mb-4 text-3xl sm:text-4xl md:text-6xl">Mercados Preditivos</div>
@@ -385,7 +385,7 @@ const Home = () => {
                 return (
                   <CarouselItem key={market.id}>
                     <div 
-                      className="relative h-[500px] w-full overflow-hidden rounded-2xl cursor-pointer"
+                      className="relative h-[300px] w-full overflow-hidden rounded-2xl cursor-pointer"
                       onClick={() => {
                         handleSlideClick();
                         navigate(`/market/${market.id}`);
@@ -400,8 +400,8 @@ const Home = () => {
                               alt={market.titulo}
                               className="w-full h-full object-cover"
                             />
-                            {/* Clean gradient overlay - increased opacity for better readability */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/30" />
+                            {/* Clean gradient overlay - more on left, less on right */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/60 to-black/20" />
                           </>
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-primary/20 via-background to-primary/10" />

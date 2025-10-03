@@ -224,7 +224,7 @@ export default function Deposit() {
                   setAmount(value);
                 }}
                 placeholder="0,00"
-                className="pl-16 pr-4 h-16 text-2xl md:text-3xl font-bold border-2 border-primary/30 focus:border-primary"
+                className="pl-16 pr-4 h-16 text-2xl md:text-3xl font-bold border-2 border-primary/30 focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </div>
             {amount && parseFloat(amount) / 100 < 5 && (

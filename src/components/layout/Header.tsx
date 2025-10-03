@@ -539,19 +539,19 @@ const Header = () => {
                      </Button>
                    </DropdownMenuTrigger>
                    <DropdownMenuContent align="end" className="w-48">
-                   <DropdownMenuItem asChild className="hover:bg-[#00ff90]/10 focus:bg-[#00ff90]/10 cursor-pointer">
-                    <Link to="/profile" className="flex items-center gap-2">
-                      <User className="w-4 h-4" />
-                      Meu Perfil
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="hover:bg-[#00ff90]/10 focus:bg-[#00ff90]/10 cursor-pointer">
-                    <Link to="/transactions" className="flex items-center gap-2">
-                      <Receipt className="w-4 h-4" />
-                      Transações
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
+                   <DropdownMenuItem asChild className="cursor-pointer focus:bg-transparent">
+                     <Link to="/profile" className="flex items-center gap-2">
+                       <User className="w-4 h-4" />
+                       Meu Perfil
+                     </Link>
+                   </DropdownMenuItem>
+                   <DropdownMenuItem asChild className="cursor-pointer focus:bg-transparent">
+                     <Link to="/transactions" className="flex items-center gap-2">
+                       <Receipt className="w-4 h-4" />
+                       Transações
+                     </Link>
+                   </DropdownMenuItem>
+                   <DropdownMenuSeparator />
                      <DropdownMenuItem 
                        onClick={async () => {
                          try {
@@ -561,7 +561,7 @@ const Header = () => {
                            console.error('Erro ao fazer logout:', error);
                          }
                        }}
-                       className="flex items-center gap-2 text-white hover:text-white cursor-pointer hover:bg-transparent focus:bg-transparent"
+                       className="flex items-center gap-2 text-white hover:text-white cursor-pointer focus:bg-transparent"
                      >
                        <LogOut className="w-4 h-4 text-white" />
                        Sair
