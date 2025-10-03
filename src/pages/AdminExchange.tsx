@@ -223,18 +223,17 @@ const AdminExchange = () => {
         const oldPath = oldAsset.icon_url.split('/').pop();
         if (oldPath) {
           await supabase.storage
-            .from('profile-pictures')
-            .remove([`exchange-assets/${oldPath}`]);
+            .from('exchange-assets')
+            .remove([oldPath]);
         }
       }
 
       const fileExt = file.name.split('.').pop();
       const fileName = `asset_${assetId}_${Date.now()}.${fileExt}`;
-      const filePath = `exchange-assets/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('profile-pictures')
-        .upload(filePath, file, {
+        .from('exchange-assets')
+        .upload(fileName, file, {
           cacheControl: '3600',
           upsert: true
         });
@@ -242,8 +241,8 @@ const AdminExchange = () => {
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from('profile-pictures')
-        .getPublicUrl(filePath);
+        .from('exchange-assets')
+        .getPublicUrl(fileName);
 
       const { error } = await supabase
         .from('exchange_assets')

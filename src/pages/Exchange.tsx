@@ -27,6 +27,8 @@ const ExchangeNew = () => {
   const [fastMarketsButtonVisible, setFastMarketsButtonVisible] = useState(false);
   const [allAssets, setAllAssets] = useState<{id: string, symbol: string, name: string, icon_url: string | null, is_active: boolean}[]>([]);
   const [exchangeEnabled, setExchangeEnabled] = useState(true);
+  const [fromCurrency, setFromCurrency] = useState('BRL');
+  const [toCurrency, setToCurrency] = useState('RIOZ');
 
   useEffect(() => {
     fetchSystemConfig();
@@ -134,6 +136,10 @@ const ExchangeNew = () => {
   };
 
   const handleSwapDirection = () => {
+    const newFromCurrency = toCurrency;
+    const newToCurrency = fromCurrency;
+    setFromCurrency(newFromCurrency);
+    setToCurrency(newToCurrency);
     setSwapDirection(prev => prev === 'brl-to-rioz' ? 'rioz-to-brl' : 'brl-to-rioz');
     // Keep the amounts when swapping direction
   };
@@ -225,10 +231,8 @@ const ExchangeNew = () => {
     }
   };
 
-  const fromCurrency = swapDirection === 'brl-to-rioz' ? 'BRL' : 'RIOZ';
-  const toCurrency = swapDirection === 'brl-to-rioz' ? 'RIOZ' : 'BRL';
-  const fromBalance = swapDirection === 'brl-to-rioz' ? brlBalance : riozBalance;
-  const toBalance = swapDirection === 'brl-to-rioz' ? riozBalance : brlBalance;
+  const fromBalance = fromCurrency === 'BRL' ? brlBalance : riozBalance;
+  const toBalance = toCurrency === 'BRL' ? brlBalance : riozBalance;
 
   if (!user) {
     return (
@@ -307,20 +311,23 @@ const ExchangeNew = () => {
                           ) : (
                             <span className="text-lg font-bold text-black">R</span>
                           )}
-                          <svg className="absolute -right-1 -bottom-1 w-4 h-4 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="absolute -right-1 -bottom-1 w-5 h-5 text-primary animate-pulse" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                           </svg>
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="bg-card border-border shadow-xl rounded-xl p-2 min-w-[280px] z-[100]">
-                        {allAssets.filter(asset => 
-                          !(fromCurrency === 'RIOZ' && asset.symbol === 'RIOZ') && 
-                          !(fromCurrency === 'BRL' && asset.symbol === 'BRL')
-                        ).map((asset) => (
+                        {allAssets.filter(asset => asset.symbol !== toCurrency).map((asset) => (
                           <DropdownMenuItem 
                             key={asset.id}
                             disabled={!asset.is_active}
-                            className={asset.is_active ? "cursor-pointer p-3 rounded-lg hover:bg-muted/50 transition-colors" : "opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors"}
+                            onClick={() => {
+                              if (asset.is_active) {
+                                setFromCurrency(asset.symbol);
+                                setSwapDirection(asset.symbol === 'BRL' ? 'brl-to-rioz' : 'rioz-to-brl');
+                              }
+                            }}
+                            className={asset.is_active ? "cursor-pointer p-3 rounded-lg hover:bg-primary/10 transition-colors" : "opacity-60 cursor-not-allowed p-3 rounded-lg"}
                           >
                             <div className="flex items-center gap-3 w-full">
                               <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -407,20 +414,23 @@ const ExchangeNew = () => {
                         ) : (
                           <span className="text-lg font-bold text-black">R</span>
                         )}
-                        <svg className="absolute -right-1 -bottom-1 w-4 h-4 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="absolute -right-1 -bottom-1 w-5 h-5 text-primary animate-pulse" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                         </svg>
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-card border-border shadow-xl rounded-xl p-2 min-w-[280px] z-[100]">
-                      {allAssets.filter(asset => 
-                        !(toCurrency === 'RIOZ' && asset.symbol === 'RIOZ') && 
-                        !(toCurrency === 'BRL' && asset.symbol === 'BRL')
-                      ).map((asset) => (
+                      {allAssets.filter(asset => asset.symbol !== fromCurrency).map((asset) => (
                         <DropdownMenuItem 
                           key={asset.id}
                           disabled={!asset.is_active}
-                          className={asset.is_active ? "cursor-pointer p-3 rounded-lg hover:bg-muted/50 transition-colors" : "opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors"}
+                          onClick={() => {
+                            if (asset.is_active) {
+                              setToCurrency(asset.symbol);
+                              setSwapDirection(fromCurrency === 'BRL' ? 'brl-to-rioz' : 'rioz-to-brl');
+                            }
+                          }}
+                          className={asset.is_active ? "cursor-pointer p-3 rounded-lg hover:bg-primary/10 transition-colors" : "opacity-60 cursor-not-allowed p-3 rounded-lg"}
                         >
                           <div className="flex items-center gap-3 w-full">
                             <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
