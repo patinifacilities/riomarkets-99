@@ -335,12 +335,12 @@ const Home = () => {
                             <Button 
                               size="lg" 
                               onClick={() => navigate('/fast')}
-                              className="gap-2 rounded-xl transition-all bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-[#ff2389] shadow-lg shadow-[#ff2389]/20 hover:shadow-[#ff2389]/40 hover:scale-105 animate-pulse w-full sm:w-auto font-semibold px-8"
+                              className="hidden md:flex gap-2 rounded-xl transition-all bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-[#ff2389] shadow-lg shadow-[#ff2389]/20 hover:shadow-[#ff2389]/40 hover:scale-105 animate-pulse w-full sm:w-auto font-semibold px-8"
                             >
                               <Zap className="w-5 h-5" />
                               Explorar Fast
                             </Button>
-                            <OnboardingTrigger size="lg" variant="outline" className="w-full sm:w-auto" />
+                            <OnboardingTrigger size="lg" variant="outline" className="w-full md:w-auto px-6" />
                           </div>
                         </div>
                       </div>

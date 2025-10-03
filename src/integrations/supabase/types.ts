@@ -149,6 +149,36 @@ export type Database = {
         }
         Relationships: []
       }
+      exchange_assets: {
+        Row: {
+          created_at: string
+          icon_url: string | null
+          id: string
+          is_active: boolean
+          name: string
+          symbol: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          symbol: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          symbol?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       exchange_events: {
         Row: {
           correlation_id: string | null

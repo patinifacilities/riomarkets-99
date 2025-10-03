@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, Settings, Users, FileText, Newspaper, DollarSign, Activity, 
-  CreditCard, Banknote, Wallet, Menu, LogOut, Zap, Gift
+  CreditCard, Banknote, Wallet, Menu, LogOut, Zap, Gift, ArrowLeftRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -100,6 +100,11 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
       icon: Settings, 
       path: '/admin/branding',
       color: 'text-[#00ff90] hover:text-[#00ff90]'
+    },
+    { 
+      title: 'Exchange', 
+      icon: ArrowLeftRight, 
+      path: '/admin/exchange'
     }
   ];
 

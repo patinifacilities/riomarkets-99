@@ -287,15 +287,22 @@ const AdminBranding = () => {
     setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
     
     const theme = THEMES[themeName];
-    const newConfig = {
-      ...config,
-      background_color: theme.background_color,
-      primary_color: theme.primary_color,
-      success_color: theme.success_color,
-      opinion_yes_color: theme.opinion_yes_color,
-      opinion_no_color: theme.opinion_no_color,
-      active_theme: themeName
-    };
+    
+    // Only apply theme colors if NOT custom or if custom theme hasn't been modified
+    const newConfig = themeName === 'custom' 
+      ? {
+          ...config,
+          active_theme: themeName
+        }
+      : {
+          ...config,
+          background_color: theme.background_color,
+          primary_color: theme.primary_color,
+          success_color: theme.success_color,
+          opinion_yes_color: theme.opinion_yes_color,
+          opinion_no_color: theme.opinion_no_color,
+          active_theme: themeName
+        };
     
     setConfig(newConfig);
     applyThemeToDocument(newConfig);

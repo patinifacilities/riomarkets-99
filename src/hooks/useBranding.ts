@@ -6,6 +6,7 @@ interface BrandingConfig {
   logo_url: string | null;
   logo_white_url: string | null;
   logo_black_url: string | null;
+  logo_light_url: string | null;
   background_color: string;
   primary_color: string;
   success_color: string;

@@ -39,6 +39,7 @@ import AdminGatewayConfigCrypto from '@/pages/AdminGatewayConfigCrypto';
 import AdminGatewaysSaque from '@/pages/AdminGatewaysSaque';
 import AdminSlider from '@/pages/AdminSlider';
 import AdminBranding from '@/pages/AdminBranding';
+import AdminExchange from '@/pages/AdminExchange';
 import Opinioes from '@/pages/Opinioes';
 import FiatRequests from '@/pages/FiatRequests';
 import Terms from '@/pages/Terms';
@@ -112,6 +113,7 @@ function App() {
             <Route path="/admin/rewards" element={<AdminRewards />} />
             <Route path="/admin/slider" element={<AdminSlider />} />
             <Route path="/admin/branding" element={<AdminBranding />} />
+            <Route path="/admin/exchange" element={<AdminExchange />} />
           <Route path="/opinioes" element={<Opinioes />} />
           <Route path="/rewards" element={<Rewards />} />
           <Route path="/fiat-requests" element={<FiatRequests />} />
