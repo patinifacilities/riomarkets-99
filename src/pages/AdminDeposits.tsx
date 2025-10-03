@@ -1,43 +1,17 @@
-import { useState, useEffect } from 'react';
-import { ArrowLeft, DollarSign, Clock, CheckCircle, XCircle, Search, Filter } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, DollarSign, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
-import { supabase } from '@/integrations/supabase/client';
 
 const AdminDeposits = () => {
   const { user, loading: authLoading } = useAuth();
   const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sizeFilter, setSizeFilter] = useState('all');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [usersMap, setUsersMap] = useState<Record<string, string>>({});
-
-
-  // Fetch users data
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const { data: users } = await supabase
-        .from('profiles')
-        .select('id, username, nome');
-      
-      if (users) {
-        const map: Record<string, string> = {};
-        users.forEach(u => {
-          map[u.id] = u.username || u.nome;
-        });
-        setUsersMap(map);
-      }
-    };
-    fetchUsers();
-  }, []);
 
   // Security check
   if (authLoading || profileLoading) {
@@ -52,11 +26,10 @@ const AdminDeposits = () => {
     return <Navigate to="/" replace />;
   }
 
-  // Mock deposits data (com user_id)
+  // Mock deposits data
   const deposits = [
     {
       id: '1',
-      user_id: 'user-id-1',
       user: 'João Silva',
       amount: 250.00,
       method: 'PIX',
@@ -64,8 +37,7 @@ const AdminDeposits = () => {
       date: '2024-01-15T10:30:00Z'
     },
     {
-      id: '2',
-      user_id: 'user-id-2', 
+      id: '2', 
       user: 'Maria Santos',
       amount: 500.00,
       method: 'Cartão de Crédito',
@@ -74,7 +46,6 @@ const AdminDeposits = () => {
     },
     {
       id: '3',
-      user_id: 'user-id-3',
       user: 'Pedro Costa',
       amount: 1000.00,
       method: 'PIX',
@@ -82,22 +53,6 @@ const AdminDeposits = () => {
       date: '2024-01-14T16:45:00Z'
     }
   ];
-
-  // Filter and sort logic
-  const filteredDeposits = deposits
-    .filter(deposit => {
-      const matchesSearch = deposit.user.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesSize = sizeFilter === 'all' || 
-        (sizeFilter === 'small' && deposit.amount < 500) ||
-        (sizeFilter === 'medium' && deposit.amount >= 500 && deposit.amount < 1000) ||
-        (sizeFilter === 'large' && deposit.amount >= 1000);
-      
-      return matchesSearch && matchesSize;
-    })
-    .sort((a, b) => {
-      return sortOrder === 'desc' ? b.amount - a.amount : a.amount - b.amount;
-    });
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -206,52 +161,14 @@ const AdminDeposits = () => {
             </Card>
           </div>
 
-          {/* Search and Filters */}
-          <Card className="bg-card-secondary border-border-secondary mb-6">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Buscar por usuário..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <Select value={sizeFilter} onValueChange={setSizeFilter}>
-                  <SelectTrigger className="w-full md:w-[200px]">
-                    <Filter className="w-4 h-4 mr-2" />
-                    <SelectValue placeholder="Tamanho" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos os valores</SelectItem>
-                    <SelectItem value="small">Até R$ 500</SelectItem>
-                    <SelectItem value="medium">R$ 500 - R$ 1.000</SelectItem>
-                    <SelectItem value="large">Acima de R$ 1.000</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={sortOrder} onValueChange={(value: 'asc' | 'desc') => setSortOrder(value)}>
-                  <SelectTrigger className="w-full md:w-[200px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="desc">Do maior para o menor</SelectItem>
-                    <SelectItem value="asc">Do menor para o maior</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Deposits Table */}
           <Card className="bg-card-secondary border-border-secondary">
             <CardHeader>
-              <CardTitle>Depósitos Recentes ({filteredDeposits.length})</CardTitle>
+              <CardTitle>Depósitos Recentes</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {filteredDeposits.map((deposit) => (
+                {deposits.map((deposit) => (
                   <div
                     key={deposit.id}
                     className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50"
@@ -260,7 +177,6 @@ const AdminDeposits = () => {
                       {getStatusIcon(deposit.status)}
                       <div>
                         <h3 className="font-semibold">{deposit.user}</h3>
-                        <p className="text-xs text-muted-foreground">@{usersMap[deposit.user_id] || 'usuário'}</p>
                         <p className="text-sm text-muted-foreground">
                           {new Date(deposit.date).toLocaleString('pt-BR')}
                         </p>
@@ -287,11 +203,6 @@ const AdminDeposits = () => {
                     </div>
                   </div>
                 ))}
-                {filteredDeposits.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Nenhum depósito encontrado
-                  </div>
-                )}
               </div>
             </CardContent>
           </Card>

@@ -223,17 +223,18 @@ const AdminExchange = () => {
         const oldPath = oldAsset.icon_url.split('/').pop();
         if (oldPath) {
           await supabase.storage
-            .from('exchange-assets')
-            .remove([oldPath]);
+            .from('profile-pictures')
+            .remove([`exchange-assets/${oldPath}`]);
         }
       }
 
       const fileExt = file.name.split('.').pop();
       const fileName = `asset_${assetId}_${Date.now()}.${fileExt}`;
+      const filePath = `exchange-assets/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('exchange-assets')
-        .upload(fileName, file, {
+        .from('profile-pictures')
+        .upload(filePath, file, {
           cacheControl: '3600',
           upsert: true
         });
@@ -241,8 +242,8 @@ const AdminExchange = () => {
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from('exchange-assets')
-        .getPublicUrl(fileName);
+        .from('profile-pictures')
+        .getPublicUrl(filePath);
 
       const { error } = await supabase
         .from('exchange_assets')
@@ -251,10 +252,8 @@ const AdminExchange = () => {
 
       if (error) throw error;
 
-      // Immediately update local state
-      setAssets(prev => prev.map(asset => 
-        asset.id === assetId ? { ...asset, icon_url: publicUrl } : asset
-      ));
+      // Force refetch to ensure UI updates
+      await fetchAssets();
 
       toast({
         title: 'Sucesso!',
@@ -358,16 +357,24 @@ const AdminExchange = () => {
                         disabled={uploading[asset.id]}
                       />
 
-                      <div className="flex items-center gap-2 px-3 py-2 border rounded-lg">
-                        <Label htmlFor={`switch-${asset.id}`} className="text-sm font-medium cursor-pointer">
-                          {asset.is_active ? 'Ativo' : 'Inativo'}
-                        </Label>
-                        <Switch
-                          id={`switch-${asset.id}`}
-                          checked={asset.is_active}
-                          onCheckedChange={() => handleToggleActive(asset.id, asset.is_active)}
-                        />
-                      </div>
+                      <Button
+                        variant={asset.is_active ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => handleToggleActive(asset.id, asset.is_active)}
+                        className="gap-2"
+                      >
+                        {asset.is_active ? (
+                          <>
+                            <ToggleRight className="w-4 h-4" />
+                            Ativo
+                          </>
+                        ) : (
+                          <>
+                            <ToggleLeft className="w-4 h-4" />
+                            Inativo
+                          </>
+                        )}
+                      </Button>
                     </div>
                   </div>
                 ))}

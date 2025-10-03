@@ -164,8 +164,8 @@ const MarketDetail = () => {
             )}
 
             {/* Market Header */}
-            <Card className="bg-gradient-card border-border/50 before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-2xl after:bg-gradient-to-tr after:from-transparent after:via-white/[0.02] after:to-white/[0.04]">
-              <CardContent className="p-6 relative z-10">
+            <Card className="bg-gradient-card border-border/50">
+              <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="space-y-2">
                     <Badge className={getCategoryColor(market.categoria)}>
@@ -210,7 +210,7 @@ const MarketDetail = () => {
 
             {/* User Info Panel - Mobile (positioned after market details) */}
             <div className="lg:hidden">
-              <Card id="wallet-section" className="shadow-lg">
+              <Card id="wallet-section">
                 <CardContent className="p-6">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <Wallet className="w-5 h-5" />
@@ -218,32 +218,27 @@ const MarketDetail = () => {
                   </h3>
                   
                    <div className="space-y-4">
-                      <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-muted-foreground">Saldo disponível</span>
-                          <span className="text-lg font-bold text-primary">
-                            {(userProfile?.saldo_moeda || 0).toLocaleString()} RIOZ
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {(userProfile?.saldo_moeda || 0) === 0 && (
+                      {(userProfile?.saldo_moeda || 0) > 0 ? (
+                        <></>
+                      ) : (
                         <div className="p-4 bg-muted/50 rounded-lg text-center">
                           <p className="text-sm text-muted-foreground mb-3">
                             Você precisa de Rioz Coin para opinar neste mercado
                           </p>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => navigate('/exchange')}
-                            className="w-full"
-                          >
-                            Depositar R$ ou Trocar por RZ
-                          </Button>
+                          <div className="flex flex-col gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => navigate('/exchange')}
+                              className="w-full"
+                            >
+                              Depositar R$ ou Trocar por RZ
+                            </Button>
+                          </div>
                         </div>
                       )}
                       
-                      <div className="text-center text-sm text-muted-foreground">Use o slider para escolher o valor</div>
+                      <div className="text-center text-sm text-muted-foreground">ou use o slider</div>
                       
                       <div className={!authUser || (userProfile?.saldo_moeda || 0) === 0 ? 'opacity-50 pointer-events-none' : ''}>
                         <BetSlider 
@@ -427,12 +422,20 @@ const MarketDetail = () => {
               />
             </div>
 
-            {/* Desktop: Open Opinions Card Detail was here, moved to sidebar */}
+            {/* Desktop: Open Opinions Card Detail */}
+            <div className="hidden lg:block">
+              <OpenOpinionsCardDetail 
+                marketId={market.id}
+                onOrderCancelled={() => {
+                  refetchMarket();
+                }}
+              />
+            </div>
 
             {/* Pool Rules - Expandable */}
             {(market as any).rules && (
-              <Card className="border-primary/20 before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-2xl after:bg-gradient-to-tr after:from-transparent after:via-white/[0.02] after:to-white/[0.04]">
-                <CardContent className="p-0 relative z-10">
+              <Card className="border-primary/20">
+                <CardContent className="p-0">
                   <button
                     onClick={() => setRulesExpanded(!rulesExpanded)}
                     className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
@@ -571,51 +574,265 @@ const MarketDetail = () => {
           </div>
 
             {/* User Info Panel - Desktop */}
-          <div className="hidden lg:block space-y-6 sticky top-24">
-            <Card id="wallet-section" className="shadow-lg">
+          <div className="hidden lg:block sticky top-24">
+            <Card id="wallet-section">
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <Wallet className="w-5 h-5" />
                   Sua Carteira
                 </h3>
                 
-                <div className="space-y-4">
-                  <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">Saldo disponível</span>
-                      <span className="text-lg font-bold text-primary">
-                        {(userProfile?.saldo_moeda || 0).toLocaleString()} RIOZ
-                      </span>
-                    </div>
-                  </div>
+                 <div className="space-y-4">
+                    {(userProfile?.saldo_moeda || 0) > 0 ? (
+                      <>
+                        <div>
+                          <Label htmlFor="bet-amount" className="text-sm font-medium">
+                            Quantidade
+                          </Label>
+                          <Input
+                            id="bet-amount"
+                            type="number"
+                            placeholder="Digite a quantidade..."
+                            value={betAmount || ''}
+                            onChange={(e) => setBetAmount(Number(e.target.value) || 0)}
+                            min="5"
+                            max={userProfile?.saldo_moeda || 0}
+                            className="mt-2"
+                          />
+                        </div>
+                      </>
+                    ) : !authUser ? (
+                      <div className="p-4 bg-muted/50 rounded-lg text-center">
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Você precisa estar logado para opinar neste mercado
+                        </p>
+                        <Button 
+                          variant="default" 
+                          size="sm"
+                          onClick={() => navigate('/auth')}
+                          className="w-full bg-primary hover:bg-primary/90"
+                        >
+                          <LogIn className="w-4 h-4 mr-2" />
+                          Fazer Login
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-muted/50 rounded-lg text-center">
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Você precisa de Rioz Coin para opinar neste mercado
+                        </p>
+                        <div className="flex flex-col gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => navigate('/exchange')}
+                            className="w-full"
+                          >
+                            Depositar R$ ou Trocar por RZ
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="text-center text-sm text-muted-foreground">ou use o slider</div>
+                    
+                    <BetSlider 
+                      balance={userProfile?.saldo_moeda || 0}
+                      onAmountChange={(amount) => setBetAmount(amount)}
+                      estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
+                      key={userProfile?.saldo_moeda}
+                    />
                   
-                  {(userProfile?.saldo_moeda || 0) === 0 && (
-                    <div className="p-4 bg-muted/50 rounded-lg text-center">
-                      <p className="text-sm text-muted-foreground mb-3">
-                        Você precisa de Rioz Coin para opinar neste mercado
-                      </p>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => navigate('/exchange')}
-                        className="w-full"
-                      >
-                        Depositar R$ ou Trocar por RZ
-                      </Button>
+                   {selectedOption && (
+                     <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">
+                       <div className="text-sm text-muted-foreground mb-2">Opção selecionada:</div>
+                       <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
+                       <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
+                       <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
+                          <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
+                           {/* Gold fill based on slider progress - resets at 100% after 1.5s */}
+                           <div 
+                             className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 transition-all"
+                             style={{
+                               width: `${sliderProgress * 100}%`,
+                               transitionDuration: sliderProgress >= 1 ? '1500ms' : '100ms',
+                             }}
+                           />
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-shimmer"></div>
+                          <div className="relative z-10 text-center">
+                            <span 
+                              className="text-xs font-semibold tracking-wide transition-colors duration-300"
+                              style={{
+                                color: (sliderProgress > 0.3 && sliderProgress < 1) ? '#374151' : 'rgba(234, 179, 8, 0.5)'
+                              }}
+                            >
+                              LUCRO ESTIMADO
+                            </span>
+                            <div 
+                              className="text-2xl font-bold mt-1 transition-colors duration-300"
+                              style={{
+                                color: (sliderProgress > 0.3 && sliderProgress < 1) ? '#374151' : '#eab308'
+                              }}
+                            >
+                              +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz
+                            </div>
+                          </div>
+                        </div>
+                     </div>
+                   )}
+                  
+                   {(userProfile?.saldo_moeda || 0) === 0 ? (
+                     <div className="p-4 bg-warning/10 border border-warning rounded-lg text-center">
+                       <p className="text-sm text-warning mb-2">Saldo insuficiente para opinar</p>
+                       <p className="text-xs text-muted-foreground">Deposite R$ ou troque R$ por RIOZ para começar a opinar</p>
+                     </div>
+                   ) : (
+                     <>
+                       <div className="grid grid-cols-2 gap-2 mt-4">
+                         <Button 
+                           onClick={() => setSelectedOption('sim')}
+                           disabled={market.status !== 'aberto'}
+                           className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-[#00ff90] hover:bg-[#00ff90]/90 text-black font-semibold' : 'bg-[#00ff90] text-black border-2 hover:bg-[#00ff90]/90 font-semibold'}`}
+                           size="sm"
+                           aria-label="Opinar Sim"
+                         >
+                           <div className="flex items-center justify-between w-full">
+                             <span>Opinar Sim</span>
+                             <span className="text-xs opacity-80">{(market.odds?.sim || 1.5).toFixed(2)}x</span>
+                           </div>
+                         </Button>
+                         <Button 
+                           onClick={() => setSelectedOption('nao')}
+                           disabled={market.status !== 'aberto'}
+                           className={`min-h-[44px] ${selectedOption === 'nao' ? 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-semibold' : 'bg-[#ff2389] text-white border-2 hover:bg-[#ff2389]/90 font-semibold'}`}
+                           size="sm"
+                           aria-label="Opinar Não"
+                         >
+                           <div className="flex items-center justify-between w-full">
+                             <span>Opinar Não</span>
+                             <span className="text-xs opacity-80">{(market.odds?.não || market.odds?.nao || 1.5).toFixed(2)}x</span>
+                           </div>
+                         </Button>
+                       </div>
+                       
+                        {selectedOption && betAmount && betAmount > 0 && (
+                          <div className="mt-4 w-full">
+                            <SliderConfirm
+                              selectedOption={selectedOption}
+                              disabled={market.status !== 'aberto' || !selectedOption || !betAmount || betAmount <= 0}
+                              onProgressChange={(progress) => setSliderProgress(progress)}
+                            onConfirm={async () => {
+                        if (!authUser?.id) {
+                          toast({
+                            title: "Erro",
+                            description: "Você precisa estar logado para opinar",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+
+                         try {
+                           const recompensa = market.odds?.[selectedOption] || 1.5;
+                           
+                           // Insert into market_order_book_pools for pool-specific orderbook
+                           const { error: orderBookError } = await supabase
+                             .from('market_order_book_pools')
+                             .insert({
+                               market_id: market.id,
+                               user_id: authUser.id,
+                               side: selectedOption,
+                               quantity: betAmount,
+                               price: recompensa,
+                               status: 'filled',
+                               filled_at: new Date().toISOString()
+                             });
+
+                           if (orderBookError) {
+                             console.error('OrderBook error:', orderBookError);
+                           }
+
+                           // Insert into orders table for user tracking
+                           const { error: orderError } = await supabase
+                             .from('orders')
+                             .insert({
+                               id: `order_${Date.now()}_${authUser.id}`,
+                               user_id: authUser.id,
+                               market_id: market.id,
+                               opcao_escolhida: selectedOption,
+                               quantidade_moeda: betAmount,
+                               preco: recompensa,
+                               status: 'ativa',
+                               entry_percent: 50,
+                               entry_multiple: recompensa
+                             });
+
+                           if (orderError) throw orderError;
+
+                           // Update user balance
+                           const { error: balanceError } = await supabase.rpc('increment_balance', {
+                             user_id: authUser.id,
+                             amount: -betAmount
+                           });
+
+                           if (balanceError) {
+                             console.error('Balance update error:', balanceError);
+                           }
+
+                           // Create transaction record
+                           await supabase.from('wallet_transactions').insert({
+                             id: `opinion_${Date.now()}_${authUser.id}`,
+                             user_id: authUser.id,
+                             tipo: 'debito',
+                             valor: betAmount,
+                             descricao: `Opinião ${selectedOption.toUpperCase()} - ${market.titulo}`,
+                             market_id: market.id
+                           });
+
+                           // Dispatch balance update events
+                           window.dispatchEvent(new CustomEvent('balanceUpdated'));
+                          window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
+
+                             // Success notification with opinion color
+                             toast({
+                               title: "Opinião confirmada!",
+                               description: `Você opinou ${selectedOption.toUpperCase()} com ${betAmount} RIOZ`,
+                               className: "fixed bottom-24 md:bottom-4 right-4 rounded-2xl z-50",
+                               style: {
+                                 backgroundColor: selectedOption === 'sim' ? '#00ff90' : '#ff2389',
+                                 color: selectedOption === 'sim' ? '#374151' : '#ffffff',
+                                 border: 'none'
+                               }
+                             });
+
+                          handleBetSuccess();
+                          setSelectedOption('');
+                          setBetAmount(0);
+                        } catch (error) {
+                          console.error('Opinion error:', error);
+                          toast({
+                            title: "Erro",
+                            description: error instanceof Error ? error.message : "Falha ao confirmar opinião. Tente novamente.",
+                            variant: "destructive",
+                          });
+                         }
+                       }}
+                       text="Deslize para confirmar opinião"
+                       className="mt-4 w-full"
+                     />
+                          </div>
+                       )}
+                     </>
+                   )}
+
+                   {market.status !== 'aberto' && (
+                    <div className="text-center text-sm text-muted-foreground">
+                      Este mercado está {market.status}
                     </div>
                   )}
                 </div>
               </CardContent>
             </Card>
-
-            {/* Desktop: Open Opinions Card Detail - Right after wallet */}
-            <OpenOpinionsCardDetail 
-              marketId={market.id}
-              onOrderCancelled={() => {
-                refetchMarket();
-              }}
-            />
-           </div>
+          </div>
         </div>
       </div>
 

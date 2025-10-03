@@ -59,32 +59,19 @@ const AdminMarkets = () => {
 
   const handleToggleMarketsGlobal = async (enabled: boolean) => {
     try {
-      // First update system config
-      const { error: configError } = await supabase
+      const { error } = await supabase
         .from('system_config')
         .update({ markets_enabled: enabled, updated_by: user?.id })
         .eq('id', (await supabase.from('system_config').select('id').single()).data?.id);
 
-      if (configError) throw configError;
-
-      // If disabling markets, pause all markets
-      if (!enabled) {
-        const { error: marketsError } = await supabase
-          .from('markets')
-          .update({ paused: true })
-          .neq('status', 'liquidado'); // Don't pause liquidated markets
-
-        if (marketsError) throw marketsError;
-      }
+      if (error) throw error;
 
       setMarketsEnabled(enabled);
-      refetch(); // Refresh markets list
-      
       toast({
         title: enabled ? "Mercados ativados!" : "Mercados desativados!",
         description: enabled 
           ? "Os usuários podem voltar a visualizar e apostar nos mercados." 
-          : "Todos os mercados foram pausados e marcados como 'Em Atualização'.",
+          : "Os mercados estão em atualização. Usuários verão uma notificação.",
       });
     } catch (error) {
       console.error('Error toggling markets:', error);

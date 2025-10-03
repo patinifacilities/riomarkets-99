@@ -339,8 +339,7 @@ const Auth = () => {
             title: "Conta criada e login realizado!",
             description: "Bem-vindo ao Rio Markets!",
           });
-          // Redirect to markets page
-          navigate('/', { replace: true });
+          // User will be automatically redirected by auth state change
         }
       }
     } catch (error) {
@@ -369,10 +368,10 @@ const Auth = () => {
                 }}
                 onClick={() => navigate('/')}
               />
-              <div className="text-2xl font-bold text-foreground text-center">
+              <div className="text-2xl font-bold text-foreground">
                 Mercados Preditivos
               </div>
-              <div className="flex justify-center">
+              <div>
               <TypewriterText
                   baseText=""
                   texts={[
@@ -629,31 +628,41 @@ const Auth = () => {
                           </div>
                         </div>
 
-                        {/* Password Requirements - only show if not all requirements met */}
-                        {formData.password && !Object.values(passwordRequirements).every(Boolean) && (
+                        {/* Password Requirements - truly disappear when complete */}
+                        {formData.password && (
                           <div className="space-y-2 p-3 rounded-lg border border-border bg-muted/20">
                             <div className="text-sm font-medium text-foreground">Requisitos da senha:</div>
                             <div className="space-y-1">
-                              <div className={`flex items-center gap-2 text-xs ${passwordRequirements.length ? 'text-success' : 'text-muted-foreground'}`}>
-                                {passwordRequirements.length ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                                Pelo menos 8 caracteres
-                              </div>
-                              <div className={`flex items-center gap-2 text-xs ${passwordRequirements.uppercase ? 'text-success' : 'text-muted-foreground'}`}>
-                                {passwordRequirements.uppercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                                Uma letra maiúscula
-                              </div>
-                              <div className={`flex items-center gap-2 text-xs ${passwordRequirements.lowercase ? 'text-success' : 'text-muted-foreground'}`}>
-                                {passwordRequirements.lowercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                                Uma letra minúscula
-                              </div>
-                              <div className={`flex items-center gap-2 text-xs ${passwordRequirements.number ? 'text-success' : 'text-muted-foreground'}`}>
-                                {passwordRequirements.number ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                                Um número
-                              </div>
-                              <div className={`flex items-center gap-2 text-xs ${passwordRequirements.special ? 'text-success' : 'text-muted-foreground'}`}>
-                                {passwordRequirements.special ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                                Um caractere especial
-                              </div>
+                              {!passwordRequirements.length && (
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <X className="w-3 h-3" />
+                                  Pelo menos 8 caracteres
+                                </div>
+                              )}
+                              {!passwordRequirements.uppercase && (
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <X className="w-3 h-3" />
+                                  Uma letra maiúscula
+                                </div>
+                              )}
+                              {!passwordRequirements.lowercase && (
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <X className="w-3 h-3" />
+                                  Uma letra minúscula
+                                </div>
+                              )}
+                              {!passwordRequirements.number && (
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <X className="w-3 h-3" />
+                                  Um número
+                                </div>
+                              )}
+                              {!passwordRequirements.special && (
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <X className="w-3 h-3" />
+                                  Um caractere especial
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
@@ -715,12 +724,6 @@ const Auth = () => {
                             type="submit" 
                             className="w-full" 
                             disabled={loading || !acceptedTerms || passwordMismatch || !Object.values(passwordRequirements).every(Boolean)}
-                            onClick={(e) => {
-                              console.log('Create account button clicked');
-                              console.log('Form data:', formData);
-                              console.log('Accepted terms:', acceptedTerms);
-                              console.log('Password requirements:', passwordRequirements);
-                            }}
                           >
                             {loading ? 'Cadastrando...' : 'Criar conta'}
                           </Button>
