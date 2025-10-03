@@ -306,7 +306,7 @@ const Home = () => {
                   return (
                     <CarouselItem key="text-card">
                       <div className="flex items-center justify-center min-h-[300px] px-4 sm:px-8">
-                        <div className="text-center space-y-6 sm:space-y-8 max-w-3xl">
+                        <div className="text-center space-y-6 sm:space-y-8 max-w-3xl mx-auto">
                           <div className="text-3xl sm:text-4xl md:text-6xl font-bold">
                             <div className="mb-3 sm:mb-4 text-3xl sm:text-4xl md:text-6xl">Mercados Preditivos</div>
                              <div className="text-3xl sm:text-4xl md:text-6xl">

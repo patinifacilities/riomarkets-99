@@ -411,13 +411,13 @@ const AdminBranding = () => {
                   </div>
                 </div>
 
-                {/* Logo Rio */}
+                {/* Logo Rio (fundo escuro) */}
                 <div className="space-y-2">
-                  <Label>Logo Rio</Label>
+                  <Label>Logo Rio (fundo escuro)</Label>
                   <div className="flex items-center gap-4">
-                    {config.logo_black_url && (
-                      <div className="bg-white p-2 rounded">
-                        <img src={config.logo_black_url} alt="Logo Black" className="h-12 object-contain" />
+                    {config.logo_url && (
+                      <div className="bg-gray-800 p-2 rounded">
+                        <img src={config.logo_url} alt="Logo Rio Dark" className="h-12 object-contain" />
                       </div>
                     )}
                     <Input
@@ -425,9 +425,9 @@ const AdminBranding = () => {
                       accept="image/*"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
-                        if (file) handleLogoUpload(file, 'logo_black');
+                        if (file) handleLogoUpload(file, 'logo');
                       }}
-                      disabled={uploading.logo_black}
+                      disabled={uploading.logo}
                     />
                   </div>
                 </div>

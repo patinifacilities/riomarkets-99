@@ -1,4 +1,4 @@
-import { useEffect, lazy } from 'react';
+import { useEffect, lazy, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import Home from '@/pages/Home';
@@ -51,20 +51,29 @@ import { Toaster } from '@/components/ui/sonner';
 import { track } from '@/lib/analytics';
 import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorModal';
 import { useBranding } from '@/hooks/useBranding';
+import { LoadingScreen } from '@/components/layout/LoadingScreen';
 
 const AdminRewards = lazy(() => import('@/pages/AdminRewards'));
 
 function App() {
   // Initialize branding theme
   useBranding();
+  const [showLoading, setShowLoading] = useState(true);
   
   useEffect(() => {
     // Track page view
     track('app_initialized');
+
+    const timer = setTimeout(() => {
+      setShowLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <Router>
+      {showLoading && <LoadingScreen />}
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />

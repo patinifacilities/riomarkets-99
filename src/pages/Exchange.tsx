@@ -147,7 +147,7 @@ const ExchangeNew = () => {
       setRiozBalance(data.new_rioz_balance);
       
       setShowSuccessNotification(true);
-      setTimeout(() => setShowSuccessNotification(false), 5000);
+      setTimeout(() => setShowSuccessNotification(false), 3000);
       
       toast({
         title: "Conversão realizada!",
@@ -437,16 +437,15 @@ const ExchangeNew = () => {
                   size="lg"
                 >
                   <a href="/fast" className="flex items-center justify-center gap-3">
-                    <Zap className="w-7 h-7 animate-bounce" />
+                    <Zap className="w-7 h-7 animate-pulse" />
                     Fast Markets
-                    <Zap className="w-7 h-7 animate-bounce" style={{ animationDelay: '150ms' }} />
                   </a>
                 </Button>
               </div>
             )}
             
             {showSuccessNotification && (
-              <div className="px-6 py-5 rounded-2xl animate-scale-in flex items-center gap-4 border-2 border-[#00ff90]/30 shadow-2xl backdrop-blur-sm" style={{ background: 'linear-gradient(135deg, rgba(0, 255, 144, 0.05), rgba(0, 255, 144, 0.02))' }}>
+              <div className="px-6 py-5 rounded-2xl flex items-center gap-4 border-2 border-[#00ff90]/30 shadow-2xl backdrop-blur-sm transition-opacity duration-500 animate-fade-in" style={{ background: 'linear-gradient(135deg, rgba(0, 255, 144, 0.05), rgba(0, 255, 144, 0.02))' }}>
                 <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#00ff90]/20 flex items-center justify-center">
                   <CheckCircle2 className="w-7 h-7 text-[#00ff90]" />
                 </div>
