@@ -786,6 +786,7 @@ export type Database = {
           paused: boolean | null
           periodicidade: string | null
           photo_url: string | null
+          rules: string | null
           status: string | null
           thumbnail_url: string | null
           titulo: string
@@ -804,6 +805,7 @@ export type Database = {
           paused?: boolean | null
           periodicidade?: string | null
           photo_url?: string | null
+          rules?: string | null
           status?: string | null
           thumbnail_url?: string | null
           titulo: string
@@ -822,6 +824,7 @@ export type Database = {
           paused?: boolean | null
           periodicidade?: string | null
           photo_url?: string | null
+          rules?: string | null
           status?: string | null
           thumbnail_url?: string | null
           titulo?: string

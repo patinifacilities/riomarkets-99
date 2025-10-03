@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bookmark, Share2, Clock, Users, TrendingUp } from 'lucide-react';
+import { Bookmark, Share2, Clock, Users, TrendingUp, Settings } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Market } from '@/types';
 import BetModal from './BetModal';
@@ -144,6 +144,16 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
         e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
         e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
       }}>
+        {/* Em Atualização Overlay */}
+        {(market as any).paused && (
+          <div className="absolute inset-0 bg-background/90 backdrop-blur-md z-50 rounded-2xl flex items-center justify-center">
+            <div className="text-center p-6">
+              <Settings className="w-12 h-12 mx-auto mb-3 text-primary animate-spin" />
+              <h3 className="text-lg font-bold mb-1">Em Atualização</h3>
+              <p className="text-sm text-muted-foreground">Este pool está sendo atualizado</p>
+            </div>
+          </div>
+        )}
         <Link to={`/market/${market.id}`} className="block">
           {/* Image Header */}
           <div className="relative h-40 overflow-hidden bg-[#2a2a2a]">

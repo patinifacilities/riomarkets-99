@@ -28,7 +28,8 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
     destaque: false,
     periodicidade: '',
     iconUrl: '',
-    photoUrl: ''
+    photoUrl: '',
+    rules: ''
   });
   const [editingOptions, setEditingOptions] = useState<string[]>([]);
 
@@ -42,7 +43,8 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
         destaque: market.destaque || false,
         periodicidade: market.periodicidade || '',
         iconUrl: market.icon_url || '',
-        photoUrl: market.photo_url || ''
+        photoUrl: market.photo_url || '',
+        rules: (market as any).rules || ''
       });
       setEditingOptions([...(market.opcoes || [])]);
     }
@@ -83,7 +85,8 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
           periodicidade: editMarket.periodicidade || null,
           opcoes: editingOptions,
           icon_url: editMarket.iconUrl || null,
-          photo_url: editMarket.photoUrl || null
+          photo_url: editMarket.photoUrl || null,
+          rules: editMarket.rules || null
         })
         .eq('id', market.id)
         .select();
@@ -216,6 +219,19 @@ const EditMarketModal = ({ market, isOpen, onClose, onSuccess }: EditMarketModal
               />
               <p className="text-xs text-muted-foreground mt-1">
                 Recomendado: imagem em formato 21:9 (ex: 1920x823px)
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">Regras do Pool</label>
+              <Textarea
+                placeholder="Digite as regras e requisitos para considerar o acontecimento final deste pool..."
+                value={editMarket.rules}
+                onChange={(e) => setEditMarket({...editMarket, rules: e.target.value})}
+                rows={4}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Estas regras serão exibidas na página de detalhes do pool
               </p>
             </div>
           </div>

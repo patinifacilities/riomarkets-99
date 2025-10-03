@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Users, TrendingUp, Clock, Wallet, Calculator, LogIn } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, TrendingUp, Clock, Wallet, Calculator, LogIn, ChevronDown, ChevronUp, FileText } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +42,7 @@ const MarketDetail = () => {
   const [betAmount, setBetAmount] = useState<number>(0);
   const [showBetModal, setShowBetModal] = useState(false);
   const [sliderProgress, setSliderProgress] = useState<number>(0);
+  const [rulesExpanded, setRulesExpanded] = useState(false);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -430,6 +431,37 @@ const MarketDetail = () => {
                 }}
               />
             </div>
+
+            {/* Pool Rules - Expandable */}
+            {(market as any).rules && (
+              <Card className="border-primary/20">
+                <CardContent className="p-0">
+                  <button
+                    onClick={() => setRulesExpanded(!rulesExpanded)}
+                    className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-primary" />
+                      <h3 className="text-lg font-semibold">Regras do Pool</h3>
+                    </div>
+                    {rulesExpanded ? (
+                      <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                    )}
+                  </button>
+                  {rulesExpanded && (
+                    <div className="px-4 pb-4">
+                      <div className="prose prose-sm max-w-none dark:prose-invert">
+                        <p className="text-muted-foreground whitespace-pre-wrap">
+                          {(market as any).rules}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             {/* Probability Chart */}
             <ProbabilityChart 

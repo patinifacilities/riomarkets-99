@@ -316,16 +316,7 @@ const AdminMarkets = () => {
                     return matchesDeleted && matchesSearch;
                   })
                   .map(market => (
-                  <div key={market.id} className="p-4 rounded-lg border border-border bg-card/50 relative">
-                    {(market as any).paused && (
-                      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 rounded-lg flex items-center justify-center">
-                        <div className="text-center">
-                          <Settings className="w-12 h-12 mx-auto mb-2 text-primary animate-spin" />
-                          <p className="font-bold text-lg">Em Atualização</p>
-                          <p className="text-sm text-muted-foreground">Este mercado está sendo atualizado</p>
-                        </div>
-                      </div>
-                    )}
+                  <div key={market.id} className="p-4 rounded-lg border border-border bg-card/50">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">

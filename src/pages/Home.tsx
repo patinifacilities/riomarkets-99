@@ -222,18 +222,18 @@ const Home = () => {
   // Build ordered slides - Only show what admin selected (Desktop only)
   const orderedSlides = useMemo(() => {
     const slides: Array<{ type: 'market' | 'image' | 'fast' | 'text', data: any }> = [];
+    const uniqueIds = new Set<string>();
     
     if (slideOrder.length === 0) {
-      // Fallback: show text/buttons + selected markets + custom images
+      // Fallback: show selected markets + custom images (text shown separately)
       slides.push(...sliderMarkets.map(m => ({ type: 'market' as const, data: m })));
       slides.push(...sliderCustomImages.map(img => ({ type: 'image' as const, data: img })));
     } else {
       // Respect the order from admin panel, filtering out hidden and fast pool slides
-      const uniqueIds = new Set<string>();
       const orderSlides = slideOrder
         .filter((item: any) => {
           const id = typeof item === 'string' ? item : item.id;
-          // Filter out hidden slides, fast pool, and text-card (shown separately on mobile)
+          // Filter out hidden slides, fast pool, and text-card (shown separately)
           if (item.hidden || id === 'fast-card' || id === 'text-card') return false;
           // Filter out duplicates
           if (uniqueIds.has(id)) return false;
