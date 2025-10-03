@@ -16,6 +16,7 @@ interface BrandingConfig {
   logo_url: string | null;
   logo_white_url: string | null;
   logo_black_url: string | null;
+  logo_light_url: string | null;
   background_color: string;
   primary_color: string;
   success_color: string;
@@ -85,9 +86,13 @@ const AdminBranding = () => {
 
       if (error) throw error;
       if (data) {
-        setConfig(data);
+        const configData: BrandingConfig = {
+          ...data,
+          logo_light_url: data.logo_light_url || null
+        };
+        setConfig(configData);
         // Save initial state to history
-        setHistory([{ config: data, timestamp: Date.now() }]);
+        setHistory([{ config: configData, timestamp: Date.now() }]);
       }
     } catch (error) {
       console.error('Error fetching branding config:', error);
@@ -148,9 +153,6 @@ const AdminBranding = () => {
     
     setSaving(true);
     try {
-      // Save current state to history before saving
-      setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
-      
       const { error } = await supabase
         .from('branding_config')
         .update({
@@ -166,7 +168,11 @@ const AdminBranding = () => {
 
       if (error) throw error;
 
+      // Apply changes immediately
       applyThemeToDocument(config);
+      
+      // Save to history after successful save
+      setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
       
       toast({
         title: 'Sucesso!',
@@ -208,7 +214,7 @@ const AdminBranding = () => {
     });
   };
 
-  const handleLogoUpload = async (file: File, type: 'logo' | 'logo_white' | 'logo_black') => {
+  const handleLogoUpload = async (file: File, type: 'logo' | 'logo_white' | 'logo_black' | 'logo_light') => {
     if (!config) return;
     
     setUploading(prev => ({ ...prev, [type]: true }));
@@ -234,6 +240,7 @@ const AdminBranding = () => {
       if (type === 'logo') updateData.logo_url = publicUrl;
       if (type === 'logo_white') updateData.logo_white_url = publicUrl;
       if (type === 'logo_black') updateData.logo_black_url = publicUrl;
+      if (type === 'logo_light') updateData.logo_light_url = publicUrl;
 
       const { error } = await supabase
         .from('branding_config')
@@ -251,7 +258,11 @@ const AdminBranding = () => {
 
       if (fetchError) throw fetchError;
       
-      setConfig(updatedConfig);
+      const configData: BrandingConfig = {
+        ...updatedConfig,
+        logo_light_url: updatedConfig.logo_light_url || null
+      };
+      setConfig(configData);
       
       toast({
         title: 'Sucesso!',
@@ -450,6 +461,27 @@ const AdminBranding = () => {
                     />
                   </div>
                 </div>
+
+                {/* Logo Rio (fundo claro) */}
+                <div className="space-y-2">
+                  <Label>Logo Rio (fundo claro)</Label>
+                  <div className="flex items-center gap-4">
+                    {config.logo_light_url && (
+                      <div className="bg-white p-2 rounded">
+                        <img src={config.logo_light_url} alt="Logo Rio Light" className="h-12 object-contain" key={config.logo_light_url} />
+                      </div>
+                    )}
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleLogoUpload(file, 'logo_light');
+                      }}
+                      disabled={uploading.logo_light}
+                    />
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
@@ -519,21 +551,13 @@ const AdminBranding = () => {
                     <Input
                       type="color"
                       value={config.success_color}
-                      onChange={(e) => {
-                        setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
-                        setConfig({ ...config, success_color: e.target.value });
-                        applyThemeToDocument({ ...config, success_color: e.target.value });
-                      }}
+                      onChange={(e) => setConfig({ ...config, success_color: e.target.value })}
                       className="w-24 h-12"
                     />
                     <Input
                       type="text"
                       value={config.success_color}
-                      onChange={(e) => {
-                        setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
-                        setConfig({ ...config, success_color: e.target.value });
-                        applyThemeToDocument({ ...config, success_color: e.target.value });
-                      }}
+                      onChange={(e) => setConfig({ ...config, success_color: e.target.value })}
                       className="flex-1"
                     />
                   </div>
@@ -550,19 +574,13 @@ const AdminBranding = () => {
                     <Input
                       type="color"
                       value={config.opinion_yes_color || config.success_color}
-                      onChange={(e) => {
-                        setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
-                        setConfig({ ...config, opinion_yes_color: e.target.value });
-                      }}
+                      onChange={(e) => setConfig({ ...config, opinion_yes_color: e.target.value })}
                       className="w-24 h-12"
                     />
                     <Input
                       type="text"
                       value={config.opinion_yes_color || config.success_color}
-                      onChange={(e) => {
-                        setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
-                        setConfig({ ...config, opinion_yes_color: e.target.value });
-                      }}
+                      onChange={(e) => setConfig({ ...config, opinion_yes_color: e.target.value })}
                       className="flex-1"
                     />
                   </div>
@@ -579,19 +597,13 @@ const AdminBranding = () => {
                     <Input
                       type="color"
                       value={config.opinion_no_color || config.primary_color}
-                      onChange={(e) => {
-                        setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
-                        setConfig({ ...config, opinion_no_color: e.target.value });
-                      }}
+                      onChange={(e) => setConfig({ ...config, opinion_no_color: e.target.value })}
                       className="w-24 h-12"
                     />
                     <Input
                       type="text"
                       value={config.opinion_no_color || config.primary_color}
-                      onChange={(e) => {
-                        setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
-                        setConfig({ ...config, opinion_no_color: e.target.value });
-                      }}
+                      onChange={(e) => setConfig({ ...config, opinion_no_color: e.target.value })}
                       className="flex-1"
                     />
                   </div>
