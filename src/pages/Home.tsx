@@ -179,12 +179,12 @@ const Home = () => {
                 delay: 7000,
               }),
             ]}
-            className="w-full max-w-5xl mx-auto"
+            className="w-full max-w-6xl mx-auto"
           >
-            <CarouselContent>
+            <CarouselContent className="py-12">
               {/* Slide 1: Title with Typewriter */}
               <CarouselItem>
-                <div className="text-center space-y-6 py-8">
+                <div className="text-center space-y-6 py-16 px-8">
                   <div className="text-4xl md:text-6xl font-bold">
                     <TypewriterText
                       baseText="Mercados Preditivos"
@@ -230,16 +230,24 @@ const Home = () => {
               {/* Slides 2-4: Top 3 Markets */}
               {topMarketsByVolume.map((market) => (
                 <CarouselItem key={market.id}>
-                  <div className="flex justify-center py-8">
-                    <div className="w-full max-w-2xl scale-125 transform">
-                      <MarketCardKalshi market={market} />
+                  <div className="flex justify-center py-16 px-8">
+                    <div className="w-full max-w-3xl">
+                      <MarketCardKalshi market={market} isSlider={true} />
                     </div>
                   </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
+            
+            {/* Dots Navigation */}
+            <div className="flex justify-center gap-2 mt-6">
+              {[0, 1, 2, 3].map((index) => (
+                <div
+                  key={index}
+                  className="w-2 h-2 rounded-full bg-white/30 transition-all"
+                />
+              ))}
+            </div>
           </Carousel>
         </div>
       </div>

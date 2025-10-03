@@ -19,9 +19,10 @@ interface MarketCardKalshiProps {
   market: Market;
   className?: string;
   showHotIcon?: boolean;
+  isSlider?: boolean;
 }
 
-const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, className, showHotIcon }: MarketCardKalshiProps) {
+const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, className, showHotIcon, isSlider = false }: MarketCardKalshiProps) {
   const [betModalOpen, setBetModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string>('sim');
   const navigate = useNavigate();
@@ -112,8 +113,13 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   const yesPercentage = yesOption?.chance || 50;
   const noPercentage = noOption?.chance || 50;
 
-  // Uniform background for all cards
-  const cardBackground = 'bg-[#1a1a1a]';
+  // Random color assignment for profile avatars
+  const getRandomAvatarColors = () => {
+    const colors = ['#00ff90', '#ff2389'];
+    return Array(3).fill(null).map(() => colors[Math.floor(Math.random() * colors.length)]);
+  };
+  
+  const avatarColors = getRandomAvatarColors();
 
   return (
     <>
@@ -133,7 +139,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/60 via-transparent to-transparent" />
             
-            {/* USDC Badge or In-Play */}
+            {/* RIOZ Badge */}
             <div className="absolute top-3 left-3">
               <Badge className="bg-blue-600/90 text-white border-0 backdrop-blur-sm">
                 <div className="w-4 h-4 rounded-full bg-white mr-1.5 flex items-center justify-center">
@@ -175,22 +181,24 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
               </div>
             </div>
 
-            {/* YES/NO Buttons */}
+            {/* SIM/NÃO Buttons */}
             <div className="grid grid-cols-2 gap-3 mb-4">
               <Button
                 onClick={(e) => handleBetClick(e, 'sim')}
                 disabled={market.status !== 'aberto'}
-                className="h-11 bg-teal-900/40 hover:bg-teal-900/60 text-teal-400 border border-teal-700/50 rounded-xl font-semibold transition-all"
+                className="h-11 hover:opacity-80 transition-all font-semibold rounded-xl text-gray-900"
+                style={{ backgroundColor: '#00ff90' }}
               >
-                YES
+                SIM
               </Button>
               
               <Button
                 onClick={(e) => handleBetClick(e, 'não')}
                 disabled={market.status !== 'aberto'}
-                className="h-11 bg-purple-900/40 hover:bg-purple-900/60 text-purple-400 border border-purple-700/50 rounded-xl font-semibold transition-all"
+                className="h-11 hover:opacity-80 transition-all font-semibold rounded-xl text-white"
+                style={{ backgroundColor: '#ff2389' }}
               >
-                NO
+                NÃO
               </Button>
             </div>
 
@@ -199,8 +207,13 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
                   <div className="flex -space-x-1.5">
-                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border border-[#1a1a1a]" />
-                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 border border-[#1a1a1a]" />
+                    {avatarColors.map((color, i) => (
+                      <div 
+                        key={i}
+                        className="w-5 h-5 rounded-full border border-[#1a1a1a]"
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
                   </div>
                   <span className="ml-1">+{stats?.participantes || 13}</span>
                 </div>
@@ -216,6 +229,24 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                 <span>{formatTimeLeft(market.end_date)}</span>
               </div>
             </div>
+
+            {/* Additional details for slider */}
+            {isSlider && (
+              <div className="mt-4 pt-4 border-t border-gray-800 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Volume 24h:</span>
+                  <span className="text-white font-medium">{formatVolume((detailedPool?.totalPool || stats?.vol_total || 0) * 0.3)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Categoria:</span>
+                  <span className="text-white capitalize">{market.categoria}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Status:</span>
+                  <span className="text-white capitalize">{market.status}</span>
+                </div>
+              </div>
+            )}
           </div>
         </Link>
       </div>

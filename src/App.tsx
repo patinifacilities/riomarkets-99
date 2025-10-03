@@ -37,6 +37,7 @@ import AdminGatewayConfigPix from '@/pages/AdminGatewayConfigPix';
 import AdminGatewayConfigStripe from '@/pages/AdminGatewayConfigStripe';
 import AdminGatewayConfigCrypto from '@/pages/AdminGatewayConfigCrypto';
 import AdminGatewaysSaque from '@/pages/AdminGatewaysSaque';
+import AdminSlider from '@/pages/AdminSlider';
 import Opinioes from '@/pages/Opinioes';
 import FiatRequests from '@/pages/FiatRequests';
 import Terms from '@/pages/Terms';
@@ -95,6 +96,7 @@ function App() {
             <Route path="/admin/gateway-config/:gatewayId" element={<AdminGatewayConfig />} />
             <Route path="/admin/gateways-saque" element={<AdminGatewaysSaque />} />
             <Route path="/admin/rewards" element={<AdminRewards />} />
+            <Route path="/admin/slider" element={<AdminSlider />} />
           <Route path="/opinioes" element={<Opinioes />} />
           <Route path="/rewards" element={<Rewards />} />
           <Route path="/fiat-requests" element={<FiatRequests />} />

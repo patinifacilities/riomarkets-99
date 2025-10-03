@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Shield, DollarSign, TrendingUp, Users, FileText, Newspaper, Activity, Settings, Menu } from 'lucide-react';
+import { Plus, Shield, DollarSign, TrendingUp, Users, FileText, Newspaper, Activity, Settings, Menu, Image as ImageIcon } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -276,6 +276,22 @@ const Admin = () => {
                     <div>
                       <h3 className="font-semibold">Categorias</h3>
                       <p className="text-sm text-muted-foreground">Gerenciar categorias</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link to="/admin/slider">
+              <Card className="hover:shadow-md transition-shadow cursor-pointer bg-card-secondary border-border-secondary">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <ImageIcon className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Slider</h3>
+                      <p className="text-sm text-muted-foreground">Gerenciar slider da homepage</p>
                     </div>
                   </div>
                 </CardContent>
