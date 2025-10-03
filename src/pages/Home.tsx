@@ -243,12 +243,12 @@ const Home = () => {
             }}
             plugins={[
               Autoplay({
-                delay: sliderDelay,
+                delay: sliderDelay * 1000,
                 stopOnInteraction: false,
                 stopOnMouseEnter: false,
               }),
             ]}
-            className="w-full max-w-7xl mx-auto"
+            className="w-full max-w-[1400px] mx-auto"
           >
             <CarouselContent className="py-8">
               {/* Slide 1: Title with Typewriter */}

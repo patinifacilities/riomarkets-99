@@ -34,6 +34,7 @@ const AdminSlider = () => {
   const [customImages, setCustomImages] = useState<CustomImage[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newImageTitle, setNewImageTitle] = useState('');
+  const [imagePreview, setImagePreview] = useState('');
   const [sliderDelay, setSliderDelay] = useState(7);
   const [slideOrder, setSlideOrder] = useState<SlideItem[]>([]);
   const [configId, setConfigId] = useState<string | null>(null);
@@ -145,6 +146,18 @@ const AdminSlider = () => {
       }]);
       setNewImageUrl('');
       setNewImageTitle('');
+      setImagePreview('');
+    }
+  };
+
+  // Update preview when URL changes
+  const handleImageUrlChange = (url: string) => {
+    setNewImageUrl(url);
+    // Simple URL validation
+    if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+      setImagePreview(url);
+    } else {
+      setImagePreview('');
     }
   };
 
@@ -329,9 +342,22 @@ const AdminSlider = () => {
                     id="image-url"
                     placeholder="https://exemplo.com/imagem.jpg"
                     value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
+                    onChange={(e) => handleImageUrlChange(e.target.value)}
                   />
                 </div>
+                
+                {/* Image Preview */}
+                {imagePreview && (
+                  <div className="rounded-lg overflow-hidden border border-border">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full h-40 object-cover"
+                      onError={() => setImagePreview('')}
+                    />
+                  </div>
+                )}
+                
                 <Button
                   onClick={handleAddCustomImage}
                   className="w-full"

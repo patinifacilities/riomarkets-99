@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import riozCoin from '@/assets/rioz-coin.png';
 
 interface MarketCardKalshiProps {
   market: Market;
@@ -222,12 +223,9 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                 
                 <div className="flex items-center gap-1">
                   <img 
-                    src="/assets/rio-markets-logo.png" 
+                    src={riozCoin} 
                     alt="RIOZ" 
                     className="w-3.5 h-3.5"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
                   />
                   <span>{formatVolume(detailedPool?.totalPool || stats?.vol_total || 0)}</span>
                 </div>

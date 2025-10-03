@@ -12,6 +12,15 @@ import { useProfile } from '@/hooks/useProfile';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+interface UserData {
+  id: string;
+  nome: string;
+  username?: string;
+  profile_pic_url?: string;
+  saldo_moeda: number;
+  nivel: string;
+}
+
 const Ranking = () => {
   const { user } = useAuth();
   const { data: profile } = useProfile(user?.id);
@@ -19,6 +28,8 @@ const Ranking = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [realUsers, setRealUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const [showUserModal, setShowUserModal] = useState(false);
   
   const sortedUsers = [...fakeUsers].sort((a, b) => b.saldo_moeda - a.saldo_moeda).slice(0, 25);
 
@@ -60,15 +71,15 @@ const Ranking = () => {
   const getLevelBadge = (nivel: string) => {
     switch (nivel) {
       case 'mestre':
-        return <Badge className="bg-danger/20 text-danger border-danger/30">Mestre</Badge>;
+        return <Badge className="bg-danger/20 text-danger border-danger/30 hover:bg-danger/20">Mestre</Badge>;
       case 'guru':
-        return <Badge className="bg-primary/20 text-primary border-primary/30">Guru</Badge>;
+        return <Badge className="bg-primary/20 text-primary border-primary/30 hover:bg-primary/20">Guru</Badge>;
       case 'analista':
-        return <Badge className="bg-accent/20 text-accent border-accent/30">Analista</Badge>;
+        return <Badge className="bg-accent/20 text-accent border-accent/30 hover:bg-accent/20">Analista</Badge>;
       case 'twitch':
-        return <Badge className="bg-[#9146FF]/20 text-[#9146FF] border-[#9146FF]/30">Twitch</Badge>;
+        return <Badge className="bg-[#9146FF]/20 text-[#9146FF] border-[#9146FF]/30 hover:bg-[#9146FF]/20">Twitch</Badge>;
       case 'iniciante':
-        return <Badge className="bg-muted text-muted-foreground">Iniciante</Badge>;
+        return <Badge className="bg-muted text-muted-foreground hover:bg-muted">Iniciante</Badge>;
       default:
         return <Badge variant="outline">Usuário</Badge>;
     }
@@ -198,6 +209,60 @@ const Ranking = () => {
           </Card>
         )}
 
+        {/* User Progress Modal */}
+        <Dialog open={showUserModal} onOpenChange={setShowUserModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center">Progresso do Analista</DialogTitle>
+            </DialogHeader>
+            {selectedUser && (
+              <div className="space-y-6 py-4">
+                <div className="flex flex-col items-center gap-4">
+                  <Avatar className="w-24 h-24 border-4 border-primary/30">
+                    <AvatarImage src={selectedUser.profile_pic_url} alt={selectedUser.nome} />
+                    <AvatarFallback className="bg-primary/20 text-primary text-2xl">
+                      {selectedUser.nome?.split(' ').map(n => n[0]).join('') || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="text-center">
+                    <h3 className="font-bold text-xl">{selectedUser.nome}</h3>
+                    {selectedUser.username && (
+                      <p className="text-sm text-muted-foreground">@{selectedUser.username}</p>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="space-y-4 p-4 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Nível atual:</span>
+                    {getLevelBadge(selectedUser.nivel)}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Saldo:</span>
+                    <span className="text-lg font-bold text-primary">{selectedUser.saldo_moeda.toLocaleString()} RZ</span>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Progresso para Mestre</span>
+                      <span className="font-semibold">{Math.round(getUserLevelProgress(selectedUser.saldo_moeda).progress)}%</span>
+                    </div>
+                    <Progress 
+                      value={getUserLevelProgress(selectedUser.saldo_moeda).progress} 
+                      className="h-3"
+                    />
+                    {getUserLevelProgress(selectedUser.saldo_moeda).nextLevel && (
+                      <p className="text-xs text-muted-foreground text-center">
+                        Faltam {(getUserLevelProgress(selectedUser.saldo_moeda).nextLevelRequirement! - selectedUser.saldo_moeda).toLocaleString()} RZ para {getUserLevelProgress(selectedUser.saldo_moeda).nextLevel}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
         {/* Levels Modal */}
         <Dialog open={showLevelsModal} onOpenChange={setShowLevelsModal}>
           <DialogContent className="sm:max-w-4xl max-w-[90vw] max-h-[90vh] overflow-y-auto">
@@ -210,7 +275,7 @@ const Ranking = () => {
             
             {/* User Progress Bar */}
             {profile && (
-              <div className="mb-6 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+              <div className="mb-6 p-6 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-xl border border-primary/20 shadow-lg">
                 <div className="flex items-center gap-4 mb-4">
                   <Avatar className="w-16 h-16 border-2 border-primary/30">
                     <AvatarImage src={profile.profile_pic_url} alt={profile.nome} />
@@ -342,7 +407,14 @@ const Ranking = () => {
               const isGoldPass = index === 0 || index === 1 || index === 8; // 1º, 2º e 9º
               
               return (
-              <div key={`${user.id}-${index}`} className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-card/50 transition-all">
+              <div 
+                key={`${user.id}-${index}`} 
+                className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:border-primary/30 hover:bg-card/50 transition-all cursor-pointer"
+                onClick={() => {
+                  setSelectedUser(user);
+                  setShowUserModal(true);
+                }}
+              >
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary font-bold text-sm">
                     {index + 1}
