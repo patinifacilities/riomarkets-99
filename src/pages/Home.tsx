@@ -13,6 +13,8 @@ import { cn } from '@/lib/utils';
 import { TypewriterText } from '@/components/ui/TypewriterText';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
+import { OnboardingTrigger } from '@/components/onboarding/OnboardingTrigger';
+import ProbabilityChart from '@/components/markets/ProbabilityChart';
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -168,7 +170,7 @@ const Home = () => {
     <div className="min-h-screen bg-background">
       {/* Hero Carousel Section */}
       <div className="bg-gradient-to-b from-primary/10 to-background border-b border-border">
-        <div className="container mx-auto px-4 py-16">
+        <div className="container mx-auto px-4 py-8">
           <Carousel
             opts={{
               align: "start",
@@ -177,17 +179,20 @@ const Home = () => {
             plugins={[
               Autoplay({
                 delay: 7000,
+                stopOnInteraction: false,
+                stopOnMouseEnter: false,
               }),
             ]}
-            className="w-full max-w-6xl mx-auto"
+            className="w-full max-w-7xl mx-auto"
           >
-            <CarouselContent className="py-12">
+            <CarouselContent className="py-8">
               {/* Slide 1: Title with Typewriter */}
               <CarouselItem>
-                <div className="text-center space-y-6 py-16 px-8">
+                <div className="text-center space-y-6 py-12 px-8">
                   <div className="text-4xl md:text-6xl font-bold">
+                    <div className="mb-4">Mercados Preditivos</div>
                     <TypewriterText
-                      baseText="Mercados Preditivos"
+                      baseText=""
                       texts={[
                         "para Análise Estratégica",
                         "baseados em Dados",
@@ -195,7 +200,7 @@ const Home = () => {
                         "Rápidos"
                       ]}
                       customColors={{
-                        "Rápidos": "#00ff90"
+                        "Rápidos": "#ff2389"
                       }}
                       className="text-4xl md:text-6xl font-bold"
                       typingSpeed={100}
@@ -215,36 +220,41 @@ const Home = () => {
                       <Sparkles className="w-5 h-5 mr-2" />
                       Explorar Mercados
                     </Button>
-                    <Button 
-                      size="lg" 
-                      variant="outline"
-                      onClick={() => navigate('/auth')}
-                    >
-                      <UserPlus className="w-5 h-5 mr-2" />
-                      Criar Conta
-                    </Button>
+                    <OnboardingTrigger size="lg" variant="outline" />
                   </div>
                 </div>
               </CarouselItem>
 
-              {/* Slides 2-4: Top 3 Markets */}
+              {/* Slides 2-4: Top 3 Markets with Probability Chart */}
               {topMarketsByVolume.map((market) => (
                 <CarouselItem key={market.id}>
-                  <div className="flex justify-center py-16 px-8">
-                    <div className="w-full max-w-3xl">
+                  <div className="flex justify-center py-8 px-8">
+                    <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6">
                       <MarketCardKalshi market={market} isSlider={true} />
+                      <ProbabilityChart marketId={market.id} createdAt={market.created_at} />
                     </div>
                   </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
             
+            <CarouselPrevious className="hidden" />
+            <CarouselNext className="hidden" />
+            
             {/* Dots Navigation */}
-            <div className="flex justify-center gap-2 mt-6">
+            <div className="flex justify-center gap-2 mt-4">
               {[0, 1, 2, 3].map((index) => (
-                <div
+                <button
                   key={index}
-                  className="w-2 h-2 rounded-full bg-white/30 transition-all"
+                  className="w-2 h-2 rounded-full bg-white/30 hover:bg-white/60 transition-all cursor-pointer"
+                  onClick={(e) => {
+                    const carousel = e.currentTarget.closest('[data-carousel-container]');
+                    if (carousel) {
+                      const api = (carousel as any).__embla__;
+                      if (api) api.scrollTo(index);
+                    }
+                  }}
+                  aria-label={`Ir para slide ${index + 1}`}
                 />
               ))}
             </div>

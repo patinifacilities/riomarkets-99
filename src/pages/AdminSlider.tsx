@@ -15,6 +15,7 @@ const AdminSlider = () => {
   const [customImages, setCustomImages] = useState<Array<{ id: string; url: string; title: string }>>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newImageTitle, setNewImageTitle] = useState('');
+  const [sliderDelay, setSliderDelay] = useState(7);
 
   const handleToggleMarket = (marketId: string) => {
     setSelectedMarkets(prev => 
@@ -70,6 +71,31 @@ const AdminSlider = () => {
             Salvar Alterações
           </Button>
         </div>
+
+        {/* Slider Delay Configuration */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Configurações do Slider</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Label htmlFor="slider-delay">Intervalo de Transição (segundos)</Label>
+              <Input
+                id="slider-delay"
+                type="number"
+                min="3"
+                max="30"
+                value={sliderDelay}
+                onChange={(e) => setSliderDelay(parseInt(e.target.value) || 7)}
+                className="max-w-xs"
+              />
+              <p className="text-sm text-muted-foreground">
+                Define quantos segundos cada slide ficará visível antes de passar para o próximo. 
+                O slider continuará passando mesmo se o usuário clicar, mas pausará se clicar e segurar.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Selected Markets */}

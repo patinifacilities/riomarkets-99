@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, CheckCircle, XCircle, Settings, Play, ArrowLeft, Search } from 'lucide-react';
+import { Plus, Edit, CheckCircle, XCircle, Settings, Play, ArrowLeft, Search, Trash2 } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,7 @@ const AdminMarkets = () => {
   }>({ isOpen: false, market: null });
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showDeleted, setShowDeleted] = useState(false);
 
   const handleCreateSuccess = () => {
     setShowCreateForm(false);
@@ -99,6 +100,31 @@ const AdminMarkets = () => {
     }
   };
 
+  const handleDeleteMarket = async (marketId: string) => {
+    try {
+      const { error } = await supabase
+        .from('markets')
+        .update({ status: 'excluido' })
+        .eq('id', marketId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Mercado excluído!",
+        description: "O mercado foi marcado como excluído.",
+      });
+
+      refetch();
+    } catch (error) {
+      console.error('Error deleting market:', error);
+      toast({
+        title: "Erro",
+        description: "Falha ao excluir mercado.",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Security check
   if (authLoading || profileLoading) {
     return (
@@ -144,6 +170,14 @@ const AdminMarkets = () => {
             </div>
             <div className="flex items-center gap-3 flex-wrap">
               <Button 
+                onClick={() => setShowDeleted(!showDeleted)}
+                style={{ backgroundColor: showDeleted ? '#2a2a2a' : '#ff2389' }}
+                className="gap-2 min-h-[44px] text-white hover:opacity-90"
+              >
+                <Trash2 className="w-4 h-4" />
+                {showDeleted ? 'Ver Ativos' : 'Ver Excluídos'}
+              </Button>
+              <Button 
                 onClick={() => setShowCreateForm(!showCreateForm)}
                 className="gap-2 shadow-success min-h-[44px]"
               >
@@ -184,12 +218,14 @@ const AdminMarkets = () => {
                 </div>
               ) : (
                 markets
-                  .filter(market => 
-                    searchTerm === '' || 
-                    market.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    market.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    market.categoria.toLowerCase().includes(searchTerm.toLowerCase())
-                  )
+                  .filter(market => {
+                    const matchesDeleted = showDeleted ? market.status === 'excluido' : market.status !== 'excluido';
+                    const matchesSearch = searchTerm === '' || 
+                      market.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      market.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                      market.categoria.toLowerCase().includes(searchTerm.toLowerCase());
+                    return matchesDeleted && matchesSearch;
+                  })
                   .map(market => (
                   <div key={market.id} className="p-4 rounded-lg border border-border bg-card/50">
                     <div className="flex items-start justify-between mb-3">
@@ -239,14 +275,36 @@ const AdminMarkets = () => {
                         Editar
                       </Button>
                       {market.status === 'aberto' ? (
+                        <>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="gap-2 min-h-[44px] hover:bg-danger/10"
+                            onClick={() => handleCloseMarket(market.id)}
+                          >
+                            <XCircle className="w-4 h-4" />
+                            Fechar
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            style={{ backgroundColor: '#ff2389' }}
+                            className="gap-2 min-h-[44px] text-white hover:opacity-90"
+                            onClick={() => handleDeleteMarket(market.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Excluir
+                          </Button>
+                        </>
+                      ) : market.status === 'excluido' ? (
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="gap-2 min-h-[44px] hover:bg-danger/10"
-                          onClick={() => handleCloseMarket(market.id)}
+                          className="gap-2 min-h-[44px] hover:bg-success/10 text-success border-success"
+                          onClick={() => handleReopenMarket(market.id)}
                         >
-                          <XCircle className="w-4 h-4" />
-                          Fechar
+                          <Play className="w-4 h-4" />
+                          Restaurar
                         </Button>
                       ) : (
                         <Button 

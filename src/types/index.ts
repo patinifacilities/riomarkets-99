@@ -34,7 +34,7 @@ export interface Market {
   categoria: string;
   opcoes: string[];
   odds?: Record<string, number>; // Real odds from database
-  status: 'aberto' | 'fechado' | 'liquidado';
+  status: 'aberto' | 'fechado' | 'liquidado' | 'excluido';
   end_date: string;
   created_at: string;
   thumbnail_url?: string;
@@ -44,6 +44,7 @@ export interface Market {
   icon_url?: string;
   photo_url?: string;
   image_url?: string;
+  imagem_url?: string;
 }
 
 export interface MarketOption {

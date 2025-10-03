@@ -113,10 +113,10 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   const yesPercentage = yesOption?.chance || 50;
   const noPercentage = noOption?.chance || 50;
 
-  // Random color assignment for profile avatars
+  // Random color assignment for only 2 profile avatars with fade gradient
   const getRandomAvatarColors = () => {
     const colors = ['#00ff90', '#ff2389'];
-    return Array(3).fill(null).map(() => colors[Math.floor(Math.random() * colors.length)]);
+    return Math.random() > 0.5 ? colors : colors.reverse();
   };
   
   const avatarColors = getRandomAvatarColors();
@@ -210,8 +210,10 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                     {avatarColors.map((color, i) => (
                       <div 
                         key={i}
-                        className="w-5 h-5 rounded-full border border-[#1a1a1a]"
-                        style={{ backgroundColor: color }}
+                        className="w-5 h-5 rounded-full border border-[#1a1a1a] transition-all duration-300"
+                        style={{ 
+                          background: `linear-gradient(135deg, ${color} 0%, transparent 100%)`
+                        }}
                       />
                     ))}
                   </div>
@@ -219,7 +221,14 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                 </div>
                 
                 <div className="flex items-center gap-1">
-                  <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                  <img 
+                    src="/assets/rio-markets-logo.png" 
+                    alt="RIOZ" 
+                    className="w-3.5 h-3.5"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
                   <span>{formatVolume(detailedPool?.totalPool || stats?.vol_total || 0)}</span>
                 </div>
               </div>
