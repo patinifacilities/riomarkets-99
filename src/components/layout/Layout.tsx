@@ -1,5 +1,6 @@
 import { useLocation, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import React from 'react';
 import Header from './Header';
 import { Footer } from './Footer';
 import { RianaChat } from '@/components/chat/RianaChat';
@@ -10,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useOnboarding } from '@/stores/useOnboarding';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { supabase } from '@/integrations/supabase/client';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
@@ -20,8 +22,29 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   
   const isAuthPage = location.pathname === '/auth';
   const isRewardsPage = location.pathname === '/rewards';
+  const isFastPage = location.pathname === '/fast';
   const shouldHideHeaderFooter = isAuthPage; // Hide on Auth page for both mobile and desktop
-  const shouldHideFooter = shouldHideHeaderFooter || (isRewardsPage && isMobile); // Hide footer on auth page and on rewards page for mobile
+  const shouldHideFooter = shouldHideHeaderFooter || isRewardsPage; // Hide footer on auth and rewards pages
+  
+  // Check if Fast page is in maintenance mode
+  const [fastPaused, setFastPaused] = React.useState(false);
+  
+  React.useEffect(() => {
+    if (isFastPage) {
+      const checkFastStatus = async () => {
+        const { data } = await supabase
+          .from('fast_pool_configs')
+          .select('paused')
+          .limit(1)
+          .maybeSingle();
+        
+        setFastPaused(data?.paused || false);
+      };
+      checkFastStatus();
+    }
+  }, [isFastPage]);
+  
+  const shouldHideFooterFinal = shouldHideFooter || (isFastPage && fastPaused);
 
   // Initialize onboarding after hydration
   useEffect(() => {
@@ -68,7 +91,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <main className={`flex-1 min-h-0 ${isMobile ? 'pb-16' : ''}`}>
         {children}
       </main>
-      {!shouldHideFooter && <Footer />}
+      {!shouldHideFooterFinal && <Footer />}
       {!shouldHideHeaderFooter && <ComplianceBanner variant="sticky" />}
       {!shouldHideHeaderFooter && <OnboardingModal />}
       {!shouldHideHeaderFooter && <RianaChat />}

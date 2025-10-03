@@ -217,12 +217,9 @@ const Home = () => {
       .filter((m): m is NonNullable<typeof m> => m !== undefined);
   }, [markets, sliderMarketIds]);
 
-  // Build ordered slides - always include Fast pool as first slide after intro
+  // Build ordered slides - Fast pool as LAST slide
   const orderedSlides = useMemo(() => {
     const slides: Array<{ type: 'market' | 'image' | 'fast', data: any }> = [];
-    
-    // Add fast pool slide
-    slides.push({ type: 'fast' as const, data: null });
     
     if (slideOrder.length === 0) {
       slides.push(...sliderMarkets.map(m => ({ type: 'market' as const, data: m })));
@@ -241,6 +238,9 @@ const Home = () => {
       
       slides.push(...orderSlides);
     }
+    
+    // Add fast pool slide as LAST
+    slides.push({ type: 'fast' as const, data: null });
     
     return slides;
   }, [slideOrder, markets, sliderMarkets, sliderCustomImages]);
@@ -262,12 +262,6 @@ const Home = () => {
     <div className="min-h-screen bg-background">
       {/* Hero Carousel Section */}
       <div className="relative overflow-hidden border-b border-border">
-        {/* Modern animated background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-accent/10 via-transparent to-transparent" />
-        </div>
-        
         <div className="container mx-auto px-4 py-8 relative z-10">
           <Carousel
             opts={{

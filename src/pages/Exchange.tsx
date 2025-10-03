@@ -198,7 +198,7 @@ const ExchangeNew = () => {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-background via-[95%] to-primary/5 pb-32">
+    <div className="min-h-[100dvh] bg-background pb-32">
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         {/* Header */}
         <div className="text-center mb-8">
