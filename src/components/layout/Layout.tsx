@@ -92,14 +92,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       {/* Blocked user warning - shown on all pages */}
       {profile?.is_blocked && (
         <div 
-          className="fixed top-20 left-0 right-0 z-50 px-4 py-3 text-center text-white font-medium shadow-lg"
+          className="fixed top-16 left-0 right-0 z-40 px-4 py-3 text-center text-white font-medium shadow-lg mb-4"
           style={{ backgroundColor: '#ff2389' }}
         >
           ⚠️ Sua conta está temporariamente bloqueada. Você não pode enviar opiniões no momento. Entre em contato com o suporte.
         </div>
       )}
       
-      <main className={`flex-1 min-h-0 ${isMobile ? 'pb-16' : ''}`}>
+      <main className={`flex-1 min-h-0 ${isMobile ? 'pb-16' : ''} ${profile?.is_blocked ? 'mt-16' : ''}`}>
         {children}
       </main>
       {!shouldHideFooterFinal && <Footer />}

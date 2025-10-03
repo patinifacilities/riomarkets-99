@@ -174,10 +174,23 @@ const Auth = () => {
   const handleSignUp = async () => {
     console.log('Attempting sign up...');
     
+    // Check for email uniqueness
+    const emailExists = !(await checkUniqueness('email', formData.email));
+    if (emailExists) {
+      return { error: { message: 'Este email já está cadastrado. Faça login em vez disso.' }, needsConfirmation: false };
+    }
+    
+    // Check for CPF uniqueness
+    const cpfExists = !(await checkUniqueness('cpf', formData.cpf));
+    if (cpfExists) {
+      return { error: { message: 'Este CPF já está cadastrado.' }, needsConfirmation: false };
+    }
+    
     const { data, error } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
       options: {
+        emailRedirectTo: `${window.location.origin}/`,
         data: {
           name: formData.name,
           username: formData.username,
@@ -188,12 +201,8 @@ const Auth = () => {
     
     console.log('Sign up result:', error ? 'Error' : 'Success', error);
     
-    // If signup successful and user is immediately confirmed, log them in
-    if (!error && data.user && !data.user.email_confirmed_at) {
-      // User needs email confirmation
-      return { error: null, needsConfirmation: true };
-    } else if (!error && data.user && data.user.email_confirmed_at) {
-      // User is automatically logged in
+    // User is automatically logged in (email confirmation disabled)
+    if (!error && data.user) {
       return { error: null, needsConfirmation: false };
     }
     
@@ -317,30 +326,18 @@ const Auth = () => {
           description: "Redirecionando...",
         });
       } else {
-        const { error, needsConfirmation } = await handleSignUp();
+        const { error } = await handleSignUp();
         if (error) {
           console.error('Auth error:', error);
-          if (error.message.includes('User already registered')) {
-            setError('Este email já está cadastrado. Tente fazer login.');
-          } else {
-            setError(error.message);
-          }
+          setError(error.message);
           return;
         }
         
-        if (needsConfirmation) {
-          toast({
-            title: "Conta criada com sucesso!",
-            description: "Verifique seu email para confirmar a conta.",
-          });
-          setFormData({ email: '', password: '', confirmPassword: '', name: '', username: '', cpf: '' });
-        } else {
-          toast({
-            title: "Conta criada e login realizado!",
-            description: "Bem-vindo ao Rio Markets!",
-          });
-          // User will be automatically redirected by auth state change
-        }
+        toast({
+          title: "Conta criada!",
+          description: "Bem-vindo ao Rio Markets!",
+        });
+        // User will be automatically redirected by auth state change
       }
     } catch (error) {
       console.error('Auth error:', error);

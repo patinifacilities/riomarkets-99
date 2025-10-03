@@ -337,7 +337,9 @@ const AdminExchange = () => {
                     </div>
                     
                     <div className="flex-1">
-                      <h3 className="font-semibold">{asset.name}</h3>
+                      <h3 className="font-semibold">
+                        {asset.symbol === 'RIOZ' ? 'Rioz Coin' : asset.name}
+                      </h3>
                       <p className="text-sm text-muted-foreground">{asset.symbol}</p>
                     </div>
 

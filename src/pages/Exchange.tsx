@@ -296,13 +296,13 @@ const ExchangeNew = () => {
                         {activeAssets
                           .filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency)
                           .map(asset => (
-                            <DropdownMenuItem 
-                              key={asset.symbol}
-                              className={`p-3 rounded-lg hover:bg-muted/50 transition-colors ${
-                                asset.is_active ? 'cursor-pointer' : 'opacity-60 cursor-not-allowed'
-                              }`}
-                              disabled={!asset.is_active}
-                            >
+                           <DropdownMenuItem 
+                             key={asset.symbol}
+                             className={`p-3 rounded-lg transition-colors ${
+                               asset.is_active ? 'cursor-pointer hover:bg-[#0A101A]' : 'opacity-60 cursor-not-allowed'
+                             }`}
+                             disabled={!asset.is_active}
+                           >
                               <div className="flex items-center gap-3 w-full">
                                 {asset.icon_url && (
                                   <img src={asset.icon_url} alt={asset.name} className="w-6 h-6 rounded-full" />
@@ -401,14 +401,14 @@ const ExchangeNew = () => {
                       </div>
                       {activeAssets
                         .filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency)
-                        .map(asset => (
-                          <DropdownMenuItem 
-                            key={asset.symbol}
-                            className={`p-3 rounded-lg hover:bg-muted/50 transition-colors ${
-                              asset.is_active ? 'cursor-pointer' : 'opacity-60 cursor-not-allowed'
-                            }`}
-                            disabled={!asset.is_active}
-                          >
+                         .map(asset => (
+                           <DropdownMenuItem 
+                             key={asset.symbol}
+                             className={`p-3 rounded-lg transition-colors ${
+                               asset.is_active ? 'cursor-pointer hover:bg-[#0A101A]' : 'opacity-60 cursor-not-allowed'
+                             }`}
+                             disabled={!asset.is_active}
+                           >
                             <div className="flex items-center gap-3 w-full">
                               {asset.icon_url && (
                                 <img src={asset.icon_url} alt={asset.name} className="w-6 h-6 rounded-full" />
@@ -479,10 +479,18 @@ const ExchangeNew = () => {
           </CardContent>
         </Card>
 
-        {/* Success Notification with Fast Button */}
-        {showSuccessNotification && (
-          <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top duration-300">
-            <Card className="border-success bg-success/10 shadow-xl">
+        {/* Fast Markets Button and Success Notification - shown after conversion */}
+        {fastMarketsButtonVisible && (
+          <div className="mt-6 space-y-4">
+            <Button
+              onClick={() => window.location.href = '/fast'}
+              className="w-full h-14 text-lg font-bold bg-[#ff2389] hover:bg-[#ff2389]/90 text-white shadow-lg"
+            >
+              <Zap className="w-5 h-5 mr-2" />
+              Ir para Fast Markets
+            </Button>
+            
+            <Card className="border-success bg-success/10">
               <CardContent className="p-4 flex items-center gap-3">
                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
                   <CheckCircle2 className="w-6 h-6 text-success" />
@@ -491,15 +499,6 @@ const ExchangeNew = () => {
                   <p className="font-semibold text-success">Conversão realizada!</p>
                   <p className="text-sm text-muted-foreground">Seus saldos foram atualizados</p>
                 </div>
-                {fastMarketsButtonVisible && (
-                  <Button
-                    onClick={() => window.location.href = '/fast'}
-                    className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white"
-                  >
-                    <Zap className="w-4 h-4 mr-2" />
-                    Fast
-                  </Button>
-                )}
               </CardContent>
             </Card>
           </div>
