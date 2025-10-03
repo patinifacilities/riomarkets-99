@@ -111,10 +111,11 @@ const AdminMarkets = () => {
 
       toast({
         title: "Mercado excluído!",
-        description: "O mercado foi marcado como excluído.",
+        description: "O mercado foi movido para Excluídos.",
       });
 
-      refetch();
+      // Refetch to update the UI
+      await refetch();
     } catch (error) {
       console.error('Error deleting market:', error);
       toast({

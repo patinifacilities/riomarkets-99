@@ -105,6 +105,7 @@ const AdminExchange = () => {
   };
 
   const fetchOrders = async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('exchange_orders')
@@ -134,6 +135,8 @@ const AdminExchange = () => {
       setOrders(ordersWithProfiles as ExchangeOrder[]);
     } catch (error) {
       console.error('Error fetching orders:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -311,50 +314,59 @@ const AdminExchange = () => {
               <CardTitle>Histórico de Conversões</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Data/Hora</TableHead>
-                      <TableHead>Usuário</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Operação</TableHead>
-                      <TableHead>Quantidade RIOZ</TableHead>
-                      <TableHead>Valor BRL</TableHead>
-                      <TableHead>Taxa</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {orders.map((order) => (
-                      <TableRow key={order.id}>
-                        <TableCell className="whitespace-nowrap">
-                          {format(new Date(order.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
-                        </TableCell>
-                        <TableCell>{order.profiles?.nome || 'N/A'}</TableCell>
-                        <TableCell>{order.profiles?.email || 'N/A'}</TableCell>
-                        <TableCell>
-                          <span className={`px-2 py-1 rounded text-xs ${
-                            order.side === 'buy_rioz' 
-                              ? 'bg-green-500/20 text-green-500' 
-                              : 'bg-red-500/20 text-red-500'
-                          }`}>
-                            {order.side === 'buy_rioz' ? 'Compra RIOZ' : 'Venda RIOZ'}
-                          </span>
-                        </TableCell>
-                        <TableCell>{order.amount_rioz.toLocaleString('pt-BR')}</TableCell>
-                        <TableCell>R$ {order.amount_brl.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
-                        <TableCell>R$ 1,00 / RIOZ</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-
-                {orders.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Nenhuma conversão registrada
+              {loading ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+                    <p className="text-sm text-muted-foreground">Carregando histórico...</p>
                   </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Data/Hora</TableHead>
+                        <TableHead>Usuário</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Operação</TableHead>
+                        <TableHead>Quantidade RIOZ</TableHead>
+                        <TableHead>Valor BRL</TableHead>
+                        <TableHead>Taxa</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {orders.map((order) => (
+                        <TableRow key={order.id}>
+                          <TableCell className="whitespace-nowrap">
+                            {format(new Date(order.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                          </TableCell>
+                          <TableCell>{order.profiles?.nome || 'N/A'}</TableCell>
+                          <TableCell>{order.profiles?.email || 'N/A'}</TableCell>
+                          <TableCell>
+                            <span className={`px-2 py-1 rounded text-xs ${
+                              order.side === 'buy_rioz' 
+                                ? 'bg-green-500/20 text-green-500' 
+                                : 'bg-red-500/20 text-red-500'
+                            }`}>
+                              {order.side === 'buy_rioz' ? 'Compra RIOZ' : 'Venda RIOZ'}
+                            </span>
+                          </TableCell>
+                          <TableCell>{order.amount_rioz.toLocaleString('pt-BR')}</TableCell>
+                          <TableCell>R$ {order.amount_brl.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
+                          <TableCell>R$ 1,00 / RIOZ</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+
+                  {orders.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      Nenhuma conversão registrada
+                    </div>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

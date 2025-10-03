@@ -265,8 +265,17 @@ const AdminBranding = () => {
 
       if (error) throw error;
 
-      // Update local state immediately
-      setConfig(prev => prev ? { ...prev, ...updateData } : null);
+      // Reload the branding config to ensure we have the latest data
+      const { data: updatedConfig } = await supabase
+        .from('branding_config')
+        .select('*')
+        .eq('id', config.id)
+        .single();
+
+      if (updatedConfig) {
+        setConfig(updatedConfig);
+        applyThemeToDocument(updatedConfig);
+      }
       
       toast({
         title: 'Sucesso!',

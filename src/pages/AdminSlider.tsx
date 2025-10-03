@@ -164,6 +164,20 @@ const AdminSlider = () => {
     setUploadModalOpen(true);
   };
 
+  const handleFileUpload = (file: File) => {
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    
+    if (file.size > maxSize) {
+      toast({
+        title: 'Arquivo muito grande',
+        description: 'O arquivo que você tentou enviar é maior que 5MB. Por favor, escolha um arquivo menor.',
+        variant: 'destructive',
+      });
+      return false;
+    }
+    return true;
+  };
+
   const handleImageCropped = (imageUrl: string, cropArea: any) => {
     setCustomImages(prev => [...prev, {
       id: `custom-${Date.now()}`,
