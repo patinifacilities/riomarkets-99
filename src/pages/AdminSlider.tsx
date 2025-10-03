@@ -77,11 +77,12 @@ const AdminSlider = () => {
         setCustomImages(customImgs);
         setSliderDelay(data.slider_delay_seconds || 7);
         
-        // Reconstruct slide order with hidden state support
+        // Reconstruct slide order with hidden state support from JSONB
         const orderData = Array.isArray(data.slide_order) ? data.slide_order : [];
         const order: SlideItem[] = orderData.map((item: any) => {
-          const id = typeof item === 'string' ? item : item.id;
-          const hidden = typeof item === 'object' ? item.hidden || false : false;
+          // Handle both string and object format for backwards compatibility
+          const id = typeof item === 'string' ? item : (item.id || item);
+          const hidden = typeof item === 'object' && item.hidden !== undefined ? item.hidden : false;
           
           if (id.startsWith('custom-')) {
             const img = customImgs.find((i) => i.id === id);

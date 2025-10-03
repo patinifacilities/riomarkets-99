@@ -1326,7 +1326,7 @@ export type Database = {
           custom_images: Json | null
           id: string
           selected_market_ids: string[] | null
-          slide_order: string[] | null
+          slide_order: Json | null
           slider_delay_seconds: number | null
           updated_at: string | null
           updated_by: string | null
@@ -1335,7 +1335,7 @@ export type Database = {
           custom_images?: Json | null
           id?: string
           selected_market_ids?: string[] | null
-          slide_order?: string[] | null
+          slide_order?: Json | null
           slider_delay_seconds?: number | null
           updated_at?: string | null
           updated_by?: string | null
@@ -1344,7 +1344,7 @@ export type Database = {
           custom_images?: Json | null
           id?: string
           selected_market_ids?: string[] | null
-          slide_order?: string[] | null
+          slide_order?: Json | null
           slider_delay_seconds?: number | null
           updated_at?: string | null
           updated_by?: string | null

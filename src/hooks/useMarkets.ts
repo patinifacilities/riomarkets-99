@@ -9,10 +9,14 @@ export const useMarkets = (categoryId?: string) => {
     queryFn: async (): Promise<Market[]> => {
       let query = supabase
         .from('markets')
-        .select('*')
-        .neq('status', 'excluido'); // Exclude deleted markets
+        .select('*');
 
-      if (categoryId && categoryId !== 'all') {
+      // Always exclude deleted markets unless explicitly requested
+      if (categoryId !== 'excluido') {
+        query = query.neq('status', 'excluido');
+      }
+
+      if (categoryId && categoryId !== 'all' && categoryId !== 'excluido') {
         query = query.eq('categoria', categoryId);
       }
 

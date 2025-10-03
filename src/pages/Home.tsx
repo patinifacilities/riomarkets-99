@@ -61,7 +61,8 @@ const Home = () => {
             : [];
           setSliderCustomImages(customImgs);
           setSliderDelay((data.slider_delay_seconds || 7) * 1000);
-          setSlideOrder(Array.isArray(data.slide_order) ? (data.slide_order as string[]) : []);
+          // Load slide order with hidden state support (JSONB array)
+          setSlideOrder(Array.isArray(data.slide_order) ? (data.slide_order as any[]) : []);
         }
       } catch (error) {
         console.error('Error loading slider config:', error);
@@ -296,9 +297,9 @@ const Home = () => {
               {/* Mobile: Show ONLY text/buttons slide */}
               <CarouselItem key="text-card-mobile" className="md:hidden">
                 <div className="flex items-center justify-center h-[280px] px-4">
-                  <div className="text-center space-y-3 max-w-3xl mx-auto">
+                  <div className="text-center space-y-2 max-w-3xl mx-auto">
                     <div className="text-3xl font-bold">
-                      <div className="mb-2 text-3xl">Mercados Preditivos</div>
+                      <div className="mb-1 text-3xl">Mercados Preditivos</div>
                       <div className="text-3xl">
                         <TypewriterText
                           baseText=""
@@ -321,7 +322,7 @@ const Home = () => {
                     <p className="text-sm text-muted-foreground max-w-2xl mx-auto px-4">
                       Ganhe recompensas compartilhando suas previsões sobre eventos futuros.
                     </p>
-                    <div className="flex justify-center px-4 mt-4">
+                    <div className="flex justify-center px-4 mt-3">
                       <OnboardingTrigger size="lg" variant="outline" className="w-auto px-6" />
                     </div>
                   </div>
