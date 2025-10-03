@@ -25,7 +25,7 @@ const ExchangeNew = () => {
   const [loading, setLoading] = useState(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [fastMarketsButtonVisible, setFastMarketsButtonVisible] = useState(false);
-  const [activeAssets, setActiveAssets] = useState<{symbol: string, name: string}[]>([]);
+  const [allAssets, setAllAssets] = useState<{id: string, symbol: string, name: string, icon_url: string | null, is_active: boolean}[]>([]);
   const [exchangeEnabled, setExchangeEnabled] = useState(true);
 
   useEffect(() => {
@@ -50,21 +50,21 @@ const ExchangeNew = () => {
   useEffect(() => {
     if (user?.id) {
       fetchBalances();
-      fetchActiveAssets();
+      fetchAllAssets();
     }
   }, [user?.id]);
 
-  const fetchActiveAssets = async () => {
+  const fetchAllAssets = async () => {
     try {
       const { data, error } = await supabase
         .from('exchange_assets')
-        .select('symbol, name')
-        .eq('is_active', true);
+        .select('id, symbol, name, icon_url, is_active')
+        .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setActiveAssets(data || []);
+      setAllAssets(data || []);
     } catch (error) {
-      console.error('Error fetching active assets:', error);
+      console.error('Error fetching assets:', error);
     }
   };
   
@@ -299,34 +299,29 @@ const ExchangeNew = () => {
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="bg-card border-border shadow-xl rounded-xl p-2 min-w-[280px] z-[100]">
-                        <div className="p-3 border-b border-border mb-2">
-                          <p className="text-sm font-semibold text-foreground mb-1">Ativos Disponíveis em Breve</p>
-                          <p className="text-xs text-muted-foreground">Novos pares de negociação em desenvolvimento</p>
-                        </div>
-                        <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                          <div className="flex items-center gap-3 w-full">
-                            <div className="flex-1">
-                              <p className="font-medium text-foreground">Bitcoin (BTC)</p>
-                              <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'BTC') ? 'Em breve' : 'Indisponível'}</p>
+                        {allAssets.map((asset) => (
+                          <DropdownMenuItem 
+                            key={asset.id}
+                            disabled 
+                            className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="flex items-center gap-3 w-full">
+                              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
+                                {asset.icon_url ? (
+                                  <img src={asset.icon_url} alt={asset.name} className="w-full h-full object-cover" />
+                                ) : (
+                                  <span className="text-xs font-bold">{asset.symbol[0]}</span>
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-medium text-foreground">{asset.name} ({asset.symbol})</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {asset.is_active ? 'Em breve' : 'Indisponível'}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                          <div className="flex items-center gap-3 w-full">
-                            <div className="flex-1">
-                              <p className="font-medium text-foreground">Tether (USDT)</p>
-                              <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'USDT') ? 'Em breve' : 'Indisponível'}</p>
-                            </div>
-                          </div>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                          <div className="flex items-center gap-3 w-full">
-                            <div className="flex-1">
-                              <p className="font-medium text-foreground">USD Coin (USDC)</p>
-                              <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'USDC') ? 'Em breve' : 'Indisponível'}</p>
-                            </div>
-                          </div>
-                        </DropdownMenuItem>
+                          </DropdownMenuItem>
+                        ))}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   <div className="flex flex-col pointer-events-none">
@@ -398,34 +393,29 @@ const ExchangeNew = () => {
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-card border-border shadow-xl rounded-xl p-2 min-w-[280px] z-[100]">
-                      <div className="p-3 border-b border-border mb-2">
-                        <p className="text-sm font-semibold text-foreground mb-1">Ativos Disponíveis em Breve</p>
-                        <p className="text-xs text-muted-foreground">Novos pares de negociação em desenvolvimento</p>
-                      </div>
-                      <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center gap-3 w-full">
-                          <div className="flex-1">
-                            <p className="font-medium text-foreground">Bitcoin (BTC)</p>
-                            <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'BTC') ? 'Em breve' : 'Indisponível'}</p>
+                      {allAssets.map((asset) => (
+                        <DropdownMenuItem 
+                          key={asset.id}
+                          disabled 
+                          className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex items-center gap-3 w-full">
+                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
+                              {asset.icon_url ? (
+                                <img src={asset.icon_url} alt={asset.name} className="w-full h-full object-cover" />
+                              ) : (
+                                <span className="text-xs font-bold">{asset.symbol[0]}</span>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium text-foreground">{asset.name} ({asset.symbol})</p>
+                              <p className="text-xs text-muted-foreground">
+                                {asset.is_active ? 'Em breve' : 'Indisponível'}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center gap-3 w-full">
-                          <div className="flex-1">
-                            <p className="font-medium text-foreground">Tether (USDT)</p>
-                            <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'USDT') ? 'Em breve' : 'Indisponível'}</p>
-                          </div>
-                        </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center gap-3 w-full">
-                          <div className="flex-1">
-                            <p className="font-medium text-foreground">USD Coin (USDC)</p>
-                            <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'USDC') ? 'Em breve' : 'Indisponível'}</p>
-                          </div>
-                        </div>
-                      </DropdownMenuItem>
+                        </DropdownMenuItem>
+                      ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <span className="text-2xl font-bold text-foreground ml-2">

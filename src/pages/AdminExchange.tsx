@@ -357,24 +357,16 @@ const AdminExchange = () => {
                         disabled={uploading[asset.id]}
                       />
 
-                      <Button
-                        variant={asset.is_active ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => handleToggleActive(asset.id, asset.is_active)}
-                        className="gap-2"
-                      >
-                        {asset.is_active ? (
-                          <>
-                            <ToggleRight className="w-4 h-4" />
-                            Ativo
-                          </>
-                        ) : (
-                          <>
-                            <ToggleLeft className="w-4 h-4" />
-                            Inativo
-                          </>
-                        )}
-                      </Button>
+                      <div className="flex items-center gap-2 px-3 py-2 border rounded-lg">
+                        <Label htmlFor={`switch-${asset.id}`} className="text-sm font-medium cursor-pointer">
+                          {asset.is_active ? 'Ativo' : 'Inativo'}
+                        </Label>
+                        <Switch
+                          id={`switch-${asset.id}`}
+                          checked={asset.is_active}
+                          onCheckedChange={() => handleToggleActive(asset.id, asset.is_active)}
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
