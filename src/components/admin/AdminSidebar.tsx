@@ -56,6 +56,11 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
       path: '/admin/users'
     },
     { 
+      title: 'Exchange', 
+      icon: ArrowLeftRight, 
+      path: '/admin/exchange'
+    },
+    { 
       title: 'Categorias', 
       icon: FileText, 
       path: '/admin/categories'
@@ -100,11 +105,6 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
       icon: Settings, 
       path: '/admin/branding',
       color: 'text-[#00ff90] hover:text-[#00ff90]'
-    },
-    { 
-      title: 'Exchange', 
-      icon: ArrowLeftRight, 
-      path: '/admin/exchange'
     }
   ];
 

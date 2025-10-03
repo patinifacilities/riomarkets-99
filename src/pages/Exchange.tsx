@@ -25,12 +25,28 @@ const ExchangeNew = () => {
   const [loading, setLoading] = useState(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [fastMarketsButtonVisible, setFastMarketsButtonVisible] = useState(false);
+  const [activeAssets, setActiveAssets] = useState<{symbol: string, name: string}[]>([]);
 
   useEffect(() => {
     if (user?.id) {
       fetchBalances();
+      fetchActiveAssets();
     }
   }, [user?.id]);
+
+  const fetchActiveAssets = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('exchange_assets')
+        .select('symbol, name')
+        .eq('is_active', true);
+
+      if (error) throw error;
+      setActiveAssets(data || []);
+    } catch (error) {
+      console.error('Error fetching active assets:', error);
+    }
+  };
   
   // Show Fast Markets button for 30 seconds after successful conversion
   useEffect(() => {
@@ -258,7 +274,7 @@ const ExchangeNew = () => {
                           <div className="flex items-center gap-3 w-full">
                             <div className="flex-1">
                               <p className="font-medium text-foreground">Bitcoin (BTC)</p>
-                              <p className="text-xs text-muted-foreground">Em breve</p>
+                              <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'BTC') ? 'Em breve' : 'Indisponível'}</p>
                             </div>
                           </div>
                         </DropdownMenuItem>
@@ -266,7 +282,7 @@ const ExchangeNew = () => {
                           <div className="flex items-center gap-3 w-full">
                             <div className="flex-1">
                               <p className="font-medium text-foreground">Tether (USDT)</p>
-                              <p className="text-xs text-muted-foreground">Em breve</p>
+                              <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'USDT') ? 'Em breve' : 'Indisponível'}</p>
                             </div>
                           </div>
                         </DropdownMenuItem>
@@ -274,7 +290,7 @@ const ExchangeNew = () => {
                           <div className="flex items-center gap-3 w-full">
                             <div className="flex-1">
                               <p className="font-medium text-foreground">USD Coin (USDC)</p>
-                              <p className="text-xs text-muted-foreground">Em breve</p>
+                              <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'USDC') ? 'Em breve' : 'Indisponível'}</p>
                             </div>
                           </div>
                         </DropdownMenuItem>
@@ -357,7 +373,7 @@ const ExchangeNew = () => {
                         <div className="flex items-center gap-3 w-full">
                           <div className="flex-1">
                             <p className="font-medium text-foreground">Bitcoin (BTC)</p>
-                            <p className="text-xs text-muted-foreground">Em breve</p>
+                            <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'BTC') ? 'Em breve' : 'Indisponível'}</p>
                           </div>
                         </div>
                       </DropdownMenuItem>
@@ -365,7 +381,7 @@ const ExchangeNew = () => {
                         <div className="flex items-center gap-3 w-full">
                           <div className="flex-1">
                             <p className="font-medium text-foreground">Tether (USDT)</p>
-                            <p className="text-xs text-muted-foreground">Em breve</p>
+                            <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'USDT') ? 'Em breve' : 'Indisponível'}</p>
                           </div>
                         </div>
                       </DropdownMenuItem>
@@ -373,7 +389,7 @@ const ExchangeNew = () => {
                         <div className="flex items-center gap-3 w-full">
                           <div className="flex-1">
                             <p className="font-medium text-foreground">USD Coin (USDC)</p>
-                            <p className="text-xs text-muted-foreground">Em breve</p>
+                            <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'USDC') ? 'Em breve' : 'Indisponível'}</p>
                           </div>
                         </div>
                       </DropdownMenuItem>

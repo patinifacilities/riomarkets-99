@@ -53,6 +53,41 @@ const AdminExchange = () => {
     }
   }, [user]);
 
+  // Add default assets if they don't exist
+  useEffect(() => {
+    const addDefaultAssets = async () => {
+      try {
+        const defaultAssets = [
+          { symbol: 'BTC', name: 'Bitcoin', is_active: false },
+          { symbol: 'USDC', name: 'USD Coin', is_active: false },
+          { symbol: 'USDT', name: 'Tether', is_active: false }
+        ];
+
+        for (const asset of defaultAssets) {
+          const { data: existing } = await supabase
+            .from('exchange_assets')
+            .select('id')
+            .eq('symbol', asset.symbol)
+            .maybeSingle();
+
+          if (!existing) {
+            await supabase
+              .from('exchange_assets')
+              .insert(asset);
+          }
+        }
+
+        fetchAssets();
+      } catch (error) {
+        console.error('Error adding default assets:', error);
+      }
+    };
+
+    if (user && !loading) {
+      addDefaultAssets();
+    }
+  }, [user, loading]);
+
   const fetchAssets = async () => {
     try {
       const { data, error } = await supabase

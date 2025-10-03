@@ -292,7 +292,7 @@ const Home = () => {
 
               {/* Mobile: Show ONLY text/buttons slide */}
               <CarouselItem key="text-card-mobile" className="md:hidden">
-                <div className="flex items-center justify-center h-[300px] px-4">
+                <div className="flex items-center justify-center h-[400px] px-4">
                   <div className="text-center space-y-3 max-w-3xl mx-auto">
                     <div className="text-3xl font-bold">
                       <div className="mb-2 text-3xl">Mercados Preditivos</div>
@@ -331,7 +331,9 @@ const Home = () => {
                   // Fast pool slide - Hidden on mobile
                   return (
                     <CarouselItem key="fast-card" className="hidden md:block">
-                      <FastPoolSlide onClick={handleSlideClick} />
+                      <div className="h-[400px]">
+                        <FastPoolSlide onClick={handleSlideClick} />
+                      </div>
                     </CarouselItem>
                   );
                 }
@@ -340,7 +342,7 @@ const Home = () => {
                   // Text/Buttons card (same as first slide)
                   return (
                     <CarouselItem key="text-card" className="hidden md:block">
-                      <div className="flex items-center justify-center h-[300px] px-4 sm:px-8">
+                      <div className="flex items-center justify-center h-[400px] px-4 sm:px-8">
                         <div className="text-center space-y-4 sm:space-y-6 max-w-3xl mx-auto">
                           <div className="text-3xl sm:text-4xl md:text-6xl font-bold">
                             <div className="mb-3 sm:mb-4 text-3xl sm:text-4xl md:text-6xl">Mercados Preditivos</div>
@@ -389,7 +391,7 @@ const Home = () => {
                   return (
                     <CarouselItem key={img.id} className="hidden md:block">
                       <div 
-                        className="relative h-[300px] w-full overflow-hidden rounded-2xl cursor-pointer"
+                        className="relative h-[400px] w-full overflow-hidden rounded-2xl cursor-pointer"
                         onClick={handleSlideClick}
                       >
                         <img 
@@ -420,7 +422,7 @@ const Home = () => {
                 return (
                   <CarouselItem key={market.id} className="hidden md:block">
                     <div 
-                      className="relative h-[300px] w-full overflow-hidden rounded-2xl cursor-pointer"
+                      className="relative h-[400px] w-full overflow-hidden rounded-2xl cursor-pointer"
                       onClick={() => {
                         handleSlideClick();
                         navigate(`/market/${market.id}`);
