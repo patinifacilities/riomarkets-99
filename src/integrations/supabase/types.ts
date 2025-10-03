@@ -1906,6 +1906,10 @@ export type Database = {
         Args: { amount_centavos: number; user_id: string }
         Returns: undefined
       }
+      is_admin_user: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
       is_current_user_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
