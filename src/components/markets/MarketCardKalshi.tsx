@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import riozCoin from '@/assets/rioz-coin.png';
+import hotFire from '@/assets/hot-fire.png';
 
 interface MarketCardKalshiProps {
   market: Market;
@@ -140,15 +141,16 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/60 via-transparent to-transparent" />
             
-            {/* RIOZ Badge */}
-            <div className="absolute top-3 left-3">
-              <Badge className="bg-blue-600/90 text-white border-0 backdrop-blur-sm">
-                <div className="w-4 h-4 rounded-full bg-white mr-1.5 flex items-center justify-center">
-                  <span className="text-[10px] font-bold text-blue-600">R</span>
-                </div>
-                RIOZ
-              </Badge>
-            </div>
+            {/* Hot/Fire Icon for top 3 */}
+            {showHotIcon && (
+              <div className="absolute top-3 right-3 animate-pulse">
+                <img 
+                  src={hotFire} 
+                  alt="Hot" 
+                  className="w-8 h-8 drop-shadow-[0_0_8px_rgba(255,100,0,0.8)]"
+                />
+              </div>
+            )}
           </div>
 
           {/* Content */}

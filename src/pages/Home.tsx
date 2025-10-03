@@ -16,6 +16,8 @@ import Autoplay from 'embla-carousel-autoplay';
 import { OnboardingTrigger } from '@/components/onboarding/OnboardingTrigger';
 import ProbabilityChart from '@/components/markets/ProbabilityChart';
 import { supabase } from '@/integrations/supabase/client';
+import { FastPoolSlide } from '@/components/fast/FastPoolSlide';
+import { useRef } from 'react';
 
 interface CustomImage {
   id: string;
@@ -33,8 +35,11 @@ const Home = () => {
   const [sliderCustomImages, setSliderCustomImages] = useState<CustomImage[]>([]);
   const [sliderDelay, setSliderDelay] = useState(7000);
   const [slideOrder, setSlideOrder] = useState<string[]>([]);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
+  const carouselApiRef = useRef<any>(null);
+  const autoplayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load slider configuration
   useEffect(() => {
@@ -212,30 +217,58 @@ const Home = () => {
       .filter((m): m is NonNullable<typeof m> => m !== undefined);
   }, [markets, sliderMarketIds]);
 
-  // Build ordered slides
+  // Build ordered slides - always include Fast pool as first slide after intro
   const orderedSlides = useMemo(() => {
+    const slides: Array<{ type: 'market' | 'image' | 'fast', data: any }> = [];
+    
+    // Add fast pool slide
+    slides.push({ type: 'fast' as const, data: null });
+    
     if (slideOrder.length === 0) {
-      return sliderMarkets.map(m => ({ type: 'market' as const, data: m }));
+      slides.push(...sliderMarkets.map(m => ({ type: 'market' as const, data: m })));
+    } else {
+      const orderSlides = slideOrder
+        .map(id => {
+          if (id.startsWith('custom-')) {
+            const img = sliderCustomImages.find(i => i.id === id);
+            return img ? { type: 'image' as const, data: img } : null;
+          } else {
+            const market = markets.find(m => m.id === id);
+            return market ? { type: 'market' as const, data: market } : null;
+          }
+        })
+        .filter((s): s is NonNullable<typeof s> => s !== null);
+      
+      slides.push(...orderSlides);
     }
-
-    return slideOrder
-      .map(id => {
-        if (id.startsWith('custom-')) {
-          const img = sliderCustomImages.find(i => i.id === id);
-          return img ? { type: 'image' as const, data: img } : null;
-        } else {
-          const market = markets.find(m => m.id === id);
-          return market ? { type: 'market' as const, data: market } : null;
-        }
-      })
-      .filter((s): s is NonNullable<typeof s> => s !== null);
+    
+    return slides;
   }, [slideOrder, markets, sliderMarkets, sliderCustomImages]);
+
+  // Handle slide click - restart autoplay after 5 seconds
+  const handleSlideClick = () => {
+    if (autoplayTimeoutRef.current) {
+      clearTimeout(autoplayTimeoutRef.current);
+    }
+    
+    autoplayTimeoutRef.current = setTimeout(() => {
+      if (carouselApiRef.current) {
+        carouselApiRef.current.plugins().autoplay?.play();
+      }
+    }, 5000);
+  };
 
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Carousel Section */}
-      <div className="bg-gradient-to-b from-primary/10 to-background border-b border-border">
-        <div className="container mx-auto px-4 py-8">
+      <div className="relative overflow-hidden border-b border-border">
+        {/* Modern animated background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-accent/10 via-transparent to-transparent" />
+        </div>
+        
+        <div className="container mx-auto px-4 py-8 relative z-10">
           <Carousel
             opts={{
               align: "start",
@@ -243,12 +276,20 @@ const Home = () => {
             }}
             plugins={[
               Autoplay({
-                delay: sliderDelay * 1000,
-                stopOnInteraction: false,
-                stopOnMouseEnter: false,
+                delay: sliderDelay,
+                stopOnInteraction: true,
+                stopOnMouseEnter: true,
               }),
             ]}
-            className="w-full max-w-[1400px] mx-auto"
+            className="w-full max-w-[1500px] mx-auto"
+            setApi={(api) => {
+              carouselApiRef.current = api;
+              if (api) {
+                api.on('select', () => {
+                  setCurrentSlideIndex(api.selectedScrollSnap());
+                });
+              }
+            }}
           >
             <CarouselContent className="py-8">
               {/* Slide 1: Title with Typewriter */}
@@ -290,14 +331,26 @@ const Home = () => {
                 </div>
               </CarouselItem>
 
-              {/* Ordered Slides - Markets and Custom Images */}
+              {/* Ordered Slides - Fast Pool, Markets and Custom Images */}
               {orderedSlides.map((slide, idx) => {
+                if (slide.type === 'fast') {
+                  // Fast pool slide
+                  return (
+                    <CarouselItem key="fast-bitcoin">
+                      <FastPoolSlide onClick={handleSlideClick} />
+                    </CarouselItem>
+                  );
+                }
+                
                 if (slide.type === 'image') {
                   // Custom image slide
                   const img = slide.data;
                   return (
                     <CarouselItem key={img.id}>
-                      <div className="relative h-[500px] w-full overflow-hidden rounded-2xl">
+                      <div 
+                        className="relative h-[500px] w-full overflow-hidden rounded-2xl cursor-pointer"
+                        onClick={handleSlideClick}
+                      >
                         <img 
                           src={img.url} 
                           alt={img.title}
@@ -325,20 +378,28 @@ const Home = () => {
                 
                 return (
                   <CarouselItem key={market.id}>
-                    <div className="relative h-[500px] w-full overflow-hidden rounded-2xl">
-                      {/* Background Image with Overlay */}
+                    <div 
+                      className="relative h-[500px] w-full overflow-hidden rounded-2xl cursor-pointer"
+                      onClick={() => {
+                        handleSlideClick();
+                        navigate(`/mercado/${market.id}`);
+                      }}
+                    >
+                      {/* Background Image with Enhanced Overlay */}
                       <div className="absolute inset-0">
                         {market.imagem_url || market.thumbnail_url || market.image_url || market.photo_url ? (
-                          <img 
-                            src={market.imagem_url || market.thumbnail_url || market.image_url || market.photo_url} 
-                            alt={market.titulo}
-                            className="w-full h-full object-cover"
-                          />
+                          <>
+                            <img 
+                              src={market.imagem_url || market.thumbnail_url || market.image_url || market.photo_url} 
+                              alt={market.titulo}
+                              className="w-full h-full object-cover scale-110 blur-[2px]"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/50" />
+                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60" />
+                          </>
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-primary/20 via-background to-primary/10" />
                         )}
-                        {/* Dark overlay for text readability */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
                       </div>
                       
                       {/* Content */}
@@ -368,12 +429,12 @@ const Home = () => {
                             <div className="flex items-center gap-4 flex-wrap">
                               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#00ff90]/20 border border-[#00ff90]/40 backdrop-blur-sm">
                                 <div className="w-2 h-2 rounded-full bg-[#00ff90]" />
-                                <span className="text-white font-medium">≥ {yesOption || 'SIM'} {yesProb.toFixed(1)}%</span>
+                                <span className="text-white font-medium">{yesOption || 'SIM'} {yesProb.toFixed(1)}%</span>
                               </div>
                               
                               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#ff2389]/20 border border-[#ff2389]/40 backdrop-blur-sm">
                                 <div className="w-2 h-2 rounded-full bg-[#ff2389]" />
-                                <span className="text-white font-medium">≤ {noOption || 'NÃO'} {noProb.toFixed(1)}%</span>
+                                <span className="text-white font-medium">{noOption || 'NÃO'} {noProb.toFixed(1)}%</span>
                               </div>
                               
                               {/* Profile icons with gradient */}
@@ -415,15 +476,18 @@ const Home = () => {
             
             {/* Dots Navigation */}
             <div className="flex justify-center gap-2 mt-4">
-              {[0, 1, 2, 3].map((index) => (
+              {orderedSlides.map((_, index) => (
                 <button
                   key={index}
-                  className="w-2 h-2 rounded-full bg-white/30 hover:bg-white/60 transition-all cursor-pointer"
-                  onClick={(e) => {
-                    const carousel = e.currentTarget.closest('[data-carousel-container]');
-                    if (carousel) {
-                      const api = (carousel as any).__embla__;
-                      if (api) api.scrollTo(index);
+                  className={cn(
+                    "h-2 rounded-full transition-all cursor-pointer",
+                    currentSlideIndex === index + 1 
+                      ? "w-8 bg-white" 
+                      : "w-2 bg-white/30 hover:bg-white/60"
+                  )}
+                  onClick={() => {
+                    if (carouselApiRef.current) {
+                      carouselApiRef.current.scrollTo(index + 1);
                     }
                   }}
                   aria-label={`Ir para slide ${index + 1}`}
@@ -535,8 +599,12 @@ const Home = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {sortedAndFilteredMarkets.map((market) => (
-              <MarketCardKalshi key={market.id} market={market} />
+            {sortedAndFilteredMarkets.map((market, index) => (
+              <MarketCardKalshi 
+                key={market.id} 
+                market={market} 
+                showHotIcon={index < 3}
+              />
             ))}
           </div>
         )}
