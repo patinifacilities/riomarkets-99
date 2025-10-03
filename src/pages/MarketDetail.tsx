@@ -210,8 +210,8 @@ const MarketDetail = () => {
 
             {/* User Info Panel - Mobile (positioned after market details) */}
             <div className="lg:hidden">
-              <Card id="wallet-section" className="before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-2xl after:bg-gradient-to-tr after:from-transparent after:via-white/[0.02] after:to-white/[0.04]">
-                <CardContent className="p-6 relative z-10">
+              <Card id="wallet-section" className="shadow-lg">
+                <CardContent className="p-6">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <Wallet className="w-5 h-5" />
                     Sua Carteira
@@ -572,8 +572,8 @@ const MarketDetail = () => {
 
             {/* User Info Panel - Desktop */}
           <div className="hidden lg:block space-y-6 sticky top-24">
-            <Card id="wallet-section" className="before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-2xl after:bg-gradient-to-tr after:from-transparent after:via-white/[0.02] after:to-white/[0.04]">
-              <CardContent className="p-6 relative z-10">
+            <Card id="wallet-section" className="shadow-lg">
+              <CardContent className="p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <Wallet className="w-5 h-5" />
                   Sua Carteira

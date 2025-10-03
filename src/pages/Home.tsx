@@ -353,13 +353,18 @@ const Home = () => {
                 </div>
               </CarouselItem>
 
-              {/* Desktop: Show slides or fallback to logo */}
+              {/* Desktop: Show slides based on admin config or fallback */}
               {orderedSlides.length > 0 ? (
                 orderedSlides.map((slide, idx) => {
+                const slideKey = slide.type === 'text' ? 'text-card' 
+                              : slide.type === 'fast' ? 'fast-card'
+                              : slide.type === 'image' ? slide.data.id
+                              : slide.data.id;
+                
                 if (slide.type === 'fast') {
                   // Fast pool slide - Hidden on mobile
                   return (
-                    <CarouselItem key="fast-card" className="hidden md:block">
+                    <CarouselItem key={slideKey} className="hidden md:block">
                       <div className="h-[400px]">
                         <FastPoolSlide onClick={handleSlideClick} />
                       </div>

@@ -132,11 +132,13 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
     <>
       <div className={cn(
         "bg-[#1a1a1a]/40 backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden transition-all duration-300 group relative",
-        // Liquid glass effect
+        // Enhanced liquid glass effect on hover
         "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.03] before:to-transparent before:opacity-100 before:pointer-events-none",
-        "after:absolute after:inset-0 after:rounded-2xl after:bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuOSIgbnVtT2N0YXZlcz0iNCIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjA1Ii8+PC9zdmc+')] after:opacity-20 after:pointer-events-none",
-        "hover:border-white/[0.15]",
-        "hover:shadow-[0_8px_16px_rgba(0,255,144,0.1)]",
+        "after:absolute after:inset-0 after:rounded-2xl after:opacity-0 after:transition-opacity after:duration-300 after:pointer-events-none",
+        "after:bg-gradient-to-br after:from-primary/10 after:via-transparent after:to-accent/10",
+        "hover:after:opacity-100",
+        "hover:border-primary/30",
+        "hover:shadow-[0_8px_32px_rgba(0,255,144,0.15),0_0_0_1px_rgba(0,255,144,0.1)]",
         "hover:scale-[1.01] hover:-translate-y-0.5",
         className
       )}>
@@ -162,13 +164,19 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/60 via-transparent to-transparent" />
             
-            {/* Hot Badge with Improved Animation */}
+            {/* Hot Badge - Icon Only with Enhanced Animation */}
             {isHot && (
               <div className="absolute top-3 right-3 z-10">
-                <div className="relative flex items-center gap-1.5 bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg animate-flame">
-                  <img src={hotFire} alt="Hot" className="w-4 h-4 animate-pulse" />
-                  HOT
-                  <div className="absolute inset-0 bg-gradient-to-r from-orange-400/50 to-red-400/50 rounded-full blur-md -z-10 animate-pulse" />
+                <div className="relative p-2 bg-gradient-to-br from-orange-500/20 via-red-500/20 to-orange-600/20 backdrop-blur-sm border border-orange-500/30 rounded-xl shadow-lg group/hot">
+                  <img 
+                    src={hotFire} 
+                    alt="Hot" 
+                    className="w-6 h-6 relative z-10 animate-float" 
+                    style={{
+                      filter: 'drop-shadow(0 0 8px rgba(255, 120, 0, 0.8))',
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-400/30 to-red-500/30 rounded-xl blur-lg animate-pulse-slow" />
                 </div>
               </div>
             )}
@@ -177,7 +185,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
           {/* Content */}
           <div className="p-5">
             {/* Title */}
-            <h3 className="text-base font-semibold text-white mb-4 line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+            <h3 className="text-base font-semibold text-white mb-4 line-clamp-2 leading-snug group-hover:text-white transition-colors">
               {market.titulo}
             </h3>
 
@@ -187,29 +195,21 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                 <span className="font-medium">Sim {Math.round(yesPercentage)}%</span>
                 <span className="font-medium">{Math.round(noPercentage)}% Não</span>
               </div>
-              <div className="h-2 bg-[#2a2a2a] rounded-full overflow-hidden flex relative group">
+              <div className="h-2 bg-[#2a2a2a] rounded-full overflow-hidden flex">
                 <div 
-                  className="transition-all duration-500 animate-pulse relative"
+                  className="transition-all duration-500"
                   style={{ 
                     width: `${yesPercentage}%`,
                     backgroundColor: '#00ff90'
                   }}
-                >
-                  <div 
-                    className="absolute inset-0 bg-gradient-to-r from-[#00ff90]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  />
-                </div>
+                />
                 <div 
-                  className="transition-all duration-500 animate-pulse relative"
+                  className="transition-all duration-500"
                   style={{ 
                     width: `${noPercentage}%`,
                     backgroundColor: '#ff2389'
                   }}
-                >
-                  <div 
-                    className="absolute inset-0 bg-gradient-to-l from-[#ff2389]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  />
-                </div>
+                />
               </div>
             </div>
 
@@ -218,7 +218,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
               <Button
                 onClick={(e) => handleBetClick(e, 'sim')}
                 disabled={market.status !== 'aberto'}
-                className="h-11 transition-all duration-300 font-semibold rounded-xl text-gray-900 hover:scale-105 hover:shadow-lg hover:shadow-[#00ff90]/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none animate-pulse"
+                className="h-11 transition-all duration-300 font-semibold rounded-xl text-gray-900 hover:scale-105 hover:shadow-lg hover:shadow-[#00ff90]/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
                 style={{ backgroundColor: '#00ff90' }}
               >
                 SIM
@@ -227,7 +227,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
               <Button
                 onClick={(e) => handleBetClick(e, 'não')}
                 disabled={market.status !== 'aberto'}
-                className="h-11 transition-all duration-300 font-semibold rounded-xl text-white hover:scale-105 hover:shadow-lg hover:shadow-[#ff2389]/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none animate-pulse"
+                className="h-11 transition-all duration-300 font-semibold rounded-xl text-white hover:scale-105 hover:shadow-lg hover:shadow-[#ff2389]/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
                 style={{ backgroundColor: '#ff2389' }}
               >
                 NÃO

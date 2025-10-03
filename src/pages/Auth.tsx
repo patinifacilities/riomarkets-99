@@ -715,6 +715,12 @@ const Auth = () => {
                             type="submit" 
                             className="w-full" 
                             disabled={loading || !acceptedTerms || passwordMismatch || !Object.values(passwordRequirements).every(Boolean)}
+                            onClick={(e) => {
+                              console.log('Create account button clicked');
+                              console.log('Form data:', formData);
+                              console.log('Accepted terms:', acceptedTerms);
+                              console.log('Password requirements:', passwordRequirements);
+                            }}
                           >
                             {loading ? 'Cadastrando...' : 'Criar conta'}
                           </Button>
