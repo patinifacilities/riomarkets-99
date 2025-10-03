@@ -41,12 +41,6 @@ const THEMES = {
     background_color: '#0f1419',
     primary_color: '#1DA1F2',
     success_color: '#17BF63',
-  },
-  custom: {
-    name: 'Custom',
-    background_color: '#0a0a0a',
-    primary_color: '#ff2389',
-    success_color: '#00ff90',
   }
 };
 
@@ -62,6 +56,11 @@ const AdminBranding = () => {
   const [uploading, setUploading] = useState<{[key: string]: boolean}>({});
   const [history, setHistory] = useState<BrandingHistory[]>([]);
   const [customThemeEnabled, setCustomThemeEnabled] = useState(false);
+  const [customThemeColors, setCustomThemeColors] = useState<{
+    background_color: string;
+    primary_color: string;
+    success_color: string;
+  } | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -85,6 +84,14 @@ const AdminBranding = () => {
           logo_light_url: data.logo_light_url || null
         };
         setConfig(configData);
+        // Save custom theme colors if active_theme is 'custom'
+        if (configData.active_theme === 'custom') {
+          setCustomThemeColors({
+            background_color: configData.background_color,
+            primary_color: configData.primary_color,
+            success_color: configData.success_color,
+          });
+        }
         // Save initial state to history
         setHistory([{ config: configData, timestamp: Date.now() }]);
       }
@@ -169,6 +176,15 @@ const AdminBranding = () => {
 
       // Apply changes immediately
       applyThemeToDocument(config);
+      
+      // Save custom theme colors if active_theme is 'custom'
+      if (config.active_theme === 'custom') {
+        setCustomThemeColors({
+          background_color: config.background_color,
+          primary_color: config.primary_color,
+          success_color: config.success_color,
+        });
+      }
       
       // Save to history after successful save
       setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
@@ -298,27 +314,35 @@ const AdminBranding = () => {
     // Save current state to history
     setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
     
-    const theme = THEMES[themeName];
+    let newConfig: BrandingConfig;
     
-    // Only apply theme colors if NOT custom or if custom theme hasn't been modified
-    const newConfig = themeName === 'custom' 
-      ? {
-          ...config,
-          active_theme: themeName
-        }
-      : {
-          ...config,
-          background_color: theme.background_color,
-          primary_color: theme.primary_color,
-          success_color: theme.success_color,
-          active_theme: themeName
-        };
+    if (themeName === 'custom') {
+      // Apply saved custom theme colors
+      newConfig = {
+        ...config,
+        background_color: customThemeColors?.background_color || config.background_color,
+        primary_color: customThemeColors?.primary_color || config.primary_color,
+        success_color: customThemeColors?.success_color || config.success_color,
+        active_theme: themeName
+      };
+    } else {
+      // Apply predefined theme colors
+      const theme = THEMES[themeName];
+      newConfig = {
+        ...config,
+        background_color: theme.background_color,
+        primary_color: theme.primary_color,
+        success_color: theme.success_color,
+        active_theme: themeName
+      };
+    }
     
     setConfig(newConfig);
     applyThemeToDocument(newConfig, customThemeEnabled);
     
+    const themeName_display = themeName === 'custom' ? 'Custom' : THEMES[themeName].name;
     toast({
-      title: `${theme.name} aplicado!`,
+      title: `${themeName_display} aplicado!`,
       description: 'Clique em "Salvar Alterações" para confirmar.',
     });
   };
@@ -425,7 +449,7 @@ const AdminBranding = () => {
                 className="flex-1"
                 disabled={!customThemeEnabled}
               >
-                {THEMES.custom.name}
+                Custom
               </Button>
             </CardContent>
           </Card>
