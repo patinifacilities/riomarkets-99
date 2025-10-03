@@ -218,6 +218,19 @@ const AdminBranding = () => {
     if (!config) return;
     
     setUploading(prev => ({ ...prev, [type]: true }));
+    
+    // Prevent auto-logout by keeping the session alive
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({
+        title: 'Erro',
+        description: 'Sessão expirada. Faça login novamente.',
+        variant: 'destructive',
+      });
+      setUploading(prev => ({ ...prev, [type]: false }));
+      return;
+    }
+    
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${type}_${Date.now()}.${fileExt}`;
@@ -225,7 +238,10 @@ const AdminBranding = () => {
 
       const { error: uploadError } = await supabase.storage
         .from('profile-pictures')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
       if (uploadError) throw uploadError;
 
@@ -249,20 +265,8 @@ const AdminBranding = () => {
 
       if (error) throw error;
 
-      // Fetch the updated config to get the actual URL
-      const { data: updatedConfig, error: fetchError } = await supabase
-        .from('branding_config')
-        .select('*')
-        .eq('id', config.id)
-        .single();
-
-      if (fetchError) throw fetchError;
-      
-      const configData: BrandingConfig = {
-        ...updatedConfig,
-        logo_light_url: updatedConfig.logo_light_url || null
-      };
-      setConfig(configData);
+      // Update local state immediately
+      setConfig(prev => prev ? { ...prev, ...updateData } : null);
       
       toast({
         title: 'Sucesso!',

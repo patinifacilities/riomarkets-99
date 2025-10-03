@@ -290,7 +290,42 @@ const Home = () => {
           >
             <CarouselContent className="py-4 md:py-8">
 
-              {/* Ordered Slides - Respecting Admin Order */}
+              {/* Mobile: Show ONLY text/buttons slide */}
+              <CarouselItem key="text-card-mobile" className="md:hidden">
+                <div className="flex items-center justify-center h-[300px] px-4">
+                  <div className="text-center space-y-3 max-w-3xl mx-auto">
+                    <div className="text-3xl font-bold">
+                      <div className="mb-2 text-3xl">Mercados Preditivos</div>
+                      <div className="text-3xl">
+                        <TypewriterText
+                          baseText=""
+                          texts={[
+                            "para Análise Estratégica",
+                            "baseados em Dados",
+                            "com Transparência Total",
+                            "Rápidos"
+                          ]}
+                          customColors={{
+                            "Rápidos": "#ff2389"
+                          }}
+                          className="text-3xl font-bold"
+                          typingSpeed={100}
+                          deletingSpeed={50}
+                          pauseDuration={2000}
+                        />
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground max-w-2xl mx-auto px-4">
+                      Ganhe recompensas compartilhando suas previsões sobre eventos futuros.
+                    </p>
+                    <div className="flex justify-center px-4 mt-4">
+                      <OnboardingTrigger size="lg" variant="outline" className="w-auto px-6" />
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+
+              {/* Desktop: Ordered Slides - Respecting Admin Order */}
               {orderedSlides.map((slide, idx) => {
                 if (slide.type === 'fast') {
                   // Fast pool slide - Hidden on mobile
@@ -304,7 +339,7 @@ const Home = () => {
                 if (slide.type === 'text') {
                   // Text/Buttons card (same as first slide)
                   return (
-                    <CarouselItem key="text-card">
+                    <CarouselItem key="text-card" className="hidden md:block">
                       <div className="flex items-center justify-center h-[300px] px-4 sm:px-8">
                         <div className="text-center space-y-4 sm:space-y-6 max-w-3xl mx-auto">
                           <div className="text-3xl sm:text-4xl md:text-6xl font-bold">
@@ -349,10 +384,10 @@ const Home = () => {
                 }
                 
                 if (slide.type === 'image') {
-                  // Custom image slide
+                  // Custom image slide - Hidden on mobile
                   const img = slide.data;
                   return (
-                    <CarouselItem key={img.id}>
+                    <CarouselItem key={img.id} className="hidden md:block">
                       <div 
                         className="relative h-[300px] w-full overflow-hidden rounded-2xl cursor-pointer"
                         onClick={handleSlideClick}
@@ -373,7 +408,7 @@ const Home = () => {
                   );
                 }
                 
-                // Market slide
+                // Market slide - Hidden on mobile
                 const market = slide.data;
                 const yesOption = market.opcoes?.find((opt: any) => opt.toLowerCase().includes('sim') || opt.toLowerCase().includes('yes'));
                 const noOption = market.opcoes?.find((opt: any) => opt.toLowerCase().includes('não') || opt.toLowerCase().includes('no'));
@@ -383,7 +418,7 @@ const Home = () => {
                 const noProb = 100 - yesProb;
                 
                 return (
-                  <CarouselItem key={market.id}>
+                  <CarouselItem key={market.id} className="hidden md:block">
                     <div 
                       className="relative h-[300px] w-full overflow-hidden rounded-2xl cursor-pointer"
                       onClick={() => {
@@ -413,38 +448,44 @@ const Home = () => {
                         <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6 md:gap-8">
                           {/* Left side - Market info */}
                           <div className="flex-1 w-full md:max-w-2xl space-y-4 md:space-y-6 text-center md:text-left">
-                            {/* Market icon */}
-                            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center overflow-hidden mx-auto md:mx-0">
-                              {market.imagem_url || market.thumbnail_url ? (
-                                <img 
-                                  src={market.imagem_url || market.thumbnail_url} 
-                                  alt={market.titulo}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <span className="text-2xl">📊</span>
-                              )}
-                            </div>
-                            
-                            {/* Title */}
-                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
                               {market.titulo}
                             </h2>
                             
-                            {/* Options with probabilities */}
-                            <div className="flex items-center gap-4 flex-wrap">
-                              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#00ff90]/20 border border-[#00ff90]/40 backdrop-blur-sm">
-                                <div className="w-2 h-2 rounded-full bg-[#00ff90]" />
-                                <span className="text-white font-medium">{yesOption || 'SIM'} {yesProb.toFixed(1)}%</span>
+                            {/* Probability Bars */}
+                            <div className="space-y-3">
+                              {/* Yes Option */}
+                              <div className="space-y-2">
+                                <div className="flex justify-between items-center text-white">
+                                  <span className="font-medium text-sm md:text-base">{yesOption || 'Sim'}</span>
+                                  <span className="font-bold text-lg md:text-xl">{Math.round(yesProb)}%</span>
+                                </div>
+                                <div className="h-2 md:h-3 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
+                                  <div 
+                                    className="h-full bg-gradient-to-r from-[#00ff90] to-[#00ff90]/80 rounded-full transition-all duration-500"
+                                    style={{ width: `${yesProb}%` }}
+                                  />
+                                </div>
                               </div>
                               
-                              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#ff2389]/20 border border-[#ff2389]/40 backdrop-blur-sm">
-                                <div className="w-2 h-2 rounded-full bg-[#ff2389]" />
-                                <span className="text-white font-medium">{noOption || 'NÃO'} {noProb.toFixed(1)}%</span>
+                              {/* No Option */}
+                              <div className="space-y-2">
+                                <div className="flex justify-between items-center text-white">
+                                  <span className="font-medium text-sm md:text-base">{noOption || 'Não'}</span>
+                                  <span className="font-bold text-lg md:text-xl">{Math.round(noProb)}%</span>
+                                </div>
+                                <div className="h-2 md:h-3 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
+                                  <div 
+                                    className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 rounded-full transition-all duration-500"
+                                    style={{ width: `${noProb}%` }}
+                                  />
+                                </div>
                               </div>
-                              
-                              {/* Profile icons with gradient */}
-                              <div className="flex items-center gap-1 px-3 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
+                            </div>
+                            
+                            {/* Stats */}
+                            <div className="flex items-center gap-3 md:gap-4 justify-center md:justify-start text-white/90">
+                              <div className="flex items-center -space-x-2">
                                 <div 
                                   className="w-6 h-6 rounded-full border-2 border-white"
                                   style={{ background: 'linear-gradient(135deg, #00ff90 0%, #ff2389 100%)' }}
@@ -484,8 +525,8 @@ const Home = () => {
             <CarouselPrevious className="hidden" />
             <CarouselNext className="hidden" />
             
-            {/* Dots Navigation - Including intro slide + all ordered slides */}
-            <div className="flex justify-center gap-2 mt-4">
+            {/* Dots Navigation - Desktop only */}
+            <div className="hidden md:flex justify-center gap-2 mt-4">
               {/* +1 for intro slide, then all ordered slides */}
               {[...Array(orderedSlides.length + 1)].map((_, index) => (
                 <button
@@ -528,7 +569,7 @@ const Home = () => {
             <button
               onClick={() => handleSortChange('recentes')}
               className={cn(
-                "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
+                "px-4 sm:px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
                 sortBy === 'recentes'
                   ? "bg-primary text-primary-foreground shadow-md"
                   : "bg-card/80 dark:bg-card/50 text-muted-foreground hover:text-foreground border border-border/40 backdrop-blur-sm"
