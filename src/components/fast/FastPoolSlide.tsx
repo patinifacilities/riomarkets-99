@@ -79,7 +79,7 @@ export const FastPoolSlide = ({ onClick }: FastPoolSlideProps) => {
   return (
     <div 
       onClick={handleSlideClick}
-      className="relative h-[400px] md:h-[500px] w-full overflow-hidden rounded-2xl cursor-pointer group"
+      className="relative h-[300px] w-full overflow-hidden rounded-2xl cursor-pointer group"
     >
       {/* Clean gradient background with shadow effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#ff2389] via-[#ff0066] to-[#cc0052]">

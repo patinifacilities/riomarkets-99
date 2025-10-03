@@ -93,8 +93,7 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
     { 
       title: 'Recompensas', 
       icon: Gift, 
-      path: '/admin/rewards',
-      color: 'text-yellow-500 hover:text-yellow-400'
+      path: '/admin/rewards'
     },
     { 
       title: 'Branding', 

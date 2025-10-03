@@ -16,7 +16,7 @@ export const LoadingScreen = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-background flex flex-col items-center justify-center">
+    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center" style={{ backgroundColor: 'hsl(0 0% 4%)' }}>
       <div className="flex flex-col items-center gap-6 animate-fade-in">
         {/* Logo */}
         {config?.logo_white_url && (

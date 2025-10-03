@@ -59,7 +59,10 @@ export const useBranding = () => {
       
       if (data) {
         setConfig(data);
-        applyThemeToDocument(data);
+        // Apply theme immediately to prevent flash
+        requestAnimationFrame(() => {
+          applyThemeToDocument(data);
+        });
       }
     } catch (error) {
       console.error('Error fetching branding config:', error);
@@ -69,6 +72,8 @@ export const useBranding = () => {
   };
 
   const applyThemeToDocument = (brandingConfig: BrandingConfig) => {
+    if (!brandingConfig) return;
+    
     const root = document.documentElement;
     
     // Convert hex to HSL for CSS variables

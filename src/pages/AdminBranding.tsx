@@ -242,7 +242,16 @@ const AdminBranding = () => {
 
       if (error) throw error;
 
-      setConfig({ ...config, ...updateData });
+      // Fetch the updated config to get the actual URL
+      const { data: updatedConfig, error: fetchError } = await supabase
+        .from('branding_config')
+        .select('*')
+        .eq('id', config.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+      
+      setConfig(updatedConfig);
       
       toast({
         title: 'Sucesso!',
