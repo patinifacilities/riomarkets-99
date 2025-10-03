@@ -164,8 +164,8 @@ const MarketDetail = () => {
             )}
 
             {/* Market Header */}
-            <Card className="bg-gradient-card border-border/50 hover:border-white/[0.25] hover:shadow-[0_0_20px_rgba(255,255,255,0.1),0_0_40px_rgba(0,255,144,0.15)] transition-all duration-500">
-              <CardContent className="p-6">
+            <Card className="bg-gradient-card border-border/50 before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-2xl after:bg-gradient-to-tr after:from-transparent after:via-white/[0.02] after:to-white/[0.04]">
+              <CardContent className="p-6 relative z-10">
                 <div className="flex items-start justify-between mb-4">
                   <div className="space-y-2">
                     <Badge className={getCategoryColor(market.categoria)}>
@@ -210,35 +210,40 @@ const MarketDetail = () => {
 
             {/* User Info Panel - Mobile (positioned after market details) */}
             <div className="lg:hidden">
-              <Card id="wallet-section" className="hover:border-white/[0.25] hover:shadow-[0_0_20px_rgba(255,255,255,0.1),0_0_40px_rgba(0,255,144,0.15)] transition-all duration-500">
-                <CardContent className="p-6">
+              <Card id="wallet-section" className="before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-2xl after:bg-gradient-to-tr after:from-transparent after:via-white/[0.02] after:to-white/[0.04]">
+                <CardContent className="p-6 relative z-10">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <Wallet className="w-5 h-5" />
                     Sua Carteira
                   </h3>
                   
                    <div className="space-y-4">
-                      {(userProfile?.saldo_moeda || 0) > 0 ? (
-                        <></>
-                      ) : (
+                      <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-muted-foreground">Saldo disponível</span>
+                          <span className="text-lg font-bold text-primary">
+                            {(userProfile?.saldo_moeda || 0).toLocaleString()} RIOZ
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {(userProfile?.saldo_moeda || 0) === 0 && (
                         <div className="p-4 bg-muted/50 rounded-lg text-center">
                           <p className="text-sm text-muted-foreground mb-3">
                             Você precisa de Rioz Coin para opinar neste mercado
                           </p>
-                          <div className="flex flex-col gap-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => navigate('/exchange')}
-                              className="w-full"
-                            >
-                              Depositar R$ ou Trocar por RZ
-                            </Button>
-                          </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => navigate('/exchange')}
+                            className="w-full"
+                          >
+                            Depositar R$ ou Trocar por RZ
+                          </Button>
                         </div>
                       )}
                       
-                      <div className="text-center text-sm text-muted-foreground">ou use o slider</div>
+                      <div className="text-center text-sm text-muted-foreground">Use o slider para escolher o valor</div>
                       
                       <div className={!authUser || (userProfile?.saldo_moeda || 0) === 0 ? 'opacity-50 pointer-events-none' : ''}>
                         <BetSlider 
@@ -426,8 +431,8 @@ const MarketDetail = () => {
 
             {/* Pool Rules - Expandable */}
             {(market as any).rules && (
-              <Card className="border-primary/20 hover:border-white/[0.25] hover:shadow-[0_0_20px_rgba(255,255,255,0.1),0_0_40px_rgba(0,255,144,0.15)] transition-all duration-500">
-                <CardContent className="p-0">
+              <Card className="border-primary/20 before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-2xl after:bg-gradient-to-tr after:from-transparent after:via-white/[0.02] after:to-white/[0.04]">
+                <CardContent className="p-0 relative z-10">
                   <button
                     onClick={() => setRulesExpanded(!rulesExpanded)}
                     className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
@@ -567,26 +572,49 @@ const MarketDetail = () => {
 
             {/* User Info Panel - Desktop */}
           <div className="hidden lg:block space-y-6 sticky top-24">
-            <Card id="wallet-section" className="hover:border-white/[0.25] hover:shadow-[0_0_20px_rgba(255,255,255,0.1),0_0_40px_rgba(0,255,144,0.15)] transition-all duration-500">
-              <CardContent className="p-6">
+            <Card id="wallet-section" className="before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.03] before:to-transparent after:absolute after:inset-0 after:rounded-2xl after:bg-gradient-to-tr after:from-transparent after:via-white/[0.02] after:to-white/[0.04]">
+              <CardContent className="p-6 relative z-10">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <Wallet className="w-5 h-5" />
                   Sua Carteira
                 </h3>
                 
-                 <div className="space-y-4">
-...
-                 </div>
-               </CardContent>
-             </Card>
+                <div className="space-y-4">
+                  <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-muted-foreground">Saldo disponível</span>
+                      <span className="text-lg font-bold text-primary">
+                        {(userProfile?.saldo_moeda || 0).toLocaleString()} RIOZ
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {(userProfile?.saldo_moeda || 0) === 0 && (
+                    <div className="p-4 bg-muted/50 rounded-lg text-center">
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Você precisa de Rioz Coin para opinar neste mercado
+                      </p>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => navigate('/exchange')}
+                        className="w-full"
+                      >
+                        Depositar R$ ou Trocar por RZ
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
-             {/* Desktop: Open Opinions Card Detail - Right after wallet */}
-             <OpenOpinionsCardDetail 
-               marketId={market.id}
-               onOrderCancelled={() => {
-                 refetchMarket();
-               }}
-             />
+            {/* Desktop: Open Opinions Card Detail - Right after wallet */}
+            <OpenOpinionsCardDetail 
+              marketId={market.id}
+              onOrderCancelled={() => {
+                refetchMarket();
+              }}
+            />
            </div>
         </div>
       </div>

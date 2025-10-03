@@ -132,14 +132,16 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
     <>
       <div className={cn(
         "bg-[#1a1a1a]/40 backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden transition-all duration-500 group relative",
-        "hover:border-white/[0.25]",
-        "hover:shadow-[0_0_20px_rgba(255,255,255,0.1),0_0_40px_rgba(0,255,144,0.15),inset_0_0_30px_rgba(255,255,255,0.05)]",
-        "hover:scale-[1.02] hover:-translate-y-1",
+        "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.03] before:to-transparent before:opacity-100 before:transition-opacity before:duration-500",
+        "after:absolute after:inset-0 after:rounded-2xl after:bg-gradient-to-tr after:from-transparent after:via-white/[0.02] after:to-white/[0.04] after:opacity-100 after:transition-opacity after:duration-500",
+        "hover:border-white/[0.3]",
+        "hover:shadow-[0_0_25px_rgba(255,255,255,0.12),0_0_45px_rgba(0,255,144,0.18)]",
+        "hover:scale-[1.015] hover:-translate-y-0.5",
         className
       )}>
         {/* Em Atualização Overlay */}
         {(market as any).paused && (
-          <div className="absolute inset-0 bg-background/90 backdrop-blur-md z-30 rounded-2xl flex items-center justify-center">
+          <div className="absolute inset-0 bg-background/90 backdrop-blur-md z-20 rounded-2xl flex items-center justify-center">
             <div className="text-center p-6">
               <Settings className="w-12 h-12 mx-auto mb-3 text-primary animate-[spin_3s_linear_infinite]" />
               <h3 className="text-lg font-bold mb-1">Em Atualização</h3>
@@ -161,14 +163,14 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
             
             {/* Hot Badge with Improved Animation */}
             {isHot && (
-              <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-gradient-to-r from-[#ff7b00] via-[#ff9500] to-[#ffb800] text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
+              <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-gradient-to-r from-[#ff7b00] via-[#ffa500] to-[#ffcc00] text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-[0_0_15px_rgba(255,165,0,0.5)]">
                 <svg 
                   className="w-4 h-4" 
                   viewBox="0 0 24 24" 
                   fill="currentColor"
                   style={{ 
-                    filter: 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))',
-                    animation: 'flame 0.5s ease-in-out infinite alternate'
+                    filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
+                    animation: 'flame 1.5s ease-in-out infinite'
                   }}
                 >
                   <path d="M13.5 2C13.5 2 11 6 11 9.5C11 11.71 12.79 13.5 15 13.5C17.21 13.5 19 11.71 19 9.5C19 6 16.5 2 16.5 2L15 4.5L13.5 2M8.5 9C8.5 9 6 13 6 16.5C6 18.71 7.79 20.5 10 20.5C12.21 20.5 14 18.71 14 16.5C14 13 11.5 9 11.5 9L10 11.5L8.5 9Z" />
@@ -176,8 +178,14 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                 HOT
                 <style>{`
                   @keyframes flame {
-                    0% { transform: translateY(0) scale(1); }
-                    100% { transform: translateY(-2px) scale(1.05); }
+                    0%, 100% { 
+                      transform: translateY(0) scale(1); 
+                      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+                    }
+                    50% { 
+                      transform: translateY(-2px) scale(1.05); 
+                      filter: drop-shadow(0 4px 8px rgba(255, 165, 0, 0.4));
+                    }
                   }
                 `}</style>
               </div>

@@ -71,12 +71,13 @@ export const TypewriterText = ({
   return (
     <span className={className}>
       <span className="block">{baseText}</span>
-      <span className="block flex items-center gap-2" style={{ color: currentColor }}>
+      <span className="flex items-center gap-2" style={{ color: currentColor }}>
         {shouldShowIcon && (
           <Zap 
-            className="w-5 h-5 md:w-7 md:h-7" 
+            className="w-5 h-5 md:w-7 md:h-7 relative" 
             style={{ 
               color: currentColor,
+              filter: 'drop-shadow(0 0 8px currentColor) drop-shadow(0 0 12px currentColor)',
               animation: 'heartbeat 0.5s ease-in-out infinite'
             }} 
           />
@@ -87,8 +88,14 @@ export const TypewriterText = ({
       </span>
       <style>{`
         @keyframes heartbeat {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.15); }
+          0%, 100% { 
+            transform: scale(1); 
+            filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 12px currentColor);
+          }
+          50% { 
+            transform: scale(1.15); 
+            filter: drop-shadow(0 0 12px currentColor) drop-shadow(0 0 18px currentColor);
+          }
         }
       `}</style>
     </span>
