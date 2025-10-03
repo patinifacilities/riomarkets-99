@@ -132,20 +132,11 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
     <>
       <div className={cn(
         "bg-[#1a1a1a]/40 backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden transition-all duration-500 group relative",
-        "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.12] before:via-white/[0.04] before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-all before:duration-700 before:pointer-events-none",
-        "after:absolute after:inset-0 after:rounded-2xl after:opacity-0 hover:after:opacity-100 after:transition-all after:duration-700 after:pointer-events-none",
-        "after:bg-[radial-gradient(circle_at_var(--mouse-x)_var(--mouse-y),rgba(255,255,255,0.15)_0%,rgba(255,255,255,0.08)_30%,transparent_70%)]",
-        "hover:border-white/[0.15] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.15),0_0_60px_-15px_rgba(0,255,144,0.1)]",
+        "hover:border-white/[0.25]",
+        "hover:shadow-[0_0_20px_rgba(255,255,255,0.1),0_0_40px_rgba(0,255,144,0.15),inset_0_0_30px_rgba(255,255,255,0.05)]",
         "hover:scale-[1.02] hover:-translate-y-1",
         className
-      )}
-      onMouseMove={(e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
-        e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
-      }}>
+      )}>
         {/* Em Atualização Overlay */}
         {(market as any).paused && (
           <div className="absolute inset-0 bg-background/90 backdrop-blur-md z-30 rounded-2xl flex items-center justify-center">
@@ -170,19 +161,25 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
             
             {/* Hot Badge with Improved Animation */}
             {isHot && (
-              <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-gradient-to-r from-[#ff2389] to-[#ff6b9d] text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg animate-pulse">
+              <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-gradient-to-r from-[#ff7b00] via-[#ff9500] to-[#ffb800] text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
                 <svg 
-                  className="w-4 h-4 animate-bounce" 
+                  className="w-4 h-4" 
                   viewBox="0 0 24 24" 
                   fill="currentColor"
                   style={{ 
                     filter: 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))',
-                    animation: 'bounce 1s ease-in-out infinite'
+                    animation: 'flame 0.5s ease-in-out infinite alternate'
                   }}
                 >
                   <path d="M13.5 2C13.5 2 11 6 11 9.5C11 11.71 12.79 13.5 15 13.5C17.21 13.5 19 11.71 19 9.5C19 6 16.5 2 16.5 2L15 4.5L13.5 2M8.5 9C8.5 9 6 13 6 16.5C6 18.71 7.79 20.5 10 20.5C12.21 20.5 14 18.71 14 16.5C14 13 11.5 9 11.5 9L10 11.5L8.5 9Z" />
                 </svg>
                 HOT
+                <style>{`
+                  @keyframes flame {
+                    0% { transform: translateY(0) scale(1); }
+                    100% { transform: translateY(-2px) scale(1.05); }
+                  }
+                `}</style>
               </div>
             )}
           </div>

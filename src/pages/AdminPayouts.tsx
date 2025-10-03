@@ -1,17 +1,42 @@
-import { useState } from 'react';
-import { ArrowLeft, ArrowUpRight, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, ArrowUpRight, Clock, CheckCircle, XCircle, Search, Filter } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { supabase } from '@/integrations/supabase/client';
 
 const AdminPayouts = () => {
   const { user, loading: authLoading } = useAuth();
   const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sizeFilter, setSizeFilter] = useState('all');
+  const [usersMap, setUsersMap] = useState<Record<string, string>>({});
+
+
+  // Fetch users data
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const { data: users } = await supabase
+        .from('profiles')
+        .select('id, username, nome');
+      
+      if (users) {
+        const map: Record<string, string> = {};
+        users.forEach(u => {
+          map[u.id] = u.username || u.nome;
+        });
+        setUsersMap(map);
+      }
+    };
+    fetchUsers();
+  }, []);
 
   // Security check
   if (authLoading || profileLoading) {
@@ -26,10 +51,11 @@ const AdminPayouts = () => {
     return <Navigate to="/" replace />;
   }
 
-  // Mock payouts data
+  // Mock payouts data (com user_id)
   const payouts = [
     {
       id: '1',
+      user_id: 'user-id-1',
       user: 'Ana Costa',
       amount: 750.00,
       method: 'PIX',
@@ -39,6 +65,7 @@ const AdminPayouts = () => {
     },
     {
       id: '2',
+      user_id: 'user-id-2',
       user: 'Carlos Lima',
       amount: 1200.00,
       method: 'Transferência',
@@ -48,6 +75,7 @@ const AdminPayouts = () => {
     },
     {
       id: '3',
+      user_id: 'user-id-3',
       user: 'Fernanda Souza',
       amount: 450.00,
       method: 'PIX',
@@ -56,6 +84,19 @@ const AdminPayouts = () => {
       pixKey: 'fernanda@email.com'
     }
   ];
+
+  // Filter logic
+  const filteredPayouts = payouts.filter(payout => {
+    const matchesSearch = payout.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (payout.pixKey && payout.pixKey.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesSize = sizeFilter === 'all' || 
+      (sizeFilter === 'small' && payout.amount < 500) ||
+      (sizeFilter === 'medium' && payout.amount >= 500 && payout.amount < 1000) ||
+      (sizeFilter === 'large' && payout.amount >= 1000);
+    
+    return matchesSearch && matchesSize;
+  });
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -164,14 +205,43 @@ const AdminPayouts = () => {
             </Card>
           </div>
 
+          {/* Search and Filters */}
+          <Card className="bg-card-secondary border-border-secondary mb-6">
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Buscar por usuário ou chave PIX..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <Select value={sizeFilter} onValueChange={setSizeFilter}>
+                  <SelectTrigger className="w-full md:w-[200px]">
+                    <Filter className="w-4 h-4 mr-2" />
+                    <SelectValue placeholder="Tamanho" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os valores</SelectItem>
+                    <SelectItem value="small">Até R$ 500</SelectItem>
+                    <SelectItem value="medium">R$ 500 - R$ 1.000</SelectItem>
+                    <SelectItem value="large">Acima de R$ 1.000</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Payouts Table */}
           <Card className="bg-card-secondary border-border-secondary">
             <CardHeader>
-              <CardTitle>Saques Recentes</CardTitle>
+              <CardTitle>Saques Recentes ({filteredPayouts.length})</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {payouts.map((payout) => (
+                {filteredPayouts.map((payout) => (
                   <div
                     key={payout.id}
                     className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50"
@@ -180,6 +250,7 @@ const AdminPayouts = () => {
                       {getStatusIcon(payout.status)}
                       <div>
                         <h3 className="font-semibold">{payout.user}</h3>
+                        <p className="text-xs text-muted-foreground">@{usersMap[payout.user_id] || 'usuário'}</p>
                         <p className="text-sm text-muted-foreground">
                           {new Date(payout.date).toLocaleString('pt-BR')}
                         </p>
@@ -216,6 +287,11 @@ const AdminPayouts = () => {
                     </div>
                   </div>
                 ))}
+                {filteredPayouts.length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Nenhum saque encontrado
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

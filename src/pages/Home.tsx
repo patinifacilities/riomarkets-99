@@ -335,6 +335,7 @@ const Home = () => {
                         customColors={{
                           "Rápidos": "#ff2389"
                         }}
+                        showFastIcon={true}
                         className="text-3xl font-bold"
                         typingSpeed={100}
                         deletingSpeed={50}
@@ -382,6 +383,7 @@ const Home = () => {
                               customColors={{
                                 "Rápidos": "#ff2389"
                               }}
+                              showFastIcon={true}
                               className="text-3xl sm:text-4xl md:text-6xl font-bold"
                               typingSpeed={100}
                               deletingSpeed={50}
