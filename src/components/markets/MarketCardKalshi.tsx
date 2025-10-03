@@ -131,12 +131,12 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   return (
     <>
       <div className={cn(
-        "bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl overflow-hidden hover:border-[#3a3a3a] transition-all duration-300 group relative",
-        "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.08] before:via-transparent before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-all before:duration-500 before:pointer-events-none",
-        "after:absolute after:inset-0 after:rounded-2xl after:opacity-0 hover:after:opacity-100 after:transition-all after:duration-500 after:pointer-events-none",
-        "after:bg-[radial-gradient(circle_at_var(--mouse-x)_var(--mouse-y),rgba(255,255,255,0.12)_0%,rgba(255,255,255,0.06)_25%,transparent_60%)]",
-        "hover:shadow-[0_8px_32px_-8px_rgba(255,255,255,0.1)]",
-        "backdrop-blur-[2px] hover:backdrop-blur-[4px]",
+        "bg-[#1a1a1a]/40 backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden transition-all duration-500 group relative",
+        "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.12] before:via-white/[0.04] before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-all before:duration-700 before:pointer-events-none",
+        "after:absolute after:inset-0 after:rounded-2xl after:opacity-0 hover:after:opacity-100 after:transition-all after:duration-700 after:pointer-events-none",
+        "after:bg-[radial-gradient(circle_at_var(--mouse-x)_var(--mouse-y),rgba(255,255,255,0.15)_0%,rgba(255,255,255,0.08)_30%,transparent_70%)]",
+        "hover:border-white/[0.15] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.15),0_0_60px_-15px_rgba(0,255,144,0.1)]",
+        "hover:scale-[1.02] hover:-translate-y-1",
         className
       )}
       onMouseMove={(e) => {
@@ -148,9 +148,9 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
       }}>
         {/* Em Atualização Overlay */}
         {(market as any).paused && (
-          <div className="absolute inset-0 bg-background/90 backdrop-blur-md z-40 rounded-2xl flex items-center justify-center">
+          <div className="absolute inset-0 bg-background/90 backdrop-blur-md z-30 rounded-2xl flex items-center justify-center">
             <div className="text-center p-6">
-              <Settings className="w-12 h-12 mx-auto mb-3 text-primary animate-spin" />
+              <Settings className="w-12 h-12 mx-auto mb-3 text-primary animate-[spin_3s_linear_infinite]" />
               <h3 className="text-lg font-bold mb-1">Em Atualização</h3>
               <p className="text-sm text-muted-foreground">Este pool está sendo atualizado</p>
             </div>

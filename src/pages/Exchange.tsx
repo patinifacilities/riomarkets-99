@@ -254,7 +254,7 @@ const ExchangeNew = () => {
           {!exchangeEnabled && (
             <div className="absolute inset-0 bg-background/90 backdrop-blur-md z-50 rounded-lg flex items-center justify-center">
               <div className="text-center p-8">
-                <Settings className="w-16 h-16 mx-auto mb-4 text-primary animate-spin" />
+                <Settings className="w-16 h-16 mx-auto mb-4 text-primary animate-[spin_3s_linear_infinite]" />
                 <h2 className="text-2xl font-bold mb-2">Exchange em Atualização</h2>
                 <p className="text-muted-foreground">
                   Estamos melhorando o sistema de conversão.

@@ -128,14 +128,15 @@ export function RianaChat() {
       {/* Floating button */}
       <button
         onClick={toggle}
-        className="fixed bottom-20 md:bottom-5 right-5 z-40 w-14 h-14 rounded-full flex items-center justify-center
+        className="fixed bottom-20 md:bottom-5 right-5 z-40 h-14 rounded-full flex items-center justify-center gap-2
                    bg-primary shadow-[0_0_30px_hsl(var(--primary)/0.35)]
                    hover:opacity-90 hover:shadow-[0_0_40px_hsl(var(--primary)/0.5)] 
                    focus:outline-none focus-visible:ring-2 focus-visible:ring-primary
-                   transition-all duration-300"
+                   transition-all duration-300 w-14 md:w-auto md:px-4"
         aria-label="Abrir chat com a Riana"
       >
         <MessageCircle className="w-6 h-6 text-primary-foreground" />
+        <span className="hidden md:inline text-primary-foreground font-semibold">Riana</span>
       </button>
 
       {/* Chat modal */}

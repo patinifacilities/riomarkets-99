@@ -19,10 +19,12 @@ export function OptionProgressBar({
   }
 
   return (
-    <div className={cn("w-full h-2 md:h-2.5 bg-[#2A2F36] overflow-hidden rounded-full", className)}>
+    <div className={cn("w-full h-2 md:h-2.5 bg-[#2A2F36] overflow-hidden rounded-full relative", className)}>
       <div 
         className={cn(
-          "h-full transition-[width] duration-500 rounded-full",
+          "h-full transition-all duration-700 ease-out rounded-full relative",
+          "before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent",
+          "before:animate-[shimmer_2s_ease-in-out_infinite]",
           variantClasses[variant],
           percentage > 0 && percentage < 5 ? "min-w-[4px]" : ""
         )}

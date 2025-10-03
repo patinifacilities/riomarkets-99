@@ -225,17 +225,17 @@ const Home = () => {
     const uniqueIds = new Set<string>();
     
     if (slideOrder.length === 0) {
-      // Fallback: show selected markets + custom images (text shown separately)
+      // Fallback: show text card + selected markets + custom images
+      slides.push({ type: 'text' as const, data: null });
       slides.push(...sliderMarkets.map(m => ({ type: 'market' as const, data: m })));
       slides.push(...sliderCustomImages.map(img => ({ type: 'image' as const, data: img })));
     } else {
-      // Respect the order from admin panel, filtering out hidden and fast pool slides
+      // Respect the order from admin panel
       const orderSlides = slideOrder
         .filter((item: any) => {
           const id = typeof item === 'string' ? item : item.id;
-          // Filter out hidden slides, fast pool, and text-card (shown separately)
-          if (item.hidden || id === 'fast-card' || id === 'text-card') return false;
-          // Filter out duplicates
+          // Filter out hidden slides and duplicates
+          if (item.hidden) return false;
           if (uniqueIds.has(id)) return false;
           uniqueIds.add(id);
           return true;
@@ -243,7 +243,11 @@ const Home = () => {
         .map((item: any) => {
           const id = typeof item === 'string' ? item : item.id;
           
-          if (id.startsWith('custom-')) {
+          if (id === 'text-card') {
+            return { type: 'text' as const, data: null };
+          } else if (id === 'fast-card') {
+            return { type: 'fast' as const, data: null };
+          } else if (id.startsWith('custom-')) {
             const img = sliderCustomImages.find(i => i.id === id);
             return img ? { type: 'image' as const, data: img } : null;
           } else {
@@ -260,6 +264,7 @@ const Home = () => {
       slides.push(...orderSlides);
     }
     
+    // If no slides after filtering, show logo fallback
     return slides;
   }, [slideOrder, markets, sliderMarkets, sliderCustomImages, sliderMarketIds]);
 
@@ -315,7 +320,7 @@ const Home = () => {
                     <div className="flex justify-center mb-2">
                       <img 
                         src={logoWhite} 
-                        alt="Rio Markets" 
+                        alt="Logo" 
                         className="h-12 object-contain"
                       />
                     </div>
@@ -346,8 +351,9 @@ const Home = () => {
                 </div>
               </CarouselItem>
 
-              {/* Desktop: Ordered Slides - Respecting Admin Order */}
-              {orderedSlides.map((slide, idx) => {
+              {/* Desktop: Show slides or fallback to logo */}
+              {orderedSlides.length > 0 ? (
+                orderedSlides.map((slide, idx) => {
                 if (slide.type === 'fast') {
                   // Fast pool slide - Hidden on mobile
                   return (
@@ -538,16 +544,28 @@ const Home = () => {
                     </div>
                   </CarouselItem>
                 );
-              })}
+              })
+              ) : (
+                <CarouselItem className="hidden md:block">
+                  <div className="flex items-center justify-center h-[400px] rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20">
+                    <img 
+                      src={logoWhite} 
+                      alt="Logo"
+                      className="max-w-[300px] max-h-[200px] object-contain opacity-50"
+                    />
+                  </div>
+                </CarouselItem>
+              )}
             </CarouselContent>
             
             <CarouselPrevious className="hidden" />
             <CarouselNext className="hidden" />
             
-            {/* Dots Navigation - Desktop only */}
-            <div className="hidden md:flex justify-center gap-2 mt-4">
-              {/* +1 for intro slide, then all ordered slides */}
-              {[...Array(orderedSlides.length + 1)].map((_, index) => (
+            {/* Dots Navigation - Desktop only - only show if there are slides */}
+            {orderedSlides.length > 0 && (
+              <div className="hidden md:flex justify-center gap-2 mt-4">
+                {/* +1 for intro slide, then all ordered slides */}
+                {[...Array(orderedSlides.length + 1)].map((_, index) => (
                 <button
                   key={index}
                   className={cn(
@@ -564,7 +582,8 @@ const Home = () => {
                   aria-label={`Ir para slide ${index + 1}`}
                 />
               ))}
-            </div>
+              </div>
+            )}
           </Carousel>
         </div>
       </div>
