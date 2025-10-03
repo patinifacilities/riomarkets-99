@@ -225,17 +225,100 @@ const Home = () => {
                 </div>
               </CarouselItem>
 
-              {/* Slides 2-4: Top 3 Markets with Probability Chart */}
-              {topMarketsByVolume.map((market) => (
-                <CarouselItem key={market.id}>
-                  <div className="flex justify-center py-8 px-8">
-                    <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      <MarketCardKalshi market={market} isSlider={true} />
-                      <ProbabilityChart marketId={market.id} createdAt={market.created_at} />
+              {/* Slides 2-4: Top 3 Markets - Hero Style */}
+              {topMarketsByVolume.map((market) => {
+                const yesOption = market.opcoes?.find((opt: any) => opt.toLowerCase().includes('sim') || opt.toLowerCase().includes('yes'));
+                const noOption = market.opcoes?.find((opt: any) => opt.toLowerCase().includes('não') || opt.toLowerCase().includes('no'));
+                
+                // Calculate probabilities (mock for now)
+                const yesProb = 50 + Math.random() * 40;
+                const noProb = 100 - yesProb;
+                
+                return (
+                  <CarouselItem key={market.id}>
+                    <div className="relative h-[500px] w-full overflow-hidden rounded-2xl">
+                      {/* Background Image with Overlay */}
+                      <div className="absolute inset-0">
+                        {market.imagem_url || market.thumbnail_url || market.image_url || market.photo_url ? (
+                          <img 
+                            src={market.imagem_url || market.thumbnail_url || market.image_url || market.photo_url} 
+                            alt={market.titulo}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-primary/20 via-background to-primary/10" />
+                        )}
+                        {/* Dark overlay for text readability */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="relative h-full flex items-center px-12">
+                        <div className="flex items-center justify-between w-full gap-8">
+                          {/* Left side - Market info */}
+                          <div className="flex-1 max-w-2xl space-y-6">
+                            {/* Market icon */}
+                            <div className="w-16 h-16 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center overflow-hidden">
+                              {market.imagem_url || market.thumbnail_url ? (
+                                <img 
+                                  src={market.imagem_url || market.thumbnail_url} 
+                                  alt={market.titulo}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <span className="text-2xl">📊</span>
+                              )}
+                            </div>
+                            
+                            {/* Title */}
+                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                              {market.titulo}
+                            </h2>
+                            
+                            {/* Options with probabilities */}
+                            <div className="flex items-center gap-4 flex-wrap">
+                              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#00ff90]/20 border border-[#00ff90]/40 backdrop-blur-sm">
+                                <div className="w-2 h-2 rounded-full bg-[#00ff90]" />
+                                <span className="text-white font-medium">≥ {yesOption || 'SIM'} {yesProb.toFixed(1)}%</span>
+                              </div>
+                              
+                              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#ff2389]/20 border border-[#ff2389]/40 backdrop-blur-sm">
+                                <div className="w-2 h-2 rounded-full bg-[#ff2389]" />
+                                <span className="text-white font-medium">≤ {noOption || 'NÃO'} {noProb.toFixed(1)}%</span>
+                              </div>
+                              
+                              {/* Profile icons with gradient */}
+                              <div className="flex items-center gap-1 px-3 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
+                                <div 
+                                  className="w-6 h-6 rounded-full border-2 border-white"
+                                  style={{ background: 'linear-gradient(135deg, #00ff90 0%, #ff2389 100%)' }}
+                                />
+                                <div 
+                                  className="w-6 h-6 rounded-full border-2 border-white -ml-2"
+                                  style={{ background: 'linear-gradient(135deg, #ff2389 0%, #00ff90 100%)' }}
+                                />
+                                <span className="text-white text-sm ml-1">+{Math.floor(Math.random() * 5000) + 1000}</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Right side - Predict button */}
+                          <div className="flex items-center justify-center">
+                            <Button
+                              size="lg"
+                              onClick={() => navigate(`/mercado/${market.id}`)}
+                              className="bg-white text-black hover:bg-white/90 font-semibold px-8 py-6 rounded-full text-lg transition-all hover:scale-105 shadow-xl"
+                            >
+                              <Sparkles className="w-5 h-5 mr-2" />
+                              Predict
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </CarouselItem>
-              ))}
+                  </CarouselItem>
+                );
+              })}
             </CarouselContent>
             
             <CarouselPrevious className="hidden" />
