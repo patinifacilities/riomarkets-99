@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, X, Image as ImageIcon, GripVertical, Save } from 'lucide-react';
+import { ArrowLeft, Plus, X, Image as ImageIcon, GripVertical, Save, Crop } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,11 +11,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { cn } from '@/lib/utils';
+import { ImageCropper } from '@/components/admin/ImageCropper';
 
 interface CustomImage {
   id: string;
   url: string;
-  title: string;
+  cropArea?: any;
 }
 
 interface SlideItem {
@@ -33,12 +34,14 @@ const AdminSlider = () => {
   const [selectedMarkets, setSelectedMarkets] = useState<string[]>([]);
   const [customImages, setCustomImages] = useState<CustomImage[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
-  const [newImageTitle, setNewImageTitle] = useState('');
   const [imagePreview, setImagePreview] = useState('');
   const [sliderDelay, setSliderDelay] = useState(7);
   const [slideOrder, setSlideOrder] = useState<SlideItem[]>([]);
   const [configId, setConfigId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [cropperOpen, setCropperOpen] = useState(false);
+  const [currentCropImage, setCurrentCropImage] = useState('');
+  const [pendingCropArea, setPendingCropArea] = useState<any>(null);
 
   // Load existing config
   useEffect(() => {
@@ -79,8 +82,7 @@ const AdminSlider = () => {
             return {
               id,
               type: 'image' as const,
-              imageUrl: img?.url,
-              title: img?.title
+              imageUrl: img?.url
             };
           } else {
             return {
@@ -114,8 +116,7 @@ const AdminSlider = () => {
         newOrder.push({ 
           id: img.id, 
           type: 'image', 
-          imageUrl: img.url, 
-          title: img.title 
+          imageUrl: img.url
         });
       }
     });
@@ -138,15 +139,24 @@ const AdminSlider = () => {
   };
 
   const handleAddCustomImage = () => {
-    if (newImageUrl && newImageTitle) {
+    if (newImageUrl) {
+      // Open cropper
+      setCurrentCropImage(newImageUrl);
+      setCropperOpen(true);
+    }
+  };
+
+  const handleCropComplete = (croppedAreaPixels: any) => {
+    if (currentCropImage) {
       setCustomImages(prev => [...prev, {
         id: `custom-${Date.now()}`,
-        url: newImageUrl,
-        title: newImageTitle
+        url: currentCropImage,
+        cropArea: croppedAreaPixels
       }]);
       setNewImageUrl('');
-      setNewImageTitle('');
       setImagePreview('');
+      setCurrentCropImage('');
+      setPendingCropArea(null);
     }
   };
 
@@ -328,15 +338,6 @@ const AdminSlider = () => {
               {/* Add New Image */}
               <div className="space-y-3 p-4 rounded-lg border bg-accent/50">
                 <div className="space-y-2">
-                  <Label htmlFor="image-title">Título da Imagem</Label>
-                  <Input
-                    id="image-title"
-                    placeholder="Ex: Promoção de Verão"
-                    value={newImageTitle}
-                    onChange={(e) => setNewImageTitle(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
                   <Label htmlFor="image-url">URL da Imagem</Label>
                   <Input
                     id="image-url"
@@ -361,10 +362,10 @@ const AdminSlider = () => {
                 <Button
                   onClick={handleAddCustomImage}
                   className="w-full"
-                  disabled={!newImageUrl || !newImageTitle}
+                  disabled={!newImageUrl}
                 >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Adicionar Imagem
+                  <Crop className="h-4 w-4 mr-2" />
+                  Recortar e Adicionar
                 </Button>
               </div>
 
@@ -377,14 +378,13 @@ const AdminSlider = () => {
                   >
                     <img
                       src={image.url}
-                      alt={image.title}
+                      alt="Imagem do slider"
                       className="w-16 h-16 object-cover rounded"
                       onError={(e) => {
                         e.currentTarget.src = '/placeholder.svg';
                       }}
                     />
                     <div className="flex-1">
-                      <p className="font-medium text-sm">{image.title}</p>
                       <p className="text-xs text-muted-foreground truncate">
                         {image.url}
                       </p>
@@ -454,9 +454,9 @@ const AdminSlider = () => {
                                       Mercado · {market.categoria}
                                     </p>
                                   </>
-                                ) : slide.type === 'image' ? (
+                                 ) : slide.type === 'image' ? (
                                   <>
-                                    <p className="font-medium text-sm">{slide.title}</p>
+                                    <p className="font-medium text-sm truncate">{slide.imageUrl}</p>
                                     <p className="text-xs text-muted-foreground">
                                       Imagem Personalizada
                                     </p>

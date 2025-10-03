@@ -22,7 +22,7 @@ interface PixPaymentModalProps {
 export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPaymentModalProps) => {
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [pixData, setPixData] = useState<{ qrCode: string; pixCode: string; expiresAt: string } | null>(null);
+  const [pixData, setPixData] = useState<{ qrCode: string; qrCodeText: string; expiresAt: string } | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const { toast } = useToast();
 
@@ -43,17 +43,24 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
 
         if (error) throw error;
 
-        if (data) {
+        console.log('PIX payment data:', data);
+
+        if (data && data.success) {
           setPixData({
             qrCode: data.qrCode,
-            pixCode: data.pixCode,
+            qrCodeText: data.qrCodeText,
             expiresAt: data.expiresAt
           });
           
           // Calculate initial time left
-          const expiryTime = new Date(data.expiresAt).getTime();
-          const now = new Date().getTime();
-          setTimeLeft(Math.max(0, Math.floor((expiryTime - now) / 1000)));
+          if (data.expiresAt) {
+            const expiryTime = new Date(data.expiresAt).getTime();
+            const now = new Date().getTime();
+            setTimeLeft(Math.max(0, Math.floor((expiryTime - now) / 1000)));
+          } else {
+            // Default to 15 minutes if no expiry time
+            setTimeLeft(15 * 60);
+          }
         }
       } catch (error) {
         console.error('Error generating PIX payment:', error);
@@ -101,9 +108,9 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
   };
 
   const handleCopyCode = async () => {
-    if (!pixData) return;
+    if (!pixData?.qrCodeText) return;
     try {
-      await navigator.clipboard.writeText(pixData.pixCode);
+      await navigator.clipboard.writeText(pixData.qrCodeText);
       setCopied(true);
       toast({
         title: "Chave PIX copiada!",
@@ -186,7 +193,7 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
             <div className="relative">
               <textarea
                 readOnly
-                value={pixData?.pixCode || ''}
+                value={pixData?.qrCodeText || ''}
                 className="w-full h-20 p-3 text-xs bg-muted rounded-md border resize-none font-mono"
                 disabled={!pixData}
               />

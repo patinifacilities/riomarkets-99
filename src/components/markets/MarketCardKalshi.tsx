@@ -143,15 +143,12 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
             
             {/* Modern Hot Icon */}
             {showHotIcon && (
-              <div className="absolute top-3 right-3 animate-pulse">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 blur-xl opacity-60 animate-pulse" />
-                  <img 
-                    src={hotFire} 
-                    alt="Hot" 
-                    className="w-12 h-12 object-contain relative z-10"
-                  />
-                </div>
+              <div className="absolute top-3 right-3">
+                <img 
+                  src={hotFire} 
+                  alt="Hot" 
+                  className="w-12 h-12 object-contain animate-pulse drop-shadow-[0_0_16px_rgba(255,100,50,0.9)]"
+                />
               </div>
             )}
           </div>

@@ -291,8 +291,8 @@ const Home = () => {
                 <div className="flex items-center justify-center min-h-[400px] px-4 sm:px-8">
                   <div className="text-center space-y-6 sm:space-y-8 max-w-3xl">
                     <div className="text-3xl sm:text-4xl md:text-6xl font-bold">
-                      <div className="mb-3 sm:mb-4">Mercados Preditivos</div>
-                      <div className="text-xl sm:text-2xl md:text-4xl">
+                      <div className="mb-3 sm:mb-4 text-3xl sm:text-4xl md:text-6xl">Mercados Preditivos</div>
+                      <div className="text-3xl sm:text-4xl md:text-6xl">
                         <TypewriterText
                           baseText=""
                           texts={[
@@ -304,7 +304,7 @@ const Home = () => {
                           customColors={{
                             "Rápidos": "#ff2389"
                           }}
-                          className="text-xl sm:text-2xl md:text-4xl font-bold"
+                          className="text-3xl sm:text-4xl md:text-6xl font-bold"
                           typingSpeed={100}
                           deletingSpeed={50}
                           pauseDuration={2000}
@@ -380,7 +380,7 @@ const Home = () => {
                       className="relative h-[500px] w-full overflow-hidden rounded-2xl cursor-pointer"
                       onClick={() => {
                         handleSlideClick();
-                        navigate(`/mercado/${market.id}`);
+                        navigate(`/market/${market.id}`);
                       }}
                     >
                       {/* Background Image with Clean Fade/Shadow Effect */}
