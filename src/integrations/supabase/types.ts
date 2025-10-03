@@ -87,6 +87,7 @@ export type Database = {
           created_at: string | null
           id: string
           logo_black_url: string | null
+          logo_light_url: string | null
           logo_url: string | null
           logo_white_url: string | null
           primary_color: string | null
@@ -99,6 +100,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           logo_black_url?: string | null
+          logo_light_url?: string | null
           logo_url?: string | null
           logo_white_url?: string | null
           primary_color?: string | null
@@ -111,6 +113,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           logo_black_url?: string | null
+          logo_light_url?: string | null
           logo_url?: string | null
           logo_white_url?: string | null
           primary_color?: string | null
