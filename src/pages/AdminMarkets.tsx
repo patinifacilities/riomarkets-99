@@ -107,20 +107,23 @@ const AdminMarkets = () => {
         .update({ status: 'excluido' })
         .eq('id', marketId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting market:', error);
+        throw error;
+      }
 
       toast({
         title: "Mercado excluído!",
         description: "O mercado foi movido para Excluídos.",
       });
 
-      // Refetch to update the UI
-      await refetch();
-    } catch (error) {
+      // Force immediate refetch to update the UI
+      refetch();
+    } catch (error: any) {
       console.error('Error deleting market:', error);
       toast({
         title: "Erro",
-        description: "Falha ao excluir mercado.",
+        description: error?.message || "Falha ao excluir mercado.",
         variant: "destructive"
       });
     }
