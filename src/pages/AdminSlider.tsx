@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { cn } from '@/lib/utils';
 import { ImageCropper } from '@/components/admin/ImageCropper';
+import { ImageUploadModal } from '@/components/admin/ImageUploadModal';
 
 interface CustomImage {
   id: string;
@@ -21,7 +22,7 @@ interface CustomImage {
 
 interface SlideItem {
   id: string;
-  type: 'market' | 'image';
+  type: 'market' | 'image' | 'fast' | 'text';
   marketId?: string;
   imageUrl?: string;
   title?: string;
@@ -42,6 +43,7 @@ const AdminSlider = () => {
   const [cropperOpen, setCropperOpen] = useState(false);
   const [currentCropImage, setCurrentCropImage] = useState('');
   const [pendingCropArea, setPendingCropArea] = useState<any>(null);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   // Load existing config
   useEffect(() => {
@@ -121,10 +123,22 @@ const AdminSlider = () => {
       }
     });
     
+    // Add Fast card if not in order
+    if (!slideOrder.find(s => s.id === 'fast-card')) {
+      newOrder.push({ id: 'fast-card', type: 'fast' });
+    }
+    
+    // Add Text/Buttons card if not in order
+    if (!slideOrder.find(s => s.id === 'text-card')) {
+      newOrder.push({ id: 'text-card', type: 'text' });
+    }
+    
     // Keep existing order and add new items
     const existingValidItems = slideOrder.filter(item => 
       (item.type === 'market' && selectedMarkets.includes(item.id)) ||
-      (item.type === 'image' && customImages.find(img => img.id === item.id))
+      (item.type === 'image' && customImages.find(img => img.id === item.id)) ||
+      item.type === 'fast' ||
+      item.type === 'text'
     );
     
     setSlideOrder([...existingValidItems, ...newOrder]);
@@ -140,10 +154,23 @@ const AdminSlider = () => {
 
   const handleAddCustomImage = () => {
     if (newImageUrl) {
-      // Open cropper
+      // Open cropper with URL
       setCurrentCropImage(newImageUrl);
       setCropperOpen(true);
     }
+  };
+
+  const handleUploadClick = () => {
+    setUploadModalOpen(true);
+  };
+
+  const handleImageCropped = (imageUrl: string, cropArea: any) => {
+    setCustomImages(prev => [...prev, {
+      id: `custom-${Date.now()}`,
+      url: imageUrl,
+      cropArea: cropArea
+    }]);
+    setUploadModalOpen(false);
   };
 
   const handleCropComplete = (croppedAreaPixels: any) => {
@@ -359,14 +386,24 @@ const AdminSlider = () => {
                   </div>
                 )}
                 
-                <Button
-                  onClick={handleAddCustomImage}
-                  className="w-full"
-                  disabled={!newImageUrl}
-                >
-                  <Crop className="h-4 w-4 mr-2" />
-                  Recortar e Adicionar
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    onClick={handleAddCustomImage}
+                    className="w-full"
+                    disabled={!newImageUrl}
+                    variant="outline"
+                  >
+                    <Crop className="h-4 w-4 mr-2" />
+                    Recortar URL
+                  </Button>
+                  <Button
+                    onClick={handleUploadClick}
+                    className="w-full"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Upload
+                  </Button>
+                </div>
               </div>
 
               {/* Custom Images List */}
@@ -386,7 +423,7 @@ const AdminSlider = () => {
                     />
                     <div className="flex-1">
                       <p className="text-xs text-muted-foreground truncate">
-                        {image.url}
+                        {image.url.length > 20 ? `${image.url.substring(0, 20)}...` : image.url}
                       </p>
                     </div>
                     <Button
@@ -454,11 +491,29 @@ const AdminSlider = () => {
                                       Mercado · {market.categoria}
                                     </p>
                                   </>
-                                 ) : slide.type === 'image' ? (
+                                ) : slide.type === 'image' ? (
                                   <>
-                                    <p className="font-medium text-sm truncate">{slide.imageUrl}</p>
+                                    <p className="font-medium text-sm truncate">
+                                      {slide.imageUrl && slide.imageUrl.length > 20 
+                                        ? `${slide.imageUrl.substring(0, 20)}...` 
+                                        : slide.imageUrl}
+                                    </p>
                                     <p className="text-xs text-muted-foreground">
                                       Imagem Personalizada
+                                    </p>
+                                  </>
+                                ) : slide.type === 'fast' ? (
+                                  <>
+                                    <p className="font-medium text-sm">Card Fast</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      Card de Mercados Rápidos
+                                    </p>
+                                  </>
+                                ) : slide.type === 'text' ? (
+                                  <>
+                                    <p className="font-medium text-sm">Card de Texto e Botões</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      Card com Conteúdo de Texto
                                     </p>
                                   </>
                                 ) : null}
@@ -484,6 +539,24 @@ const AdminSlider = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Image Cropper */}
+      <ImageCropper
+        open={cropperOpen}
+        imageUrl={currentCropImage}
+        onCropComplete={handleCropComplete}
+        onClose={() => {
+          setCropperOpen(false);
+          setCurrentCropImage('');
+        }}
+      />
+
+      {/* Upload Modal */}
+      <ImageUploadModal
+        open={uploadModalOpen}
+        onClose={() => setUploadModalOpen(false)}
+        onImageCropped={handleImageCropped}
+      />
     </div>
   );
 };

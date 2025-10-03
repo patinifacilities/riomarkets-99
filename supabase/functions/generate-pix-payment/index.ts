@@ -88,6 +88,8 @@ serve(async (req) => {
     }
 
     const paymentData = await abacateResponse.json();
+    
+    console.log('Full payment data from Abacatepay:', JSON.stringify(paymentData, null, 2));
 
     // Create fiat request record
     const { error: insertError } = await supabaseClient
@@ -103,14 +105,34 @@ serve(async (req) => {
       console.error('Error creating fiat request:', insertError);
     }
 
-    console.log('Payment data from Abacatepay:', JSON.stringify(paymentData, null, 2));
+    // Extract QR code data - Abacatepay may return it in different formats
+    let qrCodeUrl = '';
+    let qrCodeText = '';
+    let expiresAt = '';
+
+    // Try different possible response structures
+    if (paymentData.bill) {
+      qrCodeUrl = paymentData.bill.qrCode || paymentData.bill.qrcode?.base64 || '';
+      qrCodeText = paymentData.bill.qrCodeText || paymentData.bill.qrcode?.payload || '';
+      expiresAt = paymentData.bill.expiresAt || paymentData.bill.expiration || '';
+    } else if (paymentData.pix) {
+      qrCodeUrl = paymentData.pix.qrCode || paymentData.pix.qrcode?.base64 || '';
+      qrCodeText = paymentData.pix.qrCodeText || paymentData.pix.qrcode?.payload || '';
+      expiresAt = paymentData.pix.expiresAt || paymentData.pix.expiration || '';
+    } else {
+      qrCodeUrl = paymentData.qrCode || paymentData.qrcode?.base64 || '';
+      qrCodeText = paymentData.qrCodeText || paymentData.qrcode?.payload || '';
+      expiresAt = paymentData.expiresAt || paymentData.expiration || '';
+    }
+
+    console.log('Extracted QR data:', { qrCodeUrl: qrCodeUrl?.substring(0, 50), qrCodeText: qrCodeText?.substring(0, 50), expiresAt });
 
     return new Response(JSON.stringify({
       success: true,
       paymentId: paymentData.id,
-      qrCode: paymentData.qrCode || paymentData.pix?.qrCode,
-      qrCodeText: paymentData.qrCodeText || paymentData.pix?.qrCodeText,
-      expiresAt: paymentData.expiresAt,
+      qrCode: qrCodeUrl,
+      qrCodeText: qrCodeText,
+      expiresAt: expiresAt,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

@@ -47,6 +47,9 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
 
         if (data && data.success) {
           console.log('Full payment data:', data);
+          console.log('QR Code:', data.qrCode?.substring(0, 100));
+          console.log('QR Code Text:', data.qrCodeText?.substring(0, 100));
+          console.log('Expires At:', data.expiresAt);
           
           setPixData({
             qrCode: data.qrCode || '',
@@ -59,7 +62,7 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
             const expiryTime = new Date(data.expiresAt).getTime();
             const now = new Date().getTime();
             const timeLeftSeconds = Math.max(0, Math.floor((expiryTime - now) / 1000));
-            console.log('Time left seconds:', timeLeftSeconds);
+            console.log('Expiry time:', expiryTime, 'Now:', now, 'Time left:', timeLeftSeconds);
             setTimeLeft(timeLeftSeconds);
           } else {
             // Default to 15 minutes if no expiry time
@@ -67,7 +70,12 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
             setTimeLeft(15 * 60);
           }
         } else {
-          console.error('Invalid payment data:', data);
+          console.error('Invalid payment data - missing success or data:', data);
+          toast({
+            title: "Erro",
+            description: "Dados de pagamento inválidos recebidos.",
+            variant: "destructive",
+          });
         }
       } catch (error) {
         console.error('Error generating PIX payment:', error);
