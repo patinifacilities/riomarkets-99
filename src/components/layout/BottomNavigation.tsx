@@ -56,12 +56,12 @@ const BottomNavigation = () => {
           // New order: Carteira(0), Mercados(1), Fast(center), Ranking(3), Perfil(4)
           const gridColumn = index < 2 ? index + 1 : index + 2;
           
-          // Position adjustments for better spacing
+          // Position adjustments - Ranking and Perfil closer to Fast button
           let additionalClasses = '';
-          if (index === 0) additionalClasses = 'justify-self-start ml-0'; // Carteira - more to the right
-          else if (index === 1) additionalClasses = 'justify-self-end mr-2'; // Mercados - not cut off
-          else if (index === 3) additionalClasses = 'justify-self-start ml-[-12px]'; // Ranking - more to the left
-          else if (index === 4) additionalClasses = 'justify-self-end mr-[-8px]'; // Perfil - more to the left
+          if (index === 0) additionalClasses = 'justify-self-start'; // Carteira
+          else if (index === 1) additionalClasses = 'justify-self-end mr-4'; // Mercados - closer to center
+          else if (index === 3) additionalClasses = 'justify-self-start ml-4'; // Ranking - closer to center
+          else if (index === 4) additionalClasses = 'justify-self-end'; // Perfil
 
           return (
             <Link

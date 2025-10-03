@@ -273,7 +273,6 @@ const Home = () => {
             opts={{
               align: "start",
               loop: true,
-              direction: "rtl", // Right to left flow
             }}
             plugins={[
               Autoplay({
@@ -508,28 +507,28 @@ const Home = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        {/* Search and Filters */}
+        {/* Search and Filters - Improved for white mode */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               placeholder="Search markets"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 h-12 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-500 rounded-xl"
+              className="pl-12 h-12 bg-card/80 dark:bg-card/50 border-border/60 dark:border-border/40 text-foreground placeholder:text-muted-foreground/60 rounded-xl shadow-sm backdrop-blur-sm"
             />
           </div>
         </div>
 
-        {/* Filter Pills */}
+        {/* Filter Pills - Improved for white mode */}
         <div className="flex gap-3 mb-6 overflow-x-auto pb-2 scrollbar-hide">
           <button
             onClick={() => handleSortChange('recentes')}
             className={cn(
               "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
               sortBy === 'recentes'
-                ? "bg-white text-black"
-                : "bg-[#1a1a1a] text-gray-400 hover:text-white border border-[#2a2a2a]"
+                ? "bg-primary text-primary-foreground shadow-md"
+                : "bg-card/80 dark:bg-card/50 text-muted-foreground hover:text-foreground border border-border/40 backdrop-blur-sm"
             )}
           >
             <BarChart3 className="w-4 h-4" />
@@ -541,8 +540,8 @@ const Home = () => {
             className={cn(
               "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
               sortBy === 'populares'
-                ? "bg-white text-black"
-                : "bg-[#1a1a1a] text-gray-400 hover:text-white border border-[#2a2a2a]"
+                ? "bg-primary text-primary-foreground shadow-md"
+                : "bg-card/80 dark:bg-card/50 text-muted-foreground hover:text-foreground border border-border/40 backdrop-blur-sm"
             )}
           >
             <Zap className="w-4 h-4" />
@@ -554,8 +553,8 @@ const Home = () => {
             className={cn(
               "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
               sortBy === 'liquidez'
-                ? "bg-white text-black"
-                : "bg-[#1a1a1a] text-gray-400 hover:text-white border border-[#2a2a2a]"
+                ? "bg-primary text-primary-foreground shadow-md"
+                : "bg-card/80 dark:bg-card/50 text-muted-foreground hover:text-foreground border border-border/40 backdrop-blur-sm"
             )}
           >
             <Target className="w-4 h-4" />
@@ -567,18 +566,18 @@ const Home = () => {
             className={cn(
               "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all",
               sortBy === 'prazo'
-                ? "bg-white text-black"
-                : "bg-[#1a1a1a] text-gray-400 hover:text-white border border-[#2a2a2a]"
+                ? "bg-primary text-primary-foreground shadow-md"
+                : "bg-card/80 dark:bg-card/50 text-muted-foreground hover:text-foreground border border-border/40 backdrop-blur-sm"
             )}
           >
             Ending
           </button>
           
           <Select value={selectedStatus[0] || 'active'} onValueChange={(val) => setSelectedStatus([val])}>
-            <SelectTrigger className="w-[120px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
+            <SelectTrigger className="w-[120px] bg-card/80 dark:bg-card/50 border-border/40 text-foreground backdrop-blur-sm">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a]">
+            <SelectContent className="bg-card border-border">
               <SelectItem value="active">Open</SelectItem>
               <SelectItem value="ending">Ending</SelectItem>
               <SelectItem value="closed">Closed</SelectItem>

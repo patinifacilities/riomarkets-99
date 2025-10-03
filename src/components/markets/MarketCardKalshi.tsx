@@ -141,18 +141,27 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/60 via-transparent to-transparent" />
             
-            {/* Hot/Fire Icon for top 3 - Enhanced animation */}
+            {/* Modern Hot Icon Animation */}
             {showHotIcon && (
               <div className="absolute top-3 right-3">
-                <img 
-                  src={hotFire} 
-                  alt="Hot" 
-                  className="w-10 h-10 animate-bounce drop-shadow-[0_0_12px_rgba(255,100,0,0.9)]"
-                  style={{
-                    filter: 'drop-shadow(0 0 6px rgba(255,140,0,0.8)) drop-shadow(0 0 12px rgba(255,69,0,0.6))',
-                    animation: 'bounce 1s ease-in-out infinite'
-                  }}
-                />
+                <div className="relative">
+                  <img 
+                    src={hotFire} 
+                    alt="Hot" 
+                    className="w-10 h-10 relative z-10"
+                    style={{
+                      animation: 'floatAnimation 2s ease-in-out infinite'
+                    }}
+                  />
+                  {/* Glowing pulse effect */}
+                  <div 
+                    className="absolute inset-0 rounded-full blur-md opacity-60"
+                    style={{
+                      background: 'radial-gradient(circle, rgba(255,100,0,0.8) 0%, rgba(255,140,0,0.4) 50%, transparent 70%)',
+                      animation: 'pulseGlow 2s ease-in-out infinite'
+                    }}
+                  />
+                </div>
               </div>
             )}
           </div>
