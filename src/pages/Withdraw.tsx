@@ -158,7 +158,7 @@ const Withdraw = () => {
                 value={formatCurrencyDisplay(amount)}
                 onChange={handleAmountChange}
                 placeholder="0,00"
-                className="pl-16 pr-4 h-16 text-2xl md:text-3xl font-bold border-2 border-primary/30 focus:border-primary"
+                className="pl-16 pr-4 h-16 text-2xl md:text-3xl font-bold border-2 border-primary/30 focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </div>
             {amount && numericAmount < minWithdraw && (
@@ -292,7 +292,7 @@ const Withdraw = () => {
             {selectedMethod === "crypto" && (
               <div className="mt-6 pt-6 border-t border-border space-y-4 animate-scale-in">
                 <div>
-                  <Label className="mb-3 block">Rede da Criptomoeda</Label>
+                  <Label className="mb-3 block">Criptomoeda</Label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
                       { value: 'BTC', label: 'Bitcoin' },
@@ -309,6 +309,19 @@ const Withdraw = () => {
                       </Button>
                     ))}
                   </div>
+                </div>
+
+                <div>
+                  <Label className="mb-3 block">Rede</Label>
+                  <select 
+                    className="w-full h-10 px-3 rounded-md border border-border bg-background text-foreground"
+                    defaultValue="BEP20"
+                  >
+                    <option value="BEP20">BEP20 (Binance Smart Chain)</option>
+                    <option value="ERC20">ERC20 (Ethereum)</option>
+                    <option value="TRC20">TRC20 (Tron)</option>
+                    <option value="POLYGON">Polygon</option>
+                  </select>
                 </div>
 
                 <div>

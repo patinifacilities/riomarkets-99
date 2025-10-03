@@ -231,11 +231,11 @@ const AdminMarkets = () => {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          {market.icon_url && (
+                          {(market.photo_url || market.thumbnail_url) && (
                             <img 
-                              src={market.icon_url} 
+                              src={market.photo_url || market.thumbnail_url || market.icon_url} 
                               alt={market.titulo} 
-                              className="w-6 h-6 object-contain"
+                              className="w-10 h-10 object-cover rounded border border-border"
                             />
                           )}
                           <h3 className="font-semibold">{market.titulo}</h3>

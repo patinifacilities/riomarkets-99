@@ -20,6 +20,8 @@ interface BrandingConfig {
   primary_color: string;
   success_color: string;
   active_theme: string;
+  opinion_yes_color?: string;
+  opinion_no_color?: string;
 }
 
 interface BrandingHistory {
@@ -33,12 +35,24 @@ const THEMES = {
     background_color: '#0a0a0a',
     primary_color: '#ff2389',
     success_color: '#00ff90',
+    opinion_yes_color: '#00ff90',
+    opinion_no_color: '#ff2389',
   },
   theme2: {
     name: 'Tema Oceano',
     background_color: '#0f1419',
     primary_color: '#1DA1F2',
     success_color: '#17BF63',
+    opinion_yes_color: '#17BF63',
+    opinion_no_color: '#F91880',
+  },
+  custom: {
+    name: 'Custom',
+    background_color: '#0a0a0a',
+    primary_color: '#ff2389',
+    success_color: '#00ff90',
+    opinion_yes_color: '#00ff90',
+    opinion_no_color: '#ff2389',
   }
 };
 
@@ -236,7 +250,7 @@ const AdminBranding = () => {
     }
   };
 
-  const applyTheme = (themeName: 'theme1' | 'theme2') => {
+  const applyTheme = (themeName: 'theme1' | 'theme2' | 'custom') => {
     if (!config) return;
     
     // Save current state to history
@@ -248,6 +262,8 @@ const AdminBranding = () => {
       background_color: theme.background_color,
       primary_color: theme.primary_color,
       success_color: theme.success_color,
+      opinion_yes_color: theme.opinion_yes_color,
+      opinion_no_color: theme.opinion_no_color,
       active_theme: themeName
     };
     
@@ -333,6 +349,13 @@ const AdminBranding = () => {
               >
                 {THEMES.theme2.name}
               </Button>
+              <Button
+                onClick={() => applyTheme('custom')}
+                variant={config.active_theme === 'custom' ? 'default' : 'outline'}
+                className="flex-1"
+              >
+                {THEMES.custom.name}
+              </Button>
             </CardContent>
           </Card>
 
@@ -346,13 +369,13 @@ const AdminBranding = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Logo Header (White) */}
+                {/* Logo Header Dark Background */}
                 <div className="space-y-2">
                   <Label>Logo Header (fundo escuro)</Label>
                   <div className="flex items-center gap-4">
                     {config.logo_white_url && (
                       <div className="bg-gray-800 p-2 rounded">
-                        <img src={config.logo_white_url} alt="Logo Header" className="h-12 object-contain" />
+                        <img src={config.logo_white_url} alt="Logo Header Dark" className="h-12 object-contain" />
                       </div>
                     )}
                     <Input
@@ -367,28 +390,30 @@ const AdminBranding = () => {
                   </div>
                 </div>
 
-                {/* Logo Principal */}
+                {/* Logo Header Light Background */}
                 <div className="space-y-2">
-                  <Label>Logo Principal</Label>
+                  <Label>Logo Header (fundo claro)</Label>
                   <div className="flex items-center gap-4">
-                    {config.logo_url && (
-                      <img src={config.logo_url} alt="Logo" className="h-12 object-contain" />
+                    {config.logo_black_url && (
+                      <div className="bg-white p-2 rounded">
+                        <img src={config.logo_black_url} alt="Logo Header Light" className="h-12 object-contain" />
+                      </div>
                     )}
                     <Input
                       type="file"
                       accept="image/*"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
-                        if (file) handleLogoUpload(file, 'logo');
+                        if (file) handleLogoUpload(file, 'logo_black');
                       }}
-                      disabled={uploading.logo}
+                      disabled={uploading.logo_black}
                     />
                   </div>
                 </div>
 
-                {/* Logo Preta */}
+                {/* Logo Rio */}
                 <div className="space-y-2">
-                  <Label>Logo Preta (fundo claro)</Label>
+                  <Label>Logo Rio</Label>
                   <div className="flex items-center gap-4">
                     {config.logo_black_url && (
                       <div className="bg-white p-2 rounded">
@@ -489,6 +514,64 @@ const AdminBranding = () => {
                         setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
                         setConfig({ ...config, success_color: e.target.value });
                         applyThemeToDocument({ ...config, success_color: e.target.value });
+                      }}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+
+                {/* Opinion Yes Color */}
+                <div className="space-y-2">
+                  <Label>Cor do Botão "Sim"</Label>
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded border border-border"
+                      style={{ backgroundColor: config.opinion_yes_color || config.success_color }}
+                    />
+                    <Input
+                      type="color"
+                      value={config.opinion_yes_color || config.success_color}
+                      onChange={(e) => {
+                        setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
+                        setConfig({ ...config, opinion_yes_color: e.target.value });
+                      }}
+                      className="w-24 h-12"
+                    />
+                    <Input
+                      type="text"
+                      value={config.opinion_yes_color || config.success_color}
+                      onChange={(e) => {
+                        setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
+                        setConfig({ ...config, opinion_yes_color: e.target.value });
+                      }}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+
+                {/* Opinion No Color */}
+                <div className="space-y-2">
+                  <Label>Cor do Botão "Não"</Label>
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded border border-border"
+                      style={{ backgroundColor: config.opinion_no_color || config.primary_color }}
+                    />
+                    <Input
+                      type="color"
+                      value={config.opinion_no_color || config.primary_color}
+                      onChange={(e) => {
+                        setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
+                        setConfig({ ...config, opinion_no_color: e.target.value });
+                      }}
+                      className="w-24 h-12"
+                    />
+                    <Input
+                      type="text"
+                      value={config.opinion_no_color || config.primary_color}
+                      onChange={(e) => {
+                        setHistory(prev => [...prev, { config, timestamp: Date.now() }]);
+                        setConfig({ ...config, opinion_no_color: e.target.value });
                       }}
                       className="flex-1"
                     />
