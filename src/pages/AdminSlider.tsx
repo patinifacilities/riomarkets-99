@@ -125,14 +125,16 @@ const AdminSlider = () => {
     
     // Add selected markets that aren't already in the order
     selectedMarkets.forEach(marketId => {
-      if (!slideOrder.find(s => s.id === marketId)) {
+      const existing = slideOrder.find(s => s.id === marketId);
+      if (!existing) {
         newOrder.push({ id: marketId, type: 'market', marketId, hidden: false });
       }
     });
     
     // Add custom images that aren't already in the order
     customImages.forEach(img => {
-      if (!slideOrder.find(s => s.id === img.id)) {
+      const existing = slideOrder.find(s => s.id === img.id);
+      if (!existing) {
         newOrder.push({ 
           id: img.id, 
           type: 'image', 
@@ -142,19 +144,19 @@ const AdminSlider = () => {
       }
     });
     
-    // Always ensure Fast and Text cards exist in the order
-    const hasFast = slideOrder.find(s => s.id === 'fast-card');
-    const hasText = slideOrder.find(s => s.id === 'text-card');
+    // Always ensure Fast and Text cards exist in the order, preserving their hidden state
+    const existingFast = slideOrder.find(s => s.id === 'fast-card');
+    const existingText = slideOrder.find(s => s.id === 'text-card');
     
-    if (!hasFast) {
+    if (!existingFast) {
       newOrder.push({ id: 'fast-card', type: 'fast', hidden: false });
     }
     
-    if (!hasText) {
+    if (!existingText) {
       newOrder.push({ id: 'text-card', type: 'text', hidden: false });
     }
     
-    // Keep existing order and add new items
+    // Keep existing order and add new items, preserving the hidden state
     const existingValidItems = slideOrder.filter(item => 
       (item.type === 'market' && selectedMarkets.includes(item.id)) ||
       (item.type === 'image' && customImages.find(img => img.id === item.id)) ||

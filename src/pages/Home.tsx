@@ -295,7 +295,7 @@ const Home = () => {
 
               {/* Mobile: Show ONLY text/buttons slide */}
               <CarouselItem key="text-card-mobile" className="md:hidden">
-                <div className="flex items-center justify-center h-[320px] px-4">
+                <div className="flex items-center justify-center h-[280px] px-4">
                   <div className="text-center space-y-3 max-w-3xl mx-auto">
                     <div className="text-3xl font-bold">
                       <div className="mb-2 text-3xl">Mercados Preditivos</div>
