@@ -252,8 +252,10 @@ const AdminExchange = () => {
 
       if (error) throw error;
 
-      // Force refetch to ensure UI updates
-      await fetchAssets();
+      // Immediately update local state
+      setAssets(prev => prev.map(asset => 
+        asset.id === assetId ? { ...asset, icon_url: publicUrl } : asset
+      ));
 
       toast({
         title: 'Sucesso!',

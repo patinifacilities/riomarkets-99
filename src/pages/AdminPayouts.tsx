@@ -17,6 +17,7 @@ const AdminPayouts = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sizeFilter, setSizeFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [usersMap, setUsersMap] = useState<Record<string, string>>({});
 
 
@@ -85,18 +86,22 @@ const AdminPayouts = () => {
     }
   ];
 
-  // Filter logic
-  const filteredPayouts = payouts.filter(payout => {
-    const matchesSearch = payout.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          (payout.pixKey && payout.pixKey.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesSize = sizeFilter === 'all' || 
-      (sizeFilter === 'small' && payout.amount < 500) ||
-      (sizeFilter === 'medium' && payout.amount >= 500 && payout.amount < 1000) ||
-      (sizeFilter === 'large' && payout.amount >= 1000);
-    
-    return matchesSearch && matchesSize;
-  });
+  // Filter and sort logic
+  const filteredPayouts = payouts
+    .filter(payout => {
+      const matchesSearch = payout.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            (payout.pixKey && payout.pixKey.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesSize = sizeFilter === 'all' || 
+        (sizeFilter === 'small' && payout.amount < 500) ||
+        (sizeFilter === 'medium' && payout.amount >= 500 && payout.amount < 1000) ||
+        (sizeFilter === 'large' && payout.amount >= 1000);
+      
+      return matchesSearch && matchesSize;
+    })
+    .sort((a, b) => {
+      return sortOrder === 'desc' ? b.amount - a.amount : a.amount - b.amount;
+    });
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -228,6 +233,15 @@ const AdminPayouts = () => {
                     <SelectItem value="small">Até R$ 500</SelectItem>
                     <SelectItem value="medium">R$ 500 - R$ 1.000</SelectItem>
                     <SelectItem value="large">Acima de R$ 1.000</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={sortOrder} onValueChange={(value: 'asc' | 'desc') => setSortOrder(value)}>
+                  <SelectTrigger className="w-full md:w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="desc">Do maior para o menor</SelectItem>
+                    <SelectItem value="asc">Do menor para o maior</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -17,6 +17,7 @@ const AdminDeposits = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sizeFilter, setSizeFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [usersMap, setUsersMap] = useState<Record<string, string>>({});
 
 
@@ -82,17 +83,21 @@ const AdminDeposits = () => {
     }
   ];
 
-  // Filter logic
-  const filteredDeposits = deposits.filter(deposit => {
-    const matchesSearch = deposit.user.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesSize = sizeFilter === 'all' || 
-      (sizeFilter === 'small' && deposit.amount < 500) ||
-      (sizeFilter === 'medium' && deposit.amount >= 500 && deposit.amount < 1000) ||
-      (sizeFilter === 'large' && deposit.amount >= 1000);
-    
-    return matchesSearch && matchesSize;
-  });
+  // Filter and sort logic
+  const filteredDeposits = deposits
+    .filter(deposit => {
+      const matchesSearch = deposit.user.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesSize = sizeFilter === 'all' || 
+        (sizeFilter === 'small' && deposit.amount < 500) ||
+        (sizeFilter === 'medium' && deposit.amount >= 500 && deposit.amount < 1000) ||
+        (sizeFilter === 'large' && deposit.amount >= 1000);
+      
+      return matchesSearch && matchesSize;
+    })
+    .sort((a, b) => {
+      return sortOrder === 'desc' ? b.amount - a.amount : a.amount - b.amount;
+    });
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -224,6 +229,15 @@ const AdminDeposits = () => {
                     <SelectItem value="small">Até R$ 500</SelectItem>
                     <SelectItem value="medium">R$ 500 - R$ 1.000</SelectItem>
                     <SelectItem value="large">Acima de R$ 1.000</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={sortOrder} onValueChange={(value: 'asc' | 'desc') => setSortOrder(value)}>
+                  <SelectTrigger className="w-full md:w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="desc">Do maior para o menor</SelectItem>
+                    <SelectItem value="asc">Do menor para o maior</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

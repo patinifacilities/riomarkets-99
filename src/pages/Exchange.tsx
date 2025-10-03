@@ -54,6 +54,17 @@ const ExchangeNew = () => {
     }
   }, [user?.id]);
 
+  // Refetch assets every 2 seconds to get updated icons
+  useEffect(() => {
+    if (!user?.id) return;
+    
+    const interval = setInterval(() => {
+      fetchAllAssets();
+    }, 2000);
+    
+    return () => clearInterval(interval);
+  }, [user?.id]);
+
   const fetchAllAssets = async () => {
     try {
       const { data, error } = await supabase
@@ -288,7 +299,7 @@ const ExchangeNew = () => {
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity ${
+                        <button className={`relative w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity ${
                           fromCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
                         }`}>
                           {fromCurrency === 'BRL' ? (
@@ -296,14 +307,20 @@ const ExchangeNew = () => {
                           ) : (
                             <span className="text-lg font-bold text-black">R</span>
                           )}
+                          <svg className="absolute -right-1 -bottom-1 w-4 h-4 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="bg-card border-border shadow-xl rounded-xl p-2 min-w-[280px] z-[100]">
-                        {allAssets.map((asset) => (
+                        {allAssets.filter(asset => 
+                          !(fromCurrency === 'RIOZ' && asset.symbol === 'RIOZ') && 
+                          !(fromCurrency === 'BRL' && asset.symbol === 'BRL')
+                        ).map((asset) => (
                           <DropdownMenuItem 
                             key={asset.id}
-                            disabled 
-                            className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                            disabled={!asset.is_active}
+                            className={asset.is_active ? "cursor-pointer p-3 rounded-lg hover:bg-muted/50 transition-colors" : "opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors"}
                           >
                             <div className="flex items-center gap-3 w-full">
                               <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -316,7 +333,7 @@ const ExchangeNew = () => {
                               <div className="flex-1">
                                 <p className="font-medium text-foreground">{asset.name} ({asset.symbol})</p>
                                 <p className="text-xs text-muted-foreground">
-                                  {asset.is_active ? 'Em breve' : 'Indisponível'}
+                                  {asset.is_active ? 'Disponível' : 'Indisponível'}
                                 </p>
                               </div>
                             </div>
@@ -382,7 +399,7 @@ const ExchangeNew = () => {
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity ${
+                      <button className={`relative w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity ${
                         toCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
                       }`}>
                         {toCurrency === 'BRL' ? (
@@ -390,14 +407,20 @@ const ExchangeNew = () => {
                         ) : (
                           <span className="text-lg font-bold text-black">R</span>
                         )}
+                        <svg className="absolute -right-1 -bottom-1 w-4 h-4 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-card border-border shadow-xl rounded-xl p-2 min-w-[280px] z-[100]">
-                      {allAssets.map((asset) => (
+                      {allAssets.filter(asset => 
+                        !(toCurrency === 'RIOZ' && asset.symbol === 'RIOZ') && 
+                        !(toCurrency === 'BRL' && asset.symbol === 'BRL')
+                      ).map((asset) => (
                         <DropdownMenuItem 
                           key={asset.id}
-                          disabled 
-                          className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                          disabled={!asset.is_active}
+                          className={asset.is_active ? "cursor-pointer p-3 rounded-lg hover:bg-muted/50 transition-colors" : "opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors"}
                         >
                           <div className="flex items-center gap-3 w-full">
                             <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -410,7 +433,7 @@ const ExchangeNew = () => {
                             <div className="flex-1">
                               <p className="font-medium text-foreground">{asset.name} ({asset.symbol})</p>
                               <p className="text-xs text-muted-foreground">
-                                {asset.is_active ? 'Em breve' : 'Indisponível'}
+                                {asset.is_active ? 'Disponível' : 'Indisponível'}
                               </p>
                             </div>
                           </div>
