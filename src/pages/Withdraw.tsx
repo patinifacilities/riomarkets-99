@@ -21,7 +21,8 @@ const Withdraw = () => {
   const [pixKey, setPixKey] = useState('');
   const [pixKeyType, setPixKeyType] = useState<'cpf' | 'email' | 'phone' | 'random'>('cpf');
   const [cryptoAddress, setCryptoAddress] = useState('');
-  const [cryptoNetwork, setCryptoNetwork] = useState<'BTC' | 'ETH' | 'USDT'>('BTC');
+  const [cryptoAsset, setCryptoAsset] = useState<'BTC' | 'USDT' | 'USDC'>('BTC');
+  const [cryptoNetwork, setCryptoNetwork] = useState('BEP20');
 
   useEffect(() => {
     if (!loading && !user) {
@@ -83,7 +84,7 @@ const Withdraw = () => {
           amount_brl: selectedMethod === 'pix' ? numericAmount : 0,
           pix_key: selectedMethod === 'pix' ? `${pixKeyType}:${pixKey}` : null,
           admin_notes: selectedMethod === 'crypto' 
-            ? `Crypto withdrawal: ${cryptoNetwork} - ${cryptoAddress}` 
+            ? `Crypto withdrawal: ${cryptoAsset} (${cryptoNetwork}) - ${cryptoAddress}` 
             : null,
           status: 'pending',
         });
@@ -112,8 +113,17 @@ const Withdraw = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20 pb-8 px-4">
+    <div className="min-h-screen bg-background pt-12 md:pt-20 pb-8 px-4">
       <div className="max-w-2xl mx-auto">
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <img 
+            src={new URL('@/assets/rio-white-logo-deposit.png', import.meta.url).href}
+            alt="Rio Markets Logo" 
+            className="h-12 w-auto"
+          />
+        </div>
+
         {/* Header */}
         <div className="mb-8">
           <Button
@@ -280,7 +290,7 @@ const Withdraw = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-base">Criptomoeda</h3>
-                  <p className="text-sm text-muted-foreground">BTC, ETH, USDT</p>
+                  <p className="text-sm text-muted-foreground">BTC, USDT, USDC</p>
                 </div>
               </div>
               {selectedMethod === "crypto" && (
@@ -295,17 +305,17 @@ const Withdraw = () => {
                   <Label className="mb-3 block">Criptomoeda</Label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      { value: 'BTC', label: 'Bitcoin' },
-                      { value: 'ETH', label: 'Ethereum' },
-                      { value: 'USDT', label: 'USDT' }
-                    ].map((network) => (
+                      { value: 'BTC', label: 'BTC' },
+                      { value: 'USDT', label: 'USDT' },
+                      { value: 'USDC', label: 'USDC' }
+                    ].map((asset) => (
                       <Button
-                        key={network.value}
-                        variant={cryptoNetwork === network.value ? "default" : "outline"}
-                        onClick={() => setCryptoNetwork(network.value as any)}
+                        key={asset.value}
+                        variant={cryptoAsset === asset.value ? "default" : "outline"}
+                        onClick={() => setCryptoAsset(asset.value as any)}
                         className="h-10"
                       >
-                        {network.label}
+                        {asset.label}
                       </Button>
                     ))}
                   </div>
@@ -314,8 +324,9 @@ const Withdraw = () => {
                 <div>
                   <Label className="mb-3 block">Rede</Label>
                   <select 
-                    className="w-full h-10 px-3 rounded-md border border-border bg-background text-foreground"
-                    defaultValue="BEP20"
+                    value={cryptoNetwork}
+                    onChange={(e) => setCryptoNetwork(e.target.value)}
+                    className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   >
                     <option value="BEP20">BEP20 (Binance Smart Chain)</option>
                     <option value="ERC20">ERC20 (Ethereum)</option>

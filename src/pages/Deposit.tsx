@@ -29,6 +29,9 @@ export default function Deposit() {
   const [saveCard, setSaveCard] = useState(false);
   const [showPixModal, setShowPixModal] = useState(false);
   const [pixData, setPixData] = useState<{ qrCode?: string; qrCodeText?: string } | null>(null);
+  const [cryptoAsset, setCryptoAsset] = useState<'BTC' | 'USDT' | 'USDC'>('BTC');
+  const [cryptoNetwork, setCryptoNetwork] = useState('BEP20');
+  const [cryptoAddress, setCryptoAddress] = useState('');
 
   useEffect(() => {
     if (!loading && !user) {
@@ -107,7 +110,7 @@ export default function Deposit() {
     }
   };
 
-  const handleDeposit = async (method: "card" | "pix" | "apple") => {
+  const handleDeposit = async (method: "card" | "pix" | "apple" | "crypto") => {
     if (!session?.user) {
       toast.error("Você precisa estar logado para fazer um depósito");
       navigate("/auth");
@@ -148,7 +151,10 @@ export default function Deposit() {
             qrCode: data.payment?.qrCode || data.qrCode,
             qrCodeText: data.payment?.qrCodeText || data.qrCodeText,
           });
-          setShowPixModal(true);
+          // Don't close the modal immediately - let it stay open
+          setTimeout(() => {
+            setShowPixModal(true);
+          }, 100);
         } else {
           throw new Error(data?.error || "Failed to generate PIX payment");
         }
@@ -273,13 +279,67 @@ export default function Deposit() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-base">Criptomoeda</h3>
-                  <p className="text-sm text-muted-foreground">BTC, USDT, ETH</p>
+                  <p className="text-sm text-muted-foreground">BTC, USDT, USDC</p>
                 </div>
               </div>
               {selectedMethod === "crypto" && (
                 <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
               )}
             </div>
+
+            {/* Crypto Details */}
+            {selectedMethod === "crypto" && (
+              <div className="mt-6 pt-6 border-t border-border space-y-4 animate-scale-in">
+                <div>
+                  <Label className="mb-3 block">Criptomoeda</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: 'BTC', label: 'BTC' },
+                      { value: 'USDT', label: 'USDT' },
+                      { value: 'USDC', label: 'USDC' }
+                    ].map((asset) => (
+                      <Button
+                        key={asset.value}
+                        variant={cryptoAsset === asset.value ? "default" : "outline"}
+                        onClick={() => setCryptoAsset(asset.value as any)}
+                        className="h-10"
+                      >
+                        {asset.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="mb-3 block">Rede</Label>
+                  <select 
+                    value={cryptoNetwork}
+                    onChange={(e) => setCryptoNetwork(e.target.value)}
+                    className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  >
+                    <option value="BEP20">BEP20 (Binance Smart Chain)</option>
+                    <option value="ERC20">ERC20 (Ethereum)</option>
+                    <option value="TRC20">TRC20 (Tron)</option>
+                    <option value="POLYGON">Polygon</option>
+                  </select>
+                </div>
+
+                <div>
+                  <Label htmlFor="cryptoAddress">Endereço da Carteira</Label>
+                  <Input
+                    id="cryptoAddress"
+                    type="text"
+                    placeholder="0x... ou bc1..."
+                    value={cryptoAddress}
+                    onChange={(e) => setCryptoAddress(e.target.value)}
+                    className="mt-1 font-mono text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Envie {cryptoAsset} para o endereço gerado
+                  </p>
+                </div>
+              </div>
+            )}
           </Card>
 
           {/* Credit/Debit Card */}
@@ -488,7 +548,7 @@ export default function Deposit() {
 
         </div>
 
-        {/* Deposit Button - Only show when PIX is selected and card form is not shown */}
+        {/* Deposit Buttons */}
         {selectedMethod === "pix" && !showCardForm && (
           <>
             <Button
@@ -514,6 +574,18 @@ export default function Deposit() {
               </span>
             </button>
           </>
+        )}
+
+        {selectedMethod === "crypto" && !showCardForm && (
+          <Button
+            onClick={() => toast.info("Depósito por criptomoeda em breve!", {
+              description: "Esta funcionalidade estará disponível em breve."
+            })}
+            disabled={isProcessing || !amount || parseFloat(amount) / 100 < 5}
+            className="w-full h-14 text-lg font-semibold mt-6 bg-primary hover:bg-primary/90"
+          >
+            Continuar com Depósito
+          </Button>
         )}
 
         {/* Security Notice */}

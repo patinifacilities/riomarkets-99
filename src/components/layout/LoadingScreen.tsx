@@ -19,13 +19,11 @@ export const LoadingScreen = () => {
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center" style={{ backgroundColor: 'hsl(0 0% 4%)' }}>
       <div className="flex flex-col items-center gap-6 animate-fade-in">
         {/* Logo */}
-        {config?.logo_white_url && (
-          <img 
-            src={config.logo_white_url} 
-            alt="Logo" 
-            className="h-16 md:h-20 object-contain animate-pulse"
-          />
-        )}
+        <img 
+          src={new URL('@/assets/rio-white-logo-deposit.png', import.meta.url).href}
+          alt="Logo" 
+          className="h-16 md:h-20 object-contain animate-pulse"
+        />
         
         {/* Loading Animation */}
         <div className="flex gap-2">
