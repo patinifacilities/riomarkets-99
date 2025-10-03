@@ -325,9 +325,9 @@ const Home = () => {
                         className="h-12 object-contain"
                       />
                     </div>
-                    <div className="leading-tight text-center">
+                    <div className="leading-tight">
                       <TypewriterText
-                        baseText="Mercados Preditivos "
+                        baseText="Mercados Preditivos"
                         texts={[
                           "Lucrativos",
                           "Inteligentes",
@@ -336,6 +336,7 @@ const Home = () => {
                         customColors={{
                           "Rápidos": "#ff2389"
                         }}
+                        showFastIcon={true}
                         className="text-3xl font-bold"
                         typingSpeed={100}
                         deletingSpeed={50}

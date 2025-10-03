@@ -1,1 +1,0 @@
-This is a backup note - the MarketDetail page structure should remain as is from 10 versions ago with its original layout and functionality.
