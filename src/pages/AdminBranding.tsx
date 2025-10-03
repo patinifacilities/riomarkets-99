@@ -156,6 +156,10 @@ const AdminBranding = () => {
       const { error } = await supabase
         .from('branding_config')
         .update({
+          logo_url: config.logo_url,
+          logo_white_url: config.logo_white_url,
+          logo_black_url: config.logo_black_url,
+          logo_light_url: config.logo_light_url,
           background_color: config.background_color,
           primary_color: config.primary_color,
           success_color: config.success_color,

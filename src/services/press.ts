@@ -33,7 +33,7 @@ export async function fetchPressArticles(filters: PressFilters = {}) {
     query = query.gte('published_at', startDate.toISOString());
   }
 
-  const { data, error } = await query.order('published_at', { ascending: false });
+  const { data, error } = await query.order('published_at', { ascending: false }).limit(5);
 
   if (error) {
     console.error('Error fetching press articles:', error);
