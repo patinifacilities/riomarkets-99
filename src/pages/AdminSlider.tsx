@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, X, Image as ImageIcon, GripVertical, Save, Crop } from 'lucide-react';
+import { ArrowLeft, Plus, X, Image as ImageIcon, GripVertical, Save, Crop, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,7 @@ interface SlideItem {
   marketId?: string;
   imageUrl?: string;
   title?: string;
+  hidden?: boolean;
 }
 
 const AdminSlider = () => {
@@ -76,24 +77,41 @@ const AdminSlider = () => {
         setCustomImages(customImgs);
         setSliderDelay(data.slider_delay_seconds || 7);
         
-        // Reconstruct slide order
-        const orderIds = Array.isArray(data.slide_order) ? data.slide_order as string[] : [];
-        const order: SlideItem[] = orderIds.map((id: string) => {
+        // Reconstruct slide order with hidden state support
+        const orderData = Array.isArray(data.slide_order) ? data.slide_order : [];
+        const order: SlideItem[] = orderData.map((item: any) => {
+          const id = typeof item === 'string' ? item : item.id;
+          const hidden = typeof item === 'object' ? item.hidden || false : false;
+          
           if (id.startsWith('custom-')) {
             const img = customImgs.find((i) => i.id === id);
             return {
               id,
               type: 'image' as const,
-              imageUrl: img?.url
+              imageUrl: img?.url,
+              hidden
+            };
+          } else if (id === 'fast-card') {
+            return {
+              id: 'fast-card',
+              type: 'fast' as const,
+              hidden
+            };
+          } else if (id === 'text-card') {
+            return {
+              id: 'text-card',
+              type: 'text' as const,
+              hidden
             };
           } else {
             return {
               id,
               type: 'market' as const,
-              marketId: id
+              marketId: id,
+              hidden
             };
           }
-        }).filter((item: SlideItem) => item.imageUrl || item.marketId);
+        }).filter((item: SlideItem) => item.imageUrl || item.marketId || item.type === 'fast' || item.type === 'text');
         
         setSlideOrder(order);
       }
@@ -108,7 +126,7 @@ const AdminSlider = () => {
     // Add selected markets that aren't already in the order
     selectedMarkets.forEach(marketId => {
       if (!slideOrder.find(s => s.id === marketId)) {
-        newOrder.push({ id: marketId, type: 'market', marketId });
+        newOrder.push({ id: marketId, type: 'market', marketId, hidden: false });
       }
     });
     
@@ -118,19 +136,22 @@ const AdminSlider = () => {
         newOrder.push({ 
           id: img.id, 
           type: 'image', 
-          imageUrl: img.url
+          imageUrl: img.url,
+          hidden: false
         });
       }
     });
     
-    // Add Fast card if not in order
-    if (!slideOrder.find(s => s.id === 'fast-card')) {
-      newOrder.push({ id: 'fast-card', type: 'fast' });
+    // Always ensure Fast and Text cards exist in the order
+    const hasFast = slideOrder.find(s => s.id === 'fast-card');
+    const hasText = slideOrder.find(s => s.id === 'text-card');
+    
+    if (!hasFast) {
+      newOrder.push({ id: 'fast-card', type: 'fast', hidden: false });
     }
     
-    // Add Text/Buttons card if not in order
-    if (!slideOrder.find(s => s.id === 'text-card')) {
-      newOrder.push({ id: 'text-card', type: 'text' });
+    if (!hasText) {
+      newOrder.push({ id: 'text-card', type: 'text', hidden: false });
     }
     
     // Keep existing order and add new items
@@ -216,16 +237,30 @@ const AdminSlider = () => {
     setCustomImages(prev => prev.filter(img => img.id !== id));
   };
 
+  const handleToggleSlideVisibility = (slideId: string) => {
+    setSlideOrder(prev => 
+      prev.map(slide => 
+        slide.id === slideId 
+          ? { ...slide, hidden: !slide.hidden }
+          : slide
+      )
+    );
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const slideOrderIds = slideOrder.map(s => s.id);
+      // Save complete slide order including hidden state
+      const slideOrderData = slideOrder.map(s => ({
+        id: s.id,
+        hidden: s.hidden || false
+      }));
       
       const payload = {
         selected_market_ids: selectedMarkets,
         custom_images: customImages as any,
         slider_delay_seconds: sliderDelay,
-        slide_order: slideOrderIds,
+        slide_order: slideOrderData as any,
         updated_at: new Date().toISOString()
       };
 
@@ -493,7 +528,8 @@ const AdminSlider = () => {
                               {...provided.dragHandleProps}
                               className={cn(
                                 "flex items-center gap-3 p-3 rounded-lg border bg-card",
-                                snapshot.isDragging && "shadow-lg"
+                                snapshot.isDragging && "shadow-lg",
+                                slide.hidden && "opacity-50"
                               )}
                             >
                               <GripVertical className="h-5 w-5 text-muted-foreground" />
@@ -532,9 +568,23 @@ const AdminSlider = () => {
                                   </>
                                 ) : null}
                               </div>
-                              <span className="text-xs text-muted-foreground">
-                                #{index + 1}
-                              </span>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleToggleSlideVisibility(slide.id)}
+                                  title={slide.hidden ? "Mostrar slide" : "Ocultar slide"}
+                                >
+                                  {slide.hidden ? (
+                                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                  ) : (
+                                    <Eye className="h-4 w-4 text-muted-foreground" />
+                                  )}
+                                </Button>
+                                <span className="text-xs text-muted-foreground">
+                                  #{index + 1}
+                                </span>
+                              </div>
                             </div>
                           )}
                         </Draggable>

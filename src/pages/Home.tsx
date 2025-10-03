@@ -217,7 +217,7 @@ const Home = () => {
       .filter((m): m is NonNullable<typeof m> => m !== undefined);
   }, [markets, sliderMarketIds]);
 
-  // Build ordered slides - Respect admin order
+  // Build ordered slides - Respect admin order and hidden state
   const orderedSlides = useMemo(() => {
     const slides: Array<{ type: 'market' | 'image' | 'fast' | 'text', data: any }> = [];
     
@@ -225,9 +225,12 @@ const Home = () => {
       // Fallback: show markets only if no order configured
       slides.push(...sliderMarkets.map(m => ({ type: 'market' as const, data: m })));
     } else {
-      // Respect the order from admin panel
+      // Respect the order from admin panel, filtering out hidden slides
       const orderSlides = slideOrder
-        .map(id => {
+        .filter((item: any) => !item.hidden) // Filter out hidden slides
+        .map((item: any) => {
+          const id = typeof item === 'string' ? item : item.id;
+          
           if (id === 'fast-card') {
             return { type: 'fast' as const, data: null };
           } else if (id === 'text-card') {
@@ -292,7 +295,7 @@ const Home = () => {
 
               {/* Mobile: Show ONLY text/buttons slide */}
               <CarouselItem key="text-card-mobile" className="md:hidden">
-                <div className="flex items-center justify-center h-[400px] px-4">
+                <div className="flex items-center justify-center h-[320px] px-4">
                   <div className="text-center space-y-3 max-w-3xl mx-auto">
                     <div className="text-3xl font-bold">
                       <div className="mb-2 text-3xl">Mercados Preditivos</div>

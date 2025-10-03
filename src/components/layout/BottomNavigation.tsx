@@ -46,9 +46,6 @@ const BottomNavigation = () => {
                     }}
                   />
                 </div>
-                <span className="text-xs font-medium text-foreground mt-1">
-                  {item.label}
-                </span>
               </Link>
             );
           }
