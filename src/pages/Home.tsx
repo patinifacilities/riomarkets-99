@@ -219,54 +219,59 @@ const Home = () => {
       .filter((m): m is NonNullable<typeof m> => m !== undefined);
   }, [markets, sliderMarketIds]);
 
-  // Build ordered slides - Only show what admin selected (Desktop only)
+  // Build ordered slides - Only show what admin selected (Desktop only) - remove duplicates
   const orderedSlides = useMemo(() => {
     const slides: Array<{ type: 'market' | 'image' | 'fast' | 'text', data: any }> = [];
-    const uniqueIds = new Set<string>();
+    const seenSlides = new Set<string>();
     
     if (slideOrder.length === 0) {
       // Fallback: show text card + selected markets + custom images
       slides.push({ type: 'text' as const, data: null });
-      slides.push(...sliderMarkets.map(m => ({ type: 'market' as const, data: m })));
-      slides.push(...sliderCustomImages.map(img => ({ type: 'image' as const, data: img })));
+      seenSlides.add('text-card');
+      
+      sliderMarkets.forEach(m => {
+        if (!seenSlides.has(m.id)) {
+          slides.push({ type: 'market' as const, data: m });
+          seenSlides.add(m.id);
+        }
+      });
+      
+      sliderCustomImages.forEach(img => {
+        if (!seenSlides.has(img.id)) {
+          slides.push({ type: 'image' as const, data: img });
+          seenSlides.add(img.id);
+        }
+      });
     } else {
       // Respect the order from admin panel
-      const orderSlides = slideOrder
-        .filter((item: any) => {
-          const id = typeof item === 'string' ? item : item.id;
-          // Filter out hidden slides and duplicates
-          if (item.hidden) return false;
-          if (uniqueIds.has(id)) return false;
-          uniqueIds.add(id);
-          return true;
-        })
-        .map((item: any) => {
-          const id = typeof item === 'string' ? item : item.id;
-          
-          if (id === 'text-card') {
-            return { type: 'text' as const, data: null };
-          } else if (id === 'fast-card') {
-            return { type: 'fast' as const, data: null };
-          } else if (id.startsWith('custom-')) {
-            const img = sliderCustomImages.find(i => i.id === id);
-            return img ? { type: 'image' as const, data: img } : null;
-          } else {
-            // Only show markets selected in "Mercados Selecionados"
-            if (!sliderMarketIds.includes(id)) {
-              return null;
-            }
-            const market = sliderMarkets.find(m => m.id === id);
-            return market ? { type: 'market' as const, data: market } : null;
-          }
-        })
-        .filter((s): s is NonNullable<typeof s> => s !== null);
-      
-      slides.push(...orderSlides);
+      slideOrder.forEach((item: any) => {
+        const id = typeof item === 'string' ? item : item.id;
+        
+        // Skip hidden slides
+        if (item.hidden) return;
+        
+        // Skip duplicates
+        if (seenSlides.has(id)) return;
+        seenSlides.add(id);
+        
+        if (id === 'text-card') {
+          slides.push({ type: 'text' as const, data: null });
+        } else if (id === 'fast-card') {
+          slides.push({ type: 'fast' as const, data: null });
+        } else if (id.startsWith('custom-')) {
+          const img = sliderCustomImages.find(i => i.id === id);
+          if (img) slides.push({ type: 'image' as const, data: img });
+        } else {
+          // Only show markets selected in "Mercados Selecionados"
+          if (!sliderMarketIds.includes(id)) return;
+          const market = sliderMarkets.find(m => m.id === id);
+          if (market) slides.push({ type: 'market' as const, data: market });
+        }
+      });
     }
     
-    // If no slides after filtering, show logo fallback
     return slides;
-  }, [slideOrder, markets, sliderMarkets, sliderCustomImages, sliderMarketIds]);
+  }, [slideOrder, sliderMarkets, sliderCustomImages, sliderMarketIds]);
 
   // Handle slide click - restart autoplay after 5 seconds
   const handleSlideClick = () => {

@@ -98,9 +98,9 @@ const Auth = () => {
         
         console.log('Auth state changed:', event, session?.user ? 'User logged in' : 'No user');
         
-        // If user successfully signed in, redirect to home and trigger onboarding
+        // If user successfully signed in, redirect to markets page
         if (event === 'SIGNED_IN' && session?.user) {
-          console.log('Login successful, redirecting to home...');
+          console.log('Login successful, redirecting to markets...');
           navigate('/', { replace: true });
           // Scroll to top of page after navigation
           setTimeout(() => {
@@ -540,7 +540,7 @@ const Auth = () => {
                               }
                               const isUnique = await checkUniqueness('cpf', formData.cpf);
                               if (!isUnique) {
-                                setError('CPF já cadastrado');
+                                setError('CPF já cadastrado. Faça login para acessar sua conta.');
                                 return;
                               }
                               setError('');
@@ -588,7 +588,7 @@ const Auth = () => {
                               }
                               const isUnique = await checkUniqueness('email', formData.email);
                               if (!isUnique) {
-                                setError('Email já cadastrado');
+                                setError('Email já cadastrado. Faça login para acessar sua conta.');
                                 return;
                               }
                               setError('');
@@ -628,8 +628,8 @@ const Auth = () => {
                           </div>
                         </div>
 
-                        {/* Password Requirements - truly disappear when complete */}
-                        {formData.password && (
+                        {/* Password Requirements - hide when all requirements are met */}
+                        {formData.password && !Object.values(passwordRequirements).every(Boolean) && (
                           <div className="space-y-2 p-3 rounded-lg border border-border bg-muted/20">
                             <div className="text-sm font-medium text-foreground">Requisitos da senha:</div>
                             <div className="space-y-1">

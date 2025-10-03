@@ -230,7 +230,7 @@ const AdminExchange = () => {
 
       const fileExt = file.name.split('.').pop();
       const fileName = `asset_${assetId}_${Date.now()}.${fileExt}`;
-      const filePath = `exchange-assets/${fileName}`;
+      const filePath = `${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('exchange-assets')
@@ -252,13 +252,13 @@ const AdminExchange = () => {
 
       if (error) throw error;
 
-      // Force refetch to ensure UI updates
-      await fetchAssets();
-      
-      // Force update local state immediately
+      // Immediately update local state
       setAssets(prev => prev.map(a => 
         a.id === assetId ? { ...a, icon_url: publicUrl } : a
       ));
+
+      // Force refetch to ensure UI updates
+      await fetchAssets();
 
       toast({
         title: 'Sucesso!',

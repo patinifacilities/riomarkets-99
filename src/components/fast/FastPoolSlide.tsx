@@ -96,9 +96,9 @@ export const FastPoolSlide = ({ onClick }: FastPoolSlideProps) => {
         <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6 md:gap-8">
           {/* Left side - Pool info */}
           <div className="flex-1 w-full md:max-w-2xl space-y-4 md:space-y-6 text-center md:text-left">
-            {/* Fast Badge */}
-            <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mx-auto md:mx-0">
-              <Zap className="w-4 md:w-5 h-4 md:h-5 text-white fill-white animate-pulse" />
+            {/* Fast Badge with improved animation */}
+            <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mx-auto md:mx-0 animate-[pulse_1.5s_ease-in-out_infinite]">
+              <Zap className="w-4 md:w-5 h-4 md:h-5 text-white fill-white animate-bounce" style={{ animationDuration: '1s' }} />
               <span className="text-white font-bold text-sm md:text-lg">FAST POOL</span>
             </div>
             

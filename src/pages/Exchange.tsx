@@ -73,6 +73,7 @@ const ExchangeNew = () => {
     if (showSuccessNotification) {
       setFastMarketsButtonVisible(true);
       const timer = setTimeout(() => {
+        setShowSuccessNotification(false);
         setFastMarketsButtonVisible(false);
       }, 30000); // 30 seconds
       
@@ -177,14 +178,6 @@ const ExchangeNew = () => {
       setRiozBalance(data.new_rioz_balance);
       
       setShowSuccessNotification(true);
-      setTimeout(() => setShowSuccessNotification(false), 3000);
-      
-      toast({
-        title: "Conversão realizada!",
-        description: swapDirection === 'brl-to-rioz' 
-          ? `Você converteu R$ ${amountNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} para ${amountNum.toLocaleString('pt-BR')} RIOZ`
-          : `Você converteu ${amountNum.toLocaleString('pt-BR')} RIOZ para R$ ${amountNum.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-      });
       
       setFromAmount('');
       setToAmount('');
@@ -486,7 +479,7 @@ const ExchangeNew = () => {
           </CardContent>
         </Card>
 
-        {/* Success Notification */}
+        {/* Success Notification with Fast Button */}
         {showSuccessNotification && (
           <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top duration-300">
             <Card className="border-success bg-success/10 shadow-xl">
@@ -498,6 +491,15 @@ const ExchangeNew = () => {
                   <p className="font-semibold text-success">Conversão realizada!</p>
                   <p className="text-sm text-muted-foreground">Seus saldos foram atualizados</p>
                 </div>
+                {fastMarketsButtonVisible && (
+                  <Button
+                    onClick={() => window.location.href = '/fast'}
+                    className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white"
+                  >
+                    <Zap className="w-4 h-4 mr-2" />
+                    Fast
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </div>
