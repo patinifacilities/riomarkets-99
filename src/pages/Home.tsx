@@ -293,9 +293,9 @@ const Home = () => {
               {/* Ordered Slides - Respecting Admin Order */}
               {orderedSlides.map((slide, idx) => {
                 if (slide.type === 'fast') {
-                  // Fast pool slide - Hidden on mobile
+                  // Fast pool slide
                   return (
-                    <CarouselItem key="fast-card" className="hidden md:block">
+                    <CarouselItem key="fast-card">
                       <FastPoolSlide onClick={handleSlideClick} />
                     </CarouselItem>
                   );
@@ -305,7 +305,7 @@ const Home = () => {
                   // Text/Buttons card (same as first slide)
                   return (
                     <CarouselItem key="text-card">
-                      <div className="flex items-center justify-center h-[300px] px-4 sm:px-8">
+                      <div className="flex items-center justify-center min-h-[300px] px-4 sm:px-8">
                         <div className="text-center space-y-6 sm:space-y-8 max-w-3xl mx-auto">
                           <div className="text-3xl sm:text-4xl md:text-6xl font-bold">
                             <div className="mb-3 sm:mb-4 text-3xl sm:text-4xl md:text-6xl">Mercados Preditivos</div>
@@ -354,7 +354,7 @@ const Home = () => {
                   return (
                     <CarouselItem key={img.id}>
                       <div 
-                        className="relative h-[300px] w-full overflow-hidden rounded-2xl cursor-pointer"
+                        className="relative h-[300px] md:h-[500px] w-full overflow-hidden rounded-2xl cursor-pointer"
                         onClick={handleSlideClick}
                       >
                         <img 

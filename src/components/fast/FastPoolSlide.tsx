@@ -92,7 +92,7 @@ export const FastPoolSlide = ({ onClick }: FastPoolSlideProps) => {
       </div>
 
       {/* Content */}
-      <div className="relative h-[300px] flex items-center px-4 md:px-12 py-6 md:py-0">
+      <div className="relative h-full flex items-center px-4 md:px-12 py-6 md:py-0">
         <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6 md:gap-8">
           {/* Left side - Pool info */}
           <div className="flex-1 w-full md:max-w-2xl space-y-4 md:space-y-6 text-center md:text-left">

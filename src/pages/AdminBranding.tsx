@@ -133,14 +133,6 @@ const AdminBranding = () => {
     root.style.setProperty('--primary', hexToHSL(brandingConfig.primary_color));
     root.style.setProperty('--success', hexToHSL(brandingConfig.success_color));
     root.style.setProperty('--background', hexToHSL(brandingConfig.background_color));
-    
-    // Apply opinion button colors
-    if (brandingConfig.opinion_yes_color) {
-      root.style.setProperty('--opinion-yes', hexToHSL(brandingConfig.opinion_yes_color));
-    }
-    if (brandingConfig.opinion_no_color) {
-      root.style.setProperty('--opinion-no', hexToHSL(brandingConfig.opinion_no_color));
-    }
   };
 
   const handleSave = async () => {
@@ -157,8 +149,6 @@ const AdminBranding = () => {
           background_color: config.background_color,
           primary_color: config.primary_color,
           success_color: config.success_color,
-          opinion_yes_color: config.opinion_yes_color,
-          opinion_no_color: config.opinion_no_color,
           active_theme: config.active_theme,
           updated_at: new Date().toISOString()
         })
@@ -385,7 +375,7 @@ const AdminBranding = () => {
                   <div className="flex items-center gap-4">
                     {config.logo_white_url && (
                       <div className="bg-gray-800 p-2 rounded">
-                        <img src={config.logo_white_url} alt="Logo Header Dark" className="h-12 object-contain" key={config.logo_white_url} />
+                        <img src={config.logo_white_url} alt="Logo Header Dark" className="h-12 object-contain" />
                       </div>
                     )}
                     <Input
@@ -406,7 +396,7 @@ const AdminBranding = () => {
                   <div className="flex items-center gap-4">
                     {config.logo_black_url && (
                       <div className="bg-white p-2 rounded">
-                        <img src={config.logo_black_url} alt="Logo Header Light" className="h-12 object-contain" key={config.logo_black_url} />
+                        <img src={config.logo_black_url} alt="Logo Header Light" className="h-12 object-contain" />
                       </div>
                     )}
                     <Input
@@ -427,7 +417,7 @@ const AdminBranding = () => {
                   <div className="flex items-center gap-4">
                     {config.logo_url && (
                       <div className="bg-gray-800 p-2 rounded">
-                        <img src={config.logo_url} alt="Logo Rio Dark" className="h-12 object-contain" key={config.logo_url} />
+                        <img src={config.logo_url} alt="Logo Rio Dark" className="h-12 object-contain" />
                       </div>
                     )}
                     <Input

@@ -10,8 +10,6 @@ interface BrandingConfig {
   primary_color: string;
   success_color: string;
   active_theme: string;
-  opinion_yes_color?: string;
-  opinion_no_color?: string;
 }
 
 export const useBranding = () => {
@@ -105,14 +103,6 @@ export const useBranding = () => {
     root.style.setProperty('--primary', hexToHSL(brandingConfig.primary_color));
     root.style.setProperty('--success', hexToHSL(brandingConfig.success_color));
     root.style.setProperty('--background', hexToHSL(brandingConfig.background_color));
-    
-    // Apply opinion button colors
-    if (brandingConfig.opinion_yes_color) {
-      root.style.setProperty('--opinion-yes', hexToHSL(brandingConfig.opinion_yes_color));
-    }
-    if (brandingConfig.opinion_no_color) {
-      root.style.setProperty('--opinion-no', hexToHSL(brandingConfig.opinion_no_color));
-    }
   };
 
   return { config, loading };
