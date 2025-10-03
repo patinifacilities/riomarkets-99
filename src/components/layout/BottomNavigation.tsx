@@ -19,8 +19,8 @@ const BottomNavigation = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden pb-[env(safe-area-inset-bottom)]">
-      <div className="grid grid-cols-5 items-center h-16 relative px-4">
-        {visibleItems.map((item, index) => {
+      <div className="flex items-center justify-around h-16 relative">
+        {visibleItems.map((item) => {
           const isActive = item.href === '/' 
             ? (location.pathname === '/' || location.pathname.startsWith('/market/'))
             : location.pathname === item.href;
@@ -53,28 +53,16 @@ const BottomNavigation = () => {
             );
           }
 
-          // New order: Carteira(0), Mercados(1), Fast(center), Ranking(3), Perfil(4)
-          const gridColumn = index < 2 ? index + 1 : index + 2;
-          
-          // Position adjustments - Ranking and Perfil closer to Fast button
-          let additionalClasses = '';
-          if (index === 0) additionalClasses = 'justify-self-start'; // Carteira
-          else if (index === 1) additionalClasses = 'justify-self-end mr-4'; // Mercados - closer to center
-          else if (index === 3) additionalClasses = 'justify-self-start ml-4'; // Ranking - closer to center
-          else if (index === 4) additionalClasses = 'justify-self-end'; // Perfil
-
           return (
             <Link
               key={item.href}
               to={item.href}
               className={cn(
                 "flex flex-col items-center justify-center h-full gap-1 transition-colors",
-                additionalClasses,
                 isActive 
                   ? "text-primary" 
                   : "text-muted-foreground hover:text-foreground"
               )}
-              style={{ gridColumn }}
             >
               <item.icon className="w-5 h-5" />
               <span className="text-xs font-medium">

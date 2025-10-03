@@ -292,42 +292,44 @@ const Home = () => {
             onMouseEnter={handleSlideClick}
           >
             <CarouselContent className="py-8">
-              {/* Slide 1: Title with Typewriter - Centralized */}
+              {/* Slide 1: Title with Typewriter - Mobile Optimized */}
               <CarouselItem>
-                <div className="flex items-center justify-center min-h-[400px] px-8">
-                  <div className="text-center space-y-8 max-w-3xl">
-                    <div className="text-4xl md:text-6xl font-bold">
-                      <div className="mb-4">Mercados Preditivos</div>
-                      <TypewriterText
-                        baseText=""
-                        texts={[
-                          "para Análise Estratégica",
-                          "baseados em Dados",
-                          "com Transparência Total",
-                          "Rápidos"
-                        ]}
-                        customColors={{
-                          "Rápidos": "#ff2389"
-                        }}
-                        className="text-4xl md:text-6xl font-bold"
-                        typingSpeed={100}
-                        deletingSpeed={50}
-                        pauseDuration={2000}
-                      />
+                <div className="flex items-center justify-center min-h-[400px] px-4 sm:px-8">
+                  <div className="text-center space-y-6 sm:space-y-8 max-w-3xl">
+                    <div className="text-3xl sm:text-4xl md:text-6xl font-bold">
+                      <div className="mb-3 sm:mb-4">Mercados Preditivos</div>
+                      <div className="text-xl sm:text-2xl md:text-4xl">
+                        <TypewriterText
+                          baseText=""
+                          texts={[
+                            "para Análise Estratégica",
+                            "baseados em Dados",
+                            "com Transparência Total",
+                            "Rápidos"
+                          ]}
+                          customColors={{
+                            "Rápidos": "#ff2389"
+                          }}
+                          className="text-xl sm:text-2xl md:text-4xl font-bold"
+                          typingSpeed={100}
+                          deletingSpeed={50}
+                          pauseDuration={2000}
+                        />
+                      </div>
                     </div>
-                    <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+                    <p className="text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
                       Ganhe recompensas compartilhando suas previsões sobre eventos futuros.
                     </p>
-                    <div className="flex gap-4 justify-center items-center">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
                       <Button 
                         size="lg" 
-                        className="bg-[#00ff90] text-gray-900 hover:bg-[#00ff90]/90 font-semibold px-8 transition-all hover:scale-105"
+                        className="bg-[#00ff90] text-gray-900 hover:bg-[#00ff90]/90 font-semibold px-8 transition-all hover:scale-105 w-full sm:w-auto"
                         onClick={() => navigate('/auth')}
                       >
                         <Sparkles className="w-5 h-5 mr-2" />
                         Explorar Mercados
                       </Button>
-                      <OnboardingTrigger size="lg" variant="outline" />
+                      <OnboardingTrigger size="lg" variant="outline" className="w-full sm:w-auto" />
                     </div>
                   </div>
                 </div>
@@ -396,8 +398,8 @@ const Home = () => {
                               alt={market.titulo}
                               className="w-full h-full object-cover"
                             />
-                            {/* Clean gradient overlay - no blur, just shadow fade for readability */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                            {/* Clean gradient overlay - increased opacity for better readability */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent" />
                           </>
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-primary/20 via-background to-primary/10" />
