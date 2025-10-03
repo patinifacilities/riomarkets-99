@@ -72,8 +72,8 @@ export default function Rewards() {
   const monthlyProgress = Math.min((currentStreak / 30) * 100, 100);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
-      <div className="text-center space-y-3 max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 pt-4 pb-8">
+      <div className="text-center space-y-3 max-w-md -mt-20">
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 shadow-2xl shadow-yellow-500/50 animate-[golden-glow_2s_ease-in-out_infinite]" style={{
           backgroundSize: '200% 200%'
         }}>
