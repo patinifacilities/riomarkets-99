@@ -230,11 +230,16 @@ const Home = () => {
       slides.push(...sliderCustomImages.map(img => ({ type: 'image' as const, data: img })));
     } else {
       // Respect the order from admin panel, filtering out hidden and fast pool slides
+      const uniqueIds = new Set<string>();
       const orderSlides = slideOrder
         .filter((item: any) => {
           const id = typeof item === 'string' ? item : item.id;
           // Filter out hidden slides and fast pool
-          return !item.hidden && id !== 'fast-card';
+          if (item.hidden || id === 'fast-card') return false;
+          // Filter out duplicates
+          if (uniqueIds.has(id)) return false;
+          uniqueIds.add(id);
+          return true;
         })
         .map((item: any) => {
           const id = typeof item === 'string' ? item : item.id;
@@ -315,9 +320,9 @@ const Home = () => {
                         className="h-12 object-contain"
                       />
                     </div>
-                    <div className="text-3xl font-bold">
+                    <div className="text-3xl font-bold leading-tight">
                       <TypewriterText
-                        baseText="Mercados Preditivos"
+                        baseText="Mercados Preditivos "
                         texts={[
                           "Lucrativos",
                           "Inteligentes",
@@ -362,9 +367,9 @@ const Home = () => {
                     <CarouselItem key="text-card" className="hidden md:block">
                       <div className="flex items-center justify-center h-[400px] px-4 sm:px-8">
                         <div className="text-center space-y-4 sm:space-y-6 max-w-3xl mx-auto">
-                          <div className="text-3xl sm:text-4xl md:text-6xl font-bold">
+                          <div className="text-3xl sm:text-4xl md:text-6xl font-bold leading-tight">
                             <TypewriterText
-                              baseText="Mercados Preditivos"
+                              baseText="Mercados Preditivos "
                               texts={[
                                 "Lucrativos",
                                 "Inteligentes",
