@@ -80,6 +80,45 @@ export type Database = {
         }
         Relationships: []
       }
+      branding_config: {
+        Row: {
+          active_theme: string | null
+          background_color: string | null
+          created_at: string | null
+          id: string
+          logo_black_url: string | null
+          logo_url: string | null
+          logo_white_url: string | null
+          primary_color: string | null
+          success_color: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          active_theme?: string | null
+          background_color?: string | null
+          created_at?: string | null
+          id?: string
+          logo_black_url?: string | null
+          logo_url?: string | null
+          logo_white_url?: string | null
+          primary_color?: string | null
+          success_color?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          active_theme?: string | null
+          background_color?: string | null
+          created_at?: string | null
+          id?: string
+          logo_black_url?: string | null
+          logo_url?: string | null
+          logo_white_url?: string | null
+          primary_color?: string | null
+          success_color?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           ativo: boolean

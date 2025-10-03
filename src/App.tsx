@@ -38,6 +38,7 @@ import AdminGatewayConfigStripe from '@/pages/AdminGatewayConfigStripe';
 import AdminGatewayConfigCrypto from '@/pages/AdminGatewayConfigCrypto';
 import AdminGatewaysSaque from '@/pages/AdminGatewaysSaque';
 import AdminSlider from '@/pages/AdminSlider';
+import AdminBranding from '@/pages/AdminBranding';
 import Opinioes from '@/pages/Opinioes';
 import FiatRequests from '@/pages/FiatRequests';
 import Terms from '@/pages/Terms';
@@ -49,10 +50,14 @@ import NotFound from '@/pages/NotFound';
 import { Toaster } from '@/components/ui/sonner';
 import { track } from '@/lib/analytics';
 import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorModal';
+import { useBranding } from '@/hooks/useBranding';
 
 const AdminRewards = lazy(() => import('@/pages/AdminRewards'));
 
 function App() {
+  // Initialize branding theme
+  useBranding();
+  
   useEffect(() => {
     // Track page view
     track('app_initialized');
@@ -97,6 +102,7 @@ function App() {
             <Route path="/admin/gateways-saque" element={<AdminGatewaysSaque />} />
             <Route path="/admin/rewards" element={<AdminRewards />} />
             <Route path="/admin/slider" element={<AdminSlider />} />
+            <Route path="/admin/branding" element={<AdminBranding />} />
           <Route path="/opinioes" element={<Opinioes />} />
           <Route path="/rewards" element={<Rewards />} />
           <Route path="/fiat-requests" element={<FiatRequests />} />

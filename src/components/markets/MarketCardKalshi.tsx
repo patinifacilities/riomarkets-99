@@ -115,6 +115,11 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   const yesPercentage = yesOption?.chance || 50;
   const noPercentage = noOption?.chance || 50;
 
+  // Hot market logic
+  const isHot = (stats?.vol_24h && stats.vol_24h > 100) || 
+                (stats?.participantes && stats.participantes > 5) ||
+                market.destaque;
+
   // Random color assignment for only 2 profile avatars with fade gradient
   const getRandomAvatarColors = () => {
     const colors = ['#00ff90', '#ff2389'];
@@ -141,10 +146,21 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/60 via-transparent to-transparent" />
             
-            {/* Modern Hot Icon */}
-            {showHotIcon && (
-              <div className="absolute top-3 right-3">
-                <div className="text-4xl drop-shadow-lg animate-pulse">🔥</div>
+            {/* Hot Badge with Improved Animation */}
+            {isHot && (
+              <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-gradient-to-r from-[#ff2389] to-[#ff6b9d] text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg animate-pulse">
+                <svg 
+                  className="w-4 h-4 animate-bounce" 
+                  viewBox="0 0 24 24" 
+                  fill="currentColor"
+                  style={{ 
+                    filter: 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))',
+                    animation: 'bounce 1s ease-in-out infinite'
+                  }}
+                >
+                  <path d="M13.5 2C13.5 2 11 6 11 9.5C11 11.71 12.79 13.5 15 13.5C17.21 13.5 19 11.71 19 9.5C19 6 16.5 2 16.5 2L15 4.5L13.5 2M8.5 9C8.5 9 6 13 6 16.5C6 18.71 7.79 20.5 10 20.5C12.21 20.5 14 18.71 14 16.5C14 13 11.5 9 11.5 9L10 11.5L8.5 9Z" />
+                </svg>
+                HOT
               </div>
             )}
           </div>
