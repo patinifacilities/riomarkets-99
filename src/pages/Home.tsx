@@ -219,17 +219,19 @@ const Home = () => {
       .filter((m): m is NonNullable<typeof m> => m !== undefined);
   }, [markets, sliderMarketIds]);
 
-  // Build ordered slides - Respect admin order and hidden state
+  // Build ordered slides - Only show what admin selected
   const orderedSlides = useMemo(() => {
     const slides: Array<{ type: 'market' | 'image' | 'fast' | 'text', data: any }> = [];
     
     if (slideOrder.length === 0) {
-      // Fallback: show markets only if no order configured
+      // Fallback: show text/buttons + selected markets + custom images
+      slides.push({ type: 'text' as const, data: null });
       slides.push(...sliderMarkets.map(m => ({ type: 'market' as const, data: m })));
+      slides.push(...sliderCustomImages.map(img => ({ type: 'image' as const, data: img })));
     } else {
       // Respect the order from admin panel, filtering out hidden slides
       const orderSlides = slideOrder
-        .filter((item: any) => !item.hidden) // Filter out hidden slides
+        .filter((item: any) => !item.hidden)
         .map((item: any) => {
           const id = typeof item === 'string' ? item : item.id;
           
@@ -241,10 +243,9 @@ const Home = () => {
             const img = sliderCustomImages.find(i => i.id === id);
             return img ? { type: 'image' as const, data: img } : null;
           } else {
-            // CRITICAL: Only show markets that are BOTH in slideOrder AND in sliderMarketIds
-            // This ensures only markets selected in admin "Mercados Selecionados" appear
+            // Only show markets selected in "Mercados Selecionados"
             if (!sliderMarketIds.includes(id)) {
-              return null; // Market not selected in admin, skip it
+              return null;
             }
             const market = sliderMarkets.find(m => m.id === id);
             return market ? { type: 'market' as const, data: market } : null;
