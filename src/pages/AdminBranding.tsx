@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useToast } from '@/hooks/use-toast';
@@ -60,6 +61,7 @@ const AdminBranding = () => {
   const [config, setConfig] = useState<BrandingConfig | null>(null);
   const [uploading, setUploading] = useState<{[key: string]: boolean}>({});
   const [history, setHistory] = useState<BrandingHistory[]>([]);
+  const [customThemeEnabled, setCustomThemeEnabled] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -93,11 +95,10 @@ const AdminBranding = () => {
     }
   };
 
-  const applyThemeToDocument = (brandingConfig: BrandingConfig) => {
-    const root = document.documentElement;
+  const applyThemeToDocument = (brandingConfig: BrandingConfig, enabled: boolean = customThemeEnabled) => {
+    if (!enabled) return; // Don't apply if custom themes are disabled
     
-    // Get current theme mode (light or dark)
-    const isDarkMode = root.classList.contains('dark');
+    const root = document.documentElement;
     
     // Convert hex to HSL for CSS variables
     const hexToHSL = (hex: string) => {
@@ -130,14 +131,18 @@ const AdminBranding = () => {
       return `${h} ${s}% ${l}%`;
     };
 
-    // Apply theme colors respecting the current mode
+    // Apply theme colors
     root.style.setProperty('--primary', hexToHSL(brandingConfig.primary_color));
     root.style.setProperty('--success', hexToHSL(brandingConfig.success_color));
-    
-    // Only update background if in dark mode (preserve light mode background)
-    if (isDarkMode) {
-      root.style.setProperty('--background', hexToHSL(brandingConfig.background_color));
-    }
+    root.style.setProperty('--background', hexToHSL(brandingConfig.background_color));
+  };
+  
+  const resetToOriginalTheme = () => {
+    const root = document.documentElement;
+    // Remove custom properties to revert to CSS defaults
+    root.style.removeProperty('--primary');
+    root.style.removeProperty('--success');
+    root.style.removeProperty('--background');
   };
 
   const handleSave = async () => {
@@ -310,12 +315,21 @@ const AdminBranding = () => {
         };
     
     setConfig(newConfig);
-    applyThemeToDocument(newConfig);
+    applyThemeToDocument(newConfig, customThemeEnabled);
     
     toast({
       title: `${theme.name} aplicado!`,
       description: 'Clique em "Salvar Alterações" para confirmar.',
     });
+  };
+  
+  const handleThemeToggle = (enabled: boolean) => {
+    setCustomThemeEnabled(enabled);
+    if (enabled && config) {
+      applyThemeToDocument(config, true);
+    } else {
+      resetToOriginalTheme();
+    }
   };
 
   // Security check
@@ -371,9 +385,21 @@ const AdminBranding = () => {
           {/* Quick Theme Selection */}
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5" />
-                Temas Rápidos
+              <CardTitle className="flex items-center gap-2 justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" />
+                  Temas Rápidos
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="theme-toggle" className="text-sm font-normal">
+                    {customThemeEnabled ? 'Temas Personalizados Ativos' : 'Tema Original Ativo'}
+                  </Label>
+                  <Switch 
+                    id="theme-toggle"
+                    checked={customThemeEnabled}
+                    onCheckedChange={handleThemeToggle}
+                  />
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="flex gap-4">
@@ -381,6 +407,7 @@ const AdminBranding = () => {
                 onClick={() => applyTheme('theme1')}
                 variant={config.active_theme === 'theme1' ? 'default' : 'outline'}
                 className="flex-1"
+                disabled={!customThemeEnabled}
               >
                 {THEMES.theme1.name}
               </Button>
@@ -388,6 +415,7 @@ const AdminBranding = () => {
                 onClick={() => applyTheme('theme2')}
                 variant={config.active_theme === 'theme2' ? 'default' : 'outline'}
                 className="flex-1"
+                disabled={!customThemeEnabled}
               >
                 {THEMES.theme2.name}
               </Button>
@@ -395,6 +423,7 @@ const AdminBranding = () => {
                 onClick={() => applyTheme('custom')}
                 variant={config.active_theme === 'custom' ? 'default' : 'outline'}
                 className="flex-1"
+                disabled={!customThemeEnabled}
               >
                 {THEMES.custom.name}
               </Button>

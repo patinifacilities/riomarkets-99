@@ -397,19 +397,6 @@ const Header = () => {
             {/* Mobile menu */}
             {isMobile && isLoggedIn ? (
               <div className="flex items-center gap-2">
-                <Link to="/wallet">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="gap-2 bg-primary/10 border border-primary/30 text-primary rounded-xl hover:bg-primary/10"
-                  >
-                    <Wallet className="w-4 h-4" />
-                    {profile?.saldo_moeda >= 1000 
-                      ? Math.floor(profile.saldo_moeda).toLocaleString('pt-BR') 
-                      : (profile?.saldo_moeda || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                    } RZ
-                  </Button>
-                </Link>
                 <Button 
                   variant="default" 
                   size="sm"
