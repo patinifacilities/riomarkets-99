@@ -240,7 +240,8 @@ const Home = () => {
             const img = sliderCustomImages.find(i => i.id === id);
             return img ? { type: 'image' as const, data: img } : null;
           } else {
-            const market = markets.find(m => m.id === id);
+            // Only show markets that are in sliderMarkets (selected in admin)
+            const market = sliderMarkets.find(m => m.id === id);
             return market ? { type: 'market' as const, data: market } : null;
           }
         })
