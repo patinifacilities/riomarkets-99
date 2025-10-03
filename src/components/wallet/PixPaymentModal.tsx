@@ -8,28 +8,72 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { QrCode, Copy, CheckCircle, Clock } from 'lucide-react';
+import { QrCode, Copy, CheckCircle, Clock, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PixPaymentModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   amount: string;
-  qrCode?: string;
-  qrCodeText?: string;
   onSuccess?: () => void;
 }
 
-export const PixPaymentModal = ({ open, onOpenChange, amount, qrCode, qrCodeText, onSuccess }: PixPaymentModalProps) => {
+export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPaymentModalProps) => {
   const [copied, setCopied] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes in seconds
+  const [loading, setLoading] = useState(false);
+  const [pixData, setPixData] = useState<{ qrCode: string; pixCode: string; expiresAt: string } | null>(null);
+  const [timeLeft, setTimeLeft] = useState(0);
   const { toast } = useToast();
 
+  // Generate PIX payment when modal opens
   useEffect(() => {
     if (!open) {
-      setTimeLeft(15 * 60);
+      setPixData(null);
+      setTimeLeft(0);
       return;
     }
+
+    const generatePixPayment = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('generate-pix-payment', {
+          body: { amount: parseFloat(amount) }
+        });
+
+        if (error) throw error;
+
+        if (data) {
+          setPixData({
+            qrCode: data.qrCode,
+            pixCode: data.pixCode,
+            expiresAt: data.expiresAt
+          });
+          
+          // Calculate initial time left
+          const expiryTime = new Date(data.expiresAt).getTime();
+          const now = new Date().getTime();
+          setTimeLeft(Math.max(0, Math.floor((expiryTime - now) / 1000)));
+        }
+      } catch (error) {
+        console.error('Error generating PIX payment:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível gerar o pagamento PIX. Tente novamente.",
+          variant: "destructive",
+        });
+        onOpenChange(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    generatePixPayment();
+  }, [open, amount, onOpenChange, toast]);
+
+  // Timer countdown
+  useEffect(() => {
+    if (!pixData || timeLeft <= 0) return;
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
@@ -48,7 +92,7 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, qrCode, qrCodeText
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [open, onOpenChange, toast]);
+  }, [pixData, timeLeft, onOpenChange, toast]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -56,12 +100,10 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, qrCode, qrCodeText
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  // Use provided PIX code or fallback to mock code
-  const pixCode = qrCodeText || `00020126580014br.gov.bcb.pix013636c92c2b-3a13-4d1c-b7ee-${Date.now()}520400005303986540${amount.replace(/\D/g, '')}.005802BR5915RioMarkets LTDA6009SAO PAULO62070503***6304`;
-
   const handleCopyCode = async () => {
+    if (!pixData) return;
     try {
-      await navigator.clipboard.writeText(pixCode);
+      await navigator.clipboard.writeText(pixData.pixCode);
       setCopied(true);
       toast({
         title: "Chave PIX copiada!",
@@ -112,24 +154,27 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, qrCode, qrCodeText
 
           {/* QR Code */}
           <div className="flex justify-center">
-            {qrCode ? (
+            {loading ? (
+              <div className="w-48 h-48 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/20">
+                <div className="text-center">
+                  <Loader2 className="w-16 h-16 mx-auto mb-2 text-primary animate-spin" />
+                  <p className="text-sm text-muted-foreground">Gerando QR Code...</p>
+                  <p className="text-xs text-muted-foreground">R$ {amount}</p>
+                </div>
+              </div>
+            ) : pixData?.qrCode ? (
               <div className="w-48 h-48 rounded-lg border-2 border-border overflow-hidden bg-white p-2">
                 <img 
-                  src={qrCode} 
+                  src={pixData.qrCode} 
                   alt="QR Code PIX" 
                   className="w-full h-full object-contain" 
-                  onError={(e) => {
-                    console.error("QR Code image failed to load:", qrCode);
-                    e.currentTarget.style.display = 'none';
-                  }}
                 />
               </div>
             ) : (
               <div className="w-48 h-48 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/20">
                 <div className="text-center">
                   <QrCode className="w-16 h-16 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Gerando QR Code...</p>
-                  <p className="text-xs text-muted-foreground">R$ {amount}</p>
+                  <p className="text-sm text-muted-foreground">QR Code não disponível</p>
                 </div>
               </div>
             )}
@@ -141,14 +186,16 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, qrCode, qrCodeText
             <div className="relative">
               <textarea
                 readOnly
-                value={pixCode}
+                value={pixData?.pixCode || ''}
                 className="w-full h-20 p-3 text-xs bg-muted rounded-md border resize-none font-mono"
+                disabled={!pixData}
               />
               <Button
                 size="sm"
                 variant="outline"
                 className="absolute top-2 right-2"
                 onClick={handleCopyCode}
+                disabled={!pixData}
               >
                 {copied ? (
                   <CheckCircle className="w-4 h-4 text-green-500" />

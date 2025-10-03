@@ -147,9 +147,10 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                 <img 
                   src={hotFire} 
                   alt="Hot" 
-                  className="w-10 h-10 object-contain animate-bounce"
+                  className="w-10 h-10 object-contain"
                   style={{
-                    filter: 'drop-shadow(0 2px 8px rgba(255,69,0,0.5))'
+                    filter: 'drop-shadow(0 4px 12px rgba(255,69,0,0.8))',
+                    animation: 'float 2s ease-in-out infinite'
                   }}
                 />
               </div>

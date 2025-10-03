@@ -502,8 +502,6 @@ export default function Deposit() {
         open={showPixModal}
         onOpenChange={setShowPixModal}
         amount={formatCurrencyDisplay(amount)}
-        qrCode={pixData?.qrCode}
-        qrCodeText={pixData?.qrCodeText}
         onSuccess={() => {
           setShowPixModal(false);
           navigate('/wallet');

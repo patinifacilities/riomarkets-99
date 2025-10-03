@@ -9,9 +9,9 @@ const BottomNavigation = () => {
 
   const navItems = [
     { href: '/wallet', icon: Wallet, label: 'Carteira', authRequired: true },
-    { href: '/', icon: TrendingUp, label: 'Mercados' },
+    { href: '/', icon: TrendingUp, label: 'Mercados', position: 'left' },
     { href: '/fast', icon: Zap, label: 'Fast', authRequired: true, isFast: true },
-    { href: '/ranking', icon: Trophy, label: 'Ranking' },
+    { href: '/ranking', icon: Trophy, label: 'Ranking', position: 'right' },
     { href: '/profile', icon: User, label: 'Perfil', authRequired: true }
   ];
 
@@ -59,6 +59,8 @@ const BottomNavigation = () => {
               to={item.href}
               className={cn(
                 "flex flex-col items-center justify-center h-full gap-1 transition-colors",
+                item.position === 'left' && "-ml-2",
+                item.position === 'right' && "-mr-2",
                 isActive 
                   ? "text-primary" 
                   : "text-muted-foreground hover:text-foreground"

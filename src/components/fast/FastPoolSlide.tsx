@@ -79,90 +79,94 @@ export const FastPoolSlide = ({ onClick }: FastPoolSlideProps) => {
   return (
     <div 
       onClick={handleSlideClick}
-      className="relative h-[500px] w-full overflow-hidden rounded-2xl cursor-pointer group"
+      className="relative h-[400px] md:h-[500px] w-full overflow-hidden rounded-2xl cursor-pointer group"
     >
       {/* Clean gradient background with shadow effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#ff2389] via-[#ff0066] to-[#cc0052]">
+        {/* Animated Fast Icon Background */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-10">
+          <Zap className="w-96 h-96 text-white animate-pulse" style={{ animationDuration: '2s' }} />
+        </div>
         {/* Subtle overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
       </div>
 
       {/* Content */}
-      <div className="relative h-full flex items-center px-12">
-        <div className="flex items-center justify-between w-full gap-8">
+      <div className="relative h-full flex items-center px-4 md:px-12 py-6 md:py-0">
+        <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6 md:gap-8">
           {/* Left side - Pool info */}
-          <div className="flex-1 max-w-2xl space-y-6">
+          <div className="flex-1 w-full md:max-w-2xl space-y-4 md:space-y-6 text-center md:text-left">
             {/* Fast Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
-              <Zap className="w-5 h-5 text-white fill-white animate-pulse" />
-              <span className="text-white font-bold text-lg">FAST POOL</span>
+            <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mx-auto md:mx-0">
+              <Zap className="w-4 md:w-5 h-4 md:h-5 text-white fill-white animate-pulse" />
+              <span className="text-white font-bold text-sm md:text-lg">FAST POOL</span>
             </div>
             
             {/* Pool Icon & Name */}
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center">
-                <span className="text-4xl">₿</span>
+            <div className="flex items-center gap-3 md:gap-4 justify-center md:justify-start">
+              <div className="w-14 h-14 md:w-20 md:h-20 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center">
+                <span className="text-2xl md:text-4xl">₿</span>
               </div>
               <div>
-                <h2 className="text-5xl font-bold text-white leading-tight">
+                <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">
                   {pool.asset_name}
                 </h2>
-                <p className="text-white/80 text-xl mt-1">{pool.question}</p>
+                <p className="text-white/80 text-sm md:text-xl mt-1">{pool.question}</p>
               </div>
             </div>
             
             {/* Stats Row */}
-            <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center justify-center md:justify-start gap-2 md:gap-4 flex-wrap">
               {/* Timer */}
-              <div className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/20 border border-white/30 backdrop-blur-sm">
-                <Clock className="w-5 h-5 text-white" />
-                <span className="text-white font-bold text-xl">{formatTime(timeLeft)}</span>
+              <div className="flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-2 md:py-3 rounded-xl bg-white/20 border border-white/30 backdrop-blur-sm">
+                <Clock className="w-4 md:w-5 h-4 md:h-5 text-white" />
+                <span className="text-white font-bold text-sm md:text-xl">{formatTime(timeLeft)}</span>
               </div>
               
               {/* Current Price */}
               {pool.opening_price && (
-                <div className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/20 border border-white/30 backdrop-blur-sm">
-                  <TrendingUp className="w-5 h-5 text-white" />
-                  <span className="text-white font-bold text-xl">
+                <div className="flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-2 md:py-3 rounded-xl bg-white/20 border border-white/30 backdrop-blur-sm">
+                  <TrendingUp className="w-4 md:w-5 h-4 md:h-5 text-white" />
+                  <span className="text-white font-bold text-sm md:text-xl">
                     ${pool.opening_price.toLocaleString()}
                   </span>
                 </div>
               )}
               
               {/* Participants */}
-              <div className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/20 border border-white/30 backdrop-blur-sm">
-                <Users className="w-5 h-5 text-white" />
-                <span className="text-white font-bold text-xl">Live</span>
+              <div className="flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-2 md:py-3 rounded-xl bg-white/20 border border-white/30 backdrop-blur-sm">
+                <Users className="w-4 md:w-5 h-4 md:h-5 text-white" />
+                <span className="text-white font-bold text-sm md:text-xl">Live</span>
               </div>
             </div>
 
             {/* Options */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3 px-6 py-4 rounded-xl bg-white/30 border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
-                <TrendingUp className="w-6 h-6 text-white" />
-                <span className="text-white font-bold text-xl">SUBIU</span>
-                <span className="text-white/80 text-lg">{pool.base_odds.toFixed(2)}x</span>
+            <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-3 md:gap-4 w-full">
+              <div className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-3 md:py-4 rounded-xl bg-white/30 border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform w-full md:w-auto justify-center">
+                <TrendingUp className="w-5 md:w-6 h-5 md:h-6 text-white" />
+                <span className="text-white font-bold text-base md:text-xl">SUBIU</span>
+                <span className="text-white/80 text-sm md:text-lg">{pool.base_odds.toFixed(2)}x</span>
               </div>
               
-              <div className="flex items-center gap-3 px-6 py-4 rounded-xl bg-white/30 border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform">
-                <TrendingDown className="w-6 h-6 text-white" />
-                <span className="text-white font-bold text-xl">DESCEU</span>
-                <span className="text-white/80 text-lg">{pool.base_odds.toFixed(2)}x</span>
+              <div className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-3 md:py-4 rounded-xl bg-white/30 border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform w-full md:w-auto justify-center">
+                <TrendingDown className="w-5 md:w-6 h-5 md:h-6 text-white" />
+                <span className="text-white font-bold text-base md:text-xl">DESCEU</span>
+                <span className="text-white/80 text-sm md:text-lg">{pool.base_odds.toFixed(2)}x</span>
               </div>
             </div>
           </div>
           
           {/* Right side - Play button */}
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center w-full md:w-auto">
             <Button
               size="lg"
               onClick={(e) => {
                 e.stopPropagation();
                 handleSlideClick(e);
               }}
-              className="bg-white text-[#ff2389] hover:bg-white/90 font-bold px-10 py-8 rounded-full text-xl transition-all hover:scale-110 shadow-2xl group-hover:shadow-white/50"
+              className="bg-white text-[#ff2389] hover:bg-white/90 font-bold px-8 md:px-10 py-6 md:py-8 rounded-full text-lg md:text-xl transition-all hover:scale-110 shadow-2xl group-hover:shadow-white/50 w-full md:w-auto"
             >
-              <Zap className="w-6 h-6 mr-2 fill-current" />
+              <Zap className="w-5 md:w-6 h-5 md:h-6 mr-2 fill-current" />
               JOGAR AGORA
             </Button>
           </div>

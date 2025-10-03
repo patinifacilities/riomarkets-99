@@ -399,7 +399,7 @@ const Home = () => {
                               className="w-full h-full object-cover"
                             />
                             {/* Clean gradient overlay - increased opacity for better readability */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/30" />
                           </>
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-primary/20 via-background to-primary/10" />
@@ -407,12 +407,12 @@ const Home = () => {
                       </div>
                       
                       {/* Content */}
-                      <div className="relative h-full flex items-center px-12">
-                        <div className="flex items-center justify-between w-full gap-8">
+                      <div className="relative h-full flex items-center px-4 md:px-12 py-6 md:py-0">
+                        <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6 md:gap-8">
                           {/* Left side - Market info */}
-                          <div className="flex-1 max-w-2xl space-y-6">
+                          <div className="flex-1 w-full md:max-w-2xl space-y-4 md:space-y-6 text-center md:text-left">
                             {/* Market icon */}
-                            <div className="w-16 h-16 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center overflow-hidden">
+                            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center overflow-hidden mx-auto md:mx-0">
                               {market.imagem_url || market.thumbnail_url ? (
                                 <img 
                                   src={market.imagem_url || market.thumbnail_url} 
