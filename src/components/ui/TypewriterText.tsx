@@ -70,8 +70,8 @@ export const TypewriterText = ({
   
   return (
     <span className={className}>
-      <span className="block">{baseText}</span>
-      <span className="flex items-center gap-2" style={{ color: currentColor }}>
+      <span className="block text-center">{baseText}</span>
+      <span className="flex items-center justify-center gap-2" style={{ color: currentColor }}>
         {shouldShowIcon && (
           <Zap 
             className="w-5 h-5 md:w-7 md:h-7 relative" 

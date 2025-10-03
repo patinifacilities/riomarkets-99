@@ -325,7 +325,7 @@ const Home = () => {
                         className="h-12 object-contain"
                       />
                     </div>
-                    <div className="leading-tight">
+                    <div className="leading-tight flex flex-col items-center">
                       <TypewriterText
                         baseText="Mercados Preditivos"
                         texts={[
@@ -336,7 +336,7 @@ const Home = () => {
                         customColors={{
                           "Rápidos": "#ff2389"
                         }}
-                        showFastIcon={true}
+                        showFastIcon={false}
                         className="text-3xl font-bold"
                         typingSpeed={100}
                         deletingSpeed={50}
@@ -384,7 +384,7 @@ const Home = () => {
                               customColors={{
                                 "Rápidos": "#ff2389"
                               }}
-                              showFastIcon={true}
+                              showFastIcon={false}
                               className="text-3xl sm:text-4xl md:text-6xl font-bold"
                               typingSpeed={100}
                               deletingSpeed={50}

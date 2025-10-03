@@ -339,7 +339,8 @@ const Auth = () => {
             title: "Conta criada e login realizado!",
             description: "Bem-vindo ao Rio Markets!",
           });
-          // User will be automatically redirected by auth state change
+          // Redirect to markets page
+          navigate('/', { replace: true });
         }
       }
     } catch (error) {
@@ -368,10 +369,10 @@ const Auth = () => {
                 }}
                 onClick={() => navigate('/')}
               />
-              <div className="text-2xl font-bold text-foreground">
+              <div className="text-2xl font-bold text-foreground text-center">
                 Mercados Preditivos
               </div>
-              <div>
+              <div className="flex justify-center">
               <TypewriterText
                   baseText=""
                   texts={[
