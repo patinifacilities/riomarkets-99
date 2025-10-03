@@ -96,6 +96,9 @@ const AdminBranding = () => {
   const applyThemeToDocument = (brandingConfig: BrandingConfig) => {
     const root = document.documentElement;
     
+    // Get current theme mode (light or dark)
+    const isDarkMode = root.classList.contains('dark');
+    
     // Convert hex to HSL for CSS variables
     const hexToHSL = (hex: string) => {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -127,9 +130,14 @@ const AdminBranding = () => {
       return `${h} ${s}% ${l}%`;
     };
 
+    // Apply theme colors respecting the current mode
     root.style.setProperty('--primary', hexToHSL(brandingConfig.primary_color));
     root.style.setProperty('--success', hexToHSL(brandingConfig.success_color));
-    root.style.setProperty('--background', hexToHSL(brandingConfig.background_color));
+    
+    // Only update background if in dark mode (preserve light mode background)
+    if (isDarkMode) {
+      root.style.setProperty('--background', hexToHSL(brandingConfig.background_color));
+    }
   };
 
   const handleSave = async () => {
