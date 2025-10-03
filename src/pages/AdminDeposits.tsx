@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, DollarSign, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, DollarSign, Clock, CheckCircle, XCircle, ArrowUpDown } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,11 +7,13 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 const AdminDeposits = () => {
   const { user, loading: authLoading } = useAuth();
   const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // Security check
   if (authLoading || profileLoading) {
@@ -164,11 +166,31 @@ const AdminDeposits = () => {
           {/* Deposits Table */}
           <Card className="bg-card-secondary border-border-secondary">
             <CardHeader>
-              <CardTitle>Depósitos Recentes</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Depósitos Recentes</CardTitle>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <ArrowUpDown className="w-4 h-4" />
+                      {sortOrder === 'desc' ? 'Do maior para o menor' : 'Do menor para o maior'}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => setSortOrder('desc')}>
+                      Do maior para o menor
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSortOrder('asc')}>
+                      Do menor para o maior
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {deposits.map((deposit) => (
+                {deposits
+                  .sort((a, b) => sortOrder === 'desc' ? b.amount - a.amount : a.amount - b.amount)
+                  .map((deposit) => (
                   <div
                     key={deposit.id}
                     className="flex items-center justify-between p-4 rounded-lg border border-border bg-card/50"

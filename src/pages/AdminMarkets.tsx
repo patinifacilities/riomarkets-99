@@ -66,12 +66,22 @@ const AdminMarkets = () => {
 
       if (error) throw error;
 
+      // Se desativando, pausar todos os mercados
+      if (!enabled) {
+        await supabase
+          .from('markets')
+          .update({ paused: true })
+          .eq('status', 'aberto');
+        
+        refetch();
+      }
+
       setMarketsEnabled(enabled);
       toast({
         title: enabled ? "Mercados ativados!" : "Mercados desativados!",
         description: enabled 
           ? "Os usuários podem voltar a visualizar e apostar nos mercados." 
-          : "Os mercados estão em atualização. Usuários verão uma notificação.",
+          : "Todos os mercados foram marcados como em atualização.",
       });
     } catch (error) {
       console.error('Error toggling markets:', error);

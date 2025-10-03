@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { ArrowUpDown, Wallet, Loader2, ArrowDown, ArrowUp, CheckCircle2, Zap, Settings } from 'lucide-react';
+import { ArrowUpDown, Wallet, Loader2, ArrowDown, ArrowUp, CheckCircle2, Zap, Settings, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
@@ -25,7 +25,7 @@ const ExchangeNew = () => {
   const [loading, setLoading] = useState(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [fastMarketsButtonVisible, setFastMarketsButtonVisible] = useState(false);
-  const [activeAssets, setActiveAssets] = useState<{symbol: string, name: string}[]>([]);
+  const [activeAssets, setActiveAssets] = useState<{symbol: string, name: string, icon_url: string | null, is_active: boolean}[]>([]);
   const [exchangeEnabled, setExchangeEnabled] = useState(true);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ const ExchangeNew = () => {
     try {
       const { data, error } = await supabase
         .from('exchange_assets')
-        .select('symbol, name')
+        .select('symbol, name, icon_url, is_active')
         .eq('is_active', true);
 
       if (error) throw error;
@@ -104,27 +104,21 @@ const ExchangeNew = () => {
   };
 
   const handleAmountChange = (value: string) => {
-    // Remove all non-numeric characters
     const cleanValue = value.replace(/[^\d]/g, '');
-    
-    // Validate max amount (1 billion)
     const numValue = parseFloat(cleanValue);
     if (numValue > 1000000000) return;
     
     setFromAmount(cleanValue);
-    // 1:1 conversion rate
     setToAmount(cleanValue);
   };
 
   const formatNumber = (value: string) => {
     if (!value) return '';
-    // Add thousands separator
     return parseInt(value).toLocaleString('pt-BR');
   };
 
   const handleSwapDirection = () => {
     setSwapDirection(prev => prev === 'brl-to-rioz' ? 'rioz-to-brl' : 'brl-to-rioz');
-    // Keep the amounts when swapping direction
   };
 
   const handleMaxAmount = () => {
@@ -272,7 +266,7 @@ const ExchangeNew = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* From Section */}
-              <div className="space-y-3">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <Label className="text-base font-semibold text-foreground">De</Label>
                 <div className="text-sm font-medium text-foreground bg-muted/50 px-3 py-1 rounded-md">
@@ -288,7 +282,7 @@ const ExchangeNew = () => {
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity ${
+                        <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity relative ${
                           fromCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
                         }`}>
                           {fromCurrency === 'BRL' ? (
@@ -296,40 +290,47 @@ const ExchangeNew = () => {
                           ) : (
                             <span className="text-lg font-bold text-black">R</span>
                           )}
+                          <div className="absolute -bottom-1 -right-1 bg-primary rounded-full w-3 h-3 flex items-center justify-center">
+                            <ChevronDown className="w-2 h-2 text-white" />
+                          </div>
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="bg-card border-border shadow-xl rounded-xl p-2 min-w-[280px] z-[100]">
                         <div className="p-3 border-b border-border mb-2">
-                          <p className="text-sm font-semibold text-foreground mb-1">Ativos Disponíveis em Breve</p>
-                          <p className="text-xs text-muted-foreground">Novos pares de negociação em desenvolvimento</p>
+                          <p className="text-sm font-semibold text-foreground mb-1">Outros Ativos</p>
+                          <p className="text-xs text-muted-foreground">Selecione um ativo para converter</p>
                         </div>
-                        <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                          <div className="flex items-center gap-3 w-full">
-                            <div className="flex-1">
-                              <p className="font-medium text-foreground">Bitcoin (BTC)</p>
-                              <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'BTC') ? 'Em breve' : 'Indisponível'}</p>
-                            </div>
+                        {activeAssets
+                          .filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency)
+                          .map(asset => (
+                            <DropdownMenuItem 
+                              key={asset.symbol}
+                              className={`p-3 rounded-lg hover:bg-muted/50 transition-colors ${
+                                asset.is_active ? 'cursor-pointer' : 'opacity-60 cursor-not-allowed'
+                              }`}
+                              disabled={!asset.is_active}
+                            >
+                              <div className="flex items-center gap-3 w-full">
+                                {asset.icon_url && (
+                                  <img src={asset.icon_url} alt={asset.name} className="w-6 h-6 rounded-full" />
+                                )}
+                                <div className="flex-1">
+                                  <p className="font-medium text-foreground">{asset.name} ({asset.symbol})</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {asset.is_active ? 'Disponível' : 'Em breve'}
+                                  </p>
+                                </div>
+                              </div>
+                            </DropdownMenuItem>
+                          ))}
+                        {activeAssets.filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency).length === 0 && (
+                          <div className="p-3 text-center text-sm text-muted-foreground">
+                            Nenhum outro ativo disponível
                           </div>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                          <div className="flex items-center gap-3 w-full">
-                            <div className="flex-1">
-                              <p className="font-medium text-foreground">Tether (USDT)</p>
-                              <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'USDT') ? 'Em breve' : 'Indisponível'}</p>
-                            </div>
-                          </div>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                          <div className="flex items-center gap-3 w-full">
-                            <div className="flex-1">
-                              <p className="font-medium text-foreground">USD Coin (USDC)</p>
-                              <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'USDC') ? 'Em breve' : 'Indisponível'}</p>
-                            </div>
-                          </div>
-                        </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  <div className="flex flex-col pointer-events-none">
+                    <div className="flex flex-col pointer-events-none">
                       <span className="text-2xl font-bold text-foreground">
                         {fromCurrency}
                       </span>
@@ -372,7 +373,7 @@ const ExchangeNew = () => {
             </div>
 
             {/* To Section */}
-              <div className="space-y-3">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <Label className="text-base font-semibold text-foreground">Para</Label>
                 <div className="text-sm font-medium text-foreground bg-muted/50 px-3 py-1 rounded-md">
@@ -387,7 +388,7 @@ const ExchangeNew = () => {
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity ${
+                      <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity relative ${
                         toCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
                       }`}>
                         {toCurrency === 'BRL' ? (
@@ -395,117 +396,112 @@ const ExchangeNew = () => {
                         ) : (
                           <span className="text-lg font-bold text-black">R</span>
                         )}
+                        <div className="absolute -bottom-1 -right-1 bg-primary rounded-full w-3 h-3 flex items-center justify-center">
+                          <ChevronDown className="w-2 h-2 text-white" />
+                        </div>
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-card border-border shadow-xl rounded-xl p-2 min-w-[280px] z-[100]">
                       <div className="p-3 border-b border-border mb-2">
-                        <p className="text-sm font-semibold text-foreground mb-1">Ativos Disponíveis em Breve</p>
-                        <p className="text-xs text-muted-foreground">Novos pares de negociação em desenvolvimento</p>
+                        <p className="text-sm font-semibold text-foreground mb-1">Outros Ativos</p>
+                        <p className="text-xs text-muted-foreground">Selecione um ativo para converter</p>
                       </div>
-                      <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center gap-3 w-full">
-                          <div className="flex-1">
-                            <p className="font-medium text-foreground">Bitcoin (BTC)</p>
-                            <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'BTC') ? 'Em breve' : 'Indisponível'}</p>
-                          </div>
+                      {activeAssets
+                        .filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency)
+                        .map(asset => (
+                          <DropdownMenuItem 
+                            key={asset.symbol}
+                            className={`p-3 rounded-lg hover:bg-muted/50 transition-colors ${
+                              asset.is_active ? 'cursor-pointer' : 'opacity-60 cursor-not-allowed'
+                            }`}
+                            disabled={!asset.is_active}
+                          >
+                            <div className="flex items-center gap-3 w-full">
+                              {asset.icon_url && (
+                                <img src={asset.icon_url} alt={asset.name} className="w-6 h-6 rounded-full" />
+                              )}
+                              <div className="flex-1">
+                                <p className="font-medium text-foreground">{asset.name} ({asset.symbol})</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {asset.is_active ? 'Disponível' : 'Em breve'}
+                                </p>
+                              </div>
+                            </div>
+                          </DropdownMenuItem>
+                        ))}
+                      {activeAssets.filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency).length === 0 && (
+                        <div className="p-3 text-center text-sm text-muted-foreground">
+                          Nenhum outro ativo disponível
                         </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center gap-3 w-full">
-                          <div className="flex-1">
-                            <p className="font-medium text-foreground">Tether (USDT)</p>
-                            <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'USDT') ? 'Em breve' : 'Indisponível'}</p>
-                          </div>
-                        </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem disabled className="opacity-60 cursor-not-allowed p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center gap-3 w-full">
-                          <div className="flex-1">
-                            <p className="font-medium text-foreground">USD Coin (USDC)</p>
-                            <p className="text-xs text-muted-foreground">{activeAssets.find(a => a.symbol === 'USDC') ? 'Em breve' : 'Indisponível'}</p>
-                          </div>
-                        </div>
-                      </DropdownMenuItem>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  <span className="text-2xl font-bold text-foreground ml-2">
-                    {toCurrency}
-                  </span>
+                  <div className="flex flex-col pointer-events-none">
+                    <span className="text-2xl font-bold text-foreground">
+                      {toCurrency}
+                    </span>
+                  </div>
                 </div>
                 <Input
                   type="text"
                   placeholder="0"
                   value={formatNumber(toAmount)}
                   readOnly
-                  className="pl-32 pr-4 h-32 text-right text-3xl md:text-6xl leading-none font-bold bg-transparent border-0 text-muted-foreground cursor-not-allowed"
+                  className="pl-32 pr-4 h-32 text-right text-3xl md:text-6xl leading-none font-bold bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none cursor-default"
                 />
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Exchange Rate */}
-            <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Taxa de conversão</span>
-                <span className="font-medium">1:1</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Taxa de serviço</span>
-                <span className="font-medium text-success">Gratuito</span>
               </div>
             </div>
 
             {/* Convert Button */}
             <Button
               onClick={handleSwap}
-              disabled={loading || !fromAmount || parseFloat(fromAmount.replace(/[^\d.]/g, '')) <= 0 || parseFloat(fromAmount.replace(/[^\d.]/g, '')) > fromBalance}
-              className="w-full h-14 text-lg font-semibold"
-              size="lg"
+              disabled={loading || !fromAmount || parseFloat(fromAmount.replace(/[^\d.]/g, '')) > fromBalance || !exchangeEnabled}
+              className="w-full h-16 text-lg font-bold shadow-success disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                  Convertendo...
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Processando...
                 </>
               ) : (
-                'Converter'
+                <>
+                  <ArrowUpDown className="w-5 h-5 mr-2" />
+                  Converter Agora
+                </>
               )}
             </Button>
-            
-            {fastMarketsButtonVisible && (
-              <div className="relative group w-full">
-                {/* Glow effect */}
-                <div className="absolute -inset-1 rounded-2xl opacity-75 group-hover:opacity-100 blur-lg animate-pulse transition-all duration-300" style={{ background: '#ff2389' }}></div>
-                
-                {/* Button */}
-                <Button
-                  asChild
-                  className="relative w-full h-16 text-xl font-bold text-white transform transition-all duration-300 shadow-2xl border-2 border-white/30 backdrop-blur-sm"
-                  style={{ background: '#ff2389' }}
-                  size="lg"
-                >
-                  <a href="/fast" className="flex items-center justify-center gap-3">
-                    <Zap className="w-7 h-7 animate-pulse" />
-                    Fast Markets
-                  </a>
-                </Button>
+
+            {/* Rate Info */}
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <CheckCircle2 className="w-4 h-4 text-success" />
+                <span>Taxa fixa 1:1</span>
               </div>
-            )}
-            
-            {showSuccessNotification && (
-              <div className="px-6 py-5 rounded-2xl flex items-center gap-4 border-2 border-[#00ff90]/30 shadow-2xl backdrop-blur-sm transition-opacity duration-500 animate-fade-in" style={{ background: 'linear-gradient(135deg, rgba(0, 255, 144, 0.05), rgba(0, 255, 144, 0.02))' }}>
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#00ff90]/20 flex items-center justify-center">
-                  <CheckCircle2 className="w-7 h-7 text-[#00ff90]" />
-                </div>
-                <div className="flex-1">
-                  <div className="text-[#00ff90] font-bold text-lg mb-1">Conversão realizada!</div>
-                  <div className="text-muted-foreground text-sm">Seus saldos foram atualizados com sucesso</div>
-                </div>
+              <Separator orientation="vertical" className="h-4" />
+              <div className="flex items-center gap-1">
+                <Zap className="w-4 h-4 text-primary" />
+                <span>Conversão instantânea</span>
               </div>
-            )}
+            </div>
           </CardContent>
         </Card>
+
+        {/* Success Notification */}
+        {showSuccessNotification && (
+          <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top duration-300">
+            <Card className="border-success bg-success/10 shadow-xl">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+                  <CheckCircle2 className="w-6 h-6 text-success" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-success">Conversão realizada!</p>
+                  <p className="text-sm text-muted-foreground">Seus saldos foram atualizados</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">

@@ -233,7 +233,7 @@ const AdminExchange = () => {
       const filePath = `exchange-assets/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('profile-pictures')
+        .from('exchange-assets')
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: true
@@ -242,7 +242,7 @@ const AdminExchange = () => {
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from('profile-pictures')
+        .from('exchange-assets')
         .getPublicUrl(filePath);
 
       const { error } = await supabase
@@ -254,6 +254,11 @@ const AdminExchange = () => {
 
       // Force refetch to ensure UI updates
       await fetchAssets();
+      
+      // Force update local state immediately
+      setAssets(prev => prev.map(a => 
+        a.id === assetId ? { ...a, icon_url: publicUrl } : a
+      ));
 
       toast({
         title: 'Sucesso!',
@@ -348,7 +353,7 @@ const AdminExchange = () => {
                       <Input
                         id={`icon-${asset.id}`}
                         type="file"
-                        accept="image/png,image/svg+xml"
+                        accept="image/png,image/svg+xml,image/jpeg,image/jpg"
                         className="hidden"
                         onChange={(e) => {
                           const file = e.target.files?.[0];
@@ -357,24 +362,16 @@ const AdminExchange = () => {
                         disabled={uploading[asset.id]}
                       />
 
-                      <Button
-                        variant={asset.is_active ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => handleToggleActive(asset.id, asset.is_active)}
-                        className="gap-2"
-                      >
-                        {asset.is_active ? (
-                          <>
-                            <ToggleRight className="w-4 h-4" />
-                            Ativo
-                          </>
-                        ) : (
-                          <>
-                            <ToggleLeft className="w-4 h-4" />
-                            Inativo
-                          </>
-                        )}
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Label htmlFor={`switch-${asset.id}`} className="text-sm">
+                          {asset.is_active ? 'Ativo' : 'Inativo'}
+                        </Label>
+                        <Switch
+                          id={`switch-${asset.id}`}
+                          checked={asset.is_active}
+                          onCheckedChange={() => handleToggleActive(asset.id, asset.is_active)}
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
