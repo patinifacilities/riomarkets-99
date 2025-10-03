@@ -21,8 +21,6 @@ interface BrandingConfig {
   primary_color: string;
   success_color: string;
   active_theme: string;
-  opinion_yes_color?: string;
-  opinion_no_color?: string;
 }
 
 interface BrandingHistory {
@@ -36,24 +34,18 @@ const THEMES = {
     background_color: '#0a0a0a',
     primary_color: '#ff2389',
     success_color: '#00ff90',
-    opinion_yes_color: '#00ff90',
-    opinion_no_color: '#ff2389',
   },
   theme2: {
     name: 'Tema Oceano',
     background_color: '#0f1419',
     primary_color: '#1DA1F2',
     success_color: '#17BF63',
-    opinion_yes_color: '#17BF63',
-    opinion_no_color: '#F91880',
   },
   custom: {
     name: 'Custom',
     background_color: '#0a0a0a',
     primary_color: '#ff2389',
     success_color: '#00ff90',
-    opinion_yes_color: '#00ff90',
-    opinion_no_color: '#ff2389',
   }
 };
 
@@ -138,14 +130,6 @@ const AdminBranding = () => {
     root.style.setProperty('--primary', hexToHSL(brandingConfig.primary_color));
     root.style.setProperty('--success', hexToHSL(brandingConfig.success_color));
     root.style.setProperty('--background', hexToHSL(brandingConfig.background_color));
-    
-    // Apply opinion button colors
-    if (brandingConfig.opinion_yes_color) {
-      root.style.setProperty('--opinion-yes', hexToHSL(brandingConfig.opinion_yes_color));
-    }
-    if (brandingConfig.opinion_no_color) {
-      root.style.setProperty('--opinion-no', hexToHSL(brandingConfig.opinion_no_color));
-    }
   };
 
   const handleSave = async () => {
@@ -163,8 +147,6 @@ const AdminBranding = () => {
           background_color: config.background_color,
           primary_color: config.primary_color,
           success_color: config.success_color,
-          opinion_yes_color: config.opinion_yes_color,
-          opinion_no_color: config.opinion_no_color,
           active_theme: config.active_theme,
           updated_at: new Date().toISOString()
         })
@@ -316,8 +298,6 @@ const AdminBranding = () => {
           background_color: theme.background_color,
           primary_color: theme.primary_color,
           success_color: theme.success_color,
-          opinion_yes_color: theme.opinion_yes_color,
-          opinion_no_color: theme.opinion_no_color,
           active_theme: themeName
         };
     
@@ -587,51 +567,6 @@ const AdminBranding = () => {
                   </div>
                 </div>
 
-                {/* Opinion Yes Color */}
-                <div className="space-y-2">
-                  <Label>Cor do Botão "Sim"</Label>
-                  <div className="flex items-center gap-4">
-                    <div 
-                      className="w-12 h-12 rounded border border-border"
-                      style={{ backgroundColor: config.opinion_yes_color || config.success_color }}
-                    />
-                    <Input
-                      type="color"
-                      value={config.opinion_yes_color || config.success_color}
-                      onChange={(e) => setConfig({ ...config, opinion_yes_color: e.target.value })}
-                      className="w-24 h-12"
-                    />
-                    <Input
-                      type="text"
-                      value={config.opinion_yes_color || config.success_color}
-                      onChange={(e) => setConfig({ ...config, opinion_yes_color: e.target.value })}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-
-                {/* Opinion No Color */}
-                <div className="space-y-2">
-                  <Label>Cor do Botão "Não"</Label>
-                  <div className="flex items-center gap-4">
-                    <div 
-                      className="w-12 h-12 rounded border border-border"
-                      style={{ backgroundColor: config.opinion_no_color || config.primary_color }}
-                    />
-                    <Input
-                      type="color"
-                      value={config.opinion_no_color || config.primary_color}
-                      onChange={(e) => setConfig({ ...config, opinion_no_color: e.target.value })}
-                      className="w-24 h-12"
-                    />
-                    <Input
-                      type="text"
-                      value={config.opinion_no_color || config.primary_color}
-                      onChange={(e) => setConfig({ ...config, opinion_no_color: e.target.value })}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </div>
