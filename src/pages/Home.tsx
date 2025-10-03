@@ -18,6 +18,7 @@ import ProbabilityChart from '@/components/markets/ProbabilityChart';
 import { supabase } from '@/integrations/supabase/client';
 import { FastPoolSlide } from '@/components/fast/FastPoolSlide';
 import { useRef } from 'react';
+import logoWhite from '@/assets/rio-white-logo-deposit.png';
 
 interface CustomImage {
   id: string;
@@ -240,7 +241,11 @@ const Home = () => {
             const img = sliderCustomImages.find(i => i.id === id);
             return img ? { type: 'image' as const, data: img } : null;
           } else {
-            // Only show markets that are in sliderMarkets (selected in admin)
+            // CRITICAL: Only show markets that are BOTH in slideOrder AND in sliderMarketIds
+            // This ensures only markets selected in admin "Mercados Selecionados" appear
+            if (!sliderMarketIds.includes(id)) {
+              return null; // Market not selected in admin, skip it
+            }
             const market = sliderMarkets.find(m => m.id === id);
             return market ? { type: 'market' as const, data: market } : null;
           }
@@ -251,7 +256,7 @@ const Home = () => {
     }
     
     return slides;
-  }, [slideOrder, markets, sliderMarkets, sliderCustomImages]);
+  }, [slideOrder, markets, sliderMarkets, sliderCustomImages, sliderMarketIds]);
 
   // Handle slide click - restart autoplay after 5 seconds
   const handleSlideClick = () => {
@@ -298,7 +303,15 @@ const Home = () => {
               {/* Mobile: Show ONLY text/buttons slide */}
               <CarouselItem key="text-card-mobile" className="md:hidden">
                 <div className="flex items-center justify-center h-[280px] px-4">
-                  <div className="text-center space-y-2 max-w-3xl mx-auto">
+                  <div className="text-center space-y-4 max-w-3xl mx-auto">
+                    {/* Logo */}
+                    <div className="flex justify-center mb-2">
+                      <img 
+                        src={logoWhite} 
+                        alt="Rio Markets" 
+                        className="h-12 object-contain"
+                      />
+                    </div>
                     <div className="text-3xl font-bold">
                       <div className="mb-1 text-3xl">Mercados Preditivos</div>
                       <div className="text-3xl">

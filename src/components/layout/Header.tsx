@@ -297,21 +297,21 @@ const Header = () => {
             </Sheet>
           )}
 
-          {/* Logo - Mobile (left side when not logged in) and Desktop */}
-          {isMobile && !isLoggedIn && (
-            <div className="flex items-center flex-1 relative">
+          {/* Logo - Mobile (always visible, centered when logged in) */}
+          {isMobile && (
+            <div className={cn("flex items-center relative", isLoggedIn ? "flex-1 justify-center" : "flex-1")}>
               <Link to="/">
-                <div className="relative h-10 min-w-[140px]">
+                <div className="relative h-8 min-w-[120px]">
                   <img 
                     src={logoImageWhite}
                     alt="Rio Markets" 
-                    className="absolute h-10 w-auto object-contain transition-opacity duration-300" 
+                    className="absolute h-8 w-auto object-contain transition-opacity duration-300" 
                     style={{ opacity: resolvedTheme === 'light' ? 0 : 1 }}
                   />
                   <img 
                     src={logoImageBlack}
                     alt="Rio Markets" 
-                    className="absolute h-10 w-auto object-contain transition-opacity duration-300" 
+                    className="absolute h-8 w-auto object-contain transition-opacity duration-300" 
                     style={{ opacity: resolvedTheme === 'light' ? 1 : 0 }}
                   />
                 </div>
