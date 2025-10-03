@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { NewsManagement } from '@/components/admin/NewsManagement';
@@ -42,9 +43,16 @@ const AdminNews = () => {
                 Gerenciar menções na imprensa e notícias da plataforma
               </p>
             </div>
-            <Badge variant="destructive" className="text-xs">
-              ADMIN
-            </Badge>
+            <div className="flex items-center gap-4">
+              <Badge variant="destructive" className="text-xs">
+                ADMIN
+              </Badge>
+              <Link to="/admin/news/sources">
+                <Button variant="outline">
+                  Gerenciar Fontes
+                </Button>
+              </Link>
+            </div>
           </div>
 
           <NewsManagement />

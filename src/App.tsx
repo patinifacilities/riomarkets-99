@@ -27,6 +27,7 @@ import AdminDeposits from '@/pages/AdminDeposits';
 import AdminGateways from '@/pages/AdminGateways';
 import AdminLogs from '@/pages/AdminLogs';
 import AdminNews from '@/pages/AdminNews';
+import AdminNewsSources from '@/pages/AdminNewsSources';
 import AdminMarkets from '@/pages/AdminMarkets';
 import AdminFast from '@/pages/AdminFast';
 import AdminFastPoolConfig from '@/pages/AdminFastPoolConfig';
@@ -103,6 +104,7 @@ function App() {
             <Route path="/admin/gateways" element={<AdminGateways />} />
             <Route path="/admin/logs" element={<AdminLogs />} />
             <Route path="/admin/news" element={<AdminNews />} />
+            <Route path="/admin/news/sources" element={<AdminNewsSources />} />
             <Route path="/admin/markets" element={<AdminMarkets />} />
             <Route path="/admin/fast" element={<AdminFast />} />
             <Route path="/admin/fast/pool/:assetId/config" element={<AdminFastPoolConfig />} />
