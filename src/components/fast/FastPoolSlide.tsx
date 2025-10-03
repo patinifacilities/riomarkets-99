@@ -62,7 +62,8 @@ export const FastPoolSlide = ({ onClick }: FastPoolSlideProps) => {
     return () => clearInterval(interval);
   }, [pool]);
 
-  const handleSlideClick = () => {
+  const handleSlideClick = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     if (onClick) onClick();
     navigate(`/ativo/BTC`);
   };
@@ -80,20 +81,10 @@ export const FastPoolSlide = ({ onClick }: FastPoolSlideProps) => {
       onClick={handleSlideClick}
       className="relative h-[500px] w-full overflow-hidden rounded-2xl cursor-pointer group"
     >
-      {/* Animated Fast Background */}
+      {/* Clean gradient background with shadow effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#ff2389] via-[#ff0066] to-[#cc0052]">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,_transparent_0%,_#000_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,_transparent_0%,_#000_100%)]" />
-        </div>
-        
-        {/* Animated dots pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-2 h-2 bg-white rounded-full animate-pulse" />
-          <div className="absolute top-32 right-20 w-3 h-3 bg-white rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
-          <div className="absolute bottom-20 left-1/4 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute bottom-40 right-1/3 w-3 h-3 bg-white rounded-full animate-pulse" style={{ animationDelay: '1.5s' }} />
-        </div>
+        {/* Subtle overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
       </div>
 
       {/* Content */}
@@ -165,6 +156,10 @@ export const FastPoolSlide = ({ onClick }: FastPoolSlideProps) => {
           <div className="flex items-center justify-center">
             <Button
               size="lg"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSlideClick(e);
+              }}
               className="bg-white text-[#ff2389] hover:bg-white/90 font-bold px-10 py-8 rounded-full text-xl transition-all hover:scale-110 shadow-2xl group-hover:shadow-white/50"
             >
               <Zap className="w-6 h-6 mr-2 fill-current" />

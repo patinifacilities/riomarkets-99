@@ -141,13 +141,17 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/60 via-transparent to-transparent" />
             
-            {/* Hot/Fire Icon for top 3 */}
+            {/* Hot/Fire Icon for top 3 - Enhanced animation */}
             {showHotIcon && (
-              <div className="absolute top-3 right-3 animate-pulse">
+              <div className="absolute top-3 right-3">
                 <img 
                   src={hotFire} 
                   alt="Hot" 
-                  className="w-8 h-8 drop-shadow-[0_0_8px_rgba(255,100,0,0.8)]"
+                  className="w-10 h-10 animate-bounce drop-shadow-[0_0_12px_rgba(255,100,0,0.9)]"
+                  style={{
+                    filter: 'drop-shadow(0 0 6px rgba(255,140,0,0.8)) drop-shadow(0 0 12px rgba(255,69,0,0.6))',
+                    animation: 'bounce 1s ease-in-out infinite'
+                  }}
                 />
               </div>
             )}
@@ -209,18 +213,19 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
             <div className="flex items-center justify-between text-xs text-gray-500">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
-                  <div className="flex -space-x-1.5">
+                  <div className="flex -space-x-2">
                     {avatarColors.map((color, i) => (
                       <div 
                         key={i}
-                        className="w-5 h-5 rounded-full border border-[#1a1a1a] transition-all duration-300"
+                        className="w-6 h-6 rounded-full border-2 border-[#1a1a1a] shadow-lg ring-1 ring-white/10 transition-all duration-300 hover:scale-110 hover:z-10"
                         style={{ 
-                          background: `linear-gradient(135deg, ${color} 0%, transparent 100%)`
+                          background: `linear-gradient(135deg, ${color} 0%, ${color}aa 100%)`,
+                          boxShadow: `0 0 8px ${color}40`
                         }}
                       />
                     ))}
                   </div>
-                  <span className="ml-1">+{stats?.participantes || 13}</span>
+                  <span className="ml-1.5 font-medium">+{stats?.participantes || 13}</span>
                 </div>
                 
                 <div className="flex items-center gap-1">

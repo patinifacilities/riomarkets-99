@@ -273,12 +273,12 @@ const Home = () => {
             opts={{
               align: "start",
               loop: true,
+              direction: "rtl", // Right to left flow
             }}
             plugins={[
               Autoplay({
                 delay: sliderDelay,
-                stopOnInteraction: true,
-                stopOnMouseEnter: true,
+                stopOnInteraction: false,
               }),
             ]}
             className="w-full max-w-[1500px] mx-auto"
@@ -290,43 +290,46 @@ const Home = () => {
                 });
               }
             }}
+            onMouseEnter={handleSlideClick}
           >
             <CarouselContent className="py-8">
-              {/* Slide 1: Title with Typewriter */}
+              {/* Slide 1: Title with Typewriter - Centralized */}
               <CarouselItem>
-                <div className="text-center space-y-6 py-12 px-8">
-                  <div className="text-4xl md:text-6xl font-bold">
-                    <div className="mb-4">Mercados Preditivos</div>
-                    <TypewriterText
-                      baseText=""
-                      texts={[
-                        "para Análise Estratégica",
-                        "baseados em Dados",
-                        "com Transparência Total",
-                        "Rápidos"
-                      ]}
-                      customColors={{
-                        "Rápidos": "#ff2389"
-                      }}
-                      className="text-4xl md:text-6xl font-bold"
-                      typingSpeed={100}
-                      deletingSpeed={50}
-                      pauseDuration={2000}
-                    />
-                  </div>
-                  <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-                    Ganhe recompensas compartilhando suas previsões sobre eventos futuros.
-                  </p>
-                  <div className="flex gap-4 justify-center items-center pt-4">
-                    <Button 
-                      size="lg" 
-                      className="bg-[#00ff90] text-gray-900 hover:bg-[#00ff90]/90 font-semibold px-8 transition-all hover:scale-105"
-                      onClick={() => navigate('/auth')}
-                    >
-                      <Sparkles className="w-5 h-5 mr-2" />
-                      Explorar Mercados
-                    </Button>
-                    <OnboardingTrigger size="lg" variant="outline" />
+                <div className="flex items-center justify-center min-h-[400px] px-8">
+                  <div className="text-center space-y-8 max-w-3xl">
+                    <div className="text-4xl md:text-6xl font-bold">
+                      <div className="mb-4">Mercados Preditivos</div>
+                      <TypewriterText
+                        baseText=""
+                        texts={[
+                          "para Análise Estratégica",
+                          "baseados em Dados",
+                          "com Transparência Total",
+                          "Rápidos"
+                        ]}
+                        customColors={{
+                          "Rápidos": "#ff2389"
+                        }}
+                        className="text-4xl md:text-6xl font-bold"
+                        typingSpeed={100}
+                        deletingSpeed={50}
+                        pauseDuration={2000}
+                      />
+                    </div>
+                    <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+                      Ganhe recompensas compartilhando suas previsões sobre eventos futuros.
+                    </p>
+                    <div className="flex gap-4 justify-center items-center">
+                      <Button 
+                        size="lg" 
+                        className="bg-[#00ff90] text-gray-900 hover:bg-[#00ff90]/90 font-semibold px-8 transition-all hover:scale-105"
+                        onClick={() => navigate('/auth')}
+                      >
+                        <Sparkles className="w-5 h-5 mr-2" />
+                        Explorar Mercados
+                      </Button>
+                      <OnboardingTrigger size="lg" variant="outline" />
+                    </div>
                   </div>
                 </div>
               </CarouselItem>
@@ -385,17 +388,17 @@ const Home = () => {
                         navigate(`/mercado/${market.id}`);
                       }}
                     >
-                      {/* Background Image with Enhanced Overlay */}
+                      {/* Background Image with Clean Fade/Shadow Effect */}
                       <div className="absolute inset-0">
                         {market.imagem_url || market.thumbnail_url || market.image_url || market.photo_url ? (
                           <>
                             <img 
                               src={market.imagem_url || market.thumbnail_url || market.image_url || market.photo_url} 
                               alt={market.titulo}
-                              className="w-full h-full object-cover scale-110 blur-[2px]"
+                              className="w-full h-full object-cover"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/50" />
-                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60" />
+                            {/* Clean gradient overlay - no blur, just shadow fade for readability */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                           </>
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-primary/20 via-background to-primary/10" />
@@ -456,7 +459,11 @@ const Home = () => {
                           <div className="flex items-center justify-center">
                             <Button
                               size="lg"
-                              onClick={() => navigate(`/mercado/${market.id}`)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSlideClick();
+                                navigate(`/mercado/${market.id}`);
+                              }}
                               className="bg-white text-black hover:bg-white/90 font-semibold px-8 py-6 rounded-full text-lg transition-all hover:scale-105 shadow-xl"
                             >
                               <Sparkles className="w-5 h-5 mr-2" />
@@ -474,20 +481,21 @@ const Home = () => {
             <CarouselPrevious className="hidden" />
             <CarouselNext className="hidden" />
             
-            {/* Dots Navigation */}
+            {/* Dots Navigation - Including intro slide + all ordered slides */}
             <div className="flex justify-center gap-2 mt-4">
-              {orderedSlides.map((_, index) => (
+              {/* +1 for intro slide, then all ordered slides */}
+              {[...Array(orderedSlides.length + 1)].map((_, index) => (
                 <button
                   key={index}
                   className={cn(
                     "h-2 rounded-full transition-all cursor-pointer",
-                    currentSlideIndex === index + 1 
+                    currentSlideIndex === index 
                       ? "w-8 bg-white" 
                       : "w-2 bg-white/30 hover:bg-white/60"
                   )}
                   onClick={() => {
                     if (carouselApiRef.current) {
-                      carouselApiRef.current.scrollTo(index + 1);
+                      carouselApiRef.current.scrollTo(index);
                     }
                   }}
                   aria-label={`Ir para slide ${index + 1}`}
