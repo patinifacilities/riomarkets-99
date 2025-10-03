@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useToast } from '@/hooks/use-toast';
@@ -45,6 +46,52 @@ const AdminExchange = () => {
   const [orders, setOrders] = useState<ExchangeOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState<{[key: string]: boolean}>({});
+  const [exchangeEnabled, setExchangeEnabled] = useState(true);
+
+  useEffect(() => {
+    fetchSystemConfig();
+  }, []);
+
+  const fetchSystemConfig = async () => {
+    try {
+      const { data } = await supabase
+        .from('system_config')
+        .select('exchange_enabled')
+        .single();
+      
+      if (data) {
+        setExchangeEnabled(data.exchange_enabled);
+      }
+    } catch (error) {
+      console.error('Error fetching system config:', error);
+    }
+  };
+
+  const handleToggleExchangeGlobal = async (enabled: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('system_config')
+        .update({ exchange_enabled: enabled, updated_by: user?.id })
+        .eq('id', (await supabase.from('system_config').select('id').single()).data?.id);
+
+      if (error) throw error;
+
+      setExchangeEnabled(enabled);
+      toast({
+        title: enabled ? "Exchange ativado!" : "Exchange desativado!",
+        description: enabled 
+          ? "Os usuários podem voltar a fazer conversões." 
+          : "O exchange está em atualização. Usuários não poderão converter.",
+      });
+    } catch (error) {
+      console.error('Error toggling exchange:', error);
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar status do exchange.",
+        variant: "destructive"
+      });
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -170,13 +217,27 @@ const AdminExchange = () => {
   const handleIconUpload = async (file: File, assetId: string) => {
     setUploading(prev => ({ ...prev, [assetId]: true }));
     try {
+      // Delete old icon if exists
+      const oldAsset = assets.find(a => a.id === assetId);
+      if (oldAsset?.icon_url) {
+        const oldPath = oldAsset.icon_url.split('/').pop();
+        if (oldPath) {
+          await supabase.storage
+            .from('profile-pictures')
+            .remove([`exchange-assets/${oldPath}`]);
+        }
+      }
+
       const fileExt = file.name.split('.').pop();
       const fileName = `asset_${assetId}_${Date.now()}.${fileExt}`;
       const filePath = `exchange-assets/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('profile-pictures')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
 
       if (uploadError) throw uploadError;
 
@@ -191,9 +252,8 @@ const AdminExchange = () => {
 
       if (error) throw error;
 
-      setAssets(prev => prev.map(asset => 
-        asset.id === assetId ? { ...asset, icon_url: publicUrl } : asset
-      ));
+      // Force refetch to ensure UI updates
+      await fetchAssets();
 
       toast({
         title: 'Sucesso!',
@@ -234,10 +294,24 @@ const AdminExchange = () => {
               <ArrowLeft className="w-4 h-4" />
               Voltar
             </Link>
-            <h1 className="text-3xl font-bold mb-2">Exchange Admin</h1>
-            <p className="text-muted-foreground">
-              Gerencie ativos e visualize histórico de conversões
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">Exchange Admin</h1>
+                <p className="text-muted-foreground">
+                  Gerencie ativos e visualize histórico de conversões
+                </p>
+              </div>
+              <div className="flex items-center gap-3 p-3 border rounded-lg bg-card">
+                <Label htmlFor="exchange-global-switch" className="font-medium">
+                  Exchange {exchangeEnabled ? 'Ativo' : 'Em Atualização'}
+                </Label>
+                <Switch
+                  id="exchange-global-switch"
+                  checked={exchangeEnabled}
+                  onCheckedChange={handleToggleExchangeGlobal}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Assets Management */}

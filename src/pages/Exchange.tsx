@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { ArrowUpDown, Wallet, Loader2, ArrowDown, ArrowUp, CheckCircle2, Zap } from 'lucide-react';
+import { ArrowUpDown, Wallet, Loader2, ArrowDown, ArrowUp, CheckCircle2, Zap, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
@@ -26,6 +26,26 @@ const ExchangeNew = () => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [fastMarketsButtonVisible, setFastMarketsButtonVisible] = useState(false);
   const [activeAssets, setActiveAssets] = useState<{symbol: string, name: string}[]>([]);
+  const [exchangeEnabled, setExchangeEnabled] = useState(true);
+
+  useEffect(() => {
+    fetchSystemConfig();
+  }, []);
+
+  const fetchSystemConfig = async () => {
+    try {
+      const { data } = await supabase
+        .from('system_config')
+        .select('exchange_enabled')
+        .single();
+      
+      if (data) {
+        setExchangeEnabled(data.exchange_enabled);
+      }
+    } catch (error) {
+      console.error('Error fetching system config:', error);
+    }
+  };
 
   useEffect(() => {
     if (user?.id) {
@@ -230,7 +250,20 @@ const ExchangeNew = () => {
         </div>
 
         {/* Swap Interface */}
-        <Card className="bg-gradient-to-br from-card/95 to-card-secondary/95 border border-primary/30 shadow-xl">
+        <Card className="bg-gradient-to-br from-card/95 to-card-secondary/95 border border-primary/30 shadow-xl relative">
+          {!exchangeEnabled && (
+            <div className="absolute inset-0 bg-background/90 backdrop-blur-md z-50 rounded-lg flex items-center justify-center">
+              <div className="text-center p-8">
+                <Settings className="w-16 h-16 mx-auto mb-4 text-primary animate-spin" />
+                <h2 className="text-2xl font-bold mb-2">Exchange em Atualização</h2>
+                <p className="text-muted-foreground">
+                  Estamos melhorando o sistema de conversão.
+                  <br />
+                  Volte em breve!
+                </p>
+              </div>
+            </div>
+          )}
           <CardHeader>
             <CardTitle className="flex items-center justify-center gap-2">
               <ArrowUpDown className="h-5 w-5" />

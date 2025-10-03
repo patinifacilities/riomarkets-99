@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useMarkets } from '@/hooks/useMarkets';
 import { useAuth } from '@/hooks/useAuth';
@@ -34,6 +36,79 @@ const AdminMarkets = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showDeleted, setShowDeleted] = useState(false);
+  const [marketsEnabled, setMarketsEnabled] = useState(true);
+
+  useEffect(() => {
+    fetchSystemConfig();
+  }, []);
+
+  const fetchSystemConfig = async () => {
+    try {
+      const { data } = await supabase
+        .from('system_config')
+        .select('markets_enabled')
+        .single();
+      
+      if (data) {
+        setMarketsEnabled(data.markets_enabled);
+      }
+    } catch (error) {
+      console.error('Error fetching system config:', error);
+    }
+  };
+
+  const handleToggleMarketsGlobal = async (enabled: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('system_config')
+        .update({ markets_enabled: enabled, updated_by: user?.id })
+        .eq('id', (await supabase.from('system_config').select('id').single()).data?.id);
+
+      if (error) throw error;
+
+      setMarketsEnabled(enabled);
+      toast({
+        title: enabled ? "Mercados ativados!" : "Mercados desativados!",
+        description: enabled 
+          ? "Os usuários podem voltar a visualizar e apostar nos mercados." 
+          : "Os mercados estão em atualização. Usuários verão uma notificação.",
+      });
+    } catch (error) {
+      console.error('Error toggling markets:', error);
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar status dos mercados.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleToggleMarketPaused = async (marketId: string, currentPaused: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('markets')
+        .update({ paused: !currentPaused })
+        .eq('id', marketId);
+
+      if (error) throw error;
+
+      toast({
+        title: !currentPaused ? "Mercado pausado!" : "Mercado reativado!",
+        description: !currentPaused 
+          ? "Este mercado está agora em atualização." 
+          : "Este mercado voltou ao normal.",
+      });
+
+      refetch();
+    } catch (error) {
+      console.error('Error toggling market paused:', error);
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar status do mercado.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleCreateSuccess = () => {
     setShowCreateForm(false);
@@ -173,6 +248,16 @@ const AdminMarkets = () => {
               </p>
             </div>
             <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-3 p-3 border rounded-lg bg-card">
+                <Label htmlFor="markets-global-switch" className="font-medium">
+                  Mercados {marketsEnabled ? 'Ativos' : 'Em Atualização'}
+                </Label>
+                <Switch
+                  id="markets-global-switch"
+                  checked={marketsEnabled}
+                  onCheckedChange={handleToggleMarketsGlobal}
+                />
+              </div>
               <Button 
                 onClick={() => setShowDeleted(!showDeleted)}
                 style={{ backgroundColor: showDeleted ? '#2a2a2a' : '#ff2389' }}
@@ -231,7 +316,16 @@ const AdminMarkets = () => {
                     return matchesDeleted && matchesSearch;
                   })
                   .map(market => (
-                  <div key={market.id} className="p-4 rounded-lg border border-border bg-card/50">
+                  <div key={market.id} className="p-4 rounded-lg border border-border bg-card/50 relative">
+                    {(market as any).paused && (
+                      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 rounded-lg flex items-center justify-center">
+                        <div className="text-center">
+                          <Settings className="w-12 h-12 mx-auto mb-2 text-primary animate-spin" />
+                          <p className="font-bold text-lg">Em Atualização</p>
+                          <p className="text-sm text-muted-foreground">Este mercado está sendo atualizado</p>
+                        </div>
+                      </div>
+                    )}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
@@ -252,6 +346,16 @@ const AdminMarkets = () => {
                           <span>Categoria: {market.categoria}</span>
                           <span>Encerra: {new Date(market.end_date).toLocaleDateString()}</span>
                         </div>
+                      </div>
+                      <div className="flex items-center gap-2 ml-4">
+                        <Label htmlFor={`market-pause-${market.id}`} className="text-sm">
+                          {(market as any).paused ? 'Pausado' : 'Ativo'}
+                        </Label>
+                        <Switch
+                          id={`market-pause-${market.id}`}
+                          checked={!(market as any).paused}
+                          onCheckedChange={() => handleToggleMarketPaused(market.id, (market as any).paused || false)}
+                        />
                       </div>
                     </div>
 

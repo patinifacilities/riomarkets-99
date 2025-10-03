@@ -783,6 +783,7 @@ export type Database = {
           market_type: string
           odds: Json
           opcoes: Json
+          paused: boolean | null
           periodicidade: string | null
           photo_url: string | null
           status: string | null
@@ -800,6 +801,7 @@ export type Database = {
           market_type?: string
           odds: Json
           opcoes: Json
+          paused?: boolean | null
           periodicidade?: string | null
           photo_url?: string | null
           status?: string | null
@@ -817,6 +819,7 @@ export type Database = {
           market_type?: string
           odds?: Json
           opcoes?: Json
+          paused?: boolean | null
           periodicidade?: string | null
           photo_url?: string | null
           status?: string | null
@@ -1390,6 +1393,30 @@ export type Database = {
           subject?: string
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      system_config: {
+        Row: {
+          exchange_enabled: boolean | null
+          id: string
+          markets_enabled: boolean | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          exchange_enabled?: boolean | null
+          id?: string
+          markets_enabled?: boolean | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          exchange_enabled?: boolean | null
+          id?: string
+          markets_enabled?: boolean | null
+          updated_at?: string | null
+          updated_by?: string | null
         }
         Relationships: []
       }
