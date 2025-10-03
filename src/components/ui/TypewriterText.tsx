@@ -65,39 +65,13 @@ export const TypewriterText = ({
 
   // Get color for current text, default to #00ff90 if no custom color specified
   const currentColor = customColors[texts[currentTextIndex]] || '#00ff90';
-  const currentWord = texts[currentTextIndex];
-  const shouldShowIcon = showFastIcon && currentWord === 'Rápidos';
   
   return (
     <span className={className}>
-      <span className="block">{baseText}</span>
-      <span className="flex items-center gap-2" style={{ color: currentColor }}>
-        {shouldShowIcon && (
-          <Zap 
-            className="w-5 h-5 md:w-7 md:h-7 relative" 
-            style={{ 
-              color: currentColor,
-              filter: 'drop-shadow(0 0 8px currentColor) drop-shadow(0 0 12px currentColor)',
-              animation: 'heartbeat 0.5s ease-in-out infinite'
-            }} 
-          />
-        )}
-        <span>
-          {currentText}<span className="animate-pulse" style={{ color: currentColor }}>|</span>
-        </span>
+      <span>{baseText}</span>
+      <span style={{ color: currentColor }}>
+        {currentText}<span className="animate-pulse" style={{ color: currentColor }}>|</span>
       </span>
-      <style>{`
-        @keyframes heartbeat {
-          0%, 100% { 
-            transform: scale(1); 
-            filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 12px currentColor);
-          }
-          50% { 
-            transform: scale(1.15); 
-            filter: drop-shadow(0 0 12px currentColor) drop-shadow(0 0 18px currentColor);
-          }
-        }
-      `}</style>
     </span>
   );
 };
