@@ -24,8 +24,8 @@ export function OnboardingStep({ step, className = "" }: OnboardingStepProps) {
             <img src={logoWhite} alt="Rio Markets" className="h-8 w-auto" />
           </div>
         ) : content.id === 3 ? (
-          <div className="w-16 h-16 rounded-full bg-[#ff2389]/10 flex items-center justify-center animate-pulse">
-            <IconComponent className="w-8 h-8 text-[#ff2389]" />
+          <div className="w-16 h-16 rounded-full flex items-center justify-center animate-pulse" style={{ backgroundColor: '#ff2389' }}>
+            <IconComponent className="w-8 h-8 text-white" />
           </div>
         ) : content.id === 4 ? (
           <div className="w-16 h-16 rounded-full bg-gradient-to-r from-yellow-500 via-yellow-600 to-amber-600 flex items-center justify-center shadow-lg shadow-yellow-500/50 animate-[golden-glow_2s_ease-in-out_infinite]">

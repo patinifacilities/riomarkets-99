@@ -46,21 +46,28 @@ export const PixPaymentModal = ({ open, onOpenChange, amount, onSuccess }: PixPa
         console.log('PIX payment data:', data);
 
         if (data && data.success) {
+          console.log('Full payment data:', data);
+          
           setPixData({
-            qrCode: data.qrCode,
-            qrCodeText: data.qrCodeText,
-            expiresAt: data.expiresAt
+            qrCode: data.qrCode || '',
+            qrCodeText: data.qrCodeText || '',
+            expiresAt: data.expiresAt || ''
           });
           
           // Calculate initial time left
           if (data.expiresAt) {
             const expiryTime = new Date(data.expiresAt).getTime();
             const now = new Date().getTime();
-            setTimeLeft(Math.max(0, Math.floor((expiryTime - now) / 1000)));
+            const timeLeftSeconds = Math.max(0, Math.floor((expiryTime - now) / 1000));
+            console.log('Time left seconds:', timeLeftSeconds);
+            setTimeLeft(timeLeftSeconds);
           } else {
             // Default to 15 minutes if no expiry time
+            console.log('No expiry time, defaulting to 15 minutes');
             setTimeLeft(15 * 60);
           }
+        } else {
+          console.error('Invalid payment data:', data);
         }
       } catch (error) {
         console.error('Error generating PIX payment:', error);

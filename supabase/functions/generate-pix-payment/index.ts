@@ -103,11 +103,13 @@ serve(async (req) => {
       console.error('Error creating fiat request:', insertError);
     }
 
+    console.log('Payment data from Abacatepay:', JSON.stringify(paymentData, null, 2));
+
     return new Response(JSON.stringify({
       success: true,
       paymentId: paymentData.id,
-      qrCode: paymentData.pix?.qrCode,
-      qrCodeText: paymentData.pix?.qrCodeText,
+      qrCode: paymentData.qrCode || paymentData.pix?.qrCode,
+      qrCodeText: paymentData.qrCodeText || paymentData.pix?.qrCodeText,
       expiresAt: paymentData.expiresAt,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

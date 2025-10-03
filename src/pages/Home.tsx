@@ -292,7 +292,7 @@ const Home = () => {
                   <div className="text-center space-y-6 sm:space-y-8 max-w-3xl">
                     <div className="text-3xl sm:text-4xl md:text-6xl font-bold">
                       <div className="mb-3 sm:mb-4 text-3xl sm:text-4xl md:text-6xl">Mercados Preditivos</div>
-                      <div className="text-3xl sm:text-4xl md:text-6xl">
+                       <div className="text-3xl sm:text-4xl md:text-6xl">
                         <TypewriterText
                           baseText=""
                           texts={[
@@ -504,92 +504,93 @@ const Home = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         {/* Search and Filters - Improved for white mode */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <div className="relative flex-1">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6 items-center">
+          <div className="relative flex-1 max-w-md w-full sm:w-auto">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
-              placeholder="Search markets"
+              placeholder="Pesquisar mercados..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-12 h-12 bg-card/80 dark:bg-card/50 border-border/60 dark:border-border/40 text-foreground placeholder:text-muted-foreground/60 rounded-xl shadow-sm backdrop-blur-sm"
             />
           </div>
+          
+          {/* Filter Pills - on same line for desktop */}
+          <div className="flex gap-3 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide w-full sm:w-auto sm:flex-1">
+            <button
+              onClick={() => handleSortChange('recentes')}
+              className={cn(
+                "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
+                sortBy === 'recentes'
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "bg-card/80 dark:bg-card/50 text-muted-foreground hover:text-foreground border border-border/40 backdrop-blur-sm"
+              )}
+            >
+              <BarChart3 className="w-4 h-4" />
+              Newest
+            </button>
+            
+            <button
+              onClick={() => handleSortChange('populares')}
+              className={cn(
+                "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
+                sortBy === 'populares'
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "bg-card/80 dark:bg-card/50 text-muted-foreground hover:text-foreground border border-border/40 backdrop-blur-sm"
+              )}
+            >
+              <Zap className="w-4 h-4" />
+              Trending
+            </button>
+            
+            <button
+              onClick={() => handleSortChange('liquidez')}
+              className={cn(
+                "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
+                sortBy === 'liquidez'
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "bg-card/80 dark:bg-card/50 text-muted-foreground hover:text-foreground border border-border/40 backdrop-blur-sm"
+              )}
+            >
+              <Target className="w-4 h-4" />
+              Volume
+            </button>
+            
+            <button
+              onClick={() => handleSortChange('prazo')}
+              className={cn(
+                "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all",
+                sortBy === 'prazo'
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "bg-card/80 dark:bg-card/50 text-muted-foreground hover:text-foreground border border-border/40 backdrop-blur-sm"
+              )}
+            >
+              Ending
+            </button>
+            
+            <Select value={selectedStatus[0] || 'active'} onValueChange={(val) => setSelectedStatus([val])}>
+              <SelectTrigger className="w-[120px] bg-card/80 dark:bg-card/50 border-border/40 text-foreground backdrop-blur-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-card border-border">
+                <SelectItem value="active">Open</SelectItem>
+                <SelectItem value="ending">Ending</SelectItem>
+                <SelectItem value="closed">Closed</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Select value="all">
+              <SelectTrigger className="w-[140px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
+                <SelectValue placeholder="All Tokens" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a]">
+                <SelectItem value="all">All Tokens</SelectItem>
+                <SelectItem value="rioz">RIOZ</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        {/* Filter Pills - Improved for white mode */}
-        <div className="flex gap-3 mb-6 overflow-x-auto pb-2 scrollbar-hide">
-          <button
-            onClick={() => handleSortChange('recentes')}
-            className={cn(
-              "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
-              sortBy === 'recentes'
-                ? "bg-primary text-primary-foreground shadow-md"
-                : "bg-card/80 dark:bg-card/50 text-muted-foreground hover:text-foreground border border-border/40 backdrop-blur-sm"
-            )}
-          >
-            <BarChart3 className="w-4 h-4" />
-            Newest
-          </button>
-          
-          <button
-            onClick={() => handleSortChange('populares')}
-            className={cn(
-              "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
-              sortBy === 'populares'
-                ? "bg-primary text-primary-foreground shadow-md"
-                : "bg-card/80 dark:bg-card/50 text-muted-foreground hover:text-foreground border border-border/40 backdrop-blur-sm"
-            )}
-          >
-            <Zap className="w-4 h-4" />
-            Trending
-          </button>
-          
-          <button
-            onClick={() => handleSortChange('liquidez')}
-            className={cn(
-              "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2",
-              sortBy === 'liquidez'
-                ? "bg-primary text-primary-foreground shadow-md"
-                : "bg-card/80 dark:bg-card/50 text-muted-foreground hover:text-foreground border border-border/40 backdrop-blur-sm"
-            )}
-          >
-            <Target className="w-4 h-4" />
-            Volume
-          </button>
-          
-          <button
-            onClick={() => handleSortChange('prazo')}
-            className={cn(
-              "px-5 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all",
-              sortBy === 'prazo'
-                ? "bg-primary text-primary-foreground shadow-md"
-                : "bg-card/80 dark:bg-card/50 text-muted-foreground hover:text-foreground border border-border/40 backdrop-blur-sm"
-            )}
-          >
-            Ending
-          </button>
-          
-          <Select value={selectedStatus[0] || 'active'} onValueChange={(val) => setSelectedStatus([val])}>
-            <SelectTrigger className="w-[120px] bg-card/80 dark:bg-card/50 border-border/40 text-foreground backdrop-blur-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-card border-border">
-              <SelectItem value="active">Open</SelectItem>
-              <SelectItem value="ending">Ending</SelectItem>
-              <SelectItem value="closed">Closed</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Select value="all">
-            <SelectTrigger className="w-[140px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
-              <SelectValue placeholder="All Tokens" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a]">
-              <SelectItem value="all">All Tokens</SelectItem>
-              <SelectItem value="rioz">RIOZ</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
 
         {/* Markets Grid */}
         {isLoading ? (
