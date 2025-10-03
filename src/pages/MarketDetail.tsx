@@ -373,10 +373,10 @@ const MarketDetail = () => {
                                 }
 
                                 toast({
-                                  title: "✓ Opinião enviada!",
+                                  title: "✓ Opinião enviada com sucesso!",
                                  description: `Você opinou ${selectedOption.toUpperCase()} com ${betAmount} RIOZ`,
-                                 className: "fixed bottom-24 md:bottom-4 right-4 rounded-2xl z-50"
-                               });
+                                 className: "fixed bottom-24 md:bottom-4 right-4 rounded-2xl z-50 bg-[#00ff90] text-black border-[#00ff90]"
+                                });
 
                              setSelectedOption('');
                              setBetAmount(0);

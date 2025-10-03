@@ -219,13 +219,12 @@ const Home = () => {
       .filter((m): m is NonNullable<typeof m> => m !== undefined);
   }, [markets, sliderMarketIds]);
 
-  // Build ordered slides - Only show what admin selected
+  // Build ordered slides - Only show what admin selected (Desktop only)
   const orderedSlides = useMemo(() => {
     const slides: Array<{ type: 'market' | 'image' | 'fast' | 'text', data: any }> = [];
     
     if (slideOrder.length === 0) {
       // Fallback: show text/buttons + selected markets + custom images
-      slides.push({ type: 'text' as const, data: null });
       slides.push(...sliderMarkets.map(m => ({ type: 'market' as const, data: m })));
       slides.push(...sliderCustomImages.map(img => ({ type: 'image' as const, data: img })));
     } else {
@@ -234,8 +233,8 @@ const Home = () => {
       const orderSlides = slideOrder
         .filter((item: any) => {
           const id = typeof item === 'string' ? item : item.id;
-          // Filter out hidden slides and fast pool
-          if (item.hidden || id === 'fast-card') return false;
+          // Filter out hidden slides, fast pool, and text-card (shown separately on mobile)
+          if (item.hidden || id === 'fast-card' || id === 'text-card') return false;
           // Filter out duplicates
           if (uniqueIds.has(id)) return false;
           uniqueIds.add(id);
@@ -244,9 +243,7 @@ const Home = () => {
         .map((item: any) => {
           const id = typeof item === 'string' ? item : item.id;
           
-          if (id === 'text-card') {
-            return { type: 'text' as const, data: null };
-          } else if (id.startsWith('custom-')) {
+          if (id.startsWith('custom-')) {
             const img = sliderCustomImages.find(i => i.id === id);
             return img ? { type: 'image' as const, data: img } : null;
           } else {
@@ -283,6 +280,8 @@ const Home = () => {
     <div className="min-h-screen bg-background">
       {/* Hero Carousel Section */}
       <div className="relative overflow-hidden border-b border-border">
+        {/* Animated gradient background effect - mobile only */}
+        <div className="md:hidden absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 animate-gradient" style={{ backgroundSize: '200% 200%' }}></div>
         <div className="container mx-auto px-4 py-8 relative z-10">
           <Carousel
             opts={{
@@ -320,9 +319,9 @@ const Home = () => {
                         className="h-12 object-contain"
                       />
                     </div>
-                    <div className="text-3xl font-bold leading-tight">
+                    <div className="leading-tight">
                       <TypewriterText
-                        baseText="Mercados Preditivos "
+                        baseText="Mercados Preditivos"
                         texts={[
                           "Lucrativos",
                           "Inteligentes",
@@ -335,7 +334,6 @@ const Home = () => {
                         typingSpeed={100}
                         deletingSpeed={50}
                         pauseDuration={2000}
-                        mobileBreak={false}
                       />
                     </div>
                     <p className="text-sm text-muted-foreground max-w-2xl mx-auto px-4">

@@ -65,19 +65,10 @@ export const TypewriterText = ({
   
   return (
     <span className={className}>
-      {mobileBreak ? (
-        <>
-          <span className="block">{baseText}</span>
-          <span className="block" style={{ color: currentColor }}>
-            {currentText}<span className="animate-pulse" style={{ color: currentColor }}>|</span>
-          </span>
-        </>
-      ) : (
-        <>
-          {baseText} <span style={{ color: currentColor }}>{currentText}</span>
-          <span className="animate-pulse" style={{ color: currentColor }}>|</span>
-        </>
-      )}
+      <span className="block">{baseText}</span>
+      <span className="block" style={{ color: currentColor }}>
+        {currentText}<span className="animate-pulse" style={{ color: currentColor }}>|</span>
+      </span>
     </span>
   );
 };

@@ -57,7 +57,7 @@ const BottomNavigation = () => {
               className={cn(
                 "flex flex-col items-center justify-center h-full gap-1 transition-colors",
                 item.label === 'Mercados' && "-ml-[38px]",
-                item.label === 'Ranking' && "mr-[85px]",
+                item.label === 'Ranking' && "mr-[105px]",
                 item.position === 'right' && "-mr-2",
                 isActive 
                   ? "text-primary" 
