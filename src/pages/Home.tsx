@@ -399,7 +399,6 @@ const Home = () => {
                           alt={img.title}
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
                         <div className="absolute bottom-8 left-8">
                           <h2 className="text-4xl md:text-5xl font-bold text-white">
                             {img.title}
