@@ -230,16 +230,17 @@ const Home = () => {
       slides.push(...sliderMarkets.map(m => ({ type: 'market' as const, data: m })));
       slides.push(...sliderCustomImages.map(img => ({ type: 'image' as const, data: img })));
     } else {
-      // Respect the order from admin panel
-      const orderSlides = slideOrder
-        .filter((item: any) => {
-          const id = typeof item === 'string' ? item : item.id;
-          // Filter out hidden slides and duplicates
-          if (item.hidden) return false;
-          if (uniqueIds.has(id)) return false;
-          uniqueIds.add(id);
-          return true;
-        })
+      // Respect the order from admin panel - filter duplicates BEFORE mapping
+      const seenIds = new Set<string>();
+      const uniqueSlideOrder = slideOrder.filter((item: any) => {
+        const id = typeof item === 'string' ? item : item.id;
+        if (item.hidden) return false;
+        if (seenIds.has(id)) return false;
+        seenIds.add(id);
+        return true;
+      });
+
+      const orderSlides = uniqueSlideOrder
         .map((item: any) => {
           const id = typeof item === 'string' ? item : item.id;
           
@@ -372,7 +373,7 @@ const Home = () => {
                     <CarouselItem key="text-card" className="hidden md:block">
                       <div className="flex items-center justify-center h-[400px] px-4 sm:px-8">
                         <div className="text-center space-y-4 sm:space-y-6 max-w-3xl mx-auto">
-                          <div className="text-3xl sm:text-4xl md:text-6xl font-bold leading-tight">
+                          <div className="text-3xl sm:text-4xl md:text-6xl font-bold leading-tight flex flex-col items-center">
                             <TypewriterText
                               baseText="Mercados Preditivos "
                               texts={[
@@ -487,9 +488,13 @@ const Home = () => {
                                   <span className="font-medium text-sm md:text-base">{yesOption || 'Sim'}</span>
                                   <span className="font-bold text-lg md:text-xl">{Math.round(yesProb)}%</span>
                                 </div>
-                                <div className="h-2 md:h-3 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
+                                <div className="h-2 md:h-3 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm relative group">
                                   <div 
-                                    className="h-full bg-gradient-to-r from-[#00ff90] to-[#00ff90]/80 rounded-full transition-all duration-500"
+                                    className="h-full bg-gradient-to-r from-[#00ff90] to-[#00ff90]/80 rounded-full transition-all duration-500 animate-pulse"
+                                    style={{ width: `${yesProb}%` }}
+                                  />
+                                  <div 
+                                    className="absolute inset-0 bg-gradient-to-r from-[#00ff90]/50 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                     style={{ width: `${yesProb}%` }}
                                   />
                                 </div>
@@ -501,9 +506,13 @@ const Home = () => {
                                   <span className="font-medium text-sm md:text-base">{noOption || 'Não'}</span>
                                   <span className="font-bold text-lg md:text-xl">{Math.round(noProb)}%</span>
                                 </div>
-                                <div className="h-2 md:h-3 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
+                                <div className="h-2 md:h-3 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm relative group">
                                   <div 
-                                    className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 rounded-full transition-all duration-500"
+                                    className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 rounded-full transition-all duration-500 animate-pulse"
+                                    style={{ width: `${noProb}%` }}
+                                  />
+                                  <div 
+                                    className="absolute inset-0 bg-gradient-to-r from-[#ff2389]/50 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                     style={{ width: `${noProb}%` }}
                                   />
                                 </div>
@@ -533,9 +542,9 @@ const Home = () => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleSlideClick();
-                                navigate(`/mercado/${market.id}`);
+                                navigate(`/market/${market.id}`);
                               }}
-                              className="bg-white text-black hover:bg-white/90 font-semibold px-8 py-6 rounded-full text-lg transition-all hover:scale-105 shadow-xl"
+                              className="bg-white text-black hover:bg-white/90 font-semibold px-8 py-6 rounded-full text-lg transition-all hover:scale-105 shadow-xl animate-pulse"
                             >
                               <Sparkles className="w-5 h-5 mr-2" />
                               Analisar
