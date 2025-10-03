@@ -131,9 +131,19 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   return (
     <>
       <div className={cn(
-        "bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl overflow-hidden hover:border-[#3a3a3a] transition-all duration-200 group",
+        "bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl overflow-hidden hover:border-[#3a3a3a] transition-all duration-200 group relative",
+        "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/5 before:via-transparent before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:pointer-events-none",
+        "after:absolute after:inset-0 after:rounded-2xl after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-300 after:pointer-events-none",
+        "after:bg-[radial-gradient(circle_at_var(--mouse-x)_var(--mouse-y),rgba(255,255,255,0.06),transparent_50%)]",
         className
-      )}>
+      )}
+      onMouseMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+        e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+      }}>
         <Link to={`/market/${market.id}`} className="block">
           {/* Image Header */}
           <div className="relative h-40 overflow-hidden bg-[#2a2a2a]">

@@ -147,14 +147,14 @@ export default function Deposit() {
         console.log("PIX data received:", data);
 
         if (data?.success) {
-          setPixData({
+          const pixPayment = {
             qrCode: data.payment?.qrCode || data.qrCode,
             qrCodeText: data.payment?.qrCodeText || data.qrCodeText,
-          });
-          // Don't close the modal immediately - let it stay open
-          setTimeout(() => {
-            setShowPixModal(true);
-          }, 100);
+          };
+          
+          console.log("Setting PIX data:", pixPayment);
+          setPixData(pixPayment);
+          setShowPixModal(true);
         } else {
           throw new Error(data?.error || "Failed to generate PIX payment");
         }

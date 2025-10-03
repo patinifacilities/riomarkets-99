@@ -229,15 +229,17 @@ const Home = () => {
       slides.push(...sliderMarkets.map(m => ({ type: 'market' as const, data: m })));
       slides.push(...sliderCustomImages.map(img => ({ type: 'image' as const, data: img })));
     } else {
-      // Respect the order from admin panel, filtering out hidden slides
+      // Respect the order from admin panel, filtering out hidden and fast pool slides
       const orderSlides = slideOrder
-        .filter((item: any) => !item.hidden)
+        .filter((item: any) => {
+          const id = typeof item === 'string' ? item : item.id;
+          // Filter out hidden slides and fast pool
+          return !item.hidden && id !== 'fast-card';
+        })
         .map((item: any) => {
           const id = typeof item === 'string' ? item : item.id;
           
-          if (id === 'fast-card') {
-            return { type: 'fast' as const, data: null };
-          } else if (id === 'text-card') {
+          if (id === 'text-card') {
             return { type: 'text' as const, data: null };
           } else if (id.startsWith('custom-')) {
             const img = sliderCustomImages.find(i => i.id === id);
@@ -314,25 +316,22 @@ const Home = () => {
                       />
                     </div>
                     <div className="text-3xl font-bold">
-                      <div className="mb-1 text-3xl">Mercados Preditivos</div>
-                      <div className="text-3xl">
-                        <TypewriterText
-                          baseText=""
-                          texts={[
-                            "para Análise Estratégica",
-                            "baseados em Dados",
-                            "com Transparência Total",
-                            "Rápidos"
-                          ]}
-                          customColors={{
-                            "Rápidos": "#ff2389"
-                          }}
-                          className="text-3xl font-bold"
-                          typingSpeed={100}
-                          deletingSpeed={50}
-                          pauseDuration={2000}
-                        />
-                      </div>
+                      <TypewriterText
+                        baseText="Mercados Preditivos"
+                        texts={[
+                          "Lucrativos",
+                          "Inteligentes",
+                          "Rápidos"
+                        ]}
+                        customColors={{
+                          "Rápidos": "#ff2389"
+                        }}
+                        className="text-3xl font-bold"
+                        typingSpeed={100}
+                        deletingSpeed={50}
+                        pauseDuration={2000}
+                        mobileBreak={false}
+                      />
                     </div>
                     <p className="text-sm text-muted-foreground max-w-2xl mx-auto px-4">
                       Ganhe recompensas compartilhando suas previsões sobre eventos futuros.
@@ -364,25 +363,22 @@ const Home = () => {
                       <div className="flex items-center justify-center h-[400px] px-4 sm:px-8">
                         <div className="text-center space-y-4 sm:space-y-6 max-w-3xl mx-auto">
                           <div className="text-3xl sm:text-4xl md:text-6xl font-bold">
-                            <div className="mb-3 sm:mb-4 text-3xl sm:text-4xl md:text-6xl">Mercados Preditivos</div>
-                             <div className="text-3xl sm:text-4xl md:text-6xl">
-                              <TypewriterText
-                                baseText=""
-                                texts={[
-                                  "para Análise Estratégica",
-                                  "baseados em Dados",
-                                  "com Transparência Total",
-                                  "Rápidos"
-                                ]}
-                                customColors={{
-                                  "Rápidos": "#ff2389"
-                                }}
-                                className="text-3xl sm:text-4xl md:text-6xl font-bold"
-                                typingSpeed={100}
-                                deletingSpeed={50}
-                                pauseDuration={2000}
-                              />
-                            </div>
+                            <TypewriterText
+                              baseText="Mercados Preditivos"
+                              texts={[
+                                "Lucrativos",
+                                "Inteligentes",
+                                "Rápidos"
+                              ]}
+                              customColors={{
+                                "Rápidos": "#ff2389"
+                              }}
+                              className="text-3xl sm:text-4xl md:text-6xl font-bold"
+                              typingSpeed={100}
+                              deletingSpeed={50}
+                              pauseDuration={2000}
+                              mobileBreak={false}
+                            />
                           </div>
                           <p className="text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
                             Ganhe recompensas compartilhando suas previsões sobre eventos futuros.
@@ -391,9 +387,9 @@ const Home = () => {
                             <Button 
                               size="lg" 
                               onClick={() => navigate('/fast')}
-                              className="hidden md:flex gap-2 rounded-xl transition-all bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-[#ff2389] shadow-lg shadow-[#ff2389]/20 hover:shadow-[#ff2389]/40 hover:scale-105 animate-pulse w-full sm:w-auto font-semibold px-8"
+                              className="hidden md:flex gap-2 rounded-xl transition-all bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-[#ff2389] shadow-lg shadow-[#ff2389]/20 hover:shadow-[#ff2389]/40 hover:scale-105 w-full sm:w-auto font-semibold px-8"
                             >
-                              <Zap className="w-5 h-5" />
+                              <Zap className="w-5 h-5 animate-pulse" />
                               Explorar Fast
                             </Button>
                             <OnboardingTrigger size="lg" variant="outline" className="w-full md:w-auto px-6" />
