@@ -603,7 +603,7 @@ const Home = () => {
           <div className="relative flex-1 max-w-md w-full sm:w-auto">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
-              placeholder="Pesquisar mercados..."
+              placeholder="Pesquisar Mercados"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-12 h-12 bg-card/80 dark:bg-card/50 border-border/60 dark:border-border/40 text-foreground placeholder:text-muted-foreground/60 rounded-xl shadow-sm backdrop-blur-sm"

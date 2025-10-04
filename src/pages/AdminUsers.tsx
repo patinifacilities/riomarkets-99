@@ -95,10 +95,10 @@ const AdminUsers = () => {
                   <div
                     key={user.id}
                     onClick={() => setEditingUser(user)}
-                    className="flex items-center justify-between p-4 rounded-lg bg-card border border-border hover:border-primary/30 transition-colors cursor-pointer md:cursor-default"
+                    className="flex items-center justify-between p-3 rounded-lg bg-card border border-border hover:border-primary/30 transition-colors cursor-pointer md:cursor-default"
                   >
-                    <div className="flex items-center gap-4 flex-1 min-w-0">
-                      <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center flex-shrink-0 overflow-hidden">
                         {user.profile_pic_url ? (
                           <img 
                             src={user.profile_pic_url} 

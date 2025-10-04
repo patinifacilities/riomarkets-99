@@ -59,7 +59,8 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
       title: 'Rifas', 
       icon: Ticket, 
       path: '/admin/raffles',
-      color: 'text-[#ff2389]'
+      color: 'text-[#ff2389] hover:text-[#ff2389]',
+      iconColor: 'text-[#ff2389]'
     },
     { 
       title: 'Exchange', 
@@ -186,7 +187,7 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
                   // Sidebar should remain persistent for navigation
                 }}
               >
-                <item.icon className={`h-4 w-4 ${!isActive && item.color ? item.color : ''}`} />
+                <item.icon className={`h-4 w-4 ${!isActive && (item.iconColor || item.color) ? (item.iconColor || item.color) : ''}`} />
                 <span className="text-sm font-medium">{item.title}</span>
               </Link>
             );

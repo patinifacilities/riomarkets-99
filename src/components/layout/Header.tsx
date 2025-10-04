@@ -526,34 +526,34 @@ const Header = () => {
                        <UserCircle className="w-6 h-6" />
                      </Button>
                    </DropdownMenuTrigger>
-                   <DropdownMenuContent align="end" className="w-48">
-                   <DropdownMenuItem asChild className="cursor-pointer focus:bg-transparent">
-                     <Link to="/profile" className="flex items-center gap-2">
-                       <User className="w-4 h-4" />
-                       Meu Perfil
-                     </Link>
-                   </DropdownMenuItem>
-                   <DropdownMenuItem asChild className="cursor-pointer focus:bg-transparent">
-                     <Link to="/transactions" className="flex items-center gap-2">
-                       <Receipt className="w-4 h-4" />
-                       Transações
-                     </Link>
-                   </DropdownMenuItem>
+                    <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem asChild className="cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
+                      <Link to="/profile" className="flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        Meu Perfil
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
+                      <Link to="/transactions" className="flex items-center gap-2">
+                        <Receipt className="w-4 h-4" />
+                        Transações
+                      </Link>
+                    </DropdownMenuItem>
                    <DropdownMenuSeparator />
-                     <DropdownMenuItem 
-                       onClick={async () => {
-                         try {
-                           await signOut();
-                           navigate('/auth');
-                         } catch (error) {
-                           console.error('Erro ao fazer logout:', error);
-                         }
-                       }}
-                       className="flex items-center gap-2 text-white hover:text-white cursor-pointer focus:bg-transparent"
-                     >
-                       <LogOut className="w-4 h-4 text-white" />
-                       Sair
-                     </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={async () => {
+                          try {
+                            await signOut();
+                            navigate('/auth');
+                          } catch (error) {
+                            console.error('Erro ao fazer logout:', error);
+                          }
+                        }}
+                        className="flex items-center gap-2 text-white hover:text-white hover:bg-muted/50 cursor-pointer focus:bg-muted/50"
+                      >
+                        <LogOut className="w-4 h-4 text-white" />
+                        Sair
+                      </DropdownMenuItem>
                    </DropdownMenuContent>
                  </DropdownMenu>
               </>

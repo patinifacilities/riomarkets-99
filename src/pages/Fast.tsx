@@ -845,7 +845,6 @@ const Fast = () => {
 
   return (
     <div className="min-h-[100dvh] relative overflow-hidden bg-gradient-to-b from-background via-background to-primary/5 pb-32">
-      <TickerBar />
       <div className="fixed inset-0 z-0 pointer-events-none">
         <StarsBackground />
       </div>
@@ -994,8 +993,8 @@ const Fast = () => {
               <Card 
                 key={pool.id} 
                 className={cn(
-                  "relative overflow-hidden border-2 border-border/60 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm transition-all duration-300",
-                  "hover:shadow-[0_0_30px_rgba(0,255,144,0.3),0_0_60px_rgba(255,35,137,0.2)] hover:border-[rgb(0,255,144)]",
+                  "relative overflow-hidden border-2 border-transparent bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm transition-all duration-300",
+                  "hover:border-primary hover:shadow-[0_0_15px_rgba(var(--primary),0.3)]",
                   ((pool as any).paused || isMarketClosed) && "opacity-50 grayscale"
                 )}
               >
@@ -1048,7 +1047,7 @@ const Fast = () => {
                         <img 
                           src="https://ufvupwnhpqeexadmqajk.supabase.co/storage/v1/object/public/exchange-assets/rioz-coin.png" 
                           alt="Rioz Coin" 
-                          className="w-4 h-4 rounded-full object-cover"
+                          className="w-4 h-4 rounded-full object-contain bg-white p-0.5"
                         />
                         <span className="text-[#00ff90] font-semibold">{userPoolBets[pool.id] || 0}</span>
                       </div>
