@@ -18,6 +18,8 @@ import { DarkModeToggle } from '@/components/layout/DarkModeToggle';
 import { Link, useNavigate } from 'react-router-dom';
 import { getNasdaqStatus, type MarketStatus } from '@/lib/market-hours';
 import { PoolPriceDisplay } from '@/components/fast/PoolPriceDisplay';
+import { StarsBackground } from '@/components/ui/StarsBackground';
+import { TickerBar } from '@/components/ui/ticker-bar';
 
 interface FastPool {
   id: string;
@@ -811,8 +813,12 @@ const Fast = () => {
   // Don't render pool cards if FAST is disabled
   if (!fastSystemEnabled) {
     return (
-      <div className="min-h-[100dvh] bg-gradient-to-b from-background via-background to-primary/5 pb-32">
-        <div className="container mx-auto px-4 pt-8 pb-20">
+      <div className="min-h-[100dvh] relative overflow-hidden bg-gradient-to-b from-background via-background to-primary/5 pb-32">
+        <TickerBar />
+        <div className="fixed inset-0 z-0 pointer-events-none">
+          <StarsBackground />
+        </div>
+        <div className="container mx-auto px-4 pt-8 pb-20 relative z-10">
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ff2389]/10 to-[#ff2389]/5 px-6 py-3 rounded-full border border-[#ff2389]/20 mb-4">
               <Zap className="w-5 h-5 text-[#ff2389] animate-pulse" />
@@ -838,7 +844,11 @@ const Fast = () => {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-background via-background to-primary/5 pb-32">
+    <div className="min-h-[100dvh] relative overflow-hidden bg-gradient-to-b from-background via-background to-primary/5 pb-32">
+      <TickerBar />
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <StarsBackground />
+      </div>
       {/* Hide elements on mobile and add animations */}
       <style>{`
         @media (max-width: 768px) {
@@ -984,10 +994,8 @@ const Fast = () => {
               <Card 
                 key={pool.id} 
                 className={cn(
-                  "relative overflow-hidden border-2 border-transparent bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]",
-                  "before:absolute before:inset-0 before:rounded-lg before:p-[2px] before:bg-gradient-to-r before:from-[var(--liquid-glass-1)] before:via-[var(--liquid-glass-2)] before:to-[var(--liquid-glass-1)] before:opacity-0 before:transition-opacity before:duration-300",
-                  "hover:before:opacity-100 hover:shadow-[0_0_20px_rgba(0,255,144,0.3),0_0_40px_rgba(255,35,137,0.2)]",
-                  "after:absolute after:inset-[2px] after:rounded-lg after:bg-gradient-to-br after:from-card after:via-card after:to-card/50",
+                  "relative overflow-hidden border-2 border-border/60 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm transition-all duration-300",
+                  "hover:shadow-[0_0_30px_rgba(0,255,144,0.3),0_0_60px_rgba(255,35,137,0.2)] hover:border-[rgb(0,255,144)]",
                   ((pool as any).paused || isMarketClosed) && "opacity-50 grayscale"
                 )}
               >

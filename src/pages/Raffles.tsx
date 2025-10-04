@@ -135,10 +135,15 @@ const Raffles = () => {
               <Button 
                 variant="outline"
                 onClick={() => navigate('/raffle-tickets')}
-                className="flex items-center gap-2"
+                className="relative overflow-hidden flex items-center gap-2 bg-gradient-to-r from-[#ffd700]/20 via-[#ffed4e]/20 to-[#ffd700]/20 border-[#ffd700]/30 hover:from-[#ffd700]/30 hover:via-[#ffed4e]/30 hover:to-[#ffd700]/30"
               >
-                <Ticket className="w-4 h-4" />
-                Meus Bilhetes
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ffd700]/30 to-transparent animate-shimmer-slow" 
+                  style={{ backgroundSize: '200% 100%' }}
+                />
+                <Ticket className="w-4 h-4 relative z-10 text-[#ffd700]" />
+                <span className="relative z-10 font-bold bg-gradient-to-r from-[#ffd700] via-[#ffed4e] to-[#ffd700] bg-clip-text text-transparent">
+                  Meus Bilhetes
+                </span>
               </Button>
             )}
           </div>
@@ -212,11 +217,12 @@ const Raffles = () => {
                       <span className="font-semibold">{raffle.prize_description}</span>
                     </div>
 
-                    <OptionProgressBar 
-                      percentage={progressPercent}
-                      variant="neutral"
-                      className="h-2"
-                    />
+                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-white transition-all duration-300"
+                        style={{ width: `${progressPercent}%` }}
+                      />
+                    </div>
 
                     <div className="flex items-center justify-between text-sm pt-2">
                       <span className="text-muted-foreground">Bilhete</span>

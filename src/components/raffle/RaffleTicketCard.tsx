@@ -27,41 +27,6 @@ export const RaffleTicketCard = ({
         isTopTicket && "ring-2 ring-[#ffd700] shadow-[0_0_30px_rgba(255,215,0,0.3)]"
       )}
       onClick={onClick}
-      style={{
-        backgroundImage: `
-          repeating-linear-gradient(
-            90deg,
-            hsl(var(--card)) 0px,
-            hsl(var(--card)) 20px,
-            transparent 20px,
-            transparent 40px
-          ),
-          repeating-linear-gradient(
-            180deg,
-            hsl(var(--card)) 0px,
-            hsl(var(--card)) 20px,
-            transparent 20px,
-            transparent 40px
-          ),
-          repeating-linear-gradient(
-            270deg,
-            hsl(var(--card)) 0px,
-            hsl(var(--card)) 20px,
-            transparent 20px,
-            transparent 40px
-          ),
-          repeating-linear-gradient(
-            0deg,
-            hsl(var(--card)) 0px,
-            hsl(var(--card)) 20px,
-            transparent 20px,
-            transparent 40px
-          )
-        `,
-        backgroundSize: '2px 100%, 100% 2px, 2px 100%, 100% 2px',
-        backgroundPosition: '0 0, 0 0, 100% 0, 0 100%',
-        backgroundRepeat: 'no-repeat',
-      }}
     >
       {/* Golden shimmer animation for top ticket */}
       {isTopTicket && (
@@ -72,18 +37,30 @@ export const RaffleTicketCard = ({
         />
       )}
       
-      {/* Ticket perforation edge on left */}
-      <div className="absolute left-0 top-0 bottom-0 w-4 flex flex-col justify-around py-2">
-        {Array.from({ length: 12 }).map((_, i) => (
+      {/* Tear effect on right edge */}
+      <div className="absolute right-0 top-0 bottom-0 w-6 flex flex-col justify-around">
+        {Array.from({ length: 15 }).map((_, i) => (
           <div 
             key={i} 
-            className="w-2 h-2 rounded-full bg-background border border-border"
-          />
+            className="relative"
+          >
+            <svg 
+              className="absolute right-0" 
+              width="24" 
+              height="8" 
+              viewBox="0 0 24 8"
+            >
+              <path 
+                d="M 0 0 Q 12 4 24 0 L 24 8 Q 12 4 0 8 Z" 
+                fill="hsl(var(--background))"
+              />
+            </svg>
+          </div>
         ))}
       </div>
 
       {imageUrl && (
-        <div className="w-full h-48 overflow-hidden ml-4">
+        <div className="w-full h-48 overflow-hidden">
           <img 
             src={imageUrl} 
             alt={raffleTitle}
@@ -92,7 +69,7 @@ export const RaffleTicketCard = ({
         </div>
       )}
       
-      <div className="p-6 pl-8 space-y-4">
+      <div className="p-6 pr-8 space-y-4">
         <div>
           <h3 className={cn(
             "text-xl font-bold mb-2",

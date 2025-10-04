@@ -94,10 +94,10 @@ const Header = () => {
   const navItems = [
     { href: '/fast', icon: Zap, label: 'Fast', special: 'pulse' },
     { href: '/', icon: TrendingUp, label: 'Mercados' },
+    { href: '/raffles', icon: Ticket, label: 'Rifas' },
     { href: '/wallet', icon: Wallet, label: 'Carteira', authRequired: true },
     { href: '/transactions', icon: Receipt, label: 'Transações', authRequired: true },
     { href: '/exchange', icon: ArrowRightLeft, label: 'Exchange', authRequired: true },
-    { href: '/raffles', icon: Ticket, label: 'Rifas' },
     { href: '/rewards', icon: Gift, label: 'Recompensas', authRequired: true },
     { href: '/ranking', icon: Award, label: 'Ranking' },
     { href: '/press', icon: Newspaper, label: 'Notícias' },

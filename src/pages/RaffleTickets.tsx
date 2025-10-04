@@ -40,11 +40,12 @@ const RaffleTickets = () => {
             id,
             title,
             status,
-            image_url
+            image_url,
+            entry_cost
           )
         `)
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('amount_paid', { ascending: false });
 
       if (error) throw error;
       setEntries(data || []);
