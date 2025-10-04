@@ -1093,6 +1093,33 @@ export type Database = {
           },
         ]
       }
+      raffle_slider_config: {
+        Row: {
+          id: string
+          images: Json | null
+          slide_order: Json | null
+          slider_delay_seconds: number | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          images?: Json | null
+          slide_order?: Json | null
+          slider_delay_seconds?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          images?: Json | null
+          slide_order?: Json | null
+          slider_delay_seconds?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       raffles: {
         Row: {
           created_at: string

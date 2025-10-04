@@ -44,6 +44,7 @@ import AdminExchange from '@/pages/AdminExchange';
 import AdminRaffles from '@/pages/AdminRaffles';
 import Raffles from '@/pages/Raffles';
 import RaffleDetail from '@/pages/RaffleDetail';
+import RaffleTickets from '@/pages/RaffleTickets';
 import Opinioes from '@/pages/Opinioes';
 import FiatRequests from '@/pages/FiatRequests';
 import Terms from '@/pages/Terms';
@@ -121,8 +122,9 @@ function App() {
             <Route path="/admin/exchange" element={<AdminExchange />} />
             <Route path="/admin/raffles" element={<AdminRaffles />} />
           <Route path="/opinioes" element={<Opinioes />} />
-          <Route path="/raffles" element={<Raffles />} />
-          <Route path="/raffles/:id" element={<RaffleDetail />} />
+              <Route path="/raffles" element={<Raffles />} />
+              <Route path="/raffles/:id" element={<RaffleDetail />} />
+              <Route path="/raffle-tickets" element={<RaffleTickets />} />
           <Route path="/rewards" element={<Rewards />} />
           <Route path="/fiat-requests" element={<FiatRequests />} />
           <Route path="/terms" element={<Terms />} />

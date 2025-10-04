@@ -140,7 +140,7 @@ const Raffles = () => {
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent animate-shimmer"></div>
                       <div className="relative flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
-                        <p className="text-sm font-bold text-yellow-500">⏸️ Pausada</p>
+                        <p className="text-sm font-bold text-yellow-500">Pausada</p>
                       </div>
                     </div>
                   )}

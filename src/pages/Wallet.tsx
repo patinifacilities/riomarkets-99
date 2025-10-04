@@ -12,8 +12,9 @@ import { CancelBetModal } from '@/components/wallet/CancelBetModal';
 import { OrderHistoryCard } from '@/components/wallet/OrderHistoryCard';
 import { ExpandableRiozCard } from '@/components/wallet/ExpandableRiozCard';
 import { BalanceDonutChart } from '@/components/exchange/BalanceDonutChart';
-import { CompletedOrdersCard } from '@/components/wallet/CompletedOrdersCard';
-import { RecentWinsCard } from '@/components/wallet/RecentWinsCard';
+import { RaffleTicketsCard } from '@/components/wallet/RaffleTicketsCard';
+import { ExpandableCompletedOrdersCard } from '@/components/wallet/ExpandableCompletedOrdersCard';
+import { ExpandableRecentWinsCard } from '@/components/wallet/ExpandableRecentWinsCard';
 
 const WalletPage = () => {
   const { user } = useAuth();
@@ -121,12 +122,15 @@ const WalletPage = () => {
             <BalanceDonutChart />
             
             {/* 4. Recent Wins (Fast Markets / Ganhos Recentes) */}
-            <RecentWinsCard />
+            <ExpandableRecentWinsCard />
             
             {/* 5. Completed Orders (Opiniões Concluídas) */}
-            <CompletedOrdersCard />
+            <ExpandableCompletedOrdersCard />
             
-            {/* 6. Gold Pass Button - Mobile only */}
+            {/* 6. Raffle Tickets (Bilhetes de Rifas) */}
+            <RaffleTicketsCard />
+            
+            {/* 7. Gold Pass Button - Mobile only */}
             <Button 
               className="w-full bg-gradient-to-r from-yellow-500 via-yellow-600 to-amber-600 hover:from-yellow-600 hover:via-yellow-700 hover:to-amber-700 text-white font-semibold py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-yellow-400/50"
               onClick={() => navigate('/profile')}
@@ -146,10 +150,13 @@ const WalletPage = () => {
             />
             
             {/* Completed Orders - Full Width */}
-            <CompletedOrdersCard />
+            <ExpandableCompletedOrdersCard />
             
             {/* Recent Wins - Full Width */}
-            <RecentWinsCard />
+            <ExpandableRecentWinsCard />
+            
+            {/* Raffle Tickets - Full Width */}
+            <RaffleTicketsCard />
           </div>
           
           {/* Desktop Right Column - Charts and History */}

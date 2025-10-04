@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card';
 import { ArrowLeft, Loader2, Ticket } from 'lucide-react';
 import { toast } from 'sonner';
 import { OptionProgressBar } from '@/components/ui/option-progress-bar';
-import { SliderConfirm } from '@/components/ui/slider-confirm';
+import { BetSlider } from '@/components/markets/BetSlider';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -43,8 +43,7 @@ const RaffleDetail = () => {
   const [recentEntries, setRecentEntries] = useState<RaffleEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [entering, setEntering] = useState(false);
-  const [quantity, setQuantity] = useState(1);
-  const [sliderProgress, setSliderProgress] = useState(0);
+  const [amount, setAmount] = useState(10);
 
   const fetchRaffle = async () => {
     if (!id) return;
@@ -131,7 +130,13 @@ const RaffleDetail = () => {
 
     if (!raffle) return;
 
-    const totalCost = raffle.entry_cost * quantity;
+    const ticketCount = Math.floor(amount / raffle.entry_cost);
+    const totalCost = ticketCount * raffle.entry_cost;
+
+    if (ticketCount === 0) {
+      toast.error('Valor mínimo é 1 bilhete');
+      return;
+    }
 
     if (profile.saldo_moeda < totalCost) {
       toast.error('Saldo insuficiente');
@@ -160,9 +165,8 @@ const RaffleDetail = () => {
 
       if (entryError) throw entryError;
 
-      toast.success(`${quantity} bilhete(s) comprado(s) com sucesso!`);
-      setQuantity(1);
-      setSliderProgress(0);
+      toast.success(`${ticketCount} bilhete(s) comprado(s) com sucesso!`);
+      setAmount(raffle.entry_cost);
       
       // Refresh data
       window.dispatchEvent(new Event('forceProfileRefresh'));
@@ -256,13 +260,22 @@ const RaffleDetail = () => {
                 </div>
               )}
 
-              {raffle.paused && (
+               {raffle.paused && (
                 <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent animate-shimmer"></div>
                   <div className="relative flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
-                    <p className="text-lg font-bold text-yellow-500">⏸️ Rifa Pausada</p>
+                    <p className="text-lg font-bold text-yellow-500">Rifa Pausada</p>
                   </div>
+                </div>
+              )}
+
+              {raffle.ends_at && (
+                <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
+                  <p className="text-sm text-muted-foreground mb-1">Resultado em</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {formatDistanceToNow(new Date(raffle.ends_at), { addSuffix: false, locale: ptBR })}
+                  </p>
                 </div>
               )}
 
@@ -293,32 +306,32 @@ const RaffleDetail = () => {
             <h2 className="text-xl font-bold mb-4">Comprar Bilhetes</h2>
             
             <div className="space-y-4">
-              <div>
-                <label className="text-sm text-muted-foreground mb-2 block">
-                  Quantidade de bilhetes
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="100"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full px-4 py-2 rounded-lg border border-border bg-background"
-                  disabled={!hasStarted || raffle.paused || raffle.status !== 'active'}
-                />
+              <BetSlider
+                balance={profile?.saldo_moeda || 0}
+                onAmountChange={setAmount}
+                estimatedReward={Math.floor(amount / raffle.entry_cost)}
+                storageKey="raffleTicketAmount"
+                disabled={!hasStarted || raffle.paused || raffle.status !== 'active'}
+              />
+
+              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                <span className="text-sm">Bilhetes</span>
+                <span className="text-xl font-bold">{Math.floor(amount / raffle.entry_cost)}</span>
               </div>
 
               <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                 <span className="text-sm">Total</span>
-                <span className="text-xl font-bold">{raffle.entry_cost * quantity} RZ</span>
+                <span className="text-xl font-bold">{Math.floor(amount / raffle.entry_cost) * raffle.entry_cost} RZ</span>
               </div>
 
-              <SliderConfirm
-                text={`Deslize para comprar ${quantity} bilhete(s)`}
-                onConfirm={handleEnter}
+              <Button
+                onClick={handleEnter}
                 disabled={entering || !hasStarted || raffle.paused || raffle.status !== 'active' || !user}
-                onProgressChange={setSliderProgress}
-              />
+                className="w-full"
+                size="lg"
+              >
+                {entering ? 'Processando...' : 'Confirmar'}
+              </Button>
             </div>
           </Card>
 
