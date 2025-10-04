@@ -19,6 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { FastPoolSlide } from '@/components/fast/FastPoolSlide';
 import { useRef } from 'react';
 import logoWhite from '@/assets/rio-white-logo-deposit.png';
+import Aurora from '@/components/ui/Aurora';
 
 interface CustomImage {
   id: string;
@@ -290,8 +291,15 @@ const Home = () => {
     <div className="min-h-screen bg-background">
       {/* Hero Carousel Section */}
       <div className="relative overflow-hidden border-b border-border">
-        {/* Animated gradient background effect - mobile only */}
-        <div className="md:hidden absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 animate-gradient" style={{ backgroundSize: '200% 200%' }}></div>
+        {/* Aurora Background Effect */}
+        <div className="absolute inset-0 opacity-40">
+          <Aurora 
+            colorStops={['#00ff91', '#5227FF', '#00ff91']}
+            amplitude={1.2}
+            blend={0.6}
+            speed={0.8}
+          />
+        </div>
         <div className="container mx-auto px-4 py-8 relative z-10">
           <Carousel
             opts={{
