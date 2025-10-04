@@ -14,6 +14,7 @@ import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RaffleImageUpload } from '@/components/admin/RaffleImageUpload';
 
 interface Raffle {
   id: string;
@@ -32,6 +33,7 @@ interface Raffle {
   winner_user_id?: string;
   created_at: string;
   updated_at: string;
+  images?: string[];  // Array of images for carousel
 }
 
 const AdminRaffles = () => {
@@ -46,7 +48,7 @@ const AdminRaffles = () => {
     title: '',
     description: '',
     prize_description: '',
-    image_url: '',
+    images: [] as string[],
     payout_value: '',
     goal_value: '',
     entry_cost: '10',
@@ -79,11 +81,14 @@ const AdminRaffles = () => {
 
   const handleSave = async () => {
     try {
+      // Get first image from carousel or null
+      const primaryImage = formData.images.length > 0 ? formData.images[0] : null;
+      
       const raffleData = {
         title: formData.title,
         description: formData.description || null,
         prize_description: formData.prize_description,
-        image_url: formData.image_url || null,
+        image_url: primaryImage,
         payout_value: parseFloat(formData.payout_value),
         goal_value: parseFloat(formData.goal_value),
         entry_cost: parseInt(formData.entry_cost),
@@ -136,11 +141,12 @@ const AdminRaffles = () => {
 
   const handleEdit = (raffle: Raffle) => {
     setEditingRaffle(raffle);
+    const images = raffle.image_url ? [raffle.image_url] : [];
     setFormData({
       title: raffle.title,
       description: raffle.description || '',
       prize_description: raffle.prize_description,
-      image_url: raffle.image_url || '',
+      images: images,
       payout_value: raffle.payout_value.toString(),
       goal_value: raffle.goal_value.toString(),
       entry_cost: raffle.entry_cost.toString(),
@@ -175,7 +181,7 @@ const AdminRaffles = () => {
       title: '',
       description: '',
       prize_description: '',
-      image_url: '',
+      images: [],
       payout_value: '',
       goal_value: '',
       entry_cost: '10',
@@ -261,12 +267,11 @@ const AdminRaffles = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="image">URL da Imagem</Label>
-                      <Input
-                        id="image"
-                        value={formData.image_url}
-                        onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                        placeholder="https://exemplo.com/imagem.jpg"
+                      <Label>Imagens da Rifa</Label>
+                      <RaffleImageUpload
+                        raffleId={editingRaffle?.id}
+                        images={formData.images}
+                        onChange={(images) => setFormData({ ...formData, images })}
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">

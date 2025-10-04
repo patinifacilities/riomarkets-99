@@ -39,6 +39,8 @@ const Profile = () => {
     username: '',
     profile_pic_url: ''
   });
+  
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     // Wait for auth state to be determined before redirecting

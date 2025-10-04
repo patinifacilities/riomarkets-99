@@ -1,10 +1,20 @@
 import { useState, useCallback, useRef } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Upload, ZoomIn, ZoomOut, Check, X } from 'lucide-react';
+import { Upload, ZoomIn, ZoomOut, Check, X, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import Cropper from 'react-easy-crop';
 import { Area } from 'react-easy-crop';
 
@@ -54,14 +64,15 @@ async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<Blob> {
 }
 
 export const ProfileImageUpload = ({ userId, currentImageUrl, onImageUpdated }: ProfileImageUploadProps) => {
-  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const onCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels);
@@ -71,23 +82,13 @@ export const ProfileImageUpload = ({ userId, currentImageUrl, onImageUpdated }: 
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       
-      // Validate file type
       if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Arquivo inválido",
-          description: "Por favor, selecione uma imagem.",
-          variant: "destructive",
-        });
+        toast.error('Por favor, selecione apenas imagens');
         return;
       }
 
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "Arquivo muito grande",
-          description: "A imagem deve ter no máximo 5MB.",
-          variant: "destructive",
-        });
+        toast.error('Imagem muito grande. Máximo 5MB');
         return;
       }
 
@@ -105,15 +106,12 @@ export const ProfileImageUpload = ({ userId, currentImageUrl, onImageUpdated }: 
 
     setIsUploading(true);
     try {
-      // Get cropped image blob
       const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
       
-      // Generate unique filename with user folder structure for RLS
       const fileExt = 'jpg';
       const fileName = `avatar-${Date.now()}.${fileExt}`;
       const filePath = `${userId}/${fileName}`;
 
-      // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('profile-pictures')
         .upload(filePath, croppedBlob, {
@@ -123,7 +121,6 @@ export const ProfileImageUpload = ({ userId, currentImageUrl, onImageUpdated }: 
 
       if (uploadError) throw uploadError;
 
-      // Get public URL with cache busting
       const timestamp = Date.now();
       const { data: { publicUrl } } = supabase.storage
         .from('profile-pictures')
@@ -131,7 +128,6 @@ export const ProfileImageUpload = ({ userId, currentImageUrl, onImageUpdated }: 
       
       const cacheBustedUrl = `${publicUrl}?t=${timestamp}`;
 
-      // Update profile
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ profile_pic_url: cacheBustedUrl })
@@ -143,22 +139,36 @@ export const ProfileImageUpload = ({ userId, currentImageUrl, onImageUpdated }: 
       setIsOpen(false);
       setImageSrc(null);
       
-      // Force profile refresh
       window.dispatchEvent(new Event('forceProfileRefresh'));
       
-      toast({
-        title: "Foto atualizada!",
-        description: "Sua foto de perfil foi atualizada com sucesso.",
-      });
+      toast.success('Foto atualizada com sucesso!');
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast({
-        title: "Erro ao fazer upload",
-        description: "Tente novamente mais tarde.",
-        variant: "destructive",
-      });
+      toast.error('Erro ao fazer upload da imagem');
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleDeletePhoto = async () => {
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ profile_pic_url: null })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      onImageUpdated('');
+      window.dispatchEvent(new Event('forceProfileRefresh'));
+      toast.success('Foto de perfil removida');
+      setShowDeleteDialog(false);
+    } catch (error) {
+      console.error('Error deleting photo:', error);
+      toast.error('Erro ao remover foto');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -172,16 +182,31 @@ export const ProfileImageUpload = ({ userId, currentImageUrl, onImageUpdated }: 
         className="hidden"
       />
       
-      <Button
-        onClick={() => fileInputRef.current?.click()}
-        variant="outline"
-        size="sm"
-        className={`gap-2 ${currentImageUrl ? 'hover:bg-muted' : ''}`}
-      >
-        <Upload className="w-4 h-4" />
-        {currentImageUrl ? 'Alterar foto' : 'Upload foto'}
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          onClick={() => fileInputRef.current?.click()}
+          variant="outline"
+          size="sm"
+          className="gap-2"
+        >
+          <Upload className="w-4 h-4" />
+          {currentImageUrl ? 'Alterar' : 'Upload'}
+        </Button>
 
+        {currentImageUrl && (
+          <Button
+            onClick={() => setShowDeleteDialog(true)}
+            variant="outline"
+            size="sm"
+            className="gap-2 text-destructive hover:text-destructive"
+          >
+            <Trash2 className="w-4 h-4" />
+            Excluir
+          </Button>
+        )}
+      </div>
+
+      {/* Crop Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -189,7 +214,6 @@ export const ProfileImageUpload = ({ userId, currentImageUrl, onImageUpdated }: 
           </DialogHeader>
           
           <div className="space-y-6">
-            {/* Crop Area */}
             <div className="relative w-full h-[400px] bg-muted rounded-lg overflow-hidden">
               {imageSrc && (
                 <Cropper
@@ -206,7 +230,6 @@ export const ProfileImageUpload = ({ userId, currentImageUrl, onImageUpdated }: 
               )}
             </div>
 
-            {/* Zoom Controls */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <span className="flex items-center gap-2">
@@ -245,11 +268,33 @@ export const ProfileImageUpload = ({ userId, currentImageUrl, onImageUpdated }: 
               disabled={isUploading}
             >
               <Check className="w-4 h-4 mr-2" />
-              {isUploading ? 'Salvando...' : 'Salvar foto'}
+              {isUploading ? 'Salvando...' : 'Salvar'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir foto de perfil?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja remover sua foto de perfil? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeletePhoto}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? 'Excluindo...' : 'Excluir'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

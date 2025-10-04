@@ -8,9 +8,10 @@ interface BetSliderProps {
   onAmountChange: (amount: number) => void;
   estimatedReward: number;
   storageKey?: string;
+  disabled?: boolean;
 }
 
-export const BetSlider = ({ balance, onAmountChange, estimatedReward, storageKey = 'betSliderPercentage' }: BetSliderProps) => {
+export const BetSlider = ({ balance, onAmountChange, estimatedReward, storageKey = 'betSliderPercentage', disabled = false }: BetSliderProps) => {
   const [percentage, setPercentage] = useState(() => {
     const saved = localStorage.getItem(storageKey);
     return saved ? [parseInt(saved)] : [0];
@@ -51,6 +52,7 @@ export const BetSlider = ({ balance, onAmountChange, estimatedReward, storageKey
           onValueChange={setPercentage}
           max={100}
           step={1}
+          disabled={disabled}
           className="w-full [&>.relative]:h-6 [&_[role=slider]]:h-7 [&_[role=slider]]:w-7 [&_[role=slider]]:border-3 [&_[role=slider]]:border-white [&_[role=slider]]:shadow-lg [&_.bg-primary]:h-6"
         />
         
@@ -63,8 +65,8 @@ export const BetSlider = ({ balance, onAmountChange, estimatedReward, storageKey
                 percentage[0] === percent 
                   ? "bg-[#00ff90] text-gray-800 hover:bg-[#00ff90]/90" 
                   : "hover:bg-muted"
-              }`}
-              onClick={() => handlePercentageClick(percent)}
+              } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={() => !disabled && handlePercentageClick(percent)}
             >
               {percent}%
             </Badge>

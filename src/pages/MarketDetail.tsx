@@ -634,6 +634,7 @@ const MarketDetail = () => {
                       onAmountChange={(amount) => setBetAmount(amount)}
                       estimatedReward={(betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))}
                       key={userProfile?.saldo_moeda}
+                      disabled={userProfile?.is_blocked}
                     />
                   
                    {selectedOption && (
