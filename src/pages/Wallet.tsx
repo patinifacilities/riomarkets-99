@@ -124,8 +124,10 @@ const WalletPage = () => {
             {/* 4. Recent Wins (Fast Markets / Ganhos Recentes) */}
             <ExpandableRecentWinsCard />
             
-            {/* 5. Completed Orders (Opiniões Concluídas) */}
-            <ExpandableCompletedOrdersCard />
+            {/* 5. Completed Orders (Opiniões Concluídas) - Only show if user has completed orders */}
+            {orders?.some(o => o.status === 'ganha' || o.status === 'perdida') && (
+              <ExpandableCompletedOrdersCard />
+            )}
             
             {/* 6. Raffle Tickets (Bilhetes de Rifas) */}
             <RaffleTicketsCard />
@@ -149,8 +151,10 @@ const WalletPage = () => {
               brlBalance={brlBalance}
             />
             
-            {/* Completed Orders - Full Width */}
-            <ExpandableCompletedOrdersCard />
+            {/* Completed Orders - Full Width - Only show if user has completed orders */}
+            {orders?.some(o => o.status === 'ganha' || o.status === 'perdida') && (
+              <ExpandableCompletedOrdersCard />
+            )}
             
             {/* Recent Wins - Full Width */}
             <ExpandableRecentWinsCard />

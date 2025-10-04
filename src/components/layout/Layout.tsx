@@ -89,17 +89,17 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <div className="min-h-screen bg-background">
       {!shouldHideHeaderFooter && <Header />}
       
-      {/* Blocked user warning - shown below header */}
+      {/* Blocked user warning - shown directly below header with no gap */}
       {profile?.is_blocked && !shouldHideHeaderFooter && (
         <div 
-          className="sticky top-16 left-0 right-0 z-40 px-4 py-3 text-center text-white font-medium"
+          className="sticky top-16 left-0 right-0 z-40 px-4 py-3 text-center text-white font-medium -mt-[1px]"
           style={{ backgroundColor: '#d10e35' }}
         >
           ⚠️ Sua conta está temporariamente bloqueada. Entre em contato com o suporte para mais informações.
         </div>
       )}
       
-      <main className={`flex-1 min-h-0 ${isMobile ? 'pb-16' : ''} ${profile?.is_blocked ? 'mt-16' : ''}`}>
+      <main className={`flex-1 min-h-0 ${isMobile ? 'pb-16' : ''}`}>
         {children}
       </main>
       {!shouldHideFooterFinal && <Footer />}

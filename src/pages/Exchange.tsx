@@ -285,7 +285,7 @@ const ExchangeNew = () => {
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity relative ${
+                        <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity ${
                           fromCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
                         }`}>
                           {fromCurrency === 'BRL' ? (
@@ -295,9 +295,7 @@ const ExchangeNew = () => {
                           ) : (
                             <span className="text-lg font-bold text-black">R</span>
                           )}
-                          <div className="absolute -bottom-1 -right-1 bg-primary rounded-full w-3 h-3 flex items-center justify-center">
-                            <ChevronDown className="w-2 h-2 text-white" />
-                          </div>
+                          <ChevronDown className="w-3 h-3 text-foreground ml-1" />
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="bg-card border-border shadow-xl rounded-xl p-2 min-w-[280px] z-[100]">
@@ -305,29 +303,39 @@ const ExchangeNew = () => {
                           <p className="text-sm font-semibold text-foreground mb-1">Outros Ativos</p>
                           <p className="text-xs text-muted-foreground">Selecione um ativo para converter</p>
                         </div>
-                        {allAssets
-                          .filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency)
+                       {allAssets
+                         .filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency)
                           .map(asset => (
-                           <DropdownMenuItem 
-                             key={asset.symbol}
-                             className={`p-3 rounded-lg transition-colors ${
-                               asset.is_active ? 'cursor-pointer hover:bg-[#0A101A]' : 'opacity-60 cursor-not-allowed'
-                             }`}
-                             disabled={!asset.is_active}
-                           >
-                              <div className="flex items-center gap-3 w-full">
-                                {asset.icon_url && (
-                                  <img src={asset.icon_url} alt={asset.name} className="w-6 h-6 rounded-full" />
-                                )}
-                                <div className="flex-1">
-                                  <p className="font-medium text-foreground">{asset.name} ({asset.symbol})</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {asset.is_active ? 'Disponível' : 'Indisponível'}
-                                  </p>
-                                </div>
-                              </div>
-                            </DropdownMenuItem>
-                          ))}
+                            <DropdownMenuItem 
+                              key={asset.symbol}
+                              className={`p-3 rounded-lg transition-colors ${
+                                asset.is_active ? 'cursor-pointer hover:bg-[#0A101A]' : 'opacity-60 cursor-not-allowed'
+                              }`}
+                              disabled={!asset.is_active}
+                              onClick={() => {
+                                if (asset.is_active) {
+                                  // Swap the selected asset with the "From" currency
+                                  if (swapDirection === 'brl-to-rioz') {
+                                    setSwapDirection('rioz-to-brl');
+                                  } else {
+                                    setSwapDirection('brl-to-rioz');
+                                  }
+                                }
+                              }}
+                            >
+                             <div className="flex items-center gap-3 w-full">
+                               {asset.icon_url && (
+                                 <img src={asset.icon_url} alt={asset.name} className="w-6 h-6 rounded-full" />
+                               )}
+                               <div className="flex-1">
+                                 <p className="font-medium text-foreground">{asset.name} ({asset.symbol})</p>
+                                 <p className="text-xs text-muted-foreground">
+                                   {asset.is_active ? 'Disponível' : 'Indisponível'}
+                                 </p>
+                               </div>
+                             </div>
+                           </DropdownMenuItem>
+                         ))}
                         {allAssets.filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency).length === 0 && (
                           <div className="p-3 text-center text-sm text-muted-foreground">
                             Nenhum outro ativo disponível
@@ -393,7 +401,7 @@ const ExchangeNew = () => {
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity relative ${
+                      <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity ${
                         toCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
                       }`}>
                         {toCurrency === 'BRL' ? (
@@ -403,9 +411,7 @@ const ExchangeNew = () => {
                         ) : (
                           <span className="text-lg font-bold text-black">R</span>
                         )}
-                        <div className="absolute -bottom-1 -right-1 bg-primary rounded-full w-3 h-3 flex items-center justify-center">
-                          <ChevronDown className="w-2 h-2 text-white" />
-                        </div>
+                        <ChevronDown className="w-3 h-3 text-foreground ml-1" />
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-card border-border shadow-xl rounded-xl p-2 min-w-[280px] z-[100]">
@@ -413,29 +419,39 @@ const ExchangeNew = () => {
                         <p className="text-sm font-semibold text-foreground mb-1">Outros Ativos</p>
                         <p className="text-xs text-muted-foreground">Selecione um ativo para converter</p>
                       </div>
-                      {allAssets
-                        .filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency)
-                         .map(asset => (
-                           <DropdownMenuItem 
-                             key={asset.symbol}
-                             className={`p-3 rounded-lg transition-colors ${
-                               asset.is_active ? 'cursor-pointer hover:bg-[#0A101A]' : 'opacity-60 cursor-not-allowed'
-                             }`}
-                             disabled={!asset.is_active}
-                           >
-                            <div className="flex items-center gap-3 w-full">
-                              {asset.icon_url && (
-                                <img src={asset.icon_url} alt={asset.name} className="w-6 h-6 rounded-full" />
-                              )}
-                              <div className="flex-1">
-                                <p className="font-medium text-foreground">{asset.name} ({asset.symbol})</p>
-                                <p className="text-xs text-muted-foreground">
-                                  {asset.is_active ? 'Disponível' : 'Indisponível'}
-                                </p>
-                              </div>
-                            </div>
-                          </DropdownMenuItem>
-                        ))}
+                       {allAssets
+                         .filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency)
+                          .map(asset => (
+                            <DropdownMenuItem 
+                              key={asset.symbol}
+                              className={`p-3 rounded-lg transition-colors ${
+                                asset.is_active ? 'cursor-pointer hover:bg-[#0A101A]' : 'opacity-60 cursor-not-allowed'
+                              }`}
+                              disabled={!asset.is_active}
+                              onClick={() => {
+                                if (asset.is_active) {
+                                  // Swap the selected asset with the "To" currency
+                                  if (swapDirection === 'brl-to-rioz') {
+                                    setSwapDirection('rioz-to-brl');
+                                  } else {
+                                    setSwapDirection('brl-to-rioz');
+                                  }
+                                }
+                              }}
+                            >
+                             <div className="flex items-center gap-3 w-full">
+                               {asset.icon_url && (
+                                 <img src={asset.icon_url} alt={asset.name} className="w-6 h-6 rounded-full" />
+                               )}
+                               <div className="flex-1">
+                                 <p className="font-medium text-foreground">{asset.name} ({asset.symbol})</p>
+                                 <p className="text-xs text-muted-foreground">
+                                   {asset.is_active ? 'Disponível' : 'Indisponível'}
+                                 </p>
+                               </div>
+                             </div>
+                           </DropdownMenuItem>
+                         ))}
                       {allAssets.filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency).length === 0 && (
                         <div className="p-3 text-center text-sm text-muted-foreground">
                           Nenhum outro ativo disponível

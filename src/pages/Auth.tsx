@@ -50,6 +50,7 @@ const Auth = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [cpfError, setCpfError] = useState(false);
   const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
   const loginEmailInputRef = useRef<HTMLInputElement>(null);
   
@@ -781,7 +782,20 @@ const Auth = () => {
                       </div>
                     </div>
 
-                    <div className="text-right">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="rememberMe"
+                          checked={rememberMe}
+                          onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                        />
+                        <label
+                          htmlFor="rememberMe"
+                          className="text-sm font-medium leading-none cursor-pointer"
+                        >
+                          Mantenha-me conectado
+                        </label>
+                      </div>
                       <button
                         type="button"
                         onClick={() => setShowForgotPassword(true)}

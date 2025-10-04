@@ -78,12 +78,11 @@ export const ExpandableRecentWinsCard = () => {
   const displayedBets = expanded ? bets : bets.slice(0, 5);
 
   return (
-    <Card className="bg-gradient-to-b from-[#ff2389]/20 to-secondary-glass border-border/50 overflow-hidden">
-      <div className="h-2 bg-gradient-to-r from-[#ff2389] via-[#ff2389]/70 to-[#ff2389]"></div>
+    <Card className="bg-secondary-glass border-border/50 overflow-hidden">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-yellow-500" />
+            <Zap className="w-5 h-5 text-[#ff2389]" />
             Fast Markets
           </CardTitle>
         </div>
@@ -97,8 +96,8 @@ export const ExpandableRecentWinsCard = () => {
           </div>
         ) : bets.length > 0 ? (
           <>
-            <div className="space-y-3 max-h-[400px] overflow-y-auto">
-              {displayedBets.map((bet) => {
+            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+              {bets.map((bet) => {
                 const pool = bet.fast_pools as any;
                 const profit = bet.payout_amount - bet.amount_rioz;
                 const isWin = profit > 0;
@@ -146,27 +145,6 @@ export const ExpandableRecentWinsCard = () => {
                 );
               })}
             </div>
-            
-            {bets.length > 5 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setExpanded(!expanded)}
-                className="w-full mt-3"
-              >
-                {expanded ? (
-                  <>
-                    <ChevronUp className="w-4 h-4 mr-2" />
-                    Ver menos
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="w-4 h-4 mr-2" />
-                    Ver mais ({bets.length - 5})
-                  </>
-                )}
-              </Button>
-            )}
           </>
         ) : (
           <div className="text-center py-8 text-muted-foreground">
