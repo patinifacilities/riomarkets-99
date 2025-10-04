@@ -8,14 +8,14 @@ const BottomNavigation = () => {
   const { user } = useAuth();
 
   const navItems = [
-    { href: '/wallet', icon: Wallet, label: 'Carteira', authRequired: true },
+    { href: '/wallet', icon: Wallet, label: 'Carteira' },
     { href: '/', icon: TrendingUp, label: 'Mercados', position: 'left' },
-    { href: '/fast', icon: Zap, label: 'Fast', authRequired: true, isFast: true },
+    { href: '/fast', icon: Zap, label: 'Fast', isFast: true },
     { href: '/ranking', icon: Trophy, label: 'Ranking', position: 'right' },
-    { href: '/profile', icon: User, label: 'Perfil', authRequired: true }
+    { href: '/profile', icon: User, label: 'Perfil' }
   ];
 
-  const visibleItems = navItems.filter(item => !item.authRequired || (item.authRequired && user));
+  const visibleItems = navItems;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden pb-[env(safe-area-inset-bottom)]">

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Edit, Trash2, Trophy } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Trophy, Pause, Play } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -18,23 +18,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface Raffle {
   id: string;
   title: string;
-  description: string | null;
-  image_url: string | null;
+  description?: string;
   prize_description: string;
-  payout_value: number;
+  image_url?: string;
   goal_value: number;
   current_value: number;
+  payout_value: number;
   entry_cost: number;
   status: string;
-  winner_user_id: string | null;
-  ends_at: string | null;
+  start_date: string;
+  ends_at?: string;
+  paused: boolean;
+  winner_user_id?: string;
   created_at: string;
+  updated_at: string;
 }
 
 const AdminRaffles = () => {
   const { user, loading: authLoading } = useAuth();
   const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
-  const { toast } = useToast();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [raffles, setRaffles] = useState<Raffle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,10 +46,12 @@ const AdminRaffles = () => {
     title: '',
     description: '',
     prize_description: '',
+    image_url: '',
     payout_value: '',
     goal_value: '',
     entry_cost: '10',
     status: 'active',
+    start_date: new Date().toISOString().slice(0, 16),
     ends_at: ''
   });
 
@@ -79,10 +83,12 @@ const AdminRaffles = () => {
         title: formData.title,
         description: formData.description || null,
         prize_description: formData.prize_description,
+        image_url: formData.image_url || null,
         payout_value: parseFloat(formData.payout_value),
         goal_value: parseFloat(formData.goal_value),
         entry_cost: parseInt(formData.entry_cost),
         status: formData.status,
+        start_date: formData.start_date,
         ends_at: formData.ends_at || null
       };
 
@@ -93,14 +99,14 @@ const AdminRaffles = () => {
           .eq('id', editingRaffle.id);
 
         if (error) throw error;
-        toast({ title: 'Rifa atualizada com sucesso!' });
+        toast.success('Rifa atualizada com sucesso!');
       } else {
         const { error } = await supabase
           .from('raffles')
           .insert(raffleData);
 
         if (error) throw error;
-        toast({ title: 'Rifa criada com sucesso!' });
+        toast.success('Rifa criada com sucesso!');
       }
 
       setDialogOpen(false);
@@ -108,11 +114,23 @@ const AdminRaffles = () => {
       fetchRaffles();
     } catch (error) {
       console.error('Error saving raffle:', error);
-      toast({
-        title: 'Erro',
-        description: 'Não foi possível salvar a rifa.',
-        variant: 'destructive'
-      });
+      toast.error('Erro ao salvar a rifa');
+    }
+  };
+
+  const handleTogglePause = async (raffle: Raffle) => {
+    try {
+      const { error } = await supabase
+        .from('raffles')
+        .update({ paused: !raffle.paused })
+        .eq('id', raffle.id);
+
+      if (error) throw error;
+      toast.success(raffle.paused ? 'Rifa despausada' : 'Rifa pausada');
+      fetchRaffles();
+    } catch (error) {
+      console.error('Error toggling pause:', error);
+      toast.error('Erro ao pausar/despausar rifa');
     }
   };
 
@@ -122,10 +140,12 @@ const AdminRaffles = () => {
       title: raffle.title,
       description: raffle.description || '',
       prize_description: raffle.prize_description,
+      image_url: raffle.image_url || '',
       payout_value: raffle.payout_value.toString(),
       goal_value: raffle.goal_value.toString(),
       entry_cost: raffle.entry_cost.toString(),
       status: raffle.status,
+      start_date: raffle.start_date.slice(0, 16),
       ends_at: raffle.ends_at ? raffle.ends_at.split('T')[0] : ''
     });
     setDialogOpen(true);
@@ -141,15 +161,11 @@ const AdminRaffles = () => {
         .eq('id', id);
 
       if (error) throw error;
-      toast({ title: 'Rifa excluída com sucesso!' });
+      toast.success('Rifa excluída com sucesso!');
       fetchRaffles();
     } catch (error) {
       console.error('Error deleting raffle:', error);
-      toast({
-        title: 'Erro',
-        description: 'Não foi possível excluir a rifa.',
-        variant: 'destructive'
-      });
+      toast.error('Erro ao excluir a rifa');
     }
   };
 
@@ -159,10 +175,12 @@ const AdminRaffles = () => {
       title: '',
       description: '',
       prize_description: '',
+      image_url: '',
       payout_value: '',
       goal_value: '',
       entry_cost: '10',
       status: 'active',
+      start_date: new Date().toISOString().slice(0, 16),
       ends_at: ''
     });
   };
@@ -210,7 +228,7 @@ const AdminRaffles = () => {
                     Nova Rifa
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>{editingRaffle ? 'Editar Rifa' : 'Nova Rifa'}</DialogTitle>
                   </DialogHeader>
@@ -240,6 +258,15 @@ const AdminRaffles = () => {
                         value={formData.prize_description}
                         onChange={(e) => setFormData({ ...formData, prize_description: e.target.value })}
                         placeholder="Ex: iPhone 15 Pro"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="image">URL da Imagem</Label>
+                      <Input
+                        id="image"
+                        value={formData.image_url}
+                        onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                        placeholder="https://exemplo.com/imagem.jpg"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -287,6 +314,15 @@ const AdminRaffles = () => {
                           </SelectContent>
                         </Select>
                       </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="start">Data de Início</Label>
+                      <Input
+                        id="start"
+                        type="datetime-local"
+                        value={formData.start_date}
+                        onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                      />
                     </div>
                     <div>
                       <Label htmlFor="ends">Data de Término (Opcional)</Label>
@@ -340,16 +376,34 @@ const AdminRaffles = () => {
                         </TableCell>
                         <TableCell>{raffle.entry_cost} RZ</TableCell>
                         <TableCell>
-                          <span className={`px-2 py-1 rounded text-xs ${
-                            raffle.status === 'active' 
-                              ? 'bg-green-500/20 text-green-500' 
-                              : 'bg-gray-500/20 text-gray-500'
-                          }`}>
-                            {raffle.status === 'active' ? 'Ativa' : 'Concluída'}
-                          </span>
+                          {raffle.paused ? (
+                            <span className="px-2 py-1 rounded text-xs bg-yellow-500/20 text-yellow-500">
+                              ⏸️ Pausada
+                            </span>
+                          ) : (
+                            <span className={`px-2 py-1 rounded text-xs ${
+                              raffle.status === 'active' 
+                                ? 'bg-green-500/20 text-green-500' 
+                                : 'bg-gray-500/20 text-gray-500'
+                            }`}>
+                              {raffle.status === 'active' ? 'Ativa' : 'Concluída'}
+                            </span>
+                          )}
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleTogglePause(raffle)}
+                              title={raffle.paused ? 'Despausar' : 'Pausar'}
+                            >
+                              {raffle.paused ? (
+                                <Play className="w-4 h-4 text-green-500" />
+                              ) : (
+                                <Pause className="w-4 h-4 text-yellow-500" />
+                              )}
+                            </Button>
                             <Button
                               variant="ghost"
                               size="sm"

@@ -1,60 +1,32 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { useProfile } from '@/hooks/useProfile';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { useToast } from '@/hooks/use-toast';
-import { Trophy, Ticket, Clock } from 'lucide-react';
+import { Loader2, Ticket } from 'lucide-react';
+import { OptionProgressBar } from '@/components/ui/option-progress-bar';
 import { useNavigate } from 'react-router-dom';
+import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface Raffle {
   id: string;
   title: string;
-  description: string | null;
-  image_url: string | null;
+  description: string;
   prize_description: string;
-  payout_value: number;
+  image_url?: string;
   goal_value: number;
   current_value: number;
   entry_cost: number;
   status: string;
-  ends_at: string | null;
+  start_date: string;
+  ends_at?: string;
+  paused: boolean;
 }
 
 const Raffles = () => {
-  const { user } = useAuth();
-  const { data: profile, refetch: refetchProfile } = useProfile(user?.id);
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [raffles, setRaffles] = useState<Raffle[]>([]);
   const [loading, setLoading] = useState(true);
-  const [entering, setEntering] = useState<{[key: string]: boolean}>({});
-
-  useEffect(() => {
-    fetchRaffles();
-    
-    // Subscribe to raffle updates
-    const channel = supabase
-      .channel('raffles_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'raffles'
-        },
-        () => {
-          fetchRaffles();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
 
   const fetchRaffles = async () => {
     try {
@@ -73,159 +45,135 @@ const Raffles = () => {
     }
   };
 
-  const handleEnterRaffle = async (raffle: Raffle) => {
-    if (!user) {
-      navigate('/auth');
-      return;
-    }
+  useEffect(() => {
+    fetchRaffles();
 
-    if (!profile || profile.saldo_moeda < raffle.entry_cost) {
-      toast({
-        title: 'Saldo insuficiente',
-        description: `Você precisa de ${raffle.entry_cost} RZ para participar desta rifa.`,
-        variant: 'destructive'
-      });
-      return;
-    }
+    const channel = supabase
+      .channel('raffles_changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'raffles'
+      }, () => {
+        fetchRaffles();
+      })
+      .subscribe();
 
-    setEntering(prev => ({ ...prev, [raffle.id]: true }));
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
-    try {
-      // Deduct balance
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ saldo_moeda: profile.saldo_moeda - raffle.entry_cost })
-        .eq('id', user.id);
-
-      if (profileError) throw profileError;
-
-      // Create entry
-      const { error: entryError } = await supabase
-        .from('raffle_entries')
-        .insert({
-          raffle_id: raffle.id,
-          user_id: user.id,
-          amount_paid: raffle.entry_cost
-        });
-
-      if (entryError) throw entryError;
-
-      toast({
-        title: 'Participação confirmada!',
-        description: `Você está concorrendo a ${raffle.prize_description}`,
-      });
-
-      refetchProfile();
-      fetchRaffles();
-    } catch (error) {
-      console.error('Error entering raffle:', error);
-      toast({
-        title: 'Erro',
-        description: 'Não foi possível participar da rifa. Tente novamente.',
-        variant: 'destructive'
-      });
-    } finally {
-      setEntering(prev => ({ ...prev, [raffle.id]: false }));
-    }
+  const getTimeUntilStart = (startDate: string) => {
+    const start = new Date(startDate);
+    const now = new Date();
+    
+    if (start <= now) return null;
+    
+    return formatDistanceToNow(start, { addSuffix: true, locale: ptBR });
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-            <Trophy className="w-8 h-8 text-primary" />
-            Rifas
-          </h1>
-          <p className="text-muted-foreground">
-            Participe das rifas e concorra a prêmios incríveis!
-          </p>
-        </div>
+    <div className="container mx-auto px-4 py-8 pb-24 md:pb-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
+          <Ticket className="w-8 h-8 text-primary" />
+          Rifas
+        </h1>
+        <p className="text-muted-foreground">
+          Participe das rifas e concorra a prêmios incríveis!
+        </p>
+      </div>
 
-        {raffles.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <Ticket className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-muted-foreground">Nenhuma rifa disponível no momento.</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {raffles.map(raffle => {
-              const progress = (raffle.current_value / raffle.goal_value) * 100;
-              const isCompleted = raffle.status === 'completed';
+      {raffles.length === 0 ? (
+        <Card className="p-12 text-center">
+          <Ticket className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+          <p className="text-muted-foreground">Nenhuma rifa disponível no momento.</p>
+        </Card>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {raffles.map((raffle) => {
+            const progressPercent = Math.min((raffle.current_value / raffle.goal_value) * 100, 100);
+            const timeUntilStart = getTimeUntilStart(raffle.start_date);
+            const hasStarted = !timeUntilStart;
 
-              return (
-                <Card key={raffle.id} className={isCompleted ? 'opacity-75' : ''}>
-                  {raffle.image_url && (
-                    <div className="w-full h-48 overflow-hidden rounded-t-lg">
-                      <img 
-                        src={raffle.image_url} 
-                        alt={raffle.title}
-                        className="w-full h-full object-cover"
-                      />
+            return (
+              <Card 
+                key={raffle.id} 
+                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => navigate(`/raffles/${raffle.id}`)}
+              >
+                {raffle.image_url && (
+                  <div className="w-full h-48 overflow-hidden">
+                    <img 
+                      src={raffle.image_url} 
+                      alt={raffle.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                
+                <div className="p-6 space-y-4">
+                  <div>
+                    <h3 className="text-xl font-bold mb-2">{raffle.title}</h3>
+                    {raffle.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-2">{raffle.description}</p>
+                    )}
+                  </div>
+
+                  {!hasStarted && (
+                    <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">
+                      <p className="text-xs text-muted-foreground">Começa {timeUntilStart}</p>
                     </div>
                   )}
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <span>{raffle.title}</span>
-                      {isCompleted && (
-                        <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
-                          Encerrada
-                        </span>
-                      )}
-                    </CardTitle>
-                    {raffle.description && (
-                      <p className="text-sm text-muted-foreground">{raffle.description}</p>
-                    )}
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Trophy className="w-4 h-4 text-primary" />
-                      <span className="font-medium">{raffle.prize_description}</span>
+
+                  {raffle.paused && (
+                    <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
+                      <p className="text-sm font-bold text-yellow-500 animate-pulse">⏸️ Rifa Pausada</p>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Prêmio</span>
+                      <span className="font-semibold">{raffle.prize_description}</span>
                     </div>
 
-                    {raffle.ends_at && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="w-4 h-4" />
-                        <span>Termina em: {new Date(raffle.ends_at).toLocaleDateString('pt-BR')}</span>
-                      </div>
-                    )}
+                    <OptionProgressBar 
+                      percentage={progressPercent}
+                      variant="neutral"
+                      className="h-2"
+                    />
 
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Progresso</span>
-                        <span className="font-medium">
-                          {raffle.current_value.toLocaleString('pt-BR')} / {raffle.goal_value.toLocaleString('pt-BR')} RZ
-                        </span>
-                      </div>
-                      <Progress value={progress} className="h-2" />
+                    <div className="flex items-center justify-between text-sm pt-2">
+                      <span className="text-muted-foreground">Bilhete</span>
+                      <span className="font-bold text-primary">{raffle.entry_cost} RZ</span>
                     </div>
+                  </div>
 
-                    <div className="pt-2">
-                      <Button
-                        onClick={() => handleEnterRaffle(raffle)}
-                        disabled={isCompleted || entering[raffle.id] || !user}
-                        className="w-full"
-                      >
-                        {entering[raffle.id] ? 'Participando...' : `Participar (${raffle.entry_cost} RZ)`}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                  <Button
+                    className="w-full"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/raffles/${raffle.id}`);
+                    }}
+                  >
+                    Participar
+                  </Button>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

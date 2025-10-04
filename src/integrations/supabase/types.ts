@@ -1103,8 +1103,10 @@ export type Database = {
           goal_value: number
           id: string
           image_url: string | null
+          paused: boolean | null
           payout_value: number
           prize_description: string
+          start_date: string | null
           status: string
           title: string
           updated_at: string
@@ -1119,8 +1121,10 @@ export type Database = {
           goal_value: number
           id?: string
           image_url?: string | null
+          paused?: boolean | null
           payout_value?: number
           prize_description: string
+          start_date?: string | null
           status?: string
           title: string
           updated_at?: string
@@ -1135,8 +1139,10 @@ export type Database = {
           goal_value?: number
           id?: string
           image_url?: string | null
+          paused?: boolean | null
           payout_value?: number
           prize_description?: string
+          start_date?: string | null
           status?: string
           title?: string
           updated_at?: string
