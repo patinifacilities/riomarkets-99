@@ -7,6 +7,7 @@ import { OptionProgressBar } from '@/components/ui/option-progress-bar';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Raffle {
   id: string;
@@ -25,8 +26,10 @@ interface Raffle {
 
 const Raffles = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [raffles, setRaffles] = useState<Raffle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasTickets, setHasTickets] = useState(false);
 
   const fetchRaffles = async () => {
     try {
@@ -45,8 +48,30 @@ const Raffles = () => {
     }
   };
 
+  const checkUserTickets = async () => {
+    if (!user?.id) {
+      setHasTickets(false);
+      return;
+    }
+    
+    try {
+      const { data, error } = await supabase
+        .from('raffle_entries')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1);
+      
+      if (error) throw error;
+      setHasTickets((data || []).length > 0);
+    } catch (error) {
+      console.error('Error checking user tickets:', error);
+      setHasTickets(false);
+    }
+  };
+
   useEffect(() => {
     fetchRaffles();
+    checkUserTickets();
 
     const channel = supabase
       .channel('raffles_changes')
@@ -57,12 +82,20 @@ const Raffles = () => {
       }, () => {
         fetchRaffles();
       })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'raffle_entries',
+        filter: `user_id=eq.${user?.id}`
+      }, () => {
+        checkUserTickets();
+      })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [user?.id]);
 
   const getTimeUntilStart = (startDate: string) => {
     const start = new Date(startDate);
@@ -84,13 +117,27 @@ const Raffles = () => {
   return (
     <div className="container mx-auto px-4 py-8 pb-24 md:pb-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-          <Ticket className="w-8 h-8 text-primary" />
-          Rifas
-        </h1>
-        <p className="text-muted-foreground">
-          Participe das rifas e concorra a prêmios incríveis!
-        </p>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
+              <Ticket className="w-8 h-8 text-primary" />
+              Rifas
+            </h1>
+            <p className="text-muted-foreground">
+              Participe das rifas e concorra a prêmios incríveis!
+            </p>
+          </div>
+          {hasTickets && user && (
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/raffle-tickets')}
+              className="flex items-center gap-2"
+            >
+              <Ticket className="w-4 h-4" />
+              Meus Bilhetes
+            </Button>
+          )}
+        </div>
       </div>
 
       {raffles.length === 0 ? (

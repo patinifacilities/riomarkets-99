@@ -26,7 +26,9 @@ const ExchangeNew = () => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [fastMarketsButtonVisible, setFastMarketsButtonVisible] = useState(false);
   const [activeAssets, setActiveAssets] = useState<{symbol: string, name: string, icon_url: string | null, is_active: boolean}[]>([]);
+  const [allAssets, setAllAssets] = useState<{symbol: string, name: string, icon_url: string | null, is_active: boolean}[]>([]);
   const [exchangeEnabled, setExchangeEnabled] = useState(true);
+  const [riozIconUrl, setRiozIconUrl] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSystemConfig();
@@ -58,11 +60,19 @@ const ExchangeNew = () => {
     try {
       const { data, error } = await supabase
         .from('exchange_assets')
-        .select('symbol, name, icon_url, is_active')
-        .eq('is_active', true);
+        .select('symbol, name, icon_url, is_active');
 
       if (error) throw error;
-      setActiveAssets(data || []);
+      
+      const allData = data || [];
+      setAllAssets(allData);
+      setActiveAssets(allData.filter(a => a.is_active));
+      
+      // Find RIOZ icon
+      const riozAsset = allData.find(a => a.symbol === 'RIOZ');
+      if (riozAsset?.icon_url) {
+        setRiozIconUrl(riozAsset.icon_url);
+      }
     } catch (error) {
       console.error('Error fetching active assets:', error);
     }
@@ -280,6 +290,8 @@ const ExchangeNew = () => {
                         }`}>
                           {fromCurrency === 'BRL' ? (
                             <span className="text-sm font-bold text-gray-700">R$</span>
+                          ) : riozIconUrl ? (
+                            <img src={riozIconUrl} alt="RIOZ" className="w-8 h-8 rounded-full" />
                           ) : (
                             <span className="text-lg font-bold text-black">R</span>
                           )}
@@ -293,7 +305,7 @@ const ExchangeNew = () => {
                           <p className="text-sm font-semibold text-foreground mb-1">Outros Ativos</p>
                           <p className="text-xs text-muted-foreground">Selecione um ativo para converter</p>
                         </div>
-                        {activeAssets
+                        {allAssets
                           .filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency)
                           .map(asset => (
                            <DropdownMenuItem 
@@ -310,13 +322,13 @@ const ExchangeNew = () => {
                                 <div className="flex-1">
                                   <p className="font-medium text-foreground">{asset.name} ({asset.symbol})</p>
                                   <p className="text-xs text-muted-foreground">
-                                    {asset.is_active ? 'Disponível' : 'Em breve'}
+                                    {asset.is_active ? 'Disponível' : 'Indisponível'}
                                   </p>
                                 </div>
                               </div>
                             </DropdownMenuItem>
                           ))}
-                        {activeAssets.filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency).length === 0 && (
+                        {allAssets.filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency).length === 0 && (
                           <div className="p-3 text-center text-sm text-muted-foreground">
                             Nenhum outro ativo disponível
                           </div>
@@ -386,6 +398,8 @@ const ExchangeNew = () => {
                       }`}>
                         {toCurrency === 'BRL' ? (
                           <span className="text-sm font-bold text-gray-700">R$</span>
+                        ) : riozIconUrl ? (
+                          <img src={riozIconUrl} alt="RIOZ" className="w-8 h-8 rounded-full" />
                         ) : (
                           <span className="text-lg font-bold text-black">R</span>
                         )}
@@ -399,7 +413,7 @@ const ExchangeNew = () => {
                         <p className="text-sm font-semibold text-foreground mb-1">Outros Ativos</p>
                         <p className="text-xs text-muted-foreground">Selecione um ativo para converter</p>
                       </div>
-                      {activeAssets
+                      {allAssets
                         .filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency)
                          .map(asset => (
                            <DropdownMenuItem 
@@ -416,13 +430,13 @@ const ExchangeNew = () => {
                               <div className="flex-1">
                                 <p className="font-medium text-foreground">{asset.name} ({asset.symbol})</p>
                                 <p className="text-xs text-muted-foreground">
-                                  {asset.is_active ? 'Disponível' : 'Em breve'}
+                                  {asset.is_active ? 'Disponível' : 'Indisponível'}
                                 </p>
                               </div>
                             </div>
                           </DropdownMenuItem>
                         ))}
-                      {activeAssets.filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency).length === 0 && (
+                      {allAssets.filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency).length === 0 && (
                         <div className="p-3 text-center text-sm text-muted-foreground">
                           Nenhum outro ativo disponível
                         </div>

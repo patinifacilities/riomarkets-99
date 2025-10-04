@@ -24,10 +24,32 @@ export const ExpandableCompletedOrdersCard = () => {
   return (
     <Card className="bg-secondary-glass border-border/50">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <CheckCircle className="w-5 h-5" />
-          Opiniões Concluídas
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <CheckCircle className="w-5 h-5" />
+            Opiniões Concluídas
+          </CardTitle>
+          {completedOrders.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setExpanded(!expanded)}
+              className="flex items-center gap-2"
+            >
+              {expanded ? (
+                <>
+                  <ChevronUp className="w-4 h-4" />
+                  Ver menos
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="w-4 h-4" />
+                  Ver histórico ({completedOrders.length})
+                </>
+              )}
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -35,6 +57,11 @@ export const ExpandableCompletedOrdersCard = () => {
             {[...Array(3)].map((_, i) => (
               <div key={i} className="h-20 bg-muted/20 rounded animate-pulse" />
             ))}
+          </div>
+        ) : !expanded ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <CheckCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <p>Clique em "Ver histórico" para visualizar suas opiniões concluídas</p>
           </div>
         ) : completedOrders.length > 0 ? (
           <>
@@ -87,27 +114,6 @@ export const ExpandableCompletedOrdersCard = () => {
                 );
               })}
             </div>
-            
-            {completedOrders.length > 5 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setExpanded(!expanded)}
-                className="w-full mt-3"
-              >
-                {expanded ? (
-                  <>
-                    <ChevronUp className="w-4 h-4 mr-2" />
-                    Ver menos
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="w-4 h-4 mr-2" />
-                    Ver mais ({completedOrders.length - 5})
-                  </>
-                )}
-              </Button>
-            )}
           </>
         ) : (
           <div className="text-center py-8 text-muted-foreground">
