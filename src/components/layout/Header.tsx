@@ -94,6 +94,7 @@ const Header = () => {
   const navItems = [
     { href: '/fast', icon: Zap, label: 'Fast', special: 'pulse' },
     { href: '/', icon: TrendingUp, label: 'Mercados' },
+    { href: '/raffles', icon: Trophy, label: 'Rifas' },
     { href: '/wallet', icon: Wallet, label: 'Carteira', authRequired: true },
     { href: '/transactions', icon: Receipt, label: 'Transações', authRequired: true },
     { href: '/exchange', icon: ArrowRightLeft, label: 'Exchange', authRequired: true },

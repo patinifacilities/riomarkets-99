@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, Settings, Users, FileText, Newspaper, DollarSign, Activity, 
-  CreditCard, Banknote, Wallet, Menu, LogOut, Zap, Gift, ArrowLeftRight
+  CreditCard, Banknote, Wallet, Menu, LogOut, Zap, Gift, ArrowLeftRight, Trophy
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -105,6 +105,12 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
       icon: Settings, 
       path: '/admin/branding',
       color: 'text-[#00ff90] hover:text-[#00ff90]'
+    },
+    { 
+      title: 'Rifas', 
+      icon: Trophy, 
+      path: '/admin/raffles',
+      color: 'text-[#ff2389] hover:text-[#ff2389]'
     }
   ];
 

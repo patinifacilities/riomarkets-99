@@ -41,6 +41,8 @@ import AdminGatewaysSaque from '@/pages/AdminGatewaysSaque';
 import AdminSlider from '@/pages/AdminSlider';
 import AdminBranding from '@/pages/AdminBranding';
 import AdminExchange from '@/pages/AdminExchange';
+import AdminRaffles from '@/pages/AdminRaffles';
+import Raffles from '@/pages/Raffles';
 import Opinioes from '@/pages/Opinioes';
 import FiatRequests from '@/pages/FiatRequests';
 import Terms from '@/pages/Terms';
@@ -116,7 +118,9 @@ function App() {
             <Route path="/admin/slider" element={<AdminSlider />} />
             <Route path="/admin/branding" element={<AdminBranding />} />
             <Route path="/admin/exchange" element={<AdminExchange />} />
+            <Route path="/admin/raffles" element={<AdminRaffles />} />
           <Route path="/opinioes" element={<Opinioes />} />
+          <Route path="/raffles" element={<Raffles />} />
           <Route path="/rewards" element={<Rewards />} />
           <Route path="/fiat-requests" element={<FiatRequests />} />
           <Route path="/terms" element={<Terms />} />

@@ -22,7 +22,7 @@ export const useBranding = () => {
   useEffect(() => {
     fetchBrandingConfig();
     
-    // Subscribe to changes
+    // Subscribe to realtime changes
     const channel = supabase
       .channel('branding_changes')
       .on(
@@ -33,10 +33,13 @@ export const useBranding = () => {
           table: 'branding_config'
         },
         (payload) => {
-          if (payload.eventType === 'UPDATE') {
+          if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
             const newConfig = payload.new as BrandingConfig;
             setConfig(newConfig);
-            applyThemeToDocument(newConfig);
+            // Apply theme immediately for real-time updates
+            requestAnimationFrame(() => {
+              applyThemeToDocument(newConfig);
+            });
           }
         }
       )

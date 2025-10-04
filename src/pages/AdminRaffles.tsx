@@ -1,0 +1,382 @@
+import { useState, useEffect } from 'react';
+import { Link, Navigate } from 'react-router-dom';
+import { ArrowLeft, Plus, Edit, Trash2, Trophy } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+interface Raffle {
+  id: string;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  prize_description: string;
+  payout_value: number;
+  goal_value: number;
+  current_value: number;
+  entry_cost: number;
+  status: string;
+  winner_user_id: string | null;
+  ends_at: string | null;
+  created_at: string;
+}
+
+const AdminRaffles = () => {
+  const { user, loading: authLoading } = useAuth();
+  const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
+  const { toast } = useToast();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [raffles, setRaffles] = useState<Raffle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingRaffle, setEditingRaffle] = useState<Raffle | null>(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    prize_description: '',
+    payout_value: '',
+    goal_value: '',
+    entry_cost: '10',
+    status: 'active',
+    ends_at: ''
+  });
+
+  useEffect(() => {
+    if (user) {
+      fetchRaffles();
+    }
+  }, [user]);
+
+  const fetchRaffles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('raffles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setRaffles(data || []);
+    } catch (error) {
+      console.error('Error fetching raffles:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const raffleData = {
+        title: formData.title,
+        description: formData.description || null,
+        prize_description: formData.prize_description,
+        payout_value: parseFloat(formData.payout_value),
+        goal_value: parseFloat(formData.goal_value),
+        entry_cost: parseInt(formData.entry_cost),
+        status: formData.status,
+        ends_at: formData.ends_at || null
+      };
+
+      if (editingRaffle) {
+        const { error } = await supabase
+          .from('raffles')
+          .update(raffleData)
+          .eq('id', editingRaffle.id);
+
+        if (error) throw error;
+        toast({ title: 'Rifa atualizada com sucesso!' });
+      } else {
+        const { error } = await supabase
+          .from('raffles')
+          .insert(raffleData);
+
+        if (error) throw error;
+        toast({ title: 'Rifa criada com sucesso!' });
+      }
+
+      setDialogOpen(false);
+      resetForm();
+      fetchRaffles();
+    } catch (error) {
+      console.error('Error saving raffle:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível salvar a rifa.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleEdit = (raffle: Raffle) => {
+    setEditingRaffle(raffle);
+    setFormData({
+      title: raffle.title,
+      description: raffle.description || '',
+      prize_description: raffle.prize_description,
+      payout_value: raffle.payout_value.toString(),
+      goal_value: raffle.goal_value.toString(),
+      entry_cost: raffle.entry_cost.toString(),
+      status: raffle.status,
+      ends_at: raffle.ends_at ? raffle.ends_at.split('T')[0] : ''
+    });
+    setDialogOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta rifa?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('raffles')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      toast({ title: 'Rifa excluída com sucesso!' });
+      fetchRaffles();
+    } catch (error) {
+      console.error('Error deleting raffle:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível excluir a rifa.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const resetForm = () => {
+    setEditingRaffle(null);
+    setFormData({
+      title: '',
+      description: '',
+      prize_description: '',
+      payout_value: '',
+      goal_value: '',
+      entry_cost: '10',
+      status: 'active',
+      ends_at: ''
+    });
+  };
+
+  if (authLoading || profileLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user || !profile?.is_admin) {
+    return <Navigate to="/" replace />;
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex overflow-x-hidden">
+      <AdminSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      
+      <div className="flex-1 lg:ml-0 min-w-0">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="mb-8">
+            <Link to="/admin" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-2">
+              <ArrowLeft className="w-4 h-4" />
+              Voltar
+            </Link>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
+                  <Trophy className="w-8 h-8 text-primary" />
+                  Gerenciar Rifas
+                </h1>
+                <p className="text-muted-foreground">
+                  Crie e gerencie rifas para os usuários
+                </p>
+              </div>
+              <Dialog open={dialogOpen} onOpenChange={(open) => {
+                setDialogOpen(open);
+                if (!open) resetForm();
+              }}>
+                <DialogTrigger asChild>
+                  <Button className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    Nova Rifa
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>{editingRaffle ? 'Editar Rifa' : 'Nova Rifa'}</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="title">Título</Label>
+                      <Input
+                        id="title"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        placeholder="Nome da rifa"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="description">Descrição</Label>
+                      <Textarea
+                        id="description"
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        placeholder="Descrição da rifa"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="prize">Descrição do Prêmio</Label>
+                      <Input
+                        id="prize"
+                        value={formData.prize_description}
+                        onChange={(e) => setFormData({ ...formData, prize_description: e.target.value })}
+                        placeholder="Ex: iPhone 15 Pro"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="payout">Valor do Prêmio (RZ)</Label>
+                        <Input
+                          id="payout"
+                          type="number"
+                          value={formData.payout_value}
+                          onChange={(e) => setFormData({ ...formData, payout_value: e.target.value })}
+                          placeholder="0"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="goal">Meta (RZ)</Label>
+                        <Input
+                          id="goal"
+                          type="number"
+                          value={formData.goal_value}
+                          onChange={(e) => setFormData({ ...formData, goal_value: e.target.value })}
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="entry">Custo de Entrada (RZ)</Label>
+                        <Input
+                          id="entry"
+                          type="number"
+                          value={formData.entry_cost}
+                          onChange={(e) => setFormData({ ...formData, entry_cost: e.target.value })}
+                          placeholder="10"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="status">Status</Label>
+                        <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="active">Ativa</SelectItem>
+                            <SelectItem value="completed">Concluída</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="ends">Data de Término (Opcional)</Label>
+                      <Input
+                        id="ends"
+                        type="date"
+                        value={formData.ends_at}
+                        onChange={(e) => setFormData({ ...formData, ends_at: e.target.value })}
+                      />
+                    </div>
+                    <Button onClick={handleSave} className="w-full">
+                      {editingRaffle ? 'Salvar Alterações' : 'Criar Rifa'}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Rifas Cadastradas</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Título</TableHead>
+                      <TableHead>Prêmio</TableHead>
+                      <TableHead>Progresso</TableHead>
+                      <TableHead>Custo</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {raffles.map((raffle) => (
+                      <TableRow key={raffle.id}>
+                        <TableCell className="font-medium">{raffle.title}</TableCell>
+                        <TableCell>{raffle.prize_description}</TableCell>
+                        <TableCell>
+                          {raffle.current_value} / {raffle.goal_value} RZ
+                          <div className="text-xs text-muted-foreground">
+                            {((raffle.current_value / raffle.goal_value) * 100).toFixed(0)}%
+                          </div>
+                        </TableCell>
+                        <TableCell>{raffle.entry_cost} RZ</TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            raffle.status === 'active' 
+                              ? 'bg-green-500/20 text-green-500' 
+                              : 'bg-gray-500/20 text-gray-500'
+                          }`}>
+                            {raffle.status === 'active' ? 'Ativa' : 'Concluída'}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEdit(raffle)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(raffle.id)}
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminRaffles;

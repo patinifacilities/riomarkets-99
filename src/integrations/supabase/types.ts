@@ -1061,6 +1061,89 @@ export type Database = {
         }
         Relationships: []
       }
+      raffle_entries: {
+        Row: {
+          amount_paid: number
+          created_at: string
+          id: string
+          raffle_id: string
+          user_id: string
+        }
+        Insert: {
+          amount_paid: number
+          created_at?: string
+          id?: string
+          raffle_id: string
+          user_id: string
+        }
+        Update: {
+          amount_paid?: number
+          created_at?: string
+          id?: string
+          raffle_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raffle_entries_raffle_id_fkey"
+            columns: ["raffle_id"]
+            isOneToOne: false
+            referencedRelation: "raffles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      raffles: {
+        Row: {
+          created_at: string
+          current_value: number
+          description: string | null
+          ends_at: string | null
+          entry_cost: number
+          goal_value: number
+          id: string
+          image_url: string | null
+          payout_value: number
+          prize_description: string
+          status: string
+          title: string
+          updated_at: string
+          winner_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_value?: number
+          description?: string | null
+          ends_at?: string | null
+          entry_cost?: number
+          goal_value: number
+          id?: string
+          image_url?: string | null
+          payout_value?: number
+          prize_description: string
+          status?: string
+          title: string
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_value?: number
+          description?: string | null
+          ends_at?: string | null
+          entry_cost?: number
+          goal_value?: number
+          id?: string
+          image_url?: string | null
+          payout_value?: number
+          prize_description?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Relationships: []
+      }
       rate_limits: {
         Row: {
           created_at: string
