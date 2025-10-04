@@ -291,7 +291,7 @@ const ExchangeNew = () => {
                           {fromCurrency === 'BRL' ? (
                             <span className="text-sm font-bold text-gray-700">R$</span>
                           ) : riozIconUrl ? (
-                            <img src={riozIconUrl} alt="RIOZ" className="w-8 h-8 rounded-full" />
+                            <img src={riozIconUrl} alt="RIOZ" className="w-8 h-8 rounded-full object-cover" />
                           ) : (
                             <span className="text-lg font-bold text-black">R</span>
                           )}
@@ -314,26 +314,22 @@ const ExchangeNew = () => {
                               disabled={!asset.is_active}
                               onClick={() => {
                                 if (asset.is_active) {
-                                  // Swap the selected asset with the "From" currency
-                                  if (swapDirection === 'brl-to-rioz') {
-                                    setSwapDirection('rioz-to-brl');
-                                  } else {
-                                    setSwapDirection('brl-to-rioz');
-                                  }
+                                  // Don't toggle direction, just update the state if needed
+                                  // The asset is already handled by the swap logic
                                 }
                               }}
                             >
-                             <div className="flex items-center gap-3 w-full">
-                               {asset.icon_url && (
-                                 <img src={asset.icon_url} alt={asset.name} className="w-6 h-6 rounded-full" />
-                               )}
-                               <div className="flex-1">
-                                 <p className="font-medium text-foreground">{asset.name} ({asset.symbol})</p>
-                                 <p className="text-xs text-muted-foreground">
-                                   {asset.is_active ? 'Disponível' : 'Indisponível'}
-                                 </p>
-                               </div>
-                             </div>
+                              <div className="flex items-center gap-3 w-full">
+                                {asset.icon_url && (
+                                  <img src={asset.icon_url} alt={asset.name} className="w-6 h-6 rounded-full object-cover" />
+                                )}
+                                <div className="flex-1">
+                                  <p className="font-medium text-foreground">{asset.name} ({asset.symbol})</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {asset.is_active ? 'Disponível' : 'Indisponível'}
+                                  </p>
+                                </div>
+                              </div>
                            </DropdownMenuItem>
                          ))}
                         {allAssets.filter(a => a.symbol !== fromCurrency && a.symbol !== toCurrency).length === 0 && (
@@ -398,22 +394,22 @@ const ExchangeNew = () => {
               </div>
               
               <div className="relative bg-muted/30 rounded-2xl border-2 border-border hover:border-primary/50 transition-colors">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity ${
-                        toCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
-                      }`}>
-                        {toCurrency === 'BRL' ? (
-                          <span className="text-sm font-bold text-gray-700">R$</span>
-                        ) : riozIconUrl ? (
-                          <img src={riozIconUrl} alt="RIOZ" className="w-8 h-8 rounded-full" />
-                        ) : (
-                          <span className="text-lg font-bold text-black">R</span>
-                        )}
-                        <ChevronDown className="w-3 h-3 text-foreground ml-1" />
-                      </button>
-                    </DropdownMenuTrigger>
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity ${
+                          toCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
+                        }`}>
+                          {toCurrency === 'BRL' ? (
+                            <span className="text-sm font-bold text-gray-700">R$</span>
+                          ) : riozIconUrl ? (
+                            <img src={riozIconUrl} alt="RIOZ" className="w-8 h-8 rounded-full object-cover" />
+                          ) : (
+                            <span className="text-lg font-bold text-black">R</span>
+                          )}
+                          <ChevronDown className="w-3 h-3 text-foreground ml-1" />
+                        </button>
+                      </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-card border-border shadow-xl rounded-xl p-2 min-w-[280px] z-[100]">
                       <div className="p-3 border-b border-border mb-2">
                         <p className="text-sm font-semibold text-foreground mb-1">Outros Ativos</p>

@@ -141,6 +141,14 @@ export default {
             transform: "translateX(100%)",
           },
         },
+        "shimmer-slow": {
+          "0%": {
+            backgroundPosition: "200% center",
+          },
+          "100%": {
+            backgroundPosition: "-200% center",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -148,6 +156,7 @@ export default {
         "scroll-left": "scroll-left 30s linear infinite",
         "fade-in": "fade-in 0.3s ease-out",
         "shimmer": "shimmer 2s ease-in-out infinite",
+        "shimmer-slow": "shimmer-slow var(--shimmer-duration, 3s) linear infinite",
       },
     },
   },

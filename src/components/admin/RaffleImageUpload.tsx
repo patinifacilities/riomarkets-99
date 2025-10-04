@@ -40,7 +40,7 @@ export const RaffleImageUpload = ({ raffleId, images, onChange }: RaffleImageUpl
 
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `raffle-images/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -52,13 +52,15 @@ export const RaffleImageUpload = ({ raffleId, images, onChange }: RaffleImageUpl
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
-        throw uploadError;
+        toast.error(`Erro no upload: ${uploadError.message}`);
+        return null;
       }
 
       const { data: { publicUrl } } = supabase.storage
         .from('profile-pictures')
         .getPublicUrl(filePath);
 
+      toast.success('Imagem enviada com sucesso!');
       return publicUrl;
     } catch (error) {
       console.error('Error uploading image:', error);

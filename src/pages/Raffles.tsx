@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useAuth } from '@/hooks/useAuth';
+import { RaffleSlider } from '@/components/raffle/RaffleSlider';
 
 interface Raffle {
   id: string;
@@ -115,30 +116,33 @@ const Raffles = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 pb-24 md:pb-8">
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-              <Ticket className="w-8 h-8 text-primary" />
-              Rifas
-            </h1>
-            <p className="text-muted-foreground">
-              Participe das rifas e concorra a prêmios incríveis!
-            </p>
+    <div className="pb-24 md:pb-8">
+      <RaffleSlider />
+      
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
+                <Ticket className="w-8 h-8 text-primary" />
+                Rifas
+              </h1>
+              <p className="text-muted-foreground">
+                Participe das rifas e concorra a prêmios incríveis!
+              </p>
+            </div>
+            {hasTickets && user && (
+              <Button 
+                variant="outline"
+                onClick={() => navigate('/raffle-tickets')}
+                className="flex items-center gap-2"
+              >
+                <Ticket className="w-4 h-4" />
+                Meus Bilhetes
+              </Button>
+            )}
           </div>
-          {hasTickets && user && (
-            <Button 
-              variant="outline"
-              onClick={() => navigate('/raffle-tickets')}
-              className="flex items-center gap-2"
-            >
-              <Ticket className="w-4 h-4" />
-              Meus Bilhetes
-            </Button>
-          )}
         </div>
-      </div>
 
       {raffles.length === 0 ? (
         <Card className="p-12 text-center">
@@ -177,8 +181,13 @@ const Raffles = () => {
                   </div>
 
                   {!hasStarted && (
-                    <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">
-                      <p className="text-xs text-muted-foreground">Começa {timeUntilStart}</p>
+                    <div className="relative overflow-hidden bg-gradient-to-r from-[#ffd700]/20 via-[#ffed4e]/20 to-[#ffd700]/20 border border-[#ffd700]/30 rounded-lg p-3">
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ffd700]/30 to-transparent animate-shimmer-slow" 
+                        style={{ backgroundSize: '200% 100%' }}
+                      />
+                      <p className="relative text-sm font-bold bg-gradient-to-r from-[#ffd700] via-[#ffed4e] to-[#ffd700] bg-clip-text text-transparent">
+                        Resultado em {timeUntilStart}
+                      </p>
                     </div>
                   )}
 
@@ -230,6 +239,7 @@ const Raffles = () => {
           })}
         </div>
       )}
+      </div>
     </div>
   );
 };

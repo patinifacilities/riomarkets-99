@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { Loader2, Ticket, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { RaffleTicketCard } from '@/components/raffle/RaffleTicketCard';
 
 interface RaffleEntry {
   id: string;
@@ -63,6 +64,14 @@ const RaffleTickets = () => {
     return null;
   }
 
+  // Find the raffle entry with most tickets
+  const topTicketEntry = useMemo(() => {
+    if (entries.length === 0) return null;
+    return entries.reduce((max, entry) => 
+      entry.amount_paid > max.amount_paid ? entry : max
+    , entries[0]);
+  }, [entries]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -102,52 +111,22 @@ const RaffleTickets = () => {
           {entries.map((entry) => {
             const raffle = entry.raffles as any;
             const ticketCount = entry.amount_paid / 10; // Assuming entry_cost is 10 RZ
+            const isTopTicket = topTicketEntry?.id === entry.id;
 
             return (
-              <Card 
-                key={entry.id} 
-                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+              <RaffleTicketCard
+                key={entry.id}
+                raffleTitle={raffle.title}
+                ticketCount={ticketCount}
+                purchaseDate={formatDistanceToNow(new Date(entry.created_at), { 
+                  addSuffix: true, 
+                  locale: ptBR 
+                })}
+                status={raffle.status}
+                imageUrl={raffle.image_url}
                 onClick={() => navigate(`/raffles/${raffle.id}`)}
-              >
-                {raffle.image_url && (
-                  <div className="w-full h-48 overflow-hidden">
-                    <img 
-                      src={raffle.image_url} 
-                      alt={raffle.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-                
-                <div className="p-6 space-y-4">
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">{raffle.title}</h3>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Bilhetes</span>
-                      <span className="font-bold text-primary">{ticketCount}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm pt-2 border-t">
-                    <span className="text-muted-foreground">Comprado há</span>
-                    <span className="font-medium">
-                      {formatDistanceToNow(new Date(entry.created_at), { 
-                        addSuffix: true, 
-                        locale: ptBR 
-                      })}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Status</span>
-                    <span className={`font-medium ${
-                      raffle.status === 'active' ? 'text-green-500' : 'text-muted-foreground'
-                    }`}>
-                      {raffle.status === 'active' ? 'Ativa' : 'Finalizada'}
-                    </span>
-                  </div>
-                </div>
-              </Card>
+                isTopTicket={isTopTicket}
+              />
             );
           })}
         </div>

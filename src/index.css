@@ -96,6 +96,9 @@
     /* Animations */
     --animation-duration: 0.2s;
     --animation-curve: cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Shimmer animation for golden ticket */
+    --shimmer-duration: 3s;
   }
 
   /* Scale-in animation for winner announcements */

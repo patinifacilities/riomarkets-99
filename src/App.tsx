@@ -42,6 +42,7 @@ import AdminSlider from '@/pages/AdminSlider';
 import AdminBranding from '@/pages/AdminBranding';
 import AdminExchange from '@/pages/AdminExchange';
 import AdminRaffles from '@/pages/AdminRaffles';
+import AdminRaffleSlider from '@/pages/AdminRaffleSlider';
 import Raffles from '@/pages/Raffles';
 import RaffleDetail from '@/pages/RaffleDetail';
 import RaffleTickets from '@/pages/RaffleTickets';
@@ -121,6 +122,7 @@ function App() {
             <Route path="/admin/branding" element={<AdminBranding />} />
             <Route path="/admin/exchange" element={<AdminExchange />} />
             <Route path="/admin/raffles" element={<AdminRaffles />} />
+            <Route path="/admin/raffles/slider" element={<AdminRaffleSlider />} />
           <Route path="/opinioes" element={<Opinioes />} />
               <Route path="/raffles" element={<Raffles />} />
               <Route path="/raffles/:id" element={<RaffleDetail />} />

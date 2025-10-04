@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Edit, Trash2, Trophy, Pause, Play } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Trophy, Pause, Play, Image as ImageIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -224,16 +224,25 @@ const AdminRaffles = () => {
                   Crie e gerencie rifas para os usuários
                 </p>
               </div>
-              <Dialog open={dialogOpen} onOpenChange={(open) => {
-                setDialogOpen(open);
-                if (!open) resetForm();
-              }}>
-                <DialogTrigger asChild>
-                  <Button className="gap-2">
-                    <Plus className="w-4 h-4" />
-                    Nova Rifa
-                  </Button>
-                </DialogTrigger>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  className="gap-2"
+                  onClick={() => window.location.href = '/admin/raffles/slider'}
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  Slider
+                </Button>
+                <Dialog open={dialogOpen} onOpenChange={(open) => {
+                  setDialogOpen(open);
+                  if (!open) resetForm();
+                }}>
+                  <DialogTrigger asChild>
+                    <Button className="gap-2">
+                      <Plus className="w-4 h-4" />
+                      Nova Rifa
+                    </Button>
+                  </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>{editingRaffle ? 'Editar Rifa' : 'Nova Rifa'}</DialogTitle>
@@ -344,6 +353,7 @@ const AdminRaffles = () => {
                   </div>
                 </DialogContent>
               </Dialog>
+              </div>
             </div>
           </div>
 
