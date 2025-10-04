@@ -448,7 +448,7 @@ const ExchangeNew = () => {
             {/* Convert Button */}
             <Button
               onClick={handleSwap}
-              disabled={loading || !fromAmount || parseFloat(fromAmount.replace(/[^\d.]/g, '')) > fromBalance || !exchangeEnabled}
+              disabled={loading || !fromAmount || parseFloat(fromAmount.replace(/[^\d.]/g, '')) > fromBalance || !exchangeEnabled || profile?.is_blocked}
               className="w-full h-16 text-lg font-bold shadow-success disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (

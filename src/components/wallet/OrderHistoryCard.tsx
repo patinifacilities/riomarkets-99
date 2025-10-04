@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, TrendingUp, TrendingDown, X, DollarSign, Zap } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import { useUserOrders } from '@/hooks/useWallet';
 import { useMarkets } from '@/hooks/useMarkets';
 import CashoutModal from '@/components/wallet/CashoutModal';
@@ -16,6 +17,7 @@ interface OrderHistoryCardProps {
 
 export const OrderHistoryCard = ({ onRefresh }: OrderHistoryCardProps) => {
   const { user } = useAuth();
+  const { data: profile } = useProfile(user?.id);
   const { data: orders, isLoading: loadingOrders } = useUserOrders(user?.id);
   const { data: markets } = useMarkets();
   const [showCashoutModal, setShowCashoutModal] = useState(false);
@@ -128,6 +130,7 @@ export const OrderHistoryCard = ({ onRefresh }: OrderHistoryCardProps) => {
                                   handleCancel(order);
                                 }}
                                 className="text-xs px-2 py-1 h-6 bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-0"
+                                disabled={profile?.is_blocked}
                               >
                                 Cancelar
                               </Button>

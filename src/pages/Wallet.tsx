@@ -57,13 +57,6 @@ const WalletPage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
-      {/* Blocked User Warning */}
-      {profile?.is_blocked && (
-        <div className="bg-red-500 text-white px-4 py-3 text-center font-semibold">
-          ⚠️ Sua conta está temporariamente bloqueada. Você não pode realizar saques no momento. Entre em contato com o suporte.
-        </div>
-      )}
-      
       <div className="container mx-auto px-4 py-6">
         {/* Mobile header - Show only on mobile */}
         <div className="md:hidden mb-6">
@@ -89,6 +82,7 @@ const WalletPage = () => {
             <Button 
               className="bg-gradient-to-r from-yellow-500 via-yellow-600 to-amber-600 hover:from-yellow-600 hover:via-yellow-700 hover:to-amber-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-yellow-400/50"
               onClick={() => navigate('/profile')}
+              disabled={profile?.is_blocked}
             >
               <span className="relative z-10">Upgrade para Gold Pass</span>
             </Button>
@@ -136,6 +130,7 @@ const WalletPage = () => {
             <Button 
               className="w-full bg-gradient-to-r from-yellow-500 via-yellow-600 to-amber-600 hover:from-yellow-600 hover:via-yellow-700 hover:to-amber-700 text-white font-semibold py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-200 border-2 border-yellow-400/50"
               onClick={() => navigate('/profile')}
+              disabled={profile?.is_blocked}
             >
               <span className="relative z-10">Upgrade para Gold Pass</span>
             </Button>

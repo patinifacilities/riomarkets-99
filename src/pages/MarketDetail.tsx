@@ -135,13 +135,6 @@ const MarketDetail = () => {
 
   return (
     <div className="min-h-screen bg-background pb-[env(safe-area-inset-bottom)]">
-      {/* Blocked User Warning */}
-      {userProfile?.is_blocked && (
-        <div className="bg-red-500 text-white px-4 py-3 text-center font-semibold">
-          ⚠️ Sua conta está temporariamente bloqueada. Você não pode enviar opiniões no momento. Entre em contato com o suporte.
-        </div>
-      )}
-      
       <div className="container mx-auto px-4 py-6">
         {/* Header */}
         <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6" aria-label="Voltar aos mercados">
@@ -299,25 +292,25 @@ const MarketDetail = () => {
                        </div>
                      ) : (
                        <div className="grid grid-cols-2 gap-2 mt-4">
-                         <Button 
-                           onClick={() => setSelectedOption('sim')}
-                           disabled={market.status !== 'aberto'}
-                           className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-[#00ff90] hover:bg-[#00ff90]/90 text-black font-semibold' : 'bg-[#00ff90] text-black border-2 hover:bg-[#00ff90]/90 font-semibold'}`}
-                           size="sm"
-                           aria-label="Opinar Sim"
-                         >
+                          <Button 
+                            onClick={() => setSelectedOption('sim')}
+                            disabled={market.status !== 'aberto' || userProfile?.is_blocked}
+                            className={`min-h-[44px] ${selectedOption === 'sim' ? 'bg-[#00ff90] hover:bg-[#00ff90]/90 text-black font-semibold' : 'bg-[#00ff90] text-black border-2 hover:bg-[#00ff90]/90 font-semibold'}`}
+                            size="sm"
+                            aria-label="Opinar Sim"
+                          >
                            <div className="flex items-center justify-between w-full">
                              <span>Opinar Sim</span>
                              <span className="text-xs opacity-80">{(market.odds?.sim || 1.5).toFixed(2)}x</span>
                            </div>
                          </Button>
-                         <Button 
-                           onClick={() => setSelectedOption('nao')}
-                           disabled={market.status !== 'aberto'}
-                           className={`min-h-[44px] ${selectedOption === 'nao' ? 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-semibold' : 'bg-[#ff2389] text-white border-2 hover:bg-[#ff2389]/90 font-semibold'}`}
-                           size="sm"
-                           aria-label="Opinar Não"
-                         >
+                          <Button 
+                            onClick={() => setSelectedOption('nao')}
+                            disabled={market.status !== 'aberto' || userProfile?.is_blocked}
+                            className={`min-h-[44px] ${selectedOption === 'nao' ? 'bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-semibold' : 'bg-[#ff2389] text-white border-2 hover:bg-[#ff2389]/90 font-semibold'}`}
+                            size="sm"
+                            aria-label="Opinar Não"
+                          >
                            <div className="flex items-center justify-between w-full">
                              <span>Opinar Não</span>
                              <span className="text-xs opacity-80">{(market.odds?.não || market.odds?.nao || 1.5).toFixed(2)}x</span>
@@ -327,11 +320,11 @@ const MarketDetail = () => {
                      )}
                      
                      {selectedOption && betAmount > 0 && (
-                       <div className="w-full mt-4 block" data-confirm-area>
-                         <SliderConfirm
-                          selectedOption={selectedOption}
-                          disabled={market.status !== 'aberto' || !selectedOption || betAmount <= 0}
-                          onProgressChange={(progress) => setSliderProgress(progress)}
+                         <div className="w-full mt-4 block" data-confirm-area>
+                          <SliderConfirm
+                           selectedOption={selectedOption}
+                           disabled={market.status !== 'aberto' || !selectedOption || betAmount <= 0 || userProfile?.is_blocked}
+                           onProgressChange={(progress) => setSliderProgress(progress)}
                             onConfirm={async () => {
                               if (!authUser?.id) {
                                 toast({

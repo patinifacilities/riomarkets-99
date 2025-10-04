@@ -432,7 +432,8 @@ const Auth = () => {
                         </div>
                         <Button 
                           type="button" 
-                          className="w-full" 
+                          className="w-full"
+                          style={{ backgroundColor: '#00ff90', color: '#000' }}
                           onClick={() => {
                             if (formData.name) setCurrentStep(1);
                             else setError('Nome é obrigatório');
@@ -471,7 +472,8 @@ const Auth = () => {
                           </Button>
                           <Button 
                             type="button" 
-                            className="w-full" 
+                            className="w-full"
+                            style={{ backgroundColor: '#00ff90', color: '#000' }}
                             onClick={async () => {
                               if (!formData.username) {
                                 setError('Username é obrigatório');
@@ -525,7 +527,8 @@ const Auth = () => {
                           </Button>
                           <Button 
                             type="button" 
-                            className="w-full" 
+                            className="w-full"
+                            style={{ backgroundColor: '#00ff90', color: '#000' }}
                             onClick={async () => {
                               if (!formData.cpf) {
                                 setError('CPF é obrigatório');
@@ -577,7 +580,8 @@ const Auth = () => {
                           </Button>
                           <Button 
                             type="button" 
-                            className="w-full" 
+                            className="w-full"
+                            style={{ backgroundColor: '#00ff90', color: '#000' }}
                             onClick={async () => {
                               if (!formData.email) {
                                 setError('Email é obrigatório');
@@ -719,7 +723,8 @@ const Auth = () => {
                           </Button>
                           <Button 
                             type="submit" 
-                            className="w-full" 
+                            className="w-full"
+                            style={{ backgroundColor: '#00ff90', color: '#000' }}
                             disabled={loading || !acceptedTerms || passwordMismatch || !Object.values(passwordRequirements).every(Boolean)}
                           >
                             {loading ? 'Cadastrando...' : 'Criar conta'}
@@ -780,13 +785,19 @@ const Auth = () => {
                       <button
                         type="button"
                         onClick={() => setShowForgotPassword(true)}
-                        className="text-sm text-primary hover:underline"
+                        className="text-sm hover:underline font-semibold"
+                        style={{ color: '#00ff90' }}
                       >
                         Esqueceu a senha?
                       </button>
                     </div>
 
-                    <Button type="submit" className="w-full" disabled={loading}>
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      style={{ backgroundColor: '#00ff90', color: '#000' }}
+                      disabled={loading}
+                    >
                       {loading ? 'Entrando...' : 'Entrar'}
                     </Button>
                   </>
@@ -811,6 +822,7 @@ const Auth = () => {
                       <Button
                         type="button"
                         size="sm"
+                        style={{ backgroundColor: '#00ff90', color: '#000' }}
                         onClick={handleForgotPassword}
                         disabled={loading}
                         aria-label="Enviar email de recuperação de senha"
@@ -942,7 +954,8 @@ const Auth = () => {
                       setShowForgotPassword(false);
                       setCurrentStep(0);
                     }}
-                    className="text-primary hover:underline focus:outline-none focus:underline"
+                    className="hover:underline focus:outline-none focus:underline font-semibold"
+                    style={{ color: '#00ff90' }}
                     aria-label={isLogin ? "Criar nova conta" : "Entrar na sua conta"}
                   >
                     {isLogin ? 'Cadastre-se' : 'Entre aqui'}
