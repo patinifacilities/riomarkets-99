@@ -1032,8 +1032,8 @@ const Fast = () => {
                          Pool #{pool.round_number}
                        </Badge>
                      </div>
-                     <div className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-lg">
-                       Seu total: <span className="text-[#00ff90] font-semibold">{userPoolBets[pool.id] || 0} RZ</span>
+                     <div className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-lg flex items-center gap-1">
+                       Seu total: <Coins className="w-3 h-3 text-[#00ff90]" /> <span className="text-[#00ff90] font-semibold">{userPoolBets[pool.id] || 0} RZ</span>
                      </div>
                    </div>
                   

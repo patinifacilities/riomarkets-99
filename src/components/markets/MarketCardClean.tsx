@@ -18,7 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/hooks/use-toast';
 import { LazyImage } from '@/components/ui/lazy-image';
-import { ParticleCard } from '@/components/ui/MagicBento';
+
 
 interface MarketCardCleanProps {
   market: Market;
@@ -151,13 +151,10 @@ const MarketCardClean = React.memo(function MarketCardClean({ market, className 
 
   return (
     <>
-      <ParticleCard
-        className="rounded-2xl border border-[color:var(--border-soft)] bg-[color:var(--bg-card)] p-5 md:p-6 shadow-[var(--glow-green)]/0 hover:shadow-[0_0_24px_#00FF9133] transition-all duration-300 min-h-[160px] flex flex-col justify-between"
-        particleCount={8}
-        glowColor="0, 255, 145"
-        enableTilt={false}
-        clickEffect={true}
-        enableMagnetism={false}
+      <div className="rounded-2xl border border-[color:var(--border-soft)] bg-[color:var(--bg-card)] p-5 md:p-6 transition-all duration-300 min-h-[160px] flex flex-col justify-between group hover:shadow-[0_0_0_2px_rgba(0,255,145,0.15),0_0_0_4px_rgba(0,255,145,0.08)] hover:border-[#00FF91]/30"
+        style={{
+          backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(0, 255, 145, 0.03), transparent 70%)',
+        }}
       >
         <Link to={`/market/${market.id}`} className="block">
           <div className="flex flex-col min-h-[180px]">
@@ -271,7 +268,7 @@ const MarketCardClean = React.memo(function MarketCardClean({ market, className 
           
           {/* Status indicators - Remove as they're now in header */}
         </Link>
-      </ParticleCard>
+      </div>
 
       <BetModal
         open={betModalOpen}

@@ -294,7 +294,7 @@ const Home = () => {
         {/* Aurora Background Effect */}
         <div className="absolute inset-0 opacity-40">
           <Aurora 
-            colorStops={['#00ff91', '#5227FF', '#00ff91']}
+            colorStops={['#00ff90', '#ff2389', '#00ff90']}
             amplitude={1.2}
             blend={0.6}
             speed={0.8}

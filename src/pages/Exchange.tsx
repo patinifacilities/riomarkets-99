@@ -285,13 +285,11 @@ const ExchangeNew = () => {
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity ${
-                          fromCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
-                        }`}>
+                        <button className="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity bg-gray-200">
                           {fromCurrency === 'BRL' ? (
                             <span className="text-sm font-bold text-gray-700">R$</span>
                           ) : riozIconUrl ? (
-                            <img src={riozIconUrl} alt="RIOZ" className="w-8 h-8 rounded-full object-cover" />
+                            <img src={riozIconUrl} alt="RIOZ" className="w-full h-full rounded-full object-cover" />
                           ) : (
                             <span className="text-lg font-bold text-black">R</span>
                           )}
@@ -397,13 +395,11 @@ const ExchangeNew = () => {
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity ${
-                          toCurrency === 'BRL' ? 'bg-gray-200' : 'bg-[#00ff90]'
-                        }`}>
+                        <button className="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity bg-gray-200">
                           {toCurrency === 'BRL' ? (
                             <span className="text-sm font-bold text-gray-700">R$</span>
                           ) : riozIconUrl ? (
-                            <img src={riozIconUrl} alt="RIOZ" className="w-8 h-8 rounded-full object-cover" />
+                            <img src={riozIconUrl} alt="RIOZ" className="w-full h-full rounded-full object-cover" />
                           ) : (
                             <span className="text-lg font-bold text-black">R</span>
                           )}

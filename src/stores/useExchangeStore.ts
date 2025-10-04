@@ -181,7 +181,7 @@ export const useExchangeStore = create<ExchangeState>((set, get) => ({
     
     try {
       const { data, error } = await supabase.functions.invoke('get-history', {
-        body: { page, limit: 10 }
+        body: { page, limit: 50 }
       });
       
       if (error) throw error;
