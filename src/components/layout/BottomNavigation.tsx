@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { TrendingUp, Wallet, Trophy, User, Zap } from 'lucide-react';
+import { TrendingUp, Wallet, Ticket, ArrowLeftRight, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -11,8 +11,8 @@ const BottomNavigation = () => {
     { href: '/wallet', icon: Wallet, label: 'Carteira' },
     { href: '/', icon: TrendingUp, label: 'Mercados', position: 'left' },
     { href: '/fast', icon: Zap, label: 'Fast', isFast: true },
-    { href: '/ranking', icon: Trophy, label: 'Ranking', position: 'right' },
-    { href: '/profile', icon: User, label: 'Perfil' }
+    { href: '/raffles', icon: Ticket, label: 'Rifas', position: 'right' },
+    { href: '/exchange', icon: ArrowLeftRight, label: 'Exchange' }
   ];
 
   const visibleItems = navItems;

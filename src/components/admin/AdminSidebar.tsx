@@ -59,8 +59,8 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
       title: 'Rifas', 
       icon: Ticket, 
       path: '/admin/raffles',
-      color: 'text-[#ff2389] hover:text-[#ff2389]',
-      iconColor: 'text-[#ff2389]'
+      color: 'text-[#ffd700] hover:text-[#ffd700]',
+      iconColor: 'text-[#ffd700]'
     },
     { 
       title: 'Exchange', 

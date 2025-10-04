@@ -56,13 +56,28 @@ const RaffleTickets = () => {
     }
   };
 
+  // Consolidate entries by raffle - sum all tickets for each raffle
+  const consolidatedEntries = useMemo(() => {
+    const raffleMap = new Map<string, RaffleEntry>();
+    
+    entries.forEach(entry => {
+      const raffleId = entry.raffle_id;
+      if (raffleMap.has(raffleId)) {
+        const existing = raffleMap.get(raffleId)!;
+        existing.amount_paid += entry.amount_paid;
+      } else {
+        raffleMap.set(raffleId, { ...entry });
+      }
+    });
+    
+    return Array.from(raffleMap.values()).sort((a, b) => b.amount_paid - a.amount_paid);
+  }, [entries]);
+
   // Find the raffle entry with most tickets
   const topTicketEntry = useMemo(() => {
-    if (entries.length === 0) return null;
-    return entries.reduce((max, entry) => 
-      entry.amount_paid > max.amount_paid ? entry : max
-    , entries[0]);
-  }, [entries]);
+    if (consolidatedEntries.length === 0) return null;
+    return consolidatedEntries[0];
+  }, [consolidatedEntries]);
 
   useEffect(() => {
     fetchEntries();
@@ -103,21 +118,21 @@ const RaffleTickets = () => {
         </p>
       </div>
 
-      {entries.length === 0 ? (
+      {consolidatedEntries.length === 0 ? (
         <Card className="p-12 text-center">
           <Ticket className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
           <p className="text-muted-foreground">Você ainda não possui bilhetes.</p>
         </Card>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {entries.map((entry) => {
+          {consolidatedEntries.map((entry) => {
             const raffle = entry.raffles as any;
             const ticketCount = entry.amount_paid / 10; // Assuming entry_cost is 10 RZ
-            const isTopTicket = topTicketEntry?.id === entry.id;
+            const isTopTicket = topTicketEntry?.raffle_id === entry.raffle_id;
 
             return (
               <RaffleTicketCard
-                key={entry.id}
+                key={entry.raffle_id}
                 raffleTitle={raffle.title}
                 ticketCount={ticketCount}
                 purchaseDate={formatDistanceToNow(new Date(entry.created_at), { 

@@ -422,19 +422,19 @@ const Header = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={() => navigate('/profile')}>
+                    <DropdownMenuItem onClick={() => navigate('/profile')} className="hover:text-white focus:text-white">
                       <User className="mr-2 h-4 w-4" />
                       Perfil
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/wallet')}>
+                    <DropdownMenuItem onClick={() => navigate('/wallet')} className="hover:text-white focus:text-white">
                       <Wallet className="mr-2 h-4 w-4" />
                       Carteira
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/transactions')}>
+                    <DropdownMenuItem onClick={() => navigate('/transactions')} className="hover:text-white focus:text-white">
                       <Receipt className="mr-2 h-4 w-4" />
                       Transações
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/support')}>
+                    <DropdownMenuItem onClick={() => navigate('/support')} className="hover:text-white focus:text-white">
                       <HelpCircle className="mr-2 h-4 w-4" />
                       Suporte
                     </DropdownMenuItem>
@@ -527,13 +527,13 @@ const Header = () => {
                      </Button>
                    </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem asChild className="cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
+                    <DropdownMenuItem asChild className="cursor-pointer hover:bg-muted/50 focus:bg-muted/50 hover:text-white focus:text-white">
                       <Link to="/profile" className="flex items-center gap-2">
                         <User className="w-4 h-4" />
                         Meu Perfil
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer hover:bg-muted/50 focus:bg-muted/50">
+                    <DropdownMenuItem asChild className="cursor-pointer hover:bg-muted/50 focus:bg-muted/50 hover:text-white focus:text-white">
                       <Link to="/transactions" className="flex items-center gap-2">
                         <Receipt className="w-4 h-4" />
                         Transações

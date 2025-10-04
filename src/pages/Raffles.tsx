@@ -135,7 +135,8 @@ const Raffles = () => {
               <Button 
                 variant="outline"
                 onClick={() => navigate('/raffle-tickets')}
-                className="relative overflow-hidden flex items-center gap-2 bg-gradient-to-r from-[#ffd700]/20 via-[#ffed4e]/20 to-[#ffd700]/20 border-[#ffd700]/30 hover:from-[#ffd700]/30 hover:via-[#ffed4e]/30 hover:to-[#ffd700]/30"
+                disabled={!user}
+                className="relative overflow-hidden flex items-center gap-2 bg-gradient-to-r from-[#ffd700]/20 via-[#ffed4e]/20 to-[#ffd700]/20 border-[#ffd700]/30 hover:from-[#ffd700]/30 hover:via-[#ffed4e]/30 hover:to-[#ffd700]/30 disabled:opacity-50"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ffd700]/30 to-transparent animate-shimmer-slow" 
                   style={{ backgroundSize: '200% 100%' }}
