@@ -55,15 +55,6 @@ const RaffleTickets = () => {
     }
   };
 
-  useEffect(() => {
-    fetchEntries();
-  }, [user]);
-
-  if (!user) {
-    navigate('/auth');
-    return null;
-  }
-
   // Find the raffle entry with most tickets
   const topTicketEntry = useMemo(() => {
     if (entries.length === 0) return null;
@@ -71,6 +62,16 @@ const RaffleTickets = () => {
       entry.amount_paid > max.amount_paid ? entry : max
     , entries[0]);
   }, [entries]);
+
+  useEffect(() => {
+    fetchEntries();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user && !loading) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
 
   if (loading) {
     return (
