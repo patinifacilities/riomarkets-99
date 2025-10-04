@@ -135,12 +135,17 @@ const Raffles = () => {
                     </div>
                   )}
 
-                  {raffle.paused && (
+               {raffle.paused && (
                     <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent animate-shimmer"></div>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent" 
+                           style={{ 
+                             animation: 'shimmer 2s linear infinite',
+                             backgroundSize: '200% 100%'
+                           }}></div>
                       <div className="relative flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
-                        <p className="text-sm font-bold text-yellow-500">Pausada</p>
+                        <div className="w-3 h-3 rounded-full bg-yellow-500" 
+                             style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}></div>
+                        <p className="text-sm font-bold text-yellow-500">Rifa Pausada</p>
                       </div>
                     </div>
                   )}

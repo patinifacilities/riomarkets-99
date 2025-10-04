@@ -79,7 +79,7 @@ export const ExpandableRecentWinsCard = () => {
   const displayedBets = expanded ? bets : bets.slice(0, 5);
 
   return (
-    <Card className="bg-secondary-glass border-border/50">
+    <Card className="bg-gradient-to-b from-[#ff2389]/20 to-secondary-glass border-border/50">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">

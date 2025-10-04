@@ -60,7 +60,8 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
       return;
     }
 
-    openBet(opcao);
+    // Navigate to market detail page instead of opening modal
+    navigate(`/market/${market.id}`);
   };
 
   const openBet = (opcao: string) => {

@@ -92,10 +92,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       {/* Blocked user warning - shown below header */}
       {profile?.is_blocked && !shouldHideHeaderFooter && (
         <div 
-          className="sticky top-16 left-0 right-0 z-40 px-4 py-3 text-center text-white font-medium shadow-lg"
-          style={{ backgroundColor: '#ff2389' }}
+          className="sticky top-16 left-0 right-0 z-40 px-4 py-3 text-center text-white font-medium"
+          style={{ backgroundColor: '#d10e35' }}
         >
-          ⚠️ Sua conta está temporariamente bloqueada. Você não pode enviar opiniões no momento. Entre em contato com o suporte.
+          ⚠️ Sua conta está temporariamente bloqueada. Entre em contato com o suporte para mais informações.
         </div>
       )}
       

@@ -11,6 +11,7 @@ import { OptionProgressBar } from '@/components/ui/option-progress-bar';
 import { BetSlider } from '@/components/markets/BetSlider';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { CountdownTimer } from '@/components/raffle/CountdownTimer';
 
 interface Raffle {
   id: string;
@@ -125,6 +126,11 @@ const RaffleDetail = () => {
 
     if (!profile) {
       toast.error('Perfil não encontrado');
+      return;
+    }
+
+    if (profile.is_blocked) {
+      toast.error('Sua conta está bloqueada');
       return;
     }
 
@@ -270,14 +276,7 @@ const RaffleDetail = () => {
                 </div>
               )}
 
-              {raffle.ends_at && (
-                <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
-                  <p className="text-sm text-muted-foreground mb-1">Resultado em</p>
-                  <p className="text-2xl font-bold text-primary">
-                    {formatDistanceToNow(new Date(raffle.ends_at), { addSuffix: false, locale: ptBR })}
-                  </p>
-                </div>
-              )}
+              {raffle.ends_at && <CountdownTimer endsAt={raffle.ends_at} />}
 
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Progresso</p>
