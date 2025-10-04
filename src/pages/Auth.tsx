@@ -16,6 +16,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useOnboarding } from '@/stores/useOnboarding';
 import { validateCPF, formatCPF, validatePassword, validateUsername } from '@/utils/validation';
 import { EmailSuggestions } from '@/components/ui/email-suggestions';
+import MetallicPaint, { parseLogoImage } from '@/components/ui/MetallicPaint';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -53,18 +54,31 @@ const Auth = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
   const loginEmailInputRef = useRef<HTMLInputElement>(null);
+  const [logoImageData, setLogoImageData] = useState<ImageData | null>(null);
   
   const totalSteps = 5; // Total registration steps
 
-  // Preload logos for faster rendering
+  // Load logo for metallic effect
   useEffect(() => {
-    const preloadImage = (src: string) => {
-      const img = new Image();
-      img.src = src;
-    };
-    preloadImage(new URL('../assets/rio-white-logo-new.png', import.meta.url).href);
-    preloadImage('/assets/rio-black-logo.png');
-  }, []);
+    async function loadLogoImage() {
+      try {
+        const logoUrl = resolvedTheme === 'dark' 
+          ? new URL('../assets/rio-white-logo-new.png', import.meta.url).href
+          : '/assets/rio-black-logo.png';
+        
+        const response = await fetch(logoUrl);
+        const blob = await response.blob();
+        const file = new File([blob], "logo.png", { type: blob.type });
+
+        const parsedData = await parseLogoImage(file);
+        setLogoImageData(parsedData?.imageData ?? null);
+      } catch (err) {
+        console.error("Error loading logo image:", err);
+      }
+    }
+
+    loadLogoImage();
+  }, [resolvedTheme]);
 
   useEffect(() => {
     let mounted = true;
@@ -355,17 +369,41 @@ const Auth = () => {
           {/* Logo/Branding */}
           <div className="text-center mb-8">
             <div className="mb-6">
-              <img 
-                src={resolvedTheme === 'dark' 
-                  ? new URL('../assets/rio-white-logo-new.png', import.meta.url).href
-                  : "/assets/rio-black-logo.png"}
-                alt="Rio Markets Logo" 
-                className="w-auto mx-auto mb-4 cursor-pointer"
+              <div 
+                className="mx-auto mb-4 cursor-pointer"
                 style={{ 
-                  height: isMobile ? '40px' : '80px'
+                  height: isMobile ? '40px' : '80px',
+                  width: '100%',
+                  maxWidth: isMobile ? '120px' : '240px',
+                  margin: '0 auto'
                 }}
                 onClick={() => navigate('/')}
-              />
+              >
+                {logoImageData ? (
+                  <MetallicPaint 
+                    imageData={logoImageData} 
+                    params={{ 
+                      edge: 2, 
+                      patternBlur: 0.005, 
+                      patternScale: 2, 
+                      refraction: 0.015, 
+                      speed: 0.3, 
+                      liquid: 0.07 
+                    }} 
+                  />
+                ) : (
+                  <img 
+                    src={resolvedTheme === 'dark' 
+                      ? new URL('../assets/rio-white-logo-new.png', import.meta.url).href
+                      : "/assets/rio-black-logo.png"}
+                    alt="Rio Markets Logo" 
+                    className="w-auto mx-auto"
+                    style={{ 
+                      height: isMobile ? '40px' : '80px'
+                    }}
+                  />
+                )}
+              </div>
               <div className="text-2xl font-bold text-foreground">
                 Mercados Preditivos
               </div>
