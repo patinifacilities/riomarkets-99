@@ -984,7 +984,10 @@ const Fast = () => {
               <Card 
                 key={pool.id} 
                 className={cn(
-                  "relative overflow-hidden border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm transition-all hover:scale-[1.02] hover:shadow-lg",
+                  "relative overflow-hidden border-2 border-transparent bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]",
+                  "before:absolute before:inset-0 before:rounded-lg before:p-[2px] before:bg-gradient-to-r before:from-[var(--liquid-glass-1)] before:via-[var(--liquid-glass-2)] before:to-[var(--liquid-glass-1)] before:opacity-0 before:transition-opacity before:duration-300",
+                  "hover:before:opacity-100 hover:shadow-[0_0_20px_rgba(0,255,144,0.3),0_0_40px_rgba(255,35,137,0.2)]",
+                  "after:absolute after:inset-[2px] after:rounded-lg after:bg-gradient-to-br after:from-card after:via-card after:to-card/50",
                   ((pool as any).paused || isMarketClosed) && "opacity-50 grayscale"
                 )}
               >
@@ -1033,8 +1036,14 @@ const Fast = () => {
                        </Badge>
                      </div>
                      <div className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-lg flex items-center gap-1">
-                       Seu total: <Coins className="w-3 h-3 text-[#00ff90]" /> <span className="text-[#00ff90] font-semibold">{userPoolBets[pool.id] || 0} RZ</span>
-                     </div>
+                        <span>Seu total:</span>
+                        <img 
+                          src="https://ufvupwnhpqeexadmqajk.supabase.co/storage/v1/object/public/exchange-assets/rioz-coin.png" 
+                          alt="Rioz Coin" 
+                          className="w-4 h-4 rounded-full object-cover"
+                        />
+                        <span className="text-[#00ff90] font-semibold">{userPoolBets[pool.id] || 0}</span>
+                      </div>
                    </div>
                   
                   <CardTitle className="text-lg mb-2">

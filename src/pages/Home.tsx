@@ -19,7 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { FastPoolSlide } from '@/components/fast/FastPoolSlide';
 import { useRef } from 'react';
 import logoWhite from '@/assets/rio-white-logo-deposit.png';
-import Aurora from '@/components/ui/Aurora';
+import { StarsBackground } from '@/components/ui/StarsBackground';
 
 interface CustomImage {
   id: string;
@@ -291,14 +291,9 @@ const Home = () => {
     <div className="min-h-screen bg-background">
       {/* Hero Carousel Section */}
       <div className="relative overflow-hidden border-b border-border">
-        {/* Aurora Background Effect */}
-        <div className="absolute inset-0 opacity-40">
-          <Aurora 
-            colorStops={['#00ff90', '#ff2389', '#00ff90']}
-            amplitude={1.2}
-            blend={0.6}
-            speed={0.8}
-          />
+        {/* Stars Background Effect */}
+        <div className="absolute inset-0 opacity-30">
+          <StarsBackground />
         </div>
         <div className="container mx-auto px-4 py-8 relative z-10">
           <Carousel
@@ -606,7 +601,7 @@ const Home = () => {
         {/* Search and Filters - Improved for white mode */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6 items-center">
           <div className="relative flex-1 max-w-md w-full sm:w-auto">
-            <Target className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               placeholder="Pesquisar mercados..."
               value={searchTerm}

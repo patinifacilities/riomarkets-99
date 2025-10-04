@@ -99,6 +99,10 @@
     
     /* Shimmer animation for golden ticket */
     --shimmer-duration: 3s;
+    
+    /* Liquid glass effect */
+    --liquid-glass-1: rgba(0, 255, 144, 0.1);
+    --liquid-glass-2: rgba(255, 35, 137, 0.1);
   }
 
   /* Scale-in animation for winner announcements */
