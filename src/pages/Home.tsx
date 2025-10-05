@@ -400,15 +400,7 @@ const Home = () => {
                           <p className="text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
                             Ganhe recompensas compartilhando suas previsões sobre eventos futuros.
                           </p>
-                          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
-                            <Button 
-                              size="lg" 
-                              onClick={() => navigate('/fast')}
-                              className="hidden md:flex gap-2 rounded-xl transition-all bg-[#ff2389] hover:bg-[#ff2389]/90 text-white border-[#ff2389] shadow-lg shadow-[#ff2389]/20 hover:shadow-[#ff2389]/40 hover:scale-105 w-full sm:w-auto font-semibold px-8"
-                            >
-                              <Zap className="w-5 h-5 animate-pulse" />
-                              Explorar Fast
-                            </Button>
+                          <div className="flex justify-center items-center px-4">
                             <OnboardingTrigger size="lg" variant="outline" className="w-full md:w-auto px-6" />
                           </div>
                         </div>

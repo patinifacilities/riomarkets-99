@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ExternalLink, X } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LazyImage } from "@/components/ui/lazy-image";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -36,64 +36,76 @@ export function PressCard({ article }: PressCardProps) {
     }
   };
 
+  // Get a placeholder image or use a gradient if no image provided
+  const imageUrl = article.logo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(article.vehicle)}&size=400&background=random`;
+
   return (
     <>
-      <article className="relative bg-gradient-to-br from-card via-card to-card/80 rounded-2xl border border-border/50 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group cursor-pointer overflow-hidden" onClick={handleReadMore}>
+      <article 
+        className="relative bg-gradient-to-br from-card via-card to-card/80 rounded-2xl border border-border/50 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 group cursor-pointer overflow-hidden flex flex-col"
+        onClick={handleReadMore}
+      >
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-[#ff2389]/[0.02] pointer-events-none" />
         
-        <div className="relative">
-          {/* Header with Relevance and Vehicle */}
-          <div className="p-3 pb-1.5 flex items-start justify-between">
-            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-gradient-to-r from-primary/10 to-primary/5 text-primary border border-primary/20 shadow-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              Alta Relevância
-            </div>
+        <div className="relative flex flex-col h-full">
+          {/* Image Header */}
+          <div className="relative h-48 overflow-hidden rounded-t-2xl bg-muted/30">
+            <LazyImage
+              src={imageUrl}
+              alt={article.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              placeholder={
+                <div className="w-full h-full bg-gradient-to-br from-primary/10 to-[#ff2389]/10 flex items-center justify-center">
+                  <span className="text-4xl">{article.vehicle.charAt(0)}</span>
+                </div>
+              }
+            />
             
-            {article.logo_url ? (
-              <div className="h-5 flex items-center">
-                <LazyImage
-                  src={article.logo_url}
-                  alt={`Logo do ${article.vehicle}`}
-                  className="h-full w-auto object-contain bg-white/95 rounded-md px-1.5 py-0.5 shadow-sm"
-                  placeholder={
-                    <div className="h-5 w-12 bg-muted rounded-md flex items-center justify-center">
-                      <span className="text-xs text-muted-foreground">{article.vehicle}</span>
-                    </div>
-                  }
-                />
+            {/* Badge overlay on image */}
+            <div className="absolute top-3 left-3">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-primary/90 to-primary/70 text-primary-foreground border border-primary/20 shadow-lg backdrop-blur-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                Alta Relevância
               </div>
-            ) : (
-              <div className="h-5 flex items-center">
-                <div className="bg-white/95 rounded-md px-1.5 py-0.5 text-black text-xs font-semibold shadow-sm">
-                  {article.vehicle}
+            </div>
+
+            {/* Vehicle logo badge */}
+            {article.logo_url && (
+              <div className="absolute top-3 right-3">
+                <div className="h-8 bg-white/95 rounded-lg px-2 py-1 shadow-lg flex items-center">
+                  <img
+                    src={article.logo_url}
+                    alt={`Logo ${article.vehicle}`}
+                    className="h-full w-auto object-contain"
+                  />
                 </div>
               </div>
             )}
           </div>
 
           {/* Content */}
-          <div className="px-3 pb-3 space-y-1.5">
-            <h3 className="text-sm font-bold leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+          <div className="p-4 flex-1 flex flex-col">
+            <h3 className="text-base font-bold leading-tight line-clamp-2 group-hover:text-primary transition-colors mb-2">
               {article.title}
             </h3>
             
             {article.summary && (
-              <p className="text-xs text-muted-foreground/90 line-clamp-2 leading-relaxed">
+              <p className="text-sm text-muted-foreground/90 line-clamp-3 leading-relaxed mb-3 flex-1">
                 {article.summary}
               </p>
             )}
             
-            <div className="flex items-center justify-between pt-1 border-t border-border/30">
-              <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                <div className="w-1 h-1 rounded-full bg-primary/60" />
+            <div className="flex items-center justify-between pt-3 border-t border-border/30 mt-auto">
+              <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
                 {article.vehicle}
               </div>
               <span className="text-xs text-muted-foreground/80">{formatDate(article.published_at)}</span>
             </div>
             
             {/* Read More Indicator */}
-            <div className="flex items-center gap-1.5 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity pt-0.5">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity pt-2">
               <span>Ler mais</span>
               <ExternalLink className="w-3 h-3" />
             </div>
@@ -125,6 +137,14 @@ export function PressCard({ article }: PressCardProps) {
           </DialogHeader>
           
           <div className="overflow-auto max-h-[60vh] space-y-4">
+            {/* Article Image */}
+            <div className="relative h-64 overflow-hidden rounded-xl">
+              <img
+                src={imageUrl}
+                alt={article.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
 
             {/* Article Content */}
             <div className="prose prose-invert max-w-none">

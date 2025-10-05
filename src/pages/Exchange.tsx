@@ -234,7 +234,7 @@ const ExchangeNew = () => {
   return (
     <div className="min-h-[100dvh] relative pb-32">
       {/* Background gradient - same as Fast page */}
-      <div className="fixed inset-0 -z-10 overflow-hidden">
+      <div className="fixed inset-0 z-0 overflow-hidden">
         <div 
           className="absolute inset-0"
           style={{

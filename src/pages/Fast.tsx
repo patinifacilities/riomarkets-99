@@ -767,7 +767,9 @@ const Fast = () => {
         <style>{`
           footer { display: none !important; }
         `}</style>
-        <div className="fixed inset-0 bg-background flex items-center justify-center overflow-hidden">
+        <div className="fixed inset-0 flex items-center justify-center overflow-hidden">
+          {/* Background gradient */}
+          <div className="fixed inset-0 bg-gradient-to-b from-background via-background to-primary/5 pointer-events-none -z-10" />
           <div className="text-center">
             <div className="w-32 h-32 rounded-full bg-[#ff2389]/5 flex items-center justify-center mx-auto mb-4">
               <Zap className="w-16 h-16 text-[#ff2389]" style={{
@@ -846,7 +848,9 @@ const Fast = () => {
   }
 
   return (
-    <div className="min-h-[100dvh] relative overflow-hidden bg-gradient-to-b from-background via-background to-primary/5 pb-32">
+    <div className="min-h-[100dvh] relative overflow-hidden pb-32">
+      {/* Background gradient */}
+      <div className="fixed inset-0 bg-gradient-to-b from-background via-background to-primary/5 pointer-events-none z-0" />
       <div className="relative z-[60]">
         <TickerBar />
       </div>

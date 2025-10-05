@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Gift, Flame, Trophy, Star, Calendar, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
+import { StarsBackground } from '@/components/ui/StarsBackground';
 
 export default function Rewards() {
   const navigate = useNavigate();
@@ -55,8 +56,18 @@ export default function Rewards() {
 
   if (loading || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center relative">
+        <div className="fixed inset-0 z-0 overflow-hidden">
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)'
+            }}
+          >
+            <StarsBackground />
+          </div>
+        </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary relative z-10"></div>
       </div>
     );
   }
@@ -72,8 +83,20 @@ export default function Rewards() {
   const monthlyProgress = Math.min((currentStreak / 30) * 100, 100);
 
   return (
-    <div className="h-[calc(100vh-4rem)] md:min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="text-center space-y-3 max-w-md">
+    <div className="h-[calc(100vh-4rem)] md:min-h-screen flex items-center justify-center relative px-4">
+      {/* Background gradient - same as Exchange */}
+      <div className="fixed inset-0 z-0 overflow-hidden">
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)'
+          }}
+        >
+          <StarsBackground />
+        </div>
+      </div>
+      
+      <div className="text-center space-y-3 max-w-md relative z-10">
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 shadow-2xl shadow-yellow-500/50 animate-[golden-glow_2s_ease-in-out_infinite]" style={{
           backgroundSize: '200% 200%'
         }}>
