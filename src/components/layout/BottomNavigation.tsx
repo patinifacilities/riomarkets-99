@@ -70,8 +70,8 @@ const BottomNavigation = () => {
           </Link>
         )}
 
-        {/* Right side - 2 items with raffles shifted right */}
-        <div className="flex-1 flex justify-end gap-8 pr-2">
+        {/* Right side - 2 items with raffles shifted left slightly */}
+        <div className="flex-1 flex justify-end gap-6 pr-4">
           {visibleItems.slice(3).map((item) => {
             const isActive = location.pathname === item.href;
 

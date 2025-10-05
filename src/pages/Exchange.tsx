@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowUpDown, Wallet, Loader2, ArrowDown, ArrowUp, CheckCircle2, Zap, Settings, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { StarsBackground } from '@/components/ui/StarsBackground';
 
 const ExchangeNew = () => {
   const { user } = useAuth();
@@ -231,8 +232,20 @@ const ExchangeNew = () => {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-background pb-32">
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <div className="min-h-[100dvh] relative pb-32">
+      {/* Background gradient - same as Fast page */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)'
+          }}
+        >
+          <StarsBackground />
+        </div>
+      </div>
+      
+      <div className="container mx-auto px-4 py-8 max-w-2xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -289,8 +302,8 @@ const ExchangeNew = () => {
                           <span className="text-base font-bold text-white">R$</span>
                         </div>
                       ) : riozIconUrl ? (
-                        <div className="w-full h-full bg-white rounded-full flex items-center justify-center p-2">
-                          <img src={riozIconUrl} alt="RIOZ" className="w-full h-full object-contain" />
+                        <div className="w-full h-full bg-white rounded-full flex items-center justify-center overflow-hidden">
+                          <img src={riozIconUrl} alt="RIOZ" className="w-full h-full object-cover scale-150" />
                         </div>
                       ) : (
                         <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
@@ -407,8 +420,8 @@ const ExchangeNew = () => {
                           <span className="text-base font-bold text-white">R$</span>
                         </div>
                       ) : riozIconUrl ? (
-                        <div className="w-full h-full bg-white rounded-full flex items-center justify-center p-2">
-                          <img src={riozIconUrl} alt="RIOZ" className="w-full h-full object-contain" />
+                        <div className="w-full h-full bg-white rounded-full flex items-center justify-center overflow-hidden">
+                          <img src={riozIconUrl} alt="RIOZ" className="w-full h-full object-cover scale-150" />
                         </div>
                       ) : (
                         <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">

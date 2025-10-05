@@ -814,7 +814,9 @@ const Fast = () => {
   if (!fastSystemEnabled) {
     return (
       <div className="min-h-[100dvh] relative overflow-hidden bg-gradient-to-b from-background via-background to-primary/5 pb-32">
-        <TickerBar />
+        <div className="relative z-[60]">
+          <TickerBar />
+        </div>
         <div className="fixed inset-0 z-0 pointer-events-none">
           <StarsBackground />
         </div>
@@ -845,6 +847,9 @@ const Fast = () => {
 
   return (
     <div className="min-h-[100dvh] relative overflow-hidden bg-gradient-to-b from-background via-background to-primary/5 pb-32">
+      <div className="relative z-[60]">
+        <TickerBar />
+      </div>
       <div className="fixed inset-0 z-0 pointer-events-none">
         <StarsBackground />
       </div>
@@ -1345,8 +1350,6 @@ const Fast = () => {
         </div>
       </div>
 
-      {/* Footer spacing fix - remove empty space before gradient */}
-      <div className="h-8"></div>
 
       {/* Opinion Notifications Stack - Bottom right, above Riana */}
       <div className="fixed bottom-24 right-4 z-30 space-y-2 max-w-xs">
