@@ -875,13 +875,9 @@ const Fast = () => {
   }
 
   return (
-    <div className="min-h-[100dvh] relative overflow-hidden pb-32">
-      {/* Stars Background */}
-      <div className="fixed inset-0 z-0 opacity-30 pointer-events-none">
-        <StarsBackground />
-      </div>
+    <div className="min-h-[100dvh] relative overflow-hidden pb-20">
       {/* Background gradient - same as Exchange */}
-      <div className="fixed inset-0 top-16 -z-50 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 top-16 z-0 overflow-hidden">
         <div 
           className="absolute inset-0"
           style={{
@@ -1374,18 +1370,6 @@ const Fast = () => {
         </div>
         
         
-        {/* Terms Button at Bottom */}
-        <div className="max-w-4xl mx-auto mt-8 text-center">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowTermsModal(true)}
-            className="gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <AlertTriangle className="w-4 h-4" />
-            Termos Fast Markets
-          </Button>
-        </div>
       </div>
 
 

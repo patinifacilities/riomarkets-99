@@ -167,7 +167,7 @@ export const FastPoolSlide = ({ onClick }: FastPoolSlideProps) => {
               className="font-bold px-8 md:px-10 py-6 md:py-8 rounded-full text-lg md:text-xl transition-all hover:scale-110 shadow-2xl group-hover:shadow-[#00ff90]/50 w-full md:w-auto"
               style={{ backgroundColor: '#00ff90', color: '#000000' }}
             >
-              <BarChart3 className="w-5 md:w-6 h-5 md:h-6 mr-2" />
+              <Zap className="w-5 md:w-6 h-5 md:h-6 mr-2" />
               ANALISAR
             </Button>
           </div>

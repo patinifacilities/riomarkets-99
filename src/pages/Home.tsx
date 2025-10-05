@@ -367,7 +367,7 @@ const Home = () => {
               {/* Desktop: Show slides or fallback to logo */}
               {orderedSlides.length > 0 ? (
                 orderedSlides.map((slide, idx) => {
-                const slideKey = `${slide.type}-${idx}-${slide.type === 'market' ? slide.data?.id : slide.type === 'image' ? slide.data?.id : 'card'}`;
+                const slideKey = `slide-${idx}-${Date.now()}`;
                 
                 if (slide.type === 'fast') {
                   // Fast pool slide - Hidden on mobile
