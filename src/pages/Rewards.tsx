@@ -57,7 +57,7 @@ export default function Rewards() {
   if (loading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center relative">
-        <div className="fixed inset-0 z-0 overflow-hidden">
+        <div className="fixed inset-0 top-16 z-0 overflow-hidden">
           <div 
             className="absolute inset-0"
             style={{
@@ -85,7 +85,7 @@ export default function Rewards() {
   return (
     <div className="h-[calc(100vh-4rem)] md:min-h-screen flex items-center justify-center relative px-4">
       {/* Background gradient - same as Exchange */}
-      <div className="fixed inset-0 z-0 overflow-hidden">
+      <div className="fixed inset-0 top-16 z-0 overflow-hidden">
         <div 
           className="absolute inset-0"
           style={{
