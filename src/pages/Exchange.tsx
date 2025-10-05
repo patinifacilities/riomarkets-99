@@ -535,9 +535,9 @@ const ExchangeNew = () => {
           <div className="mt-6 space-y-4">
             <Button
               onClick={() => window.location.href = '/fast'}
-              className="w-full h-14 text-lg font-bold bg-[#ff2389] hover:bg-[#ff2389]/90 text-white shadow-lg"
+              className="w-full h-14 text-lg font-bold bg-[#ff2389] hover:bg-[#ff2389]/90 text-white shadow-lg animate-pulse hover:animate-none transition-all hover:scale-105"
             >
-              <Zap className="w-5 h-5 mr-2" />
+              <Zap className="w-5 h-5 mr-2 fill-white animate-bounce" style={{ animationDuration: '1s' }} />
               Ir para Fast Markets
             </Button>
             

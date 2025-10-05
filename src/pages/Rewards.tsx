@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Gift, Flame, Trophy, Star, Calendar, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
+import { StarsBackground } from '@/components/ui/StarsBackground';
 
 export default function Rewards() {
   const navigate = useNavigate();
@@ -79,13 +80,15 @@ export default function Rewards() {
   return (
     <div className="min-h-[70vh] md:min-h-[80vh] flex items-center justify-center relative px-4 py-8 pb-24 md:pb-8">
       {/* Exchange background */}
-      <div className="fixed inset-0 top-16 z-0 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 top-16 -z-50 overflow-hidden pointer-events-none">
         <div 
           className="absolute inset-0"
           style={{
             background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)'
           }}
-        />
+        >
+          <StarsBackground />
+        </div>
       </div>
       
       <div className="text-center space-y-3 max-w-md relative z-10">

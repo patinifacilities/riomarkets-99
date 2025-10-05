@@ -435,12 +435,6 @@ const Home = () => {
                 
                 // Market slide - Hidden on mobile
                 const market = slide.data;
-                const yesOption = market.opcoes?.find((opt: any) => opt.toLowerCase().includes('sim') || opt.toLowerCase().includes('yes'));
-                const noOption = market.opcoes?.find((opt: any) => opt.toLowerCase().includes('não') || opt.toLowerCase().includes('no'));
-                
-                // Calculate probabilities (mock for now)
-                const yesProb = 50 + Math.random() * 40;
-                const noProb = 100 - yesProb;
                 
                 return (
                   <CarouselItem key={market.id} className="hidden md:block">
@@ -473,40 +467,9 @@ const Home = () => {
                         <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6 md:gap-8">
                           {/* Left side - Market info */}
                           <div className="flex-1 w-full md:max-w-2xl space-y-4 md:space-y-6 text-center md:text-left">
-                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight line-clamp-3">
                               {market.titulo}
                             </h2>
-                            
-                            {/* Probability Bars */}
-                            <div className="space-y-3">
-                              {/* Yes Option */}
-                              <div className="space-y-2">
-                                <div className="flex justify-between items-center text-white">
-                                  <span className="font-medium text-sm md:text-base">{yesOption || 'Sim'}</span>
-                                  <span className="font-bold text-lg md:text-xl">{Math.round(yesProb)}%</span>
-                                </div>
-                                <div className="h-2 md:h-3 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
-                                  <div 
-                                    className="h-full bg-gradient-to-r from-[#00ff90] to-[#00ff90]/80 rounded-full transition-all duration-500"
-                                    style={{ width: `${yesProb}%` }}
-                                  />
-                                </div>
-                              </div>
-                              
-                              {/* No Option */}
-                              <div className="space-y-2">
-                                <div className="flex justify-between items-center text-white">
-                                  <span className="font-medium text-sm md:text-base">{noOption || 'Não'}</span>
-                                  <span className="font-bold text-lg md:text-xl">{Math.round(noProb)}%</span>
-                                </div>
-                                <div className="h-2 md:h-3 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
-                                  <div 
-                                    className="h-full bg-gradient-to-r from-[#ff2389] to-[#ff2389]/80 rounded-full transition-all duration-500"
-                                    style={{ width: `${noProb}%` }}
-                                  />
-                                </div>
-                              </div>
-                            </div>
                             
                             {/* Stats */}
                             <div className="flex items-center gap-3 md:gap-4 justify-center md:justify-start text-white/90">

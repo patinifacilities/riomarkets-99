@@ -175,9 +175,10 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                 <img 
                   src={hotFire}
                   alt="Hot"
-                  className="w-5 h-5 drop-shadow-[0_0_8px_rgba(255,35,137,0.8)]"
+                  className="w-5 h-5 drop-shadow-[0_0_8px_rgba(255,35,137,0.8)] mix-blend-lighten"
                   style={{ 
-                    animation: 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    animation: 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    filter: 'drop-shadow(0 0 8px rgba(255,35,137,0.8))'
                   }}
                 />
                 HOT
@@ -194,31 +195,23 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
 
             {/* Probability Bar */}
             <div className="mb-4">
-              <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
-                <span className="font-medium">Sim {Math.round(yesPercentage)}%</span>
-                <span className="font-medium">{Math.round(noPercentage)}% Não</span>
-              </div>
-              <div className="relative h-2 bg-[#2a2a2a] rounded-full overflow-hidden flex group">
+              <div className="relative h-2.5 bg-[#2a2a2a] rounded-full overflow-hidden flex group">
                 <div 
-                  className="transition-all duration-500 ease-out group-hover:opacity-90"
+                  className="transition-all duration-700 ease-out relative before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:animate-[shimmer_2s_ease-in-out_infinite]"
                   style={{ 
                     width: `${yesPercentage}%`,
-                    backgroundColor: '#00ff90'
+                    backgroundColor: '#00ff90',
+                    minWidth: yesPercentage > 0 && yesPercentage < 5 ? '4px' : '0'
                   }}
                 />
                 <div 
-                  className="transition-all duration-500 ease-out group-hover:opacity-90"
+                  className="transition-all duration-700 ease-out relative before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:animate-[shimmer_2s_ease-in-out_infinite]"
                   style={{ 
                     width: `${noPercentage}%`,
-                    backgroundColor: '#ff2389'
+                    backgroundColor: '#ff2389',
+                    minWidth: noPercentage > 0 && noPercentage < 5 ? '4px' : '0'
                   }}
                 />
-                {/* Hover tooltip */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                  <span className="text-xs font-bold text-white drop-shadow-lg">
-                    Order Book: {Math.round(yesPercentage)}% / {Math.round(noPercentage)}%
-                  </span>
-                </div>
               </div>
             </div>
 

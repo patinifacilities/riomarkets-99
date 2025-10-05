@@ -281,11 +281,20 @@ const RaffleDetail = () => {
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Progresso</p>
                 {progressPercent >= 78 ? (
-                  <OptionProgressBar 
-                    percentage={progressPercent}
-                    variant="neutral"
-                    className="h-3 animate-gradient"
-                  />
+                  <div className="w-full h-3 bg-muted rounded-full overflow-hidden relative">
+                    <div 
+                      className="h-full transition-all duration-700 bg-gradient-to-r from-[#ffd700] via-[#ffed4e] to-[#ffd700] relative"
+                      style={{ 
+                        width: `${progressPercent}%`,
+                        backgroundSize: '200% 100%',
+                        animation: 'gradient 3s ease infinite'
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer-slow" 
+                        style={{ backgroundSize: '200% 100%' }}
+                      />
+                    </div>
+                  </div>
                 ) : (
                   <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
                     <div 
@@ -327,12 +336,13 @@ const RaffleDetail = () => {
 
               <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <Ticket className="w-4 h-4 text-primary" />
-                  <span className="text-sm">Bilhetes</span>
+                  <Ticket className="w-5 h-5 text-primary" />
+                  <span className="text-sm font-medium">Quantidade</span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Ticket className="w-5 h-5 text-primary" />
                   <span className="text-xl font-bold">{Math.floor(amount / raffle.entry_cost)}</span>
-                  <span className="text-sm text-muted-foreground">Bilhetes</span>
+                  <span className="text-sm font-medium">Bilhetes</span>
                 </div>
               </div>
 
