@@ -122,7 +122,7 @@ function App() {
             <Route path="/admin/branding" element={<AdminBranding />} />
             <Route path="/admin/exchange" element={<AdminExchange />} />
             <Route path="/admin/raffles" element={<AdminRaffles />} />
-            <Route path="/admin/raffles/slider" element={<AdminRaffleSlider />} />
+            <Route path="/admin/raffle-slider" element={<AdminRaffleSlider />} />
           <Route path="/opinioes" element={<Opinioes />} />
               <Route path="/raffles" element={<Raffles />} />
               <Route path="/raffles/:id" element={<RaffleDetail />} />

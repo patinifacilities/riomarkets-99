@@ -766,13 +766,21 @@ const Fast = () => {
         {/* Hide footer on loading screen only */}
         <style>{`
           footer { display: none !important; }
+          /* Ensure ticker bar is visible above loading screen */
+          .ticker-bar { 
+            z-index: 50 !important; 
+            position: relative !important;
+          }
         `}</style>
-        <div className="fixed inset-0 flex items-center justify-center overflow-hidden">
-          {/* Background gradient */}
-          <div className="fixed inset-0 -z-50 pointer-events-none" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)' }}>
+        <div className="fixed inset-0 flex items-center justify-center overflow-hidden" style={{ zIndex: 1 }}>
+          {/* Background gradient - lowest layer */}
+          <div className="fixed inset-0 pointer-events-none" style={{ 
+            background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)',
+            zIndex: -100
+          }}>
             <StarsBackground />
           </div>
-          <div className="text-center">
+          <div className="text-center" style={{ zIndex: 10 }}>
             <div className="w-32 h-32 rounded-full bg-[#ff2389]/5 flex items-center justify-center mx-auto mb-4">
               <Zap className="w-16 h-16 text-[#ff2389]" style={{
                 animation: 'blink-118bpm 0.508s infinite'
@@ -850,9 +858,10 @@ const Fast = () => {
     <div className="min-h-[100dvh] relative overflow-hidden pb-32">
       {/* Background gradient - LOWEST z-index */}
       <div 
-        className="fixed inset-0 -z-50 pointer-events-none"
+        className="fixed inset-0 pointer-events-none"
         style={{ 
-          background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)'
+          background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)',
+          zIndex: -100
         }}
       >
         <StarsBackground />

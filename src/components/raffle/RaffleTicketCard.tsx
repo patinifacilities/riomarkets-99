@@ -60,7 +60,7 @@ export const RaffleTicketCard = ({
       </div>
 
       {imageUrl && (
-        <div className="w-full h-48 overflow-hidden">
+        <div className="w-full aspect-square overflow-hidden">
           <img 
             src={imageUrl} 
             alt={raffleTitle}

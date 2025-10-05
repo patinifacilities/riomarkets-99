@@ -70,9 +70,9 @@ const BottomNavigation = () => {
           </Link>
         )}
 
-        {/* Right side - 2 items with raffles shifted left slightly */}
-        <div className="flex-1 flex justify-end gap-6 pr-4">
-          {visibleItems.slice(3).map((item) => {
+        {/* Right side - 2 items with raffles shifted left */}
+        <div className="flex-1 flex justify-end gap-8 pr-2">
+          {visibleItems.slice(3).map((item, index) => {
             const isActive = location.pathname === item.href;
 
             return (
@@ -83,7 +83,8 @@ const BottomNavigation = () => {
                   "flex flex-col items-center justify-center h-full gap-1 transition-colors",
                   isActive 
                     ? "text-primary" 
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                  index === 0 && "-translate-x-4"
                 )}
               >
                 <item.icon className="w-5 h-5" />

@@ -169,7 +169,7 @@ const Raffles = () => {
                 onClick={() => navigate(`/raffles/${raffle.id}`)}
               >
                 {raffle.image_url && (
-                  <div className="w-full h-48 overflow-hidden">
+                  <div className="w-full aspect-square overflow-hidden">
                     <img 
                       src={raffle.image_url} 
                       alt={raffle.title}
