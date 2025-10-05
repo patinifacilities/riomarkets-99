@@ -283,23 +283,25 @@ const ExchangeNew = () => {
               <div className="space-y-2">
                 <div className="relative bg-muted/30 rounded-2xl border-2 border-border hover:border-primary/50 transition-colors">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center">
+                      {fromCurrency === 'BRL' ? (
+                        <div className="w-full h-full bg-green-600 rounded-full flex items-center justify-center">
+                          <span className="text-base font-bold text-white">R$</span>
+                        </div>
+                      ) : riozIconUrl ? (
+                        <div className="w-full h-full bg-white rounded-full flex items-center justify-center p-2">
+                          <img src={riozIconUrl} alt="RIOZ" className="w-full h-full object-contain" />
+                        </div>
+                      ) : (
+                        <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
+                          <span className="text-xl font-bold text-black">R</span>
+                        </div>
+                      )}
+                    </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity overflow-hidden">
-                          {fromCurrency === 'BRL' ? (
-                            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                              <span className="text-sm font-bold text-white">R$</span>
-                            </div>
-                          ) : riozIconUrl ? (
-                            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1.5">
-                              <img src={riozIconUrl} alt="RIOZ" className="w-full h-full object-contain" />
-                            </div>
-                          ) : (
-                            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                              <span className="text-lg font-bold text-black">R</span>
-                            </div>
-                          )}
-                          <ChevronDown className="w-3 h-3 text-foreground ml-1" />
+                        <button className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity">
+                          <ChevronDown className="w-4 h-4 text-muted-foreground" />
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="bg-card border-border shadow-xl rounded-xl p-2 min-w-[280px] z-[100]">
@@ -399,23 +401,25 @@ const ExchangeNew = () => {
               
               <div className="relative bg-muted/30 rounded-2xl border-2 border-border hover:border-primary/50 transition-colors">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-3 z-10">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center">
+                      {toCurrency === 'BRL' ? (
+                        <div className="w-full h-full bg-green-600 rounded-full flex items-center justify-center">
+                          <span className="text-base font-bold text-white">R$</span>
+                        </div>
+                      ) : riozIconUrl ? (
+                        <div className="w-full h-full bg-white rounded-full flex items-center justify-center p-2">
+                          <img src={riozIconUrl} alt="RIOZ" className="w-full h-full object-contain" />
+                        </div>
+                      ) : (
+                        <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
+                          <span className="text-xl font-bold text-black">R</span>
+                        </div>
+                      )}
+                    </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity overflow-hidden">
-                          {toCurrency === 'BRL' ? (
-                            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                              <span className="text-sm font-bold text-white">R$</span>
-                            </div>
-                          ) : riozIconUrl ? (
-                            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1.5">
-                              <img src={riozIconUrl} alt="RIOZ" className="w-full h-full object-contain" />
-                            </div>
-                          ) : (
-                            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                              <span className="text-lg font-bold text-black">R</span>
-                            </div>
-                          )}
-                          <ChevronDown className="w-3 h-3 text-foreground ml-1" />
+                        <button className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity">
+                          <ChevronDown className="w-4 h-4 text-muted-foreground" />
                         </button>
                       </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-card border-border shadow-xl rounded-xl p-2 min-w-[280px] z-[100]">

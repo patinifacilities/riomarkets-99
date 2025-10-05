@@ -848,7 +848,7 @@ const Fast = () => {
       <div className="fixed inset-0 z-0 pointer-events-none">
         <StarsBackground />
       </div>
-      {/* Hide elements on mobile and add animations */}
+      {/* Hide elements on mobile, fix z-index for loading, and add animations */}
       <style>{`
         @media (max-width: 768px) {
           .riana-chat-button,
@@ -858,6 +858,15 @@ const Fast = () => {
           .fixed-dark-mode-toggle {
             display: none !important;
           }
+        }
+        
+        /* Fix z-index during loading to prevent markets passing over header */
+        .ticker-bar {
+          z-index: 40 !important;
+        }
+        
+        header {
+          z-index: 50 !important;
         }
         
         @keyframes heartbeat {
@@ -1335,6 +1344,9 @@ const Fast = () => {
           </Button>
         </div>
       </div>
+
+      {/* Footer spacing fix - remove empty space before gradient */}
+      <div className="h-8"></div>
 
       {/* Opinion Notifications Stack - Bottom right, above Riana */}
       <div className="fixed bottom-24 right-4 z-30 space-y-2 max-w-xs">

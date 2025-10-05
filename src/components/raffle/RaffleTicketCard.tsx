@@ -69,7 +69,7 @@ export const RaffleTicketCard = ({
         </div>
       )}
       
-      <div className="p-6 pr-8 space-y-4">
+      <div className="p-5 pr-10 space-y-4">
         <div>
           <h3 className={cn(
             "text-xl font-bold mb-2",

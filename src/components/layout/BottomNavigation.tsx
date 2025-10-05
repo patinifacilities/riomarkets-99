@@ -20,8 +20,8 @@ const BottomNavigation = () => {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden pb-[env(safe-area-inset-bottom)]">
       <div className="flex items-center h-16 relative px-2">
-        {/* Left side - 2 items evenly spaced */}
-        <div className="flex-1 flex justify-around">
+        {/* Left side - 2 items with markets shifted left */}
+        <div className="flex-1 flex justify-start gap-8 pl-2">
           {visibleItems.slice(0, 2).map((item) => {
             const isActive = item.href === '/' 
               ? (location.pathname === '/' || location.pathname.startsWith('/market/'))
@@ -70,8 +70,8 @@ const BottomNavigation = () => {
           </Link>
         )}
 
-        {/* Right side - 2 items evenly spaced */}
-        <div className="flex-1 flex justify-around">
+        {/* Right side - 2 items with raffles shifted right */}
+        <div className="flex-1 flex justify-end gap-8 pr-2">
           {visibleItems.slice(3).map((item) => {
             const isActive = location.pathname === item.href;
 
