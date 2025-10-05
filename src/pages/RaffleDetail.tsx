@@ -280,11 +280,23 @@ const RaffleDetail = () => {
 
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Progresso</p>
-                <OptionProgressBar 
-                  percentage={progressPercent}
-                  variant="neutral"
-                  className="h-3"
-                />
+                {progressPercent >= 78 ? (
+                  <OptionProgressBar 
+                    percentage={progressPercent}
+                    variant="neutral"
+                    className="h-3 animate-gradient"
+                  />
+                ) : (
+                  <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full transition-all duration-700"
+                      style={{
+                        width: `${progressPercent}%`,
+                        background: 'linear-gradient(90deg, hsl(var(--success)) 0%, hsl(var(--success)) 100%)'
+                      }}
+                    />
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground mt-1">
                   {progressPercent.toFixed(1)}% da meta
                 </p>
@@ -314,8 +326,14 @@ const RaffleDetail = () => {
               />
 
               <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                <span className="text-sm">Bilhetes</span>
-                <span className="text-xl font-bold">{Math.floor(amount / raffle.entry_cost)}</span>
+                <div className="flex items-center gap-2">
+                  <Ticket className="w-4 h-4 text-primary" />
+                  <span className="text-sm">Bilhetes</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl font-bold">{Math.floor(amount / raffle.entry_cost)}</span>
+                  <span className="text-sm text-muted-foreground">Bilhetes</span>
+                </div>
               </div>
 
               <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">

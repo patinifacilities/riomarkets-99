@@ -48,6 +48,25 @@ const AdminRaffles = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRaffle, setEditingRaffle] = useState<Raffle | null>(null);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
+  
+  const toggleMaintenanceMode = async (newMode: boolean) => {
+    setMaintenanceMode(newMode);
+    
+    // Update all active raffles to be paused/unpaused
+    const { error } = await supabase
+      .from('raffles')
+      .update({ paused: newMode })
+      .eq('status', 'active');
+    
+    if (error) {
+      toast.error('Erro ao atualizar modo manutenção');
+      setMaintenanceMode(!newMode); // Revert on error
+    } else {
+      toast.success(newMode ? 'Modo manutenção ativado - rifas pausadas' : 'Modo manutenção desativado - rifas ativas');
+      fetchRaffles(); // Refresh raffles
+    }
+  };
+  
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -72,10 +91,15 @@ const AdminRaffles = () => {
       const { data, error } = await supabase
         .from('raffles')
         .select('*')
-        .order('display_order', { ascending: true, nullsFirst: false });
+        .order('display_order', { ascending: true, nullsFirst: false })
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       setRaffles(data || []);
+      
+      // Check if any raffles are paused to set maintenance mode
+      const anyPaused = data?.some(r => r.paused && r.status !== 'completed');
+      if (anyPaused) setMaintenanceMode(true);
     } catch (error) {
       console.error('Error fetching raffles:', error);
     } finally {
@@ -401,7 +425,7 @@ const AdminRaffles = () => {
                   <Switch
                     id="maintenance-mode"
                     checked={maintenanceMode}
-                    onCheckedChange={setMaintenanceMode}
+                    onCheckedChange={toggleMaintenanceMode}
                   />
                 </div>
               </div>

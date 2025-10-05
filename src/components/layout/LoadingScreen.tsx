@@ -16,7 +16,9 @@ export const LoadingScreen = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background">
+    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center" style={{
+      background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)'
+    }}>
       <div className="flex flex-col items-center gap-6 animate-fade-in">
         {/* Logo */}
         <img 

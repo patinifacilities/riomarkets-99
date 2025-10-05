@@ -855,14 +855,16 @@ const Fast = () => {
 
   return (
     <div className="min-h-[100dvh] relative overflow-hidden pb-32">
-      {/* Loading Screen Background - Same as LoadingScreen - LOWEST z-index */}
-      <div 
-        className="fixed inset-0 pointer-events-none bg-gradient-to-br from-background via-primary/5 to-background"
-        style={{ 
-          zIndex: -100
-        }}
-      >
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background opacity-60" />
+      {/* Background gradient - same as Exchange */}
+      <div className="fixed inset-0 top-16 z-0 overflow-hidden pointer-events-none">
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)'
+          }}
+        >
+          <StarsBackground />
+        </div>
       </div>
       {/* Hide elements on mobile, fix z-index for loading, and add animations */}
       <style>{`

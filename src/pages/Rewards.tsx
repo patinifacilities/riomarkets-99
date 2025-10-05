@@ -78,10 +78,14 @@ export default function Rewards() {
 
   return (
     <div className="min-h-[70vh] md:min-h-[80vh] flex items-center justify-center relative px-4 py-8 pb-24 md:pb-8">
-      {/* Exchange-like background */}
-      <div className="fixed inset-0 pointer-events-none -z-50">
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-primary/5 to-background" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+      {/* Exchange background */}
+      <div className="fixed inset-0 top-16 z-0 overflow-hidden pointer-events-none">
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)'
+          }}
+        />
       </div>
       
       <div className="text-center space-y-3 max-w-md relative z-10">

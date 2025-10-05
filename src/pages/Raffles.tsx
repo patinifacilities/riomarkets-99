@@ -39,6 +39,7 @@ const Raffles = () => {
         .from('raffles')
         .select('*')
         .in('status', ['active', 'completed'])
+        .order('display_order', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -170,12 +171,30 @@ const Raffles = () => {
                 onClick={() => navigate(`/raffles/${raffle.id}`)}
               >
                 {raffle.image_url && (
-                  <div className="w-full aspect-square overflow-hidden">
+                  <div className="w-full aspect-square overflow-hidden relative">
                     <img 
                       src={raffle.image_url} 
                       alt={raffle.title}
                       className="w-full h-full object-cover"
                     />
+                    {/* Countdown badge */}
+                    {raffle.ends_at && (
+                      <div className="absolute top-2 right-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-sm border border-white/20 animate-pulse">
+                        <span className="text-white text-xs font-bold">
+                          {(() => {
+                            const endDate = new Date(raffle.ends_at);
+                            const now = new Date();
+                            const diff = endDate.getTime() - now.getTime();
+                            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            
+                            if (days > 0) return `em ${days} dia${days > 1 ? 's' : ''}`;
+                            if (hours > 0) return `em ${hours} hora${hours > 1 ? 's' : ''}`;
+                            return 'finaliza em breve';
+                          })()}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
                 
