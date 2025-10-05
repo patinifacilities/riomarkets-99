@@ -816,9 +816,6 @@ const Fast = () => {
   if (!fastSystemEnabled) {
     return (
       <div className="min-h-[100dvh] relative overflow-hidden bg-gradient-to-b from-background via-background to-primary/5 pb-32">
-        <div className="relative z-[60]">
-          <TickerBar />
-        </div>
         <div className="fixed inset-0 z-0 pointer-events-none">
           <StarsBackground />
         </div>
@@ -849,11 +846,8 @@ const Fast = () => {
 
   return (
     <div className="min-h-[100dvh] relative overflow-hidden pb-32">
-      {/* Background gradient */}
-      <div className="fixed inset-0 bg-gradient-to-b from-background via-background to-primary/5 pointer-events-none z-0" />
-      <div className="relative z-[60]">
-        <TickerBar />
-      </div>
+      {/* Background gradient - starts at footer top */}
+      <div className="fixed inset-0 top-0 bottom-16 bg-gradient-to-b from-background via-background to-primary/5 pointer-events-none z-0" />
       <div className="fixed inset-0 z-0 pointer-events-none">
         <StarsBackground />
       </div>
