@@ -316,7 +316,7 @@ export const NewsManagement = () => {
                 Nova Notícia
               </Button>
             </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>
                 {editingNews ? 'Editar Notícia' : 'Nova Notícia'}
@@ -414,7 +414,8 @@ export const NewsManagement = () => {
               </div>
             </form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <div className="grid gap-4">

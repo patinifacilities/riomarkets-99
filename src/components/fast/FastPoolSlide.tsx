@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Zap, TrendingUp, TrendingDown, Users, Clock } from 'lucide-react';
+import { Zap, TrendingUp, TrendingDown, Users, Clock, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
@@ -156,7 +156,7 @@ export const FastPoolSlide = ({ onClick }: FastPoolSlideProps) => {
             </div>
           </div>
           
-          {/* Right side - Play button */}
+          {/* Right side - Analisar button */}
           <div className="flex items-center justify-center w-full md:w-auto">
             <Button
               size="lg"
@@ -164,10 +164,11 @@ export const FastPoolSlide = ({ onClick }: FastPoolSlideProps) => {
                 e.stopPropagation();
                 handleSlideClick(e);
               }}
-              className="bg-white text-[#ff2389] hover:bg-white/90 font-bold px-8 md:px-10 py-6 md:py-8 rounded-full text-lg md:text-xl transition-all hover:scale-110 shadow-2xl group-hover:shadow-white/50 w-full md:w-auto"
+              className="font-bold px-8 md:px-10 py-6 md:py-8 rounded-full text-lg md:text-xl transition-all hover:scale-110 shadow-2xl group-hover:shadow-[#00ff90]/50 w-full md:w-auto"
+              style={{ backgroundColor: '#00ff90', color: '#000000' }}
             >
-              <Zap className="w-5 md:w-6 h-5 md:h-6 mr-2 fill-current" />
-              OPINAR AGORA
+              <BarChart3 className="w-5 md:w-6 h-5 md:h-6 mr-2" />
+              ANALISAR
             </Button>
           </div>
         </div>

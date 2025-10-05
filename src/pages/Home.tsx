@@ -226,10 +226,7 @@ const Home = () => {
     const seenSlides = new Set<string>();
     
     if (slideOrder.length === 0) {
-      // Fallback: show text card + selected markets + custom images
-      slides.push({ type: 'text' as const, data: null });
-      seenSlides.add('text-card');
-      
+      // Fallback: show selected markets + custom images
       sliderMarkets.forEach(m => {
         if (!seenSlides.has(m.id)) {
           slides.push({ type: 'market' as const, data: m });
