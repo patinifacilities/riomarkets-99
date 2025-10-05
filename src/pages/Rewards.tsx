@@ -78,9 +78,9 @@ export default function Rewards() {
   const monthlyProgress = Math.min((currentStreak / 30) * 100, 100);
 
   return (
-    <div className="min-h-[70vh] md:min-h-[80vh] flex items-center justify-center relative px-4 py-8 pb-24 md:pb-8">
-      {/* Exchange background */}
-      <div className="fixed inset-0 top-16 -z-50 overflow-hidden pointer-events-none">
+    <div className="min-h-screen relative pb-32">
+      {/* Exchange background - same as Exchange page */}
+      <div className="fixed inset-0 top-16 z-0 overflow-hidden">
         <div 
           className="absolute inset-0"
           style={{
@@ -91,7 +91,9 @@ export default function Rewards() {
         </div>
       </div>
       
-      <div className="text-center space-y-3 max-w-md relative z-10">
+      <div className="min-h-[70vh] md:min-h-[80vh] flex items-center justify-center relative px-4 py-8 pb-24 md:pb-8 z-10">
+      
+      <div className="text-center space-y-3 max-w-md">
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 shadow-2xl shadow-yellow-500/50 animate-[golden-glow_2s_ease-in-out_infinite]" style={{
           backgroundSize: '200% 200%'
         }}>
@@ -110,6 +112,7 @@ export default function Rewards() {
             Ver Mercados
           </Button>
         </div>
+      </div>
       </div>
     </div>
   );

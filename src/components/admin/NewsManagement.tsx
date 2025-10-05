@@ -433,11 +433,11 @@ export const NewsManagement = () => {
               <CardContent className="p-6">
                 <div className="flex gap-4">
                   {newsItem.logo_url && (
-                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-white p-2">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                       <img 
                         src={newsItem.logo_url} 
                         alt={newsItem.vehicle}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-cover"
                       />
                     </div>
                   )}

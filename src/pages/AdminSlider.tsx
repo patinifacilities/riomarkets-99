@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { useMarkets } from '@/hooks/useMarkets';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +14,12 @@ import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea
 import { cn } from '@/lib/utils';
 import { ImageCropper } from '@/components/admin/ImageCropper';
 import { ImageUploadModal } from '@/components/admin/ImageUploadModal';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle 
+} from '@/components/ui/dialog';
 
 interface CustomImage {
   id: string;
@@ -27,6 +34,7 @@ interface SlideItem {
   imageUrl?: string;
   title?: string;
   hidden?: boolean;
+  linkSlug?: string;
 }
 
 const AdminSlider = () => {
@@ -45,6 +53,8 @@ const AdminSlider = () => {
   const [currentCropImage, setCurrentCropImage] = useState('');
   const [pendingCropArea, setPendingCropArea] = useState<any>(null);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [editingSlideId, setEditingSlideId] = useState<string | null>(null);
+  const [editLinkSlug, setEditLinkSlug] = useState('');
 
   // Load existing config
   useEffect(() => {
@@ -83,6 +93,7 @@ const AdminSlider = () => {
           // Handle both string and object format for backwards compatibility
           const id = typeof item === 'string' ? item : (item.id || item);
           const hidden = typeof item === 'object' && item.hidden !== undefined ? item.hidden : false;
+          const linkSlug = typeof item === 'object' && item.linkSlug ? item.linkSlug : '';
           
           if (id.startsWith('custom-')) {
             const img = customImgs.find((i) => i.id === id);
@@ -90,26 +101,30 @@ const AdminSlider = () => {
               id,
               type: 'image' as const,
               imageUrl: img?.url,
-              hidden
+              hidden,
+              linkSlug
             };
           } else if (id === 'fast-card') {
             return {
               id: 'fast-card',
               type: 'fast' as const,
-              hidden
+              hidden,
+              linkSlug
             };
           } else if (id === 'text-card') {
             return {
               id: 'text-card',
               type: 'text' as const,
-              hidden
+              hidden,
+              linkSlug
             };
           } else {
             return {
               id,
               type: 'market' as const,
               marketId: id,
-              hidden
+              hidden,
+              linkSlug
             };
           }
         }).filter((item: SlideItem) => item.imageUrl || item.marketId || item.type === 'fast' || item.type === 'text');
@@ -250,13 +265,33 @@ const AdminSlider = () => {
     );
   };
 
+  const handleEditSlideLink = (slideId: string, currentSlug?: string) => {
+    setEditingSlideId(slideId);
+    setEditLinkSlug(currentSlug || '');
+  };
+
+  const handleSaveSlideLink = () => {
+    if (editingSlideId) {
+      setSlideOrder(prev =>
+        prev.map(slide =>
+          slide.id === editingSlideId
+            ? { ...slide, linkSlug: editLinkSlug }
+            : slide
+        )
+      );
+      setEditingSlideId(null);
+      setEditLinkSlug('');
+    }
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Save complete slide order including hidden state
+      // Save complete slide order including hidden state and link slug
       const slideOrderData = slideOrder.map(s => ({
         id: s.id,
-        hidden: s.hidden || false
+        hidden: s.hidden || false,
+        linkSlug: s.linkSlug || ''
       }));
       
       const payload = {
@@ -572,6 +607,20 @@ const AdminSlider = () => {
                                 ) : null}
                               </div>
                               <div className="flex items-center gap-2">
+                                {slide.linkSlug && (
+                                  <Badge variant="outline" className="text-xs">
+                                    /{slide.linkSlug}
+                                  </Badge>
+                                )}
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleEditSlideLink(slide.id, slide.linkSlug)}
+                                  title="Editar link"
+                                  className="h-8 text-xs"
+                                >
+                                  Editar
+                                </Button>
                                 <Button
                                   variant="ghost"
                                   size="icon"
@@ -624,6 +673,40 @@ const AdminSlider = () => {
         onClose={() => setUploadModalOpen(false)}
         onImageCropped={handleImageCropped}
       />
+
+      {/* Edit Link Dialog */}
+      <Dialog open={!!editingSlideId} onOpenChange={() => setEditingSlideId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Link do Slide</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="link-slug">Slug do Link (ex: "mercados", "exchange")</Label>
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">/</span>
+                <Input
+                  id="link-slug"
+                  placeholder="mercados"
+                  value={editLinkSlug}
+                  onChange={(e) => setEditLinkSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Digite apenas o slug da página (sem barra inicial). Exemplos: mercados, fast, exchange, wallet
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleSaveSlideLink} className="flex-1">
+                Salvar
+              </Button>
+              <Button variant="outline" onClick={() => setEditingSlideId(null)}>
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
