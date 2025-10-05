@@ -271,14 +271,14 @@ const MarketDetail = () => {
                             <div 
                               className="text-2xl font-bold mt-1"
                               style={{
-                                color: sliderProgress > 0.1 ? '#1f2937' : 'transparent',
+                                color: sliderProgress > 0.1 ? '#374151' : 'transparent',
                                 backgroundImage: sliderProgress > 0.1 ? 'none' : 'linear-gradient(to right, rgb(250, 204, 21), rgb(234, 179, 8), rgb(202, 138, 4))',
                                 backgroundClip: sliderProgress > 0.1 ? 'unset' : 'text',
                                 WebkitBackgroundClip: sliderProgress > 0.1 ? 'unset' : 'text',
                                 transition: 'none'
                               }}
                             >
-                              +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz
+                              R$ {(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </div>
                           </div>
                         </div>
@@ -578,6 +578,15 @@ const MarketDetail = () => {
                  <div className="space-y-4">
                     {(userProfile?.saldo_moeda || 0) > 0 ? (
                       <>
+                        <div className="p-4 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-2 border-primary/30 rounded-xl">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium text-muted-foreground">Saldo Disponível</span>
+                            <Wallet className="w-4 h-4 text-primary" />
+                          </div>
+                          <div className="text-3xl font-bold text-primary">
+                            {(userProfile?.saldo_moeda || 0).toLocaleString()} RIOZ
+                          </div>
+                        </div>
                         <div>
                           <Label htmlFor="bet-amount" className="text-sm font-medium">
                             Quantidade
@@ -668,7 +677,7 @@ const MarketDetail = () => {
                                 color: (sliderProgress > 0.3 && sliderProgress < 1) ? '#374151' : '#eab308'
                               }}
                             >
-                              +{(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz
+                              R$ {(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </div>
                           </div>
                         </div>

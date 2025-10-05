@@ -65,7 +65,7 @@ export const FastPoolSlide = ({ onClick }: FastPoolSlideProps) => {
   const handleSlideClick = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (onClick) onClick();
-    navigate(`/ativo/BTC`);
+    navigate('/fast');
   };
 
   if (!pool) return null;

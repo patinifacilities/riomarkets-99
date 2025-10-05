@@ -127,7 +127,13 @@ const AdminSlider = () => {
               linkSlug
             };
           }
-        }).filter((item: SlideItem) => item.imageUrl || item.marketId || item.type === 'fast' || item.type === 'text');
+        }).filter((item: SlideItem) => {
+          // Only include items that have valid data
+          if (item.type === 'image') return !!item.imageUrl;
+          if (item.type === 'market') return !!item.marketId;
+          if (item.type === 'fast' || item.type === 'text') return true;
+          return false;
+        });
         
         setSlideOrder(order);
       }

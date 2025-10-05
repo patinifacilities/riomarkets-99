@@ -367,10 +367,12 @@ const Home = () => {
               {/* Desktop: Show slides or fallback to logo */}
               {orderedSlides.length > 0 ? (
                 orderedSlides.map((slide, idx) => {
+                const slideKey = `${slide.type}-${slide.type === 'market' ? slide.data?.id : slide.type === 'image' ? slide.data?.id : slide.type}-${idx}`;
+                
                 if (slide.type === 'fast') {
                   // Fast pool slide - Hidden on mobile
                   return (
-                    <CarouselItem key="fast-card" className="hidden md:block">
+                    <CarouselItem key={slideKey} className="hidden md:block">
                       <div className="h-[400px]">
                         <FastPoolSlide onClick={handleSlideClick} />
                       </div>
@@ -381,7 +383,7 @@ const Home = () => {
                 if (slide.type === 'text') {
                   // Text/Buttons card (same as first slide)
                   return (
-                    <CarouselItem key="text-card" className="hidden md:block">
+                    <CarouselItem key={slideKey} className="hidden md:block">
                       <div className="flex items-center justify-center h-[400px] px-4 sm:px-8">
                         <div className="text-center space-y-4 sm:space-y-6 max-w-3xl mx-auto">
                           <div className="text-3xl sm:text-4xl md:text-6xl font-bold leading-tight">
@@ -418,7 +420,7 @@ const Home = () => {
                   // Custom image slide - Hidden on mobile
                   const img = slide.data;
                   return (
-                    <CarouselItem key={img.id} className="hidden md:block">
+                    <CarouselItem key={slideKey} className="hidden md:block">
                       <div 
                         className="relative h-[400px] w-full overflow-hidden rounded-2xl cursor-pointer"
                         onClick={handleSlideClick}
@@ -442,7 +444,7 @@ const Home = () => {
                 const market = slide.data;
                 
                 return (
-                  <CarouselItem key={market.id} className="hidden md:block">
+                  <CarouselItem key={slideKey} className="hidden md:block">
                     <div 
                       className="relative h-[400px] w-full overflow-hidden rounded-2xl cursor-pointer"
                       onClick={() => {
