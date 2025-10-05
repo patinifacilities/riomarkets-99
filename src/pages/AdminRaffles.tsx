@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Edit, Trash2, Trophy, Pause, Play, Image as ImageIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,6 +37,7 @@ interface Raffle {
 }
 
 const AdminRaffles = () => {
+  const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -228,7 +229,7 @@ const AdminRaffles = () => {
                 <Button 
                   variant="outline" 
                   className="gap-2"
-                  onClick={() => window.location.href = '/admin/raffles/slider'}
+                  onClick={() => navigate('/admin/raffle-slider')}
                 >
                   <ImageIcon className="w-4 h-4" />
                   Slider

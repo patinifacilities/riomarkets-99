@@ -769,7 +769,9 @@ const Fast = () => {
         `}</style>
         <div className="fixed inset-0 flex items-center justify-center overflow-hidden">
           {/* Background gradient */}
-          <div className="fixed inset-0 bg-gradient-to-b from-background via-background to-primary/5 pointer-events-none -z-10" />
+          <div className="fixed inset-0 -z-50 pointer-events-none" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)' }}>
+            <StarsBackground />
+          </div>
           <div className="text-center">
             <div className="w-32 h-32 rounded-full bg-[#ff2389]/5 flex items-center justify-center mx-auto mb-4">
               <Zap className="w-16 h-16 text-[#ff2389]" style={{
@@ -846,9 +848,13 @@ const Fast = () => {
 
   return (
     <div className="min-h-[100dvh] relative overflow-hidden pb-32">
-      {/* Background gradient - starts at footer top */}
-      <div className="fixed inset-0 top-0 bottom-16 bg-gradient-to-b from-background via-background to-primary/5 pointer-events-none z-0" />
-      <div className="fixed inset-0 z-0 pointer-events-none">
+      {/* Background gradient - LOWEST z-index */}
+      <div 
+        className="fixed inset-0 -z-50 pointer-events-none"
+        style={{ 
+          background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)'
+        }}
+      >
         <StarsBackground />
       </div>
       {/* Hide elements on mobile, fix z-index for loading, and add animations */}

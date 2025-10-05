@@ -146,7 +146,7 @@ export const RaffleImageUpload = ({ raffleId, images, onChange }: RaffleImageUpl
               </label>
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              PNG, JPG, WEBP até 5MB
+              PNG, JPG, WEBP até 5MB (proporção 1:1 recomendada)
             </p>
           </div>
         </div>

@@ -83,9 +83,9 @@ export default function Rewards() {
   const monthlyProgress = Math.min((currentStreak / 30) * 100, 100);
 
   return (
-    <div className="h-[calc(100vh-4rem)] md:min-h-screen flex items-center justify-center relative px-4">
+    <div className="min-h-[70vh] md:min-h-[80vh] flex items-center justify-center relative px-4 py-8">
       {/* Background gradient - same as Exchange */}
-      <div className="fixed inset-0 top-16 z-0 overflow-hidden">
+      <div className="fixed inset-0 top-16 -z-50 overflow-hidden">
         <div 
           className="absolute inset-0"
           style={{
