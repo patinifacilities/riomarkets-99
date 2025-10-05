@@ -187,13 +187,14 @@ const Raffles = () => {
                     )}
                   </div>
 
-                  {!hasStarted && (
-                    <div className="relative overflow-hidden bg-gradient-to-r from-[#ffd700]/20 via-[#ffed4e]/20 to-[#ffd700]/20 border border-[#ffd700]/30 rounded-lg p-3">
+                  {!hasStarted && progressPercent >= 100 && (
+                    <div className="relative overflow-hidden bg-gradient-to-r from-[#ffd700]/20 via-[#ffed4e]/20 to-[#ffd700]/20 border border-[#ffd700]/30 rounded-lg p-3 animate-pulse">
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ffd700]/30 to-transparent animate-shimmer-slow" 
                         style={{ backgroundSize: '200% 100%' }}
                       />
-                      <p className="relative text-sm font-bold bg-gradient-to-r from-[#ffd700] via-[#ffed4e] to-[#ffd700] bg-clip-text text-transparent">
-                        Resultado em {timeUntilStart}
+                      <div className="absolute inset-0 animate-ping opacity-20 bg-[#ffd700] rounded-lg" />
+                      <p className="relative text-sm font-bold bg-gradient-to-r from-[#ffd700] via-[#ffed4e] to-[#ffd700] bg-clip-text text-transparent animate-pulse">
+                        ✨ Resultado em {timeUntilStart} ✨
                       </p>
                     </div>
                   )}
@@ -219,19 +220,25 @@ const Raffles = () => {
                       <span className="font-semibold">{raffle.prize_description}</span>
                     </div>
 
-                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden relative">
                       <div 
                         className={cn(
-                          "h-full transition-all duration-300",
+                          "h-full transition-all duration-500",
                           progressPercent >= 100 
-                            ? "bg-gradient-to-r from-[#ffd700] via-[#ffed4e] to-[#ffd700] animate-gradient" 
+                            ? "bg-gradient-to-r from-[#ffd700] via-[#ffed4e] to-[#ffd700] animate-gradient relative" 
                             : "bg-white"
                         )}
                         style={{ 
                           width: `${progressPercent}%`,
                           backgroundSize: progressPercent >= 100 ? '200% 100%' : 'auto'
                         }}
-                      />
+                      >
+                        {progressPercent >= 100 && (
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer-slow" 
+                            style={{ backgroundSize: '200% 100%' }}
+                          />
+                        )}
+                      </div>
                     </div>
 
                     <div className="flex items-center justify-between text-sm pt-2">

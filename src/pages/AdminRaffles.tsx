@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Edit, Trash2, Trophy, Pause, Play, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Trophy, Pause, Play, Image as ImageIcon, GripVertical } from 'lucide-react';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RaffleImageUpload } from '@/components/admin/RaffleImageUpload';
+import { Switch } from '@/components/ui/switch';
 
 interface Raffle {
   id: string;
@@ -45,6 +47,7 @@ const AdminRaffles = () => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRaffle, setEditingRaffle] = useState<Raffle | null>(null);
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -69,7 +72,7 @@ const AdminRaffles = () => {
       const { data, error } = await supabase
         .from('raffles')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('display_order', { ascending: true, nullsFirst: false });
 
       if (error) throw error;
       setRaffles(data || []);
@@ -77,6 +80,37 @@ const AdminRaffles = () => {
       console.error('Error fetching raffles:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDragEnd = async (result: DropResult) => {
+    if (!result.destination) return;
+
+    const items = Array.from(raffles);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setRaffles(items);
+
+    // Update display_order for all raffles
+    try {
+      const updates = items.map((raffle, index) => ({
+        id: raffle.id,
+        display_order: index
+      }));
+
+      for (const update of updates) {
+        await supabase
+          .from('raffles')
+          .update({ display_order: update.display_order })
+          .eq('id', update.id);
+      }
+
+      toast.success('Ordem atualizada com sucesso!');
+    } catch (error) {
+      console.error('Error updating order:', error);
+      toast.error('Erro ao atualizar ordem');
+      fetchRaffles(); // Revert on error
     }
   };
 
@@ -360,7 +394,17 @@ const AdminRaffles = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Rifas Cadastradas</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Rifas Cadastradas</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="maintenance-mode" className="text-sm">Modo Manutenção</Label>
+                  <Switch
+                    id="maintenance-mode"
+                    checked={maintenanceMode}
+                    onCheckedChange={setMaintenanceMode}
+                  />
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -368,78 +412,101 @@ const AdminRaffles = () => {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Título</TableHead>
-                      <TableHead>Prêmio</TableHead>
-                      <TableHead>Progresso</TableHead>
-                      <TableHead>Custo</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {raffles.map((raffle) => (
-                      <TableRow key={raffle.id}>
-                        <TableCell className="font-medium">{raffle.title}</TableCell>
-                        <TableCell>{raffle.prize_description}</TableCell>
-                        <TableCell>
-                          {raffle.current_value} / {raffle.goal_value} RZ
-                          <div className="text-xs text-muted-foreground">
-                            {((raffle.current_value / raffle.goal_value) * 100).toFixed(0)}%
-                          </div>
-                        </TableCell>
-                        <TableCell>{raffle.entry_cost} RZ</TableCell>
-                        <TableCell>
-                          {raffle.paused ? (
-                            <span className="px-2 py-1 rounded text-xs bg-yellow-500/20 text-yellow-500">
-                              ⏸️ Pausada
-                            </span>
-                          ) : (
-                            <span className={`px-2 py-1 rounded text-xs ${
-                              raffle.status === 'active' 
-                                ? 'bg-green-500/20 text-green-500' 
-                                : 'bg-gray-500/20 text-gray-500'
-                            }`}>
-                              {raffle.status === 'active' ? 'Ativa' : 'Concluída'}
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleTogglePause(raffle)}
-                              title={raffle.paused ? 'Despausar' : 'Pausar'}
-                            >
-                              {raffle.paused ? (
-                                <Play className="w-4 h-4 text-green-500" />
-                              ) : (
-                                <Pause className="w-4 h-4 text-yellow-500" />
-                              )}
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEdit(raffle)}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDelete(raffle.id)}
-                            >
-                              <Trash2 className="w-4 h-4 text-destructive" />
-                            </Button>
-                          </div>
-                        </TableCell>
+                <DragDropContext onDragEnd={handleDragEnd}>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[50px]"></TableHead>
+                        <TableHead>Título</TableHead>
+                        <TableHead>Prêmio</TableHead>
+                        <TableHead>Progresso</TableHead>
+                        <TableHead>Custo</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Ações</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <Droppable droppableId="raffles">
+                      {(provided) => (
+                        <TableBody {...provided.droppableProps} ref={provided.innerRef}>
+                          {raffles.map((raffle, index) => (
+                            <Draggable key={raffle.id} draggableId={raffle.id} index={index}>
+                              {(provided, snapshot) => (
+                                <TableRow
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  className={snapshot.isDragging ? 'bg-muted' : ''}
+                                >
+                                  <TableCell {...provided.dragHandleProps}>
+                                    <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab active:cursor-grabbing" />
+                                  </TableCell>
+                                  <TableCell className="font-medium">{raffle.title}</TableCell>
+                                  <TableCell>{raffle.prize_description}</TableCell>
+                                  <TableCell>
+                                    {raffle.current_value} / {raffle.goal_value} RZ
+                                    <div className="text-xs text-muted-foreground">
+                                      {((raffle.current_value / raffle.goal_value) * 100).toFixed(0)}%
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>{raffle.entry_cost} RZ</TableCell>
+                                  <TableCell>
+                                    {maintenanceMode ? (
+                                      <span className="px-2 py-1 rounded text-xs bg-orange-500/20 text-orange-500">
+                                        🔧 Manutenção
+                                      </span>
+                                    ) : raffle.paused ? (
+                                      <span className="px-2 py-1 rounded text-xs bg-yellow-500/20 text-yellow-500">
+                                        ⏸️ Pausada
+                                      </span>
+                                    ) : (
+                                      <span className={`px-2 py-1 rounded text-xs ${
+                                        raffle.status === 'active' 
+                                          ? 'bg-green-500/20 text-green-500' 
+                                          : 'bg-gray-500/20 text-gray-500'
+                                      }`}>
+                                        {raffle.status === 'active' ? 'Ativa' : 'Concluída'}
+                                      </span>
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="flex gap-2">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleTogglePause(raffle)}
+                                        title={raffle.paused ? 'Despausar' : 'Pausar'}
+                                      >
+                                        {raffle.paused ? (
+                                          <Play className="w-4 h-4 text-green-500" />
+                                        ) : (
+                                          <Pause className="w-4 h-4 text-yellow-500" />
+                                        )}
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleEdit(raffle)}
+                                      >
+                                        <Edit className="w-4 h-4" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleDelete(raffle.id)}
+                                      >
+                                        <Trash2 className="w-4 h-4 text-destructive" />
+                                      </Button>
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              )}
+                            </Draggable>
+                          ))}
+                          {provided.placeholder}
+                        </TableBody>
+                      )}
+                    </Droppable>
+                  </Table>
+                </DragDropContext>
               )}
             </CardContent>
           </Card>

@@ -74,7 +74,7 @@ export const RaffleSlider = () => {
           <CarouselContent>
             {images.map((image) => (
               <CarouselItem key={image.id}>
-                <div className="relative h-[300px] w-full overflow-hidden rounded-xl">
+                <div className="relative w-full overflow-hidden rounded-xl aspect-[16/9] md:aspect-[21/9]">
                   <img 
                     src={image.url} 
                     alt={image.title}
