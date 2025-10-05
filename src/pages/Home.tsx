@@ -592,14 +592,15 @@ const Home = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Search and Filters - Improved for white mode */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6 items-center">
-          <div className="relative flex-1 max-w-md w-full sm:w-auto">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" strokeWidth={2.5} />
+          <div className="group relative flex-1 max-w-md w-full sm:w-auto">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary/70 group-hover:text-primary transition-colors duration-300 z-10" strokeWidth={2.5} />
             <Input
               placeholder="Pesquisar Mercados"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 h-12 bg-card/80 dark:bg-card/50 border-border/60 dark:border-border/40 text-foreground placeholder:text-muted-foreground/60 rounded-xl shadow-sm backdrop-blur-sm"
+              className="pl-12 h-14 bg-gradient-to-r from-card/70 to-card/50 dark:from-card/60 dark:to-card/40 border border-white/10 hover:border-white/20 dark:border-border/40 dark:hover:border-border/60 text-foreground placeholder:text-muted-foreground/60 rounded-2xl shadow-lg hover:shadow-xl backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] focus-within:border-primary/50 focus-within:shadow-primary/20"
             />
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
           </div>
           
           {/* Filter Pills - on same line for desktop */}

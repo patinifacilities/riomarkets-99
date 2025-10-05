@@ -169,20 +169,17 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/60 via-transparent to-transparent" />
             
-            {/* Hot Badge with Improved Animation */}
+            {/* Hot Badge with Enhanced Animation */}
             {isHot && (
-              <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-gradient-to-r from-[#ff2389] to-[#ff6b9d] text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg animate-pulse">
-                <svg 
-                  className="w-4 h-4 animate-bounce" 
-                  viewBox="0 0 24 24" 
-                  fill="currentColor"
+              <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-gradient-to-r from-[#ff2389] via-[#ff4499] to-[#ff2389] text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-[#ff2389]/50 animate-gradient" style={{ backgroundSize: '200% 200%' }}>
+                <img 
+                  src={hotFire}
+                  alt="Hot"
+                  className="w-5 h-5 drop-shadow-[0_0_8px_rgba(255,35,137,0.8)]"
                   style={{ 
-                    filter: 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))',
-                    animation: 'bounce 1s ease-in-out infinite'
+                    animation: 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite'
                   }}
-                >
-                  <path d="M13.5 2C13.5 2 11 6 11 9.5C11 11.71 12.79 13.5 15 13.5C17.21 13.5 19 11.71 19 9.5C19 6 16.5 2 16.5 2L15 4.5L13.5 2M8.5 9C8.5 9 6 13 6 16.5C6 18.71 7.79 20.5 10 20.5C12.21 20.5 14 18.71 14 16.5C14 13 11.5 9 11.5 9L10 11.5L8.5 9Z" />
-                </svg>
+                />
                 HOT
               </div>
             )}
@@ -201,21 +198,27 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                 <span className="font-medium">Sim {Math.round(yesPercentage)}%</span>
                 <span className="font-medium">{Math.round(noPercentage)}% Não</span>
               </div>
-              <div className="h-2 bg-[#2a2a2a] rounded-full overflow-hidden flex">
+              <div className="relative h-2 bg-[#2a2a2a] rounded-full overflow-hidden flex group">
                 <div 
-                  className="transition-all duration-300"
+                  className="transition-all duration-500 ease-out group-hover:opacity-90"
                   style={{ 
                     width: `${yesPercentage}%`,
                     backgroundColor: '#00ff90'
                   }}
                 />
                 <div 
-                  className="transition-all duration-300"
+                  className="transition-all duration-500 ease-out group-hover:opacity-90"
                   style={{ 
                     width: `${noPercentage}%`,
                     backgroundColor: '#ff2389'
                   }}
                 />
+                {/* Hover tooltip */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                  <span className="text-xs font-bold text-white drop-shadow-lg">
+                    Order Book: {Math.round(yesPercentage)}% / {Math.round(noPercentage)}%
+                  </span>
+                </div>
               </div>
             </div>
 

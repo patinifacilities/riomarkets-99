@@ -9,6 +9,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useAuth } from '@/hooks/useAuth';
 import { RaffleSlider } from '@/components/raffle/RaffleSlider';
+import { cn } from '@/lib/utils';
 
 interface Raffle {
   id: string;
@@ -220,8 +221,16 @@ const Raffles = () => {
 
                     <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-white transition-all duration-300"
-                        style={{ width: `${progressPercent}%` }}
+                        className={cn(
+                          "h-full transition-all duration-300",
+                          progressPercent >= 100 
+                            ? "bg-gradient-to-r from-[#ffd700] via-[#ffed4e] to-[#ffd700] animate-gradient" 
+                            : "bg-white"
+                        )}
+                        style={{ 
+                          width: `${progressPercent}%`,
+                          backgroundSize: progressPercent >= 100 ? '200% 100%' : 'auto'
+                        }}
                       />
                     </div>
 
