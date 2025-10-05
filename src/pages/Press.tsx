@@ -6,6 +6,7 @@ import { PressCardCompact } from "@/components/press/PressCardCompact";
 import { PressFilter } from "@/components/press/PressFilter";
 import { Skeleton } from "@/components/ui/loading-skeleton";
 import { track } from "@/lib/analytics";
+import { StarsBackground } from "@/components/ui/StarsBackground";
 
 export default function Press() {
   const { articles, loading, error, fetchArticles, fetchVehicles } = usePressStore();
@@ -71,7 +72,20 @@ export default function Press() {
         <link rel="canonical" href="https://riomarkets.com/press" />
       </Helmet>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen relative">
+        {/* Background with stars */}
+        <div className="fixed inset-0 z-0 overflow-hidden">
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)'
+            }}
+          >
+            <StarsBackground />
+          </div>
+        </div>
+
+      <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Header */}
         <header className="text-center mb-12 relative">
           <div className="flex items-center justify-center gap-4 mb-4">
@@ -102,7 +116,7 @@ export default function Press() {
           {!loading && !error && articles.length === 0 && renderEmptyState()}
           
           {!loading && !error && articles.length > 0 && (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {articles.map((article) => (
                 <PressCardCompact key={article.id} article={article} />
               ))}
@@ -118,6 +132,7 @@ export default function Press() {
             </p>
           </footer>
         )}
+      </div>
       </div>
     </>
   );

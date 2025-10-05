@@ -64,54 +64,47 @@ export function PressCardCompact({ article }: PressCardCompactProps) {
 
   return (
     <>
-      <article className="bg-gradient-to-br from-card via-card/95 to-card/90 rounded-xl border-2 border-border/40 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 group cursor-pointer p-4 relative overflow-hidden backdrop-blur-sm" onClick={handleReadMore}>
+      <article className="bg-gradient-to-br from-card via-card/95 to-card/90 rounded-xl border-2 border-border/40 hover:border-primary/60 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 group cursor-pointer relative overflow-hidden backdrop-blur-sm flex flex-col" onClick={handleReadMore}>
         {/* Animated gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.05] via-[#ff2389]/[0.03] to-transparent opacity-70 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
         
-        <div className="flex items-start gap-3 relative z-10">
-          {/* Vehicle Logo */}
-          <div className="flex-shrink-0">
-            {article.logo_url ? (
-              <div className="w-12 h-8 flex items-center bg-white rounded-md shadow-sm p-1">
-                <LazyImage
-                  src={article.logo_url}
-                  alt={`Logo do ${article.vehicle}`}
-                  className="w-full h-full object-contain"
-                  placeholder={
-                    <div className="w-12 h-8 bg-muted rounded-md flex items-center justify-center">
-                      <span className="text-xs text-muted-foreground font-semibold">{article.vehicle.slice(0, 3)}</span>
-                    </div>
-                  }
-                />
-              </div>
-            ) : (
-              <div className="w-12 h-8 bg-white rounded-md shadow-sm flex items-center justify-center">
-                <span className="text-xs text-black font-bold">{article.vehicle.slice(0, 3)}</span>
-              </div>
-            )}
+        {/* Image */}
+        {article.logo_url && (
+          <div className="w-full aspect-square bg-white rounded-t-xl overflow-hidden relative z-10">
+            <LazyImage
+              src={article.logo_url}
+              alt={`Logo do ${article.vehicle}`}
+              className="w-full h-full object-contain p-8"
+              placeholder={
+                <div className="w-full h-full bg-muted flex items-center justify-center">
+                  <span className="text-2xl text-muted-foreground font-semibold">{article.vehicle.slice(0, 3)}</span>
+                </div>
+              }
+            />
           </div>
-
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2 mb-1.5">
-              <h3 className="text-foreground font-bold leading-tight line-clamp-2 group-hover:text-primary transition-colors text-sm">
-                {article.title}
-              </h3>
-              <Badge className={`text-xs font-semibold flex-shrink-0 border ${getPriorityColor(article.vehicle)}`}>
-                {getPriorityLabel(article.vehicle)}
-              </Badge>
-            </div>
-            
-            {article.summary && (
-              <p className="text-xs text-muted-foreground/90 line-clamp-2 leading-relaxed mb-2">
-                {article.summary}
-              </p>
-            )}
-            
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-foreground/80">{article.vehicle}</span>
-              <span className="text-muted-foreground">{formatDate(article.published_at)}</span>
-            </div>
+        )}
+        
+        {/* Content */}
+        <div className="p-4 flex-1 flex flex-col relative z-10">
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <Badge className={`text-xs font-semibold flex-shrink-0 border ${getPriorityColor(article.vehicle)}`}>
+              {getPriorityLabel(article.vehicle)}
+            </Badge>
+          </div>
+          
+          <h3 className="text-foreground font-bold leading-tight line-clamp-3 group-hover:text-primary transition-colors text-base mb-2 flex-1">
+            {article.title}
+          </h3>
+          
+          {article.summary && (
+            <p className="text-sm text-muted-foreground/90 line-clamp-2 leading-relaxed mb-3">
+              {article.summary}
+            </p>
+          )}
+          
+          <div className="flex items-center justify-between text-xs mt-auto pt-3 border-t border-border/50">
+            <span className="font-semibold text-foreground/80">{article.vehicle}</span>
+            <span className="text-muted-foreground">{formatDate(article.published_at)}</span>
           </div>
         </div>
         

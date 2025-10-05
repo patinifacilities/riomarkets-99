@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { LivePriceChart } from '@/components/markets/LivePriceChart';
 import { PoolResultModal } from '@/components/fast/PoolResultModal';
+import { StarsBackground } from '@/components/ui/StarsBackground';
 
 interface FastPool {
   id: string;
@@ -472,7 +473,18 @@ const AssetDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 relative">
+    <div className="min-h-screen relative">
+      {/* Background with stars */}
+      <div className="fixed inset-0 z-0 overflow-hidden">
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)'
+          }}
+        >
+          <StarsBackground />
+        </div>
+      </div>
       {/* Opinion Notifications - Bottom right above Riana chat */}
       <div className="fixed bottom-24 right-6 z-50 pointer-events-none space-y-2">
         {opinionNotifications.map((notification) => (
@@ -492,7 +504,7 @@ const AssetDetail = () => {
         ))}
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
         <Link to="/fast" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6">
           <ArrowLeft className="w-4 h-4" />
           Voltar para Fast Markets

@@ -63,6 +63,7 @@ const Fast = () => {
     return saved ? parseInt(saved) : 100;
   });
   const [clickedPool, setClickedPool] = useState<{id: string, side: string} | null>(null);
+  const [riozIconUrl, setRiozIconUrl] = useState<string | null>(null);
 
   useEffect(() => {
     localStorage.setItem('fastBetAmount', betAmount.toString());
@@ -231,6 +232,28 @@ const Fast = () => {
     if (!hasAcceptedTerms) {
       setShowTermsModal(true);
     }
+  }, []);
+
+  // Fetch RIOZ icon
+  useEffect(() => {
+    const fetchRiozIcon = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('exchange_assets')
+          .select('icon_url')
+          .eq('symbol', 'RIOZ')
+          .maybeSingle();
+        
+        if (error) throw error;
+        if (data?.icon_url) {
+          setRiozIconUrl(data.icon_url);
+        }
+      } catch (error) {
+        console.error('Error fetching RIOZ icon:', error);
+      }
+    };
+    
+    fetchRiozIcon();
   }, []);
 
   // Load current pools and history
@@ -1067,10 +1090,10 @@ const Fast = () => {
                          Pool #{pool.round_number}
                        </Badge>
                      </div>
-                     <div className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-lg flex items-center gap-1">
+                      <div className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-lg flex items-center gap-1">
                         <span>Seu total:</span>
                         <img 
-                          src="https://ufvupwnhpqeexadmqajk.supabase.co/storage/v1/object/public/exchange-assets/rioz-coin.png" 
+                          src={riozIconUrl || "https://ufvupwnhpqeexadmqajk.supabase.co/storage/v1/object/public/exchange-assets/rioz-coin.png"}
                           alt="Rioz Coin" 
                           className="w-4 h-4 rounded-full object-contain bg-white p-0.5"
                         />
