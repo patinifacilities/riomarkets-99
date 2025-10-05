@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, ExternalLink, Calendar } from 'lucide-react';
+import { Plus, Edit, Trash2, ExternalLink, Calendar, Link as LinkIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
@@ -31,7 +31,10 @@ export const NewsManagement = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [editingNews, setEditingNews] = useState<NewsItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isScrapeDialogOpen, setIsScrapeDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isScraping, setIsScraping] = useState(false);
+  const [scrapeUrl, setScrapeUrl] = useState('');
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -205,17 +208,114 @@ export const NewsManagement = () => {
     }
   };
 
+  const handleScrapeNews = async () => {
+    if (!scrapeUrl) {
+      toast({
+        title: "Erro",
+        description: "Por favor, insira uma URL válida",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsScraping(true);
+      
+      const { data, error } = await supabase.functions.invoke('scrape-news-url', {
+        body: { url: scrapeUrl }
+      });
+
+      if (error) throw error;
+
+      if (!data?.success) {
+        throw new Error(data?.error || 'Erro ao fazer scrape da notícia');
+      }
+
+      toast({
+        title: "Notícia adicionada!",
+        description: "A notícia foi extraída e salva com sucesso.",
+      });
+
+      setScrapeUrl('');
+      setIsScrapeDialogOpen(false);
+      loadNews();
+    } catch (error) {
+      console.error('Error scraping news:', error);
+      toast({
+        title: "Erro",
+        description: error instanceof Error ? error.message : "Erro ao fazer scrape da notícia",
+        variant: "destructive"
+      });
+    } finally {
+      setIsScraping(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Gerenciar Notícias</h2>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={resetForm} className="gap-2">
-              <Plus className="w-4 h-4" />
-              Nova Notícia
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Dialog open={isScrapeDialogOpen} onOpenChange={setIsScrapeDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <LinkIcon className="w-4 h-4" />
+                Scrape Notícia
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Scrape Notícia</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">URL da Notícia</label>
+                  <Input
+                    type="url"
+                    value={scrapeUrl}
+                    onChange={(e) => setScrapeUrl(e.target.value)}
+                    placeholder="https://exemplo.com/noticia"
+                    disabled={isScraping}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Cole o link completo da notícia que deseja importar
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={handleScrapeNews} 
+                    disabled={isScraping || !scrapeUrl}
+                    className="flex-1"
+                  >
+                    {isScraping ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Extraindo...
+                      </>
+                    ) : (
+                      'Confirmar'
+                    )}
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setIsScrapeDialogOpen(false)}
+                    disabled={isScraping}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={resetForm} className="gap-2">
+                <Plus className="w-4 h-4" />
+                Nova Notícia
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>
