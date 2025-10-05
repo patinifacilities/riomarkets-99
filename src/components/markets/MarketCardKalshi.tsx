@@ -171,16 +171,20 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
             
             {/* Hot Badge with Enhanced Animation */}
             {isHot && (
-              <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-gradient-to-r from-[#ff2389] via-[#ff4499] to-[#ff2389] text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-[#ff2389]/50 animate-gradient" style={{ backgroundSize: '200% 200%' }}>
-                <img 
-                  src={hotFire}
-                  alt="Hot"
-                  className="w-5 h-5 drop-shadow-[0_0_8px_rgba(255,35,137,0.8)] mix-blend-lighten"
-                  style={{ 
-                    animation: 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    filter: 'drop-shadow(0 0 8px rgba(255,35,137,0.8))'
-                  }}
-                />
+              <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-gradient-to-r from-[#ff2389] via-[#ff4499] to-[#ff2389] text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-[#ff2389]/50 animate-[gradient_3s_ease_infinite]" style={{ backgroundSize: '200% 200%' }}>
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  className="w-4 h-4 animate-[pulse_1.5s_ease-in-out_infinite]"
+                  style={{ filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.8))' }}
+                >
+                  <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                </svg>
                 HOT
               </div>
             )}

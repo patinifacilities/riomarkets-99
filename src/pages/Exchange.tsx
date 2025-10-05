@@ -303,7 +303,7 @@ const ExchangeNew = () => {
                         </div>
                       ) : riozIconUrl ? (
                         <div className="w-full h-full bg-white rounded-full flex items-center justify-center overflow-hidden">
-                          <img src={riozIconUrl} alt="RIOZ" className="w-full h-full object-cover scale-125" />
+                          <img src={riozIconUrl} alt="RIOZ" className="w-full h-full object-cover scale-110" />
                         </div>
                       ) : (
                         <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
@@ -535,9 +535,10 @@ const ExchangeNew = () => {
           <div className="mt-6 space-y-4">
             <Button
               onClick={() => window.location.href = '/fast'}
-              className="w-full h-14 text-lg font-bold bg-[#ff2389] hover:bg-[#ff2389]/90 text-white shadow-lg animate-pulse hover:animate-none transition-all hover:scale-105"
+              className="w-full h-14 text-lg font-bold bg-gradient-to-r from-[#ff2389] via-[#ff4499] to-[#ff2389] hover:from-[#ff4499] hover:via-[#ff2389] hover:to-[#ff4499] text-white shadow-lg shadow-[#ff2389]/50 transition-all hover:scale-105 active:scale-95 animate-[gradient_3s_ease_infinite]"
+              style={{ backgroundSize: '200% 200%' }}
             >
-              <Zap className="w-5 h-5 mr-2 fill-white animate-bounce" style={{ animationDuration: '1s' }} />
+              <Zap className="w-5 h-5 mr-2 fill-white" />
               Ir para Fast Markets
             </Button>
             

@@ -247,26 +247,34 @@ const Home = () => {
       // Respect the order from admin panel
       slideOrder.forEach((item: any) => {
         const id = typeof item === 'string' ? item : item.id;
+        const isHidden = typeof item === 'object' && item.hidden;
         
         // Skip hidden slides
-        if (item.hidden) return;
+        if (isHidden) return;
         
         // Skip duplicates
         if (seenSlides.has(id)) return;
-        seenSlides.add(id);
         
         if (id === 'text-card') {
+          seenSlides.add(id);
           slides.push({ type: 'text' as const, data: null });
         } else if (id === 'fast-card') {
+          seenSlides.add(id);
           slides.push({ type: 'fast' as const, data: null });
         } else if (id.startsWith('custom-')) {
           const img = sliderCustomImages.find(i => i.id === id);
-          if (img) slides.push({ type: 'image' as const, data: img });
+          if (img) {
+            seenSlides.add(id);
+            slides.push({ type: 'image' as const, data: img });
+          }
         } else {
           // Only show markets selected in "Mercados Selecionados"
           if (!sliderMarketIds.includes(id)) return;
           const market = sliderMarkets.find(m => m.id === id);
-          if (market) slides.push({ type: 'market' as const, data: market });
+          if (market) {
+            seenSlides.add(id);
+            slides.push({ type: 'market' as const, data: market });
+          }
         }
       });
     }

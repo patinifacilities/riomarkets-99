@@ -773,12 +773,10 @@ const Fast = () => {
           }
         `}</style>
         <div className="fixed inset-0 flex items-center justify-center overflow-hidden" style={{ zIndex: 1 }}>
-          {/* Loading Screen Background - Same as LoadingScreen */}
-          <div className="fixed inset-0 pointer-events-none bg-gradient-to-br from-background via-primary/5 to-background" style={{ 
+          {/* Loading Screen Background */}
+          <div className="fixed inset-0 pointer-events-none bg-background" style={{ 
             zIndex: -100
-          }}>
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background opacity-60" />
-          </div>
+          }} />
           <div className="text-center" style={{ zIndex: 10 }}>
             <div className="w-32 h-32 rounded-full bg-[#ff2389]/5 flex items-center justify-center mx-auto mb-4">
               <Zap className="w-16 h-16 text-[#ff2389]" style={{
