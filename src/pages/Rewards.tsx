@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Gift, Flame, Trophy, Star, Calendar, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
-import { StarsBackground } from '@/components/ui/StarsBackground';
 
 export default function Rewards() {
   const navigate = useNavigate();
@@ -57,15 +56,10 @@ export default function Rewards() {
   if (loading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center relative">
-        <div className="fixed inset-0 top-16 z-0 overflow-hidden">
-          <div 
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)'
-            }}
-          >
-            <StarsBackground />
-          </div>
+        {/* Exchange-like background */}
+        <div className="fixed inset-0 pointer-events-none -z-50">
+          <div className="absolute inset-0 bg-gradient-to-br from-background via-primary/5 to-background" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
         </div>
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary relative z-10"></div>
       </div>
@@ -83,17 +77,11 @@ export default function Rewards() {
   const monthlyProgress = Math.min((currentStreak / 30) * 100, 100);
 
   return (
-    <div className="min-h-[70vh] md:min-h-[80vh] flex items-center justify-center relative px-4 py-8">
-      {/* Background gradient - same as Exchange */}
-      <div className="fixed inset-0 top-16 -z-50 overflow-hidden">
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)'
-          }}
-        >
-          <StarsBackground />
-        </div>
+    <div className="min-h-[70vh] md:min-h-[80vh] flex items-center justify-center relative px-4 py-8 pb-24 md:pb-8">
+      {/* Exchange-like background */}
+      <div className="fixed inset-0 pointer-events-none -z-50">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-primary/5 to-background" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
       </div>
       
       <div className="text-center space-y-3 max-w-md relative z-10">

@@ -1125,6 +1125,7 @@ export type Database = {
           created_at: string
           current_value: number
           description: string | null
+          display_order: number | null
           ends_at: string | null
           entry_cost: number
           goal_value: number
@@ -1143,6 +1144,7 @@ export type Database = {
           created_at?: string
           current_value?: number
           description?: string | null
+          display_order?: number | null
           ends_at?: string | null
           entry_cost?: number
           goal_value: number
@@ -1161,6 +1163,7 @@ export type Database = {
           created_at?: string
           current_value?: number
           description?: string | null
+          display_order?: number | null
           ends_at?: string | null
           entry_cost?: number
           goal_value?: number

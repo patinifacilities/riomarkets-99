@@ -135,7 +135,7 @@ const AdminRaffles = () => {
       if (editingRaffle) {
         const { error } = await supabase
           .from('raffles')
-          .update(raffleData)
+          .update(raffleData as any)
           .eq('id', editingRaffle.id);
 
         if (error) throw error;

@@ -16,7 +16,6 @@ export const RaffleTicketCard = ({
   ticketCount,
   purchaseDate,
   status,
-  imageUrl,
   onClick,
   isTopTicket = false
 }: RaffleTicketCardProps) => {
@@ -30,7 +29,7 @@ export const RaffleTicketCard = ({
     >
       {/* Golden shimmer animation for top ticket */}
       {isTopTicket && (
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ffd700]/20 to-transparent animate-shimmer-slow pointer-events-none" 
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ffd700]/20 to-transparent animate-shimmer-slow pointer-events-none z-10" 
           style={{
             backgroundSize: '200% 100%',
           }}
@@ -38,7 +37,7 @@ export const RaffleTicketCard = ({
       )}
       
       {/* Tear effect on right edge */}
-      <div className="absolute right-0 top-0 bottom-0 w-6 flex flex-col justify-around">
+      <div className="absolute right-0 top-0 bottom-0 w-6 flex flex-col justify-around z-10">
         {Array.from({ length: 15 }).map((_, i) => (
           <div 
             key={i} 
@@ -58,16 +57,6 @@ export const RaffleTicketCard = ({
           </div>
         ))}
       </div>
-
-      {imageUrl && (
-        <div className="w-full aspect-square overflow-hidden">
-          <img 
-            src={imageUrl} 
-            alt={raffleTitle}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-          />
-        </div>
-      )}
       
       <div className="p-5 pr-10 space-y-4">
         <div>

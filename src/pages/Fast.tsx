@@ -773,12 +773,11 @@ const Fast = () => {
           }
         `}</style>
         <div className="fixed inset-0 flex items-center justify-center overflow-hidden" style={{ zIndex: 1 }}>
-          {/* Background gradient - lowest layer */}
-          <div className="fixed inset-0 pointer-events-none" style={{ 
-            background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)',
+          {/* Loading Screen Background - Same as LoadingScreen */}
+          <div className="fixed inset-0 pointer-events-none bg-gradient-to-br from-background via-primary/5 to-background" style={{ 
             zIndex: -100
           }}>
-            <StarsBackground />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background opacity-60" />
           </div>
           <div className="text-center" style={{ zIndex: 10 }}>
             <div className="w-32 h-32 rounded-full bg-[#ff2389]/5 flex items-center justify-center mx-auto mb-4">
@@ -856,15 +855,14 @@ const Fast = () => {
 
   return (
     <div className="min-h-[100dvh] relative overflow-hidden pb-32">
-      {/* Background gradient - LOWEST z-index */}
+      {/* Loading Screen Background - Same as LoadingScreen - LOWEST z-index */}
       <div 
-        className="fixed inset-0 pointer-events-none"
+        className="fixed inset-0 pointer-events-none bg-gradient-to-br from-background via-primary/5 to-background"
         style={{ 
-          background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)',
           zIndex: -100
         }}
       >
-        <StarsBackground />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background opacity-60" />
       </div>
       {/* Hide elements on mobile, fix z-index for loading, and add animations */}
       <style>{`
