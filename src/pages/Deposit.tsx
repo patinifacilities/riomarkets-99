@@ -134,30 +134,8 @@ export default function Deposit() {
         setIsProcessing(false);
         return;
       } else if (method === "pix") {
-        // Generate PIX payment via Abacatepay
-        const { data, error } = await supabase.functions.invoke("generate-pix-payment", {
-          body: { amount: numericAmount },
-        });
-
-        if (error) {
-          console.error("PIX generation error:", error);
-          throw error;
-        }
-
-        console.log("PIX data received:", data);
-
-        if (data?.success) {
-          const pixPayment = {
-            qrCode: data.payment?.qrCode || data.qrCode,
-            qrCodeText: data.payment?.qrCodeText || data.qrCodeText,
-          };
-          
-          console.log("Setting PIX data:", pixPayment);
-          setPixData(pixPayment);
-          setShowPixModal(true);
-        } else {
-          throw new Error(data?.error || "Failed to generate PIX payment");
-        }
+        // Just show the modal - it will generate PIX payment internally
+        setShowPixModal(true);
       } else if (method === "apple") {
         toast.info("Apple Pay em breve!", {
           description: "Esta opção estará disponível em breve.",
@@ -247,7 +225,10 @@ export default function Deposit() {
               <Button
                 key={value}
                 variant="outline"
-                onClick={() => setAmount((value * 100).toString())}
+                onClick={() => {
+                  const currentAmount = parseFloat(amount) || 0;
+                  setAmount((currentAmount + (value * 100)).toString());
+                }}
                 className="h-12 font-semibold hover:bg-primary/10 hover:border-primary"
               >
                 R$ {value}
@@ -565,8 +546,8 @@ export default function Deposit() {
               disabled={isProcessing || !amount || parseFloat(amount) / 100 < 5}
               className="group relative w-full h-14 text-lg font-semibold mt-3 bg-black text-white rounded-xl overflow-hidden hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="absolute inset-0 bg-white transform -translate-x-full transition-transform duration-0 group-hover:translate-x-0"></span>
-              <span className="relative z-10 flex items-center justify-center gap-2">
+              <span className="absolute inset-0 bg-white transform -translate-x-full transition-transform duration-500 ease-out group-hover:translate-x-0"></span>
+              <span className="relative z-10 flex items-center justify-center gap-2 transition-colors duration-300">
                 <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                   <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
                 </svg>
@@ -601,7 +582,7 @@ export default function Deposit() {
       <PixPaymentModal
         open={showPixModal}
         onOpenChange={setShowPixModal}
-        amount={formatCurrencyDisplay(amount)}
+        amount={(parseFloat(amount || "0") / 100).toString()}
         onSuccess={() => {
           setShowPixModal(false);
           navigate('/wallet');

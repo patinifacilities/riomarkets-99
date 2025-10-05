@@ -45,7 +45,7 @@ export const TickerBar = () => {
   const currentItem = tickerItems[currentIndex];
 
   return (
-    <div className="bg-card border-b border-border overflow-hidden relative">
+    <div className="bg-card border-b border-border overflow-hidden relative z-40">
       <div className="ticker-scroll whitespace-nowrap py-2 flex animate-ticker-scroll-mobile md:animate-ticker-scroll">
         {[...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems].map((item, index) => (
           <div key={index} className="flex items-center gap-6 text-sm mx-8 flex-shrink-0">

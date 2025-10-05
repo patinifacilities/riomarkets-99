@@ -421,7 +421,7 @@ const ExchangeNew = () => {
                         </div>
                       ) : riozIconUrl ? (
                         <div className="w-full h-full bg-white rounded-full flex items-center justify-center overflow-hidden">
-                          <img src={riozIconUrl} alt="RIOZ" className="w-full h-full object-cover scale-150" />
+                          <img src={riozIconUrl} alt="RIOZ" className="w-full h-full object-cover scale-100" />
                         </div>
                       ) : (
                         <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
