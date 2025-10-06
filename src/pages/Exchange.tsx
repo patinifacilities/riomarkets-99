@@ -535,13 +535,13 @@ const ExchangeNew = () => {
           <div className="mt-6 space-y-4">
             <Button
               onClick={() => window.location.href = '/fast'}
-              className="w-full h-14 text-lg font-bold bg-gradient-to-r from-primary via-secondary to-primary text-white shadow-lg shadow-primary/50 transition-all hover:scale-105 active:scale-95"
+              className="w-full h-14 text-lg font-bold text-black shadow-lg transition-all hover:scale-105 active:scale-95 animate-pulse"
               style={{ 
-                backgroundSize: '200% 100%',
-                animation: 'gradient-shift 3s ease infinite, pulse 2s cubic-bezier(0.4,0,0.6,1) infinite'
+                backgroundColor: '#ff2389',
+                boxShadow: '0 0 30px rgba(255, 35, 137, 0.6), 0 0 60px rgba(255, 35, 137, 0.3)'
               }}
             >
-              <Zap className="w-5 h-5 mr-2 fill-white" />
+              <Zap className="w-5 h-5 mr-2 fill-black" />
               Ir para Fast Markets
             </Button>
             

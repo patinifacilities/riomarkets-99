@@ -877,7 +877,7 @@ const Fast = () => {
   return (
     <div className="min-h-[100dvh] relative overflow-hidden pb-20">
       {/* Background gradient - same as Exchange */}
-      <div className="fixed inset-0 top-16 z-0 overflow-hidden">
+      <div className="fixed inset-0 top-16 -z-10 overflow-hidden">
         <div 
           className="absolute inset-0"
           style={{
@@ -1090,15 +1090,15 @@ const Fast = () => {
                          Pool #{pool.round_number}
                        </Badge>
                      </div>
-                      <div className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-lg flex items-center gap-1">
-                        <span>Seu total:</span>
-                        <img 
-                          src={riozIconUrl || "https://ufvupwnhpqeexadmqajk.supabase.co/storage/v1/object/public/exchange-assets/rioz-coin.png"}
-                          alt="Rioz Coin" 
-                          className="w-4 h-4 rounded-full object-contain bg-white p-0.5"
-                        />
-                        <span className="text-[#00ff90] font-semibold">{userPoolBets[pool.id] || 0}</span>
-                      </div>
+                       <div className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-lg flex items-center gap-1">
+                         <span>Seu total:</span>
+                         <img 
+                           src={riozIconUrl || "https://ufvupwnhpqeexadmqajk.supabase.co/storage/v1/object/public/exchange-assets/rioz-coin.png"}
+                           alt="Rioz Coin" 
+                           className="w-4 h-4 rounded-full object-cover bg-white"
+                         />
+                         <span className="text-[#00ff90] font-semibold">{userPoolBets[pool.id] || 0}</span>
+                       </div>
                    </div>
                   
                   <CardTitle className="text-lg mb-2">

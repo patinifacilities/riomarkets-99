@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Zap, TrendingUp, TrendingDown, Users, Clock, BarChart3 } from 'lucide-react';
+import { Zap, TrendingUp, TrendingDown, Users, Clock, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
@@ -65,7 +65,11 @@ export const FastPoolSlide = ({ onClick }: FastPoolSlideProps) => {
   const handleSlideClick = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (onClick) onClick();
-    navigate('/fast');
+    if (pool?.id) {
+      navigate(`/fast/${pool.id}`);
+    } else {
+      navigate('/fast');
+    }
   };
 
   if (!pool) return null;
@@ -167,7 +171,7 @@ export const FastPoolSlide = ({ onClick }: FastPoolSlideProps) => {
               className="font-bold px-8 md:px-10 py-6 md:py-8 rounded-full text-lg md:text-xl transition-all hover:scale-110 shadow-2xl group-hover:shadow-[#00ff90]/50 w-full md:w-auto"
               style={{ backgroundColor: '#00ff90', color: '#000000' }}
             >
-              <Zap className="w-5 md:w-6 h-5 md:h-6 mr-2" />
+              <Target className="w-5 md:w-6 h-5 md:h-6 mr-2" />
               ANALISAR
             </Button>
           </div>
