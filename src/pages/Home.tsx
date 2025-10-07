@@ -276,7 +276,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen bg-background">
       {/* Hero Carousel Section - Only show if there are slides */}
       {orderedSlides.length > 0 && (
         <div className="relative overflow-hidden border-b border-border/50 bg-gradient-to-r from-background via-primary/5 to-background">
