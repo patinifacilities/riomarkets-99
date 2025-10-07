@@ -68,9 +68,9 @@ const RaffleTickets = () => {
       if (raffleMap.has(raffleId)) {
         const existing = raffleMap.get(raffleId)!;
         existing.amount_paid += entry.amount_paid;
-        existing.ticket_numbers = [...existing.ticket_numbers, ...entry.ticket_numbers];
+        existing.ticket_numbers = [...existing.ticket_numbers, ...(entry.ticket_numbers || [])];
       } else {
-        raffleMap.set(raffleId, { ...entry });
+        raffleMap.set(raffleId, { ...entry, ticket_numbers: entry.ticket_numbers || [] });
       }
     });
     

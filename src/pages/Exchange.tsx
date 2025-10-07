@@ -255,7 +255,7 @@ const ExchangeNew = () => {
             <h1 className="text-4xl font-bold text-foreground">Exchange</h1>
           </div>
           <p className="text-muted-foreground text-lg">
-            Converta entre BRL e RIOZ com taxa fixa 1:1
+            Converta entre BRL e RIOZ (1 RIOZ = 1 USD)
           </p>
         </div>
 

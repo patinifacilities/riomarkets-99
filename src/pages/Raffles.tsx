@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Ticket } from 'lucide-react';
+import { Loader2, Ticket, Flame } from 'lucide-react';
 import { OptionProgressBar } from '@/components/ui/option-progress-bar';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
@@ -178,10 +178,7 @@ const Raffles = () => {
             return (
               <Card 
                 key={raffle.id} 
-                className={cn(
-                  "overflow-hidden hover:shadow-lg transition-shadow cursor-pointer relative",
-                  isTopRaffle && "ring-2 ring-orange-500 shadow-[0_0_30px_rgba(255,165,0,0.3)]"
-                )}
+                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer relative"
                 onClick={() => navigate(`/raffles/${raffle.id}`)}
               >
                 {raffle.image_url && (
@@ -192,18 +189,15 @@ const Raffles = () => {
                       className="w-full h-full object-cover"
                     />
                     
-                    {/* Fire badge for top raffle */}
-                    {isTopRaffle && (
-                      <div className="absolute top-2 left-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 backdrop-blur-sm border border-orange-300 shadow-lg animate-pulse">
+                    {/* Fire badge for top raffle - replaces countdown */}
+                    {isTopRaffle ? (
+                      <div className="absolute top-2 right-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 backdrop-blur-sm border border-orange-300 shadow-lg animate-pulse">
                         <span className="text-white text-xs font-bold flex items-center gap-1">
-                          <img src="/src/assets/hot-fire.png" alt="fire" className="w-4 h-4" />
+                          <Flame className="w-4 h-4" />
                           QUENTE
                         </span>
                       </div>
-                    )}
-                    
-                    {/* Countdown badge */}
-                    {raffle.ends_at && (
+                    ) : raffle.ends_at && (
                       <div className="absolute top-2 right-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-sm border border-white/20 animate-pulse">
                         <span className="text-white text-xs font-bold">
                           {(() => {
