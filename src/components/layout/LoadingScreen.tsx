@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useBranding } from '@/hooks/useBranding';
 
 export const LoadingScreen = () => {
-  const { config } = useBranding();
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {

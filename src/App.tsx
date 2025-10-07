@@ -57,14 +57,11 @@ import NotFound from '@/pages/NotFound';
 import { Toaster } from '@/components/ui/sonner';
 import { track } from '@/lib/analytics';
 import { RewardCalculatorModal } from '@/components/calculator/RewardCalculatorModal';
-import { useBranding } from '@/hooks/useBranding';
 import { LoadingScreen } from '@/components/layout/LoadingScreen';
 
 const AdminRewards = lazy(() => import('@/pages/AdminRewards'));
 
 function App() {
-  // Initialize branding theme
-  useBranding();
   const [showLoading, setShowLoading] = useState(true);
   
   useEffect(() => {
