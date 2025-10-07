@@ -881,7 +881,7 @@ const Fast = () => {
         <div 
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(180deg, #0a0a0a 0%, #0A101A 50%, #0a0a0a 100%)'
+            background: 'linear-gradient(180deg, #0A101A 0%, #0A101A 50%, #0A101A 100%)'
           }}
         >
           <StarsBackground />
