@@ -74,6 +74,7 @@ const AdminRaffles = () => {
     images: [] as string[],
     payout_value: '',
     goal_value: '',
+    ticket_count: '10000',
     entry_cost: '10',
     status: 'active',
     start_date: new Date().toISOString().slice(0, 16),
@@ -143,14 +144,21 @@ const AdminRaffles = () => {
       // Get first image from carousel or null
       const primaryImage = formData.images.length > 0 ? formData.images[0] : null;
       
+      const ticketCount = parseInt(formData.ticket_count);
+      const goalValue = parseFloat(formData.goal_value);
+      
+      // Calculate entry cost based on ticket count and goal value
+      const entryCost = Math.ceil(goalValue / ticketCount);
+      
       const raffleData = {
         title: formData.title,
         description: formData.description || null,
         prize_description: formData.prize_description,
         image_url: primaryImage,
         payout_value: parseFloat(formData.payout_value),
-        goal_value: parseFloat(formData.goal_value),
-        entry_cost: parseInt(formData.entry_cost),
+        goal_value: goalValue,
+        ticket_count: ticketCount,
+        entry_cost: entryCost,
         status: formData.status,
         start_date: formData.start_date,
         ends_at: formData.ends_at || null
@@ -198,7 +206,7 @@ const AdminRaffles = () => {
     }
   };
 
-  const handleEdit = (raffle: Raffle) => {
+  const handleEdit = (raffle: Raffle & { ticket_count?: number }) => {
     setEditingRaffle(raffle);
     const images = raffle.image_url ? [raffle.image_url] : [];
     setFormData({
@@ -208,6 +216,7 @@ const AdminRaffles = () => {
       images: images,
       payout_value: raffle.payout_value.toString(),
       goal_value: raffle.goal_value.toString(),
+      ticket_count: (raffle.ticket_count || 10000).toString(),
       entry_cost: raffle.entry_cost.toString(),
       status: raffle.status,
       start_date: raffle.start_date.slice(0, 16),
@@ -243,6 +252,7 @@ const AdminRaffles = () => {
       images: [],
       payout_value: '',
       goal_value: '',
+      ticket_count: '10000',
       entry_cost: '10',
       status: 'active',
       start_date: new Date().toISOString().slice(0, 16),
@@ -364,17 +374,29 @@ const AdminRaffles = () => {
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="entry">Custo de Entrada (RZ)</Label>
-                        <Input
-                          id="entry"
-                          type="number"
-                          value={formData.entry_cost}
-                          onChange={(e) => setFormData({ ...formData, entry_cost: e.target.value })}
-                          placeholder="10"
-                        />
-                      </div>
+                    <div>
+                      <Label htmlFor="ticket_count">Quantidade de Bilhetes</Label>
+                      <Select value={formData.ticket_count} onValueChange={(value) => setFormData({ ...formData, ticket_count: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="10000">10.000 bilhetes</SelectItem>
+                          <SelectItem value="100000">100.000 bilhetes</SelectItem>
+                          <SelectItem value="500000">500.000 bilhetes</SelectItem>
+                          <SelectItem value="1000000">1.000.000 bilhetes</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Preço do bilhete será calculado automaticamente: Meta ÷ Quantidade de bilhetes
+                        {formData.goal_value && formData.ticket_count && (
+                          <span className="block text-primary font-semibold mt-1">
+                            = {Math.ceil(parseFloat(formData.goal_value) / parseInt(formData.ticket_count))} RZ por bilhete
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4">
                       <div>
                         <Label htmlFor="status">Status</Label>
                         <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>

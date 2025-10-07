@@ -152,6 +152,17 @@ const RaffleDetail = () => {
     setEntering(true);
 
     try {
+      // Generate ticket numbers for this purchase
+      const { data: ticketNumbers, error: ticketError } = await supabase.rpc(
+        'generate_raffle_ticket_numbers',
+        {
+          p_raffle_id: raffle.id,
+          p_quantity: ticketCount
+        }
+      );
+
+      if (ticketError) throw ticketError;
+
       // Deduct balance
       const { error: balanceError } = await supabase
         .from('profiles')
@@ -160,13 +171,14 @@ const RaffleDetail = () => {
 
       if (balanceError) throw balanceError;
 
-      // Create entry
+      // Create entry with ticket numbers
       const { error: entryError } = await supabase
         .from('raffle_entries')
         .insert({
           raffle_id: raffle.id,
           user_id: user.id,
-          amount_paid: totalCost
+          amount_paid: totalCost,
+          ticket_numbers: ticketNumbers
         });
 
       if (entryError) throw entryError;
@@ -178,6 +190,11 @@ const RaffleDetail = () => {
       window.dispatchEvent(new Event('forceProfileRefresh'));
       await fetchRaffle();
       await fetchRecentEntries();
+      
+      // Navigate to tickets page after successful purchase
+      setTimeout(() => {
+        navigate('/raffle-tickets');
+      }, 1500);
     } catch (error) {
       console.error('Error entering raffle:', error);
       toast.error('Erro ao participar da rifa');

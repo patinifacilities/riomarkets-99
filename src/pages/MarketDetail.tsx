@@ -634,8 +634,11 @@ const MarketDetail = () => {
                           </div>
                         </div>
                         <div>
-                          <Label htmlFor="bet-amount" className="text-sm font-medium">
-                            Quantidade
+                          <Label htmlFor="bet-amount" className="text-sm font-medium mb-2 flex items-center justify-between">
+                            <span>Quantidade para opinar</span>
+                            <span className="text-xs text-muted-foreground">
+                              Saldo: {formatNumber(userProfile?.saldo_moeda || 0)} RIOZ
+                            </span>
                           </Label>
                           <Input
                             id="bet-amount"
@@ -694,43 +697,46 @@ const MarketDetail = () => {
                       disabled={userProfile?.is_blocked}
                     />
                   
-                   {selectedOption && (
-                     <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">
-                       <div className="text-sm text-muted-foreground mb-2">Opção selecionada:</div>
-                       <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
-                       <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
-                       <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
-                          <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
-                           {/* Gold fill based on slider progress - resets at 100% after 1.5s */}
-                           <div 
-                             className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 transition-all"
-                             style={{
-                               width: `${sliderProgress * 100}%`,
-                               transitionDuration: sliderProgress >= 1 ? '1500ms' : '100ms',
-                             }}
-                           />
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-shimmer"></div>
-                          <div className="relative z-10 text-center">
-                            <span 
-                              className="text-xs font-semibold tracking-wide transition-colors duration-300"
-                              style={{
-                                color: (sliderProgress > 0.3 && sliderProgress < 1) ? '#374151' : 'rgba(234, 179, 8, 0.5)'
-                              }}
-                            >
-                              RETORNO ESTIMADO
-                            </span>
+                    {selectedOption && (
+                      <div className="mt-4 p-4 bg-secondary/20 rounded-lg border border-primary/20">
+                        <div className="text-sm text-muted-foreground mb-2">Opção selecionada:</div>
+                        <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
+                        <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
+                        <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
+                           <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
+                            {/* Gold fill based on slider progress - resets at 100% after 1.5s */}
                             <div 
-                              className="text-2xl font-bold mt-1 transition-colors duration-300"
+                              className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 transition-all"
                               style={{
-                                color: (sliderProgress > 0.3 && sliderProgress < 1) ? '#374151' : '#eab308'
+                                width: `${sliderProgress * 100}%`,
+                                transitionDuration: sliderProgress >= 1 ? '1500ms' : '100ms',
                               }}
-                            >
-                              R$ {(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </div>
-                          </div>
-                        </div>
-                     </div>
-                   )}
+                            />
+                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent animate-shimmer"></div>
+                           <div className="relative z-10 text-center">
+                             <span 
+                               className="text-xs font-semibold tracking-wide transition-colors duration-300"
+                               style={{
+                                 color: (sliderProgress > 0.3 && sliderProgress < 1) ? '#374151' : 'rgba(234, 179, 8, 0.5)'
+                               }}
+                             >
+                               RETORNO ESTIMADO
+                             </span>
+                             <div 
+                               className="text-2xl font-bold mt-1 transition-colors duration-300"
+                               style={{
+                                 color: (sliderProgress > 0.3 && sliderProgress < 1) ? '#374151' : '#eab308'
+                               }}
+                             >
+                               {(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5)))).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} RIOZ
+                             </div>
+                             <div className="text-xs text-muted-foreground mt-1">
+                               Lucro: {(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} RIOZ
+                             </div>
+                           </div>
+                         </div>
+                      </div>
+                    )}
                   
                    {(userProfile?.saldo_moeda || 0) === 0 ? (
                      <div className="p-4 bg-warning/10 border border-warning rounded-lg text-center">
@@ -843,17 +849,19 @@ const MarketDetail = () => {
                            window.dispatchEvent(new CustomEvent('balanceUpdated'));
                           window.dispatchEvent(new CustomEvent('forceProfileRefresh'));
 
-                             // Success notification with opinion color
-                             toast({
-                               title: "Opinião confirmada!",
-                               description: `Você opinou ${selectedOption.toUpperCase()} com ${betAmount} RIOZ`,
-                               className: "fixed bottom-24 md:bottom-4 right-4 rounded-2xl z-50",
-                               style: {
-                                 backgroundColor: selectedOption === 'sim' ? '#00ff90' : '#ff2389',
-                                 color: selectedOption === 'sim' ? '#374151' : '#ffffff',
-                                 border: 'none'
-                               }
-                             });
+                              // Success notification with opinion color and coin sound
+                              const coinSound = new Audio('/sounds/coin.mp3');
+                              coinSound.volume = 0.3;
+                              coinSound.play().catch(console.error);
+
+                              toast({
+                                title: "✅ Opinião enviada!",
+                                description: `Você opinou ${selectedOption.toUpperCase()} com ${betAmount.toLocaleString()} RIOZ`,
+                                duration: 3000,
+                                className: selectedOption === 'sim' 
+                                  ? 'bg-[#00ff90]/10 border-[#00ff90]/30 text-foreground' 
+                                  : 'bg-[#ff2389]/10 border-[#ff2389]/30 text-foreground'
+                              });
 
                           handleBetSuccess();
                           setSelectedOption('');

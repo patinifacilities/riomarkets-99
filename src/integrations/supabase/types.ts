@@ -1169,6 +1169,7 @@ export type Database = {
           prize_description: string
           start_date: string | null
           status: string
+          ticket_count: number
           title: string
           updated_at: string
           winner_user_id: string | null
@@ -1188,6 +1189,7 @@ export type Database = {
           prize_description: string
           start_date?: string | null
           status?: string
+          ticket_count?: number
           title: string
           updated_at?: string
           winner_user_id?: string | null
@@ -1207,6 +1209,7 @@ export type Database = {
           prize_description?: string
           start_date?: string | null
           status?: string
+          ticket_count?: number
           title?: string
           updated_at?: string
           winner_user_id?: string | null
