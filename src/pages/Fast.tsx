@@ -876,8 +876,8 @@ const Fast = () => {
 
   return (
     <div className="min-h-[100dvh] relative overflow-hidden pb-20">
-      {/* Background gradient - same as Exchange */}
-      <div className="fixed inset-0 top-16 -z-10 overflow-hidden">
+      {/* Background gradient with stars - hidden in light mode */}
+      <div className="fixed inset-0 top-16 z-0 overflow-hidden dark:block hidden">
         <div 
           className="absolute inset-0"
           style={{

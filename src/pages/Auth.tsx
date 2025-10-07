@@ -409,7 +409,7 @@ const Auth = () => {
                         <div>
                           <label htmlFor="name" className="text-sm font-medium mb-2 block">Nome completo</label>
                           <div className="relative">
-                            <UserPlus className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                            <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                             <Input
                               id="name"
                               type="text"
@@ -436,8 +436,56 @@ const Auth = () => {
                       </div>
                     )}
 
-                    {/* Step 2: Username */}
+                    {/* Step 2: Email */}
                     {currentStep === 1 && (
+                      <div className="space-y-4">
+                        <div>
+                          <label htmlFor="email" className="text-sm font-medium mb-2 block">Email</label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                            <Input
+                              ref={emailInputRef}
+                              id="email"
+                              type="email"
+                              placeholder="seu@email.com"
+                              value={formData.email}
+                              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                              className="pl-10"
+                              aria-label="Digite seu endereço de email"
+                              autoFocus
+                            />
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(0)}>
+                            Voltar
+                          </Button>
+                          <Button 
+                            type="button" 
+                            className="w-full"
+                            style={{ backgroundColor: '#00ff90', color: '#000' }}
+                            onClick={async () => {
+                              if (!formData.email) {
+                                setError('Email é obrigatório');
+                                return;
+                              }
+                              const isUnique = await checkUniqueness('email', formData.email);
+                              if (!isUnique) {
+                                setError('Email já cadastrado. Faça login para acessar sua conta.');
+                                return;
+                              }
+                              setError('');
+                              setCurrentStep(2);
+                            }}
+                          >
+                            Continuar
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 3: Username */}
+                    {currentStep === 2 && (
                       <div className="space-y-4">
                         <div>
                           <label htmlFor="username" className="text-sm font-medium mb-2 block">Username</label>
@@ -459,7 +507,7 @@ const Auth = () => {
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(0)}>
+                          <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(1)}>
                             Voltar
                           </Button>
                           <Button 
@@ -481,7 +529,7 @@ const Auth = () => {
                                 return;
                               }
                               setError('');
-                              setCurrentStep(2);
+                              setCurrentStep(3);
                             }}
                           >
                             Continuar
@@ -490,8 +538,8 @@ const Auth = () => {
                       </div>
                     )}
 
-                    {/* Step 3: CPF */}
-                    {currentStep === 2 && (
+                    {/* Step 4: CPF */}
+                    {currentStep === 3 && (
                       <div className="space-y-4">
                         <div>
                           <label htmlFor="cpf" className="text-sm font-medium mb-2 block">CPF</label>
@@ -514,7 +562,7 @@ const Auth = () => {
                           )}
                         </div>
                         <div className="flex gap-2">
-                          <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(1)}>
+                          <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(2)}>
                             Voltar
                           </Button>
                           <Button 
@@ -536,7 +584,7 @@ const Auth = () => {
                                 return;
                               }
                               setError('');
-                              setCurrentStep(3);
+                              setCurrentStep(4);
                             }}
                             disabled={cpfError}
                           >
@@ -546,55 +594,7 @@ const Auth = () => {
                       </div>
                     )}
 
-                    {/* Step 4: Email */}
-                    {currentStep === 3 && (
-                      <div className="space-y-4">
-                        <div>
-                          <label htmlFor="email" className="text-sm font-medium mb-2 block">Email</label>
-                          <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                            <Input
-                              ref={emailInputRef}
-                              id="email"
-                              type="email"
-                              placeholder="seu@email.com"
-                              value={formData.email}
-                              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                              className="pl-10"
-                              aria-label="Digite seu endereço de email"
-                              autoFocus
-                            />
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(2)}>
-                            Voltar
-                          </Button>
-                          <Button 
-                            type="button" 
-                            className="w-full"
-                            style={{ backgroundColor: '#00ff90', color: '#000' }}
-                            onClick={async () => {
-                              if (!formData.email) {
-                                setError('Email é obrigatório');
-                                return;
-                              }
-                              const isUnique = await checkUniqueness('email', formData.email);
-                              if (!isUnique) {
-                                setError('Email já cadastrado. Faça login para acessar sua conta.');
-                                return;
-                              }
-                              setError('');
-                              setCurrentStep(4);
-                            }}
-                          >
-                            Continuar
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Step 5: Password, Confirm Password & Terms */}
+                    {/* Step 5: Passwords & Terms */}
                     {currentStep === 4 && (
                       <div className="space-y-4">
                         <div>
@@ -604,111 +604,65 @@ const Auth = () => {
                             <Input
                               id="password"
                               type={showPassword ? 'text' : 'password'}
-                              placeholder="Sua senha"
+                              placeholder="Senha"
                               value={formData.password}
                               onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                               className="pl-10 pr-10"
                               aria-label="Digite sua senha"
                               autoFocus
                             />
-                            <button
+                            <Button
                               type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute right-0 top-0 rounded-none w-10 h-full"
                               onClick={() => setShowPassword(!showPassword)}
-                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"
                             >
-                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                            </button>
+                              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              <span className="sr-only">Mostrar senha</span>
+                            </Button>
                           </div>
+                          <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                            <li className={passwordRequirements.length ? 'text-green-500' : ''}>
+                              <Check className={passwordRequirements.length ? 'inline w-4 h-4 mr-1 align-middle' : 'hidden'} />
+                              Mínimo 8 caracteres
+                            </li>
+                            <li className={passwordRequirements.uppercase ? 'text-green-500' : ''}>
+                              <Check className={passwordRequirements.uppercase ? 'inline w-4 h-4 mr-1 align-middle' : 'hidden'} />
+                              Uma letra maiúscula
+                            </li>
+                            <li className={passwordRequirements.lowercase ? 'text-green-500' : ''}>
+                              <Check className={passwordRequirements.lowercase ? 'inline w-4 h-4 mr-1 align-middle' : 'hidden'} />
+                              Uma letra minúscula
+                            </li>
+                            <li className={passwordRequirements.number ? 'text-green-500' : ''}>
+                              <Check className={passwordRequirements.number ? 'inline w-4 h-4 mr-1 align-middle' : 'hidden'} />
+                              Um número
+                            </li>
+                            <li className={passwordRequirements.special ? 'text-green-500' : ''}>
+                              <Check className={passwordRequirements.special ? 'inline w-4 h-4 mr-1 align-middle' : 'hidden'} />
+                              Um caractere especial (!@#$%^&*)
+                            </li>
+                          </ul>
                         </div>
-
-                        {/* Password Requirements - hide when all requirements are met */}
-                        {formData.password && !Object.values(passwordRequirements).every(Boolean) && (
-                          <div className="space-y-2 p-3 rounded-lg border border-border bg-muted/20">
-                            <div className="text-sm font-medium text-foreground">Requisitos da senha:</div>
-                            <div className="space-y-1">
-                              {!passwordRequirements.length && (
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                  <X className="w-3 h-3" />
-                                  Pelo menos 8 caracteres
-                                </div>
-                              )}
-                              {!passwordRequirements.uppercase && (
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                  <X className="w-3 h-3" />
-                                  Uma letra maiúscula
-                                </div>
-                              )}
-                              {!passwordRequirements.lowercase && (
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                  <X className="w-3 h-3" />
-                                  Uma letra minúscula
-                                </div>
-                              )}
-                              {!passwordRequirements.number && (
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                  <X className="w-3 h-3" />
-                                  Um número
-                                </div>
-                              )}
-                              {!passwordRequirements.special && (
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                  <X className="w-3 h-3" />
-                                  Um caractere especial
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-
                         <div>
-                          <label htmlFor="confirmPassword" className="text-sm font-medium mb-2 block">Confirmar senha</label>
+                          <label htmlFor="confirmPassword" className="text-sm font-medium mb-2 block">Confirmar Senha</label>
                           <div className="relative">
                             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                             <Input
                               id="confirmPassword"
                               type={showPassword ? 'text' : 'password'}
-                              placeholder="Confirme sua senha"
+                              placeholder="Confirmar Senha"
                               value={formData.confirmPassword}
                               onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                               className="pl-10 pr-10"
                               aria-label="Confirme sua senha"
-                              autoFocus
                             />
-                            <button
-                              type="button"
-                              onClick={() => setShowPassword(!showPassword)}
-                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"
-                            >
-                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                            </button>
                           </div>
                           {passwordMismatch && (
-                            <p className="text-xs mt-1 text-white">As senhas não coincidem</p>
+                            <p className="text-xs mt-1" style={{ color: '#ff2389' }}>As senhas não coincidem</p>
                           )}
                         </div>
-
-                        <div className="flex items-start space-x-2 p-3 rounded-lg border border-primary/20 bg-primary/5">
-                          <Checkbox
-                            id="terms"
-                            checked={acceptedTerms}
-                            onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
-                          />
-                          <div className="space-y-1">
-                            <label
-                              htmlFor="terms"
-                              className="text-sm font-medium leading-none cursor-pointer"
-                            >
-                              Aceito os Termos de Uso e Política de Privacidade
-                            </label>
-                            <p className="text-xs text-muted-foreground">
-                              Ao se cadastrar, você concorda com nossos{' '}
-                              <a href="#" className="text-primary hover:underline">Termos de Uso</a>
-                              {' '}e{' '}
-                              <a href="#" className="text-primary hover:underline">Política de Privacidade</a>
-                            </p>
-                          </div>
-                        </div>
-
                         <div className="flex gap-2">
                           <Button type="button" variant="outline" className="w-full" onClick={() => setCurrentStep(3)}>
                             Voltar
@@ -717,9 +671,9 @@ const Auth = () => {
                             type="submit" 
                             className="w-full"
                             style={{ backgroundColor: '#00ff90', color: '#000' }}
-                            disabled={loading || !acceptedTerms || passwordMismatch || !Object.values(passwordRequirements).every(Boolean)}
+                            disabled={loading}
                           >
-                            {loading ? 'Cadastrando...' : 'Criar conta'}
+                            Criar Conta
                           </Button>
                         </div>
                       </div>
@@ -727,246 +681,160 @@ const Auth = () => {
                   </>
                 ) : (
                   <>
-                    {/* Login Form */}
-                    <div>
-                      <label htmlFor="email" className="text-sm font-medium mb-2 block">Email</label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 z-10" />
-                        <Input
-                          ref={loginEmailInputRef}
-                          id="email"
-                          type="email"
-                          placeholder="seu@email.com"
-                          value={formData.email}
-                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                          className="pl-10"
-                          required
-                        />
-                        <EmailSuggestions
-                          value={formData.email}
-                          onSelect={(email) => setFormData(prev => ({ ...prev, email }))}
-                          inputRef={loginEmailInputRef}
-                        />
+                    <div className="space-y-4">
+                      <div>
+                        <label htmlFor="email" className="text-sm font-medium mb-2 block">Email</label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                          <Input
+                            ref={loginEmailInputRef}
+                            id="email"
+                            type="email"
+                            placeholder="seu@email.com"
+                            value={formData.email}
+                            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                            className="pl-10"
+                            aria-label="Digite seu endereço de email"
+                            autoFocus
+                          />
+                        </div>
                       </div>
-                    </div>
-
-                    <div>
-                      <label htmlFor="password" className="text-sm font-medium mb-2 block">Senha</label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                        <Input
-                          id="password"
-                          type={showPassword ? 'text' : 'password'}
-                          placeholder="Sua senha"
-                          value={formData.password}
-                          onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                          className="pl-10 pr-10"
-                          required
-                        />
-                        <button
+                      <div>
+                        <label htmlFor="password" className="text-sm font-medium mb-2 block">Senha</label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                          <Input
+                            id="password"
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Senha"
+                            value={formData.password}
+                            onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                            className="pl-10 pr-10"
+                            aria-label="Digite sua senha"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-0 top-0 rounded-none w-10 h-full"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            <span className="sr-only">Mostrar senha</span>
+                          </Button>
+                        </div>
+                        <Button
                           type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"
+                          variant="link"
+                          className="text-sm px-0"
+                          onClick={() => setShowForgotPassword(true)}
                         >
-                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
+                          Esqueci minha senha
+                        </Button>
                       </div>
+                      <Button type="submit" className="w-full" disabled={loading}>
+                        Entrar
+                      </Button>
                     </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="rememberMe"
-                          checked={rememberMe}
-                          onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                        />
-                        <label
-                          htmlFor="rememberMe"
-                          className="text-sm font-medium leading-none cursor-pointer"
-                        >
-                          Mantenha-me conectado
-                        </label>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setShowForgotPassword(true)}
-                        className="text-sm hover:underline font-semibold"
-                        style={{ color: '#00ff90' }}
-                      >
-                        Esqueceu a senha?
-                      </button>
-                    </div>
-
-                    <Button 
-                      type="submit" 
-                      className="w-full"
-                      style={{ backgroundColor: '#00ff90', color: '#000' }}
-                      disabled={loading}
-                    >
-                      {loading ? 'Entrando...' : 'Entrar'}
-                    </Button>
                   </>
                 )}
 
-                {error && (
-                  <Alert variant="destructive" role="alert" aria-live="polite" className="bg-destructive/10 border-destructive text-white">
-                    <AlertDescription className="text-white">{error}</AlertDescription>
-                  </Alert>
-                )}
-
-                {showForgotPassword && (
-                  <div className="p-4 rounded-lg border border-muted bg-muted/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <KeyRound className="w-4 h-4 text-muted-foreground" />
-                      <h3 className="text-sm font-medium">Recuperar senha</h3>
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-3">
-                      Digite seu email acima e clique em "Enviar" para receber o link de recuperação
-                    </p>
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        style={{ backgroundColor: '#00ff90', color: '#000' }}
-                        onClick={handleForgotPassword}
-                        disabled={loading}
-                        aria-label="Enviar email de recuperação de senha"
-                      >
-                        Enviar
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowForgotPassword(false)}
-                        aria-label="Cancelar recuperação de senha"
-                      >
-                        Cancelar
-                      </Button>
-                    </div>
+                {/* Terms and Conditions */}
+                {!isLogin && currentStep === 4 && (
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="terms"
+                      checked={acceptedTerms}
+                      onCheckedChange={(checked) => setAcceptedTerms(!!checked)}
+                    />
+                    <label
+                      htmlFor="terms"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed"
+                    >
+                      Eu aceito os <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">Termos de Uso</a> e <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">Política de Privacidade</a>
+                    </label>
                   </div>
                 )}
               </form>
 
-              {/* Social Login Buttons - only show on login or first step of registration */}
-              {(isLogin || (!isLogin && currentStep === 0)) && (
-                <div className="space-y-3">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-border" />
+              {/* Forgot Password */}
+              {showForgotPassword && (
+                <div className="space-y-4">
+                  <p className="text-muted-foreground">
+                    Digite seu email para receber um link de recuperação de senha.
+                  </p>
+                  <div>
+                    <label htmlFor="email" className="text-sm font-medium mb-2 block">Email</label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="seu@email.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                      aria-label="Digite seu endereço de email"
+                    />
                   </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">ou continue com</span>
+                  <div className="flex gap-2">
+                    <Button type="button" variant="outline" onClick={() => setShowForgotPassword(false)}>
+                      Cancelar
+                    </Button>
+                    <Button type="button" onClick={handleForgotPassword}>
+                      Enviar Link
+                    </Button>
                   </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    type="button"
-                    className="min-h-[44px] bg-white text-black border border-gray-300 hover:bg-gray-50"
-                    onClick={async () => {
-                      try {
-                        const { error } = await supabase.auth.signInWithOAuth({
-                          provider: 'google',
-                          options: {
-                            redirectTo: `${window.location.origin}/`
-                          }
-                        });
-                        if (error) throw error;
-                      } catch (error) {
-                        console.error('Google auth error:', error);
-                        setError('Erro ao conectar com Google');
-                      }
-                    }}
-                    disabled={loading}
-                    aria-label="Entrar com Google"
-                  >
-                    <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    Google
-                  </Button>
-                  
-                  <Button
-                    type="button"
-                    className="min-h-[44px] bg-black text-white hover:bg-gray-800"
-                    onClick={async () => {
-                      try {
-                        const { error } = await supabase.auth.signInWithOAuth({
-                          provider: 'apple',
-                          options: {
-                            redirectTo: `${window.location.origin}/`
-                          }
-                        });
-                        if (error) throw error;
-                      } catch (error) {
-                        console.error('Apple auth error:', error);
-                        setError('Erro ao conectar com Apple');
-                      }
-                    }}
-                    disabled={loading}
-                    aria-label="Entrar com Apple"
-                  >
-                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                    </svg>
-                    Apple
-                  </Button>
-                </div>
-                
-                {/* Twitch Login Button */}
-                <Button
-                  type="button"
-                  className="min-h-[44px] bg-[#9146ff] text-white hover:bg-[#7d39e6] w-full"
-                  onClick={async () => {
-                    try {
-                      const { error } = await supabase.auth.signInWithOAuth({
-                        provider: 'twitch',
-                        options: {
-                          redirectTo: `${window.location.origin}/`
-                        }
-                      });
-                      if (error) throw error;
-                    } catch (error) {
-                      console.error('Twitch auth error:', error);
-                      setError('Erro ao conectar com Twitch');
-                    }
-                  }}
-                  disabled={loading}
-                  aria-label="Entrar com Twitch"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
-                  </svg>
-                  Entrar com Twitch
-                </Button>
                 </div>
               )}
 
-              {/* Toggle Login/Register */}
+              {/* Sign Up / Sign In Toggle */}
               <div className="text-center">
-                <p className="text-sm text-muted-foreground">
-                  {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}
-                  {' '}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsLogin(!isLogin);
-                      setError('');
-                      setShowForgotPassword(false);
+                {isLogin ? (
+                  <>
+                    Não tem uma conta?{' '}
+                    <Button type="button" variant="link" onClick={() => {
+                      setIsLogin(false);
                       setCurrentStep(0);
-                    }}
-                    className="hover:underline focus:outline-none focus:underline font-semibold"
-                    style={{ color: '#00ff90' }}
-                    aria-label={isLogin ? "Criar nova conta" : "Entrar na sua conta"}
-                  >
-                    {isLogin ? 'Cadastre-se' : 'Entre aqui'}
-                  </button>
-                </p>
+                      setError('');
+                      setFormData({
+                        email: '',
+                        password: '',
+                        confirmPassword: '',
+                        name: '',
+                        username: '',
+                        cpf: ''
+                      });
+                    }}>
+                      Criar uma conta
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    Já tem uma conta?{' '}
+                    <Button type="button" variant="link" onClick={() => {
+                      setIsLogin(true);
+                      setError('');
+                      setFormData({
+                        email: '',
+                        password: '',
+                        confirmPassword: '',
+                        name: '',
+                        username: '',
+                        cpf: ''
+                      });
+                    }}>
+                      Entrar
+                    </Button>
+                  </>
+                )}
               </div>
+
+              {/* Error Message */}
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>
+                    {error}
+                  </AlertDescription>
+                </Alert>
+              )}
             </CardContent>
           </Card>
         </div>
