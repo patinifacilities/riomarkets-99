@@ -2,7 +2,6 @@ import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 export function DarkModeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -11,100 +10,6 @@ export function DarkModeToggle() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  // Apply branding theme when light mode is activated
-  useEffect(() => {
-    if (!mounted) return;
-    
-    const applyBrandingTheme = async () => {
-      if (resolvedTheme === 'light') {
-        try {
-          // First, check if whitemode theme exists
-          const { data, error } = await supabase
-            .from('branding_config')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle();
-
-          if (data && !error) {
-            // Update the active_theme to whitemode
-            await supabase
-              .from('branding_config')
-              .update({ active_theme: 'whitemode' })
-              .eq('id', data.id);
-
-            const root = document.documentElement;
-            
-            // Convert hex to HSL
-            const hexToHSL = (hex: string) => {
-              const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-              if (!result) return '0 0% 0%';
-              
-              let r = parseInt(result[1], 16) / 255;
-              let g = parseInt(result[2], 16) / 255;
-              let b = parseInt(result[3], 16) / 255;
-              
-              const max = Math.max(r, g, b);
-              const min = Math.min(r, g, b);
-              let h = 0, s = 0, l = (max + min) / 2;
-              
-              if (max !== min) {
-                const d = max - min;
-                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-                
-                switch (max) {
-                  case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
-                  case g: h = ((b - r) / d + 2) / 6; break;
-                  case b: h = ((r - g) / d + 4) / 6; break;
-                }
-              }
-              
-              h = Math.round(h * 360);
-              s = Math.round(s * 100);
-              l = Math.round(l * 100);
-              
-              return `${h} ${s}% ${l}%`;
-            };
-
-            // Apply white mode theme colors
-            root.style.setProperty('--background', '0 0% 100%');
-            root.style.setProperty('--primary', '155 100% 35%');
-            root.style.setProperty('--success', '160 100% 40%');
-          }
-        } catch (error) {
-          console.error('Error applying branding theme:', error);
-        }
-      } else {
-        // Reset to default dark theme and update branding config
-        try {
-          const { data } = await supabase
-            .from('branding_config')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle();
-
-          if (data) {
-            // Update back to theme1 (default)
-            await supabase
-              .from('branding_config')
-              .update({ active_theme: 'theme1' })
-              .eq('id', data.id);
-          }
-        } catch (error) {
-          console.error('Error resetting branding theme:', error);
-        }
-
-        const root = document.documentElement;
-        root.style.removeProperty('--background');
-        root.style.removeProperty('--primary');
-        root.style.removeProperty('--success');
-      }
-    };
-
-    applyBrandingTheme();
-  }, [resolvedTheme, mounted]);
 
   if (!mounted) {
     return (

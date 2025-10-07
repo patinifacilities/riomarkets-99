@@ -29,18 +29,18 @@
 
 @layer base {
   :root {
-    /* Kalshi-inspired Design System - Clean Modern */
-    --background: 16 19 26;  /* #10131A */
+    /* Dark theme - Default background #0A101A */
+    --background: 10 16 26;  /* #0A101A */
     --foreground: 210 20% 98%;
 
-    /* Card system - Liquid glass effect */
-    --card: 16 19 26;  
+    /* Card system */
+    --card: 10 16 26;  
     --card-foreground: 210 20% 98%;
 
     --popover: 210 13% 7%;
     --popover-foreground: 210 20% 98%;
 
-    /* Brand colors - Professional green with pink accent */
+    /* Brand colors */
     --primary: 155 100% 45%;
     --primary-foreground: 210 13% 5%;
     --primary-glow: 155 100% 55%;
@@ -51,12 +51,11 @@
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 65%;
 
-    /* Trading colors - Verde Neon */
+    /* Trading colors */
     --success: 160 100% 50%;
     --success-foreground: 0 0% 6%;
     --success-muted: 160 100% 50% / 0.1;
 
-    /* Rosa Neon for negatives */
     --danger: 328 100% 54%;
     --danger-foreground: 210 20% 98%;
     --danger-muted: 328 100% 54% / 0.1;
@@ -69,7 +68,7 @@
     --accent-foreground: 210 13% 5%;
     --accent-muted: 155 100% 45% / 0.1;
 
-    /* Borders and inputs - Kalshi-style subtle */
+    /* Borders and inputs */
     --border: 210 13% 15%;
     --border-soft: 210 13% 10%;
     --input: 210 13% 9%;
@@ -96,13 +95,7 @@
     /* Animations */
     --animation-duration: 0.2s;
     --animation-curve: cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Shimmer animation for golden ticket */
     --shimmer-duration: 3s;
-    
-    /* Liquid glass effect */
-    --liquid-glass-1: 0, 255, 144;
-    --liquid-glass-2: 255, 35, 137;
   }
 
   /* Scale-in animation for winner announcements */
