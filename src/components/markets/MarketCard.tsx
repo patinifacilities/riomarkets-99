@@ -98,12 +98,7 @@ const MarketCard = ({ market }: MarketCardProps) => {
         {/* Pool Info */}
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
-            <img 
-              src="/storage/v1/object/public/assets/asset_a435aa1c-9553-4fad-8609-5bd54ef07447_1759612614765.png" 
-              alt="Rioz"
-              className="w-4 h-4 object-contain"
-            />
-            Vol {pool?.total_pool || 0} Rioz
+            Vol {pool?.total_pool || 0}
           </div>
           <div className="flex items-center gap-1">
             <Eye className="w-3 h-3" />
@@ -221,7 +216,7 @@ const MarketCard = ({ market }: MarketCardProps) => {
               <Link to={`/market/${market.id}`} className="block">
                 <Button
                   size="sm"
-                  className="w-full bg-[#00FF91] hover:bg-[#00FF91]/90 text-black font-medium py-2 px-3 rounded-lg"
+                  className="w-full bg-[#00FF91] hover:bg-[#00FF91]/90 text-gray-900 dark:text-black font-medium py-2 px-3 rounded-lg shadow-sm"
                 >
                   SIM - {(market.odds?.sim || 1.5).toFixed(2)}x
                 </Button>

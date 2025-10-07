@@ -82,6 +82,9 @@ const AdminBranding = () => {
           logo_white_url: config.logo_white_url,
           logo_black_url: config.logo_black_url,
           logo_light_url: config.logo_light_url,
+          background_color: config.background_color,
+          primary_color: config.primary_color,
+          success_color: config.success_color,
           updated_at: new Date().toISOString()
         })
         .eq('id', config.id);
@@ -225,6 +228,101 @@ const AdminBranding = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Color Customization */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Palette className="w-5 h-5" />
+                  Cores do Site
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="bg-color">Cor de Fundo (Background)</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      id="bg-color"
+                      type="color"
+                      value={config.background_color}
+                      onChange={(e) => setConfig({ ...config, background_color: e.target.value })}
+                      className="w-20 h-10"
+                    />
+                    <Input
+                      type="text"
+                      value={config.background_color}
+                      onChange={(e) => setConfig({ ...config, background_color: e.target.value })}
+                      className="flex-1"
+                      placeholder="#0A101A"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="primary-color">Cor Principal (Accent)</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      id="primary-color"
+                      type="color"
+                      value={config.primary_color}
+                      onChange={(e) => setConfig({ ...config, primary_color: e.target.value })}
+                      className="w-20 h-10"
+                    />
+                    <Input
+                      type="text"
+                      value={config.primary_color}
+                      onChange={(e) => setConfig({ ...config, primary_color: e.target.value })}
+                      className="flex-1"
+                      placeholder="#ff2389"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="success-color">Cor de Sucesso</Label>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      id="success-color"
+                      type="color"
+                      value={config.success_color}
+                      onChange={(e) => setConfig({ ...config, success_color: e.target.value })}
+                      className="w-20 h-10"
+                    />
+                    <Input
+                      type="text"
+                      value={config.success_color}
+                      onChange={(e) => setConfig({ ...config, success_color: e.target.value })}
+                      className="flex-1"
+                      placeholder="#00ff90"
+                    />
+                  </div>
+                </div>
+
+                <div className="p-4 bg-muted rounded-lg space-y-2">
+                  <p className="text-sm font-medium">Preview</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div 
+                      className="h-12 rounded border border-border flex items-center justify-center text-xs"
+                      style={{ backgroundColor: config.background_color, color: '#fff' }}
+                    >
+                      Background
+                    </div>
+                    <div 
+                      className="h-12 rounded border border-border flex items-center justify-center text-xs text-white"
+                      style={{ backgroundColor: config.primary_color }}
+                    >
+                      Primary
+                    </div>
+                    <div 
+                      className="h-12 rounded border border-border flex items-center justify-center text-xs text-black"
+                      style={{ backgroundColor: config.success_color }}
+                    >
+                      Success
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Logos */}
             <Card>
               <CardHeader>
