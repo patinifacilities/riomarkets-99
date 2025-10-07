@@ -41,6 +41,7 @@ import AdminGatewaysSaque from '@/pages/AdminGatewaysSaque';
 import AdminSlider from '@/pages/AdminSlider';
 import AdminBranding from '@/pages/AdminBranding';
 import AdminExchange from '@/pages/AdminExchange';
+import AdminExchangeApiConfig from '@/pages/AdminExchangeApiConfig';
 import AdminRaffles from '@/pages/AdminRaffles';
 import AdminRaffleSlider from '@/pages/AdminRaffleSlider';
 import Raffles from '@/pages/Raffles';
@@ -118,6 +119,7 @@ function App() {
             <Route path="/admin/slider" element={<AdminSlider />} />
             <Route path="/admin/branding" element={<AdminBranding />} />
             <Route path="/admin/exchange" element={<AdminExchange />} />
+            <Route path="/admin/exchange/api-config/:symbol" element={<AdminExchangeApiConfig />} />
             <Route path="/admin/raffles" element={<AdminRaffles />} />
           <Route path="/admin/raffle-slider" element={<AdminRaffleSlider />} />
           <Route path="/opinioes" element={<Opinioes />} />

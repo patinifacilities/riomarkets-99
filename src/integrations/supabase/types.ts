@@ -149,6 +149,36 @@ export type Database = {
         }
         Relationships: []
       }
+      exchange_asset_api_config: {
+        Row: {
+          api_url: string
+          created_at: string
+          id: string
+          price_field: string
+          symbol: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          api_url: string
+          created_at?: string
+          id?: string
+          price_field: string
+          symbol: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          api_url?: string
+          created_at?: string
+          id?: string
+          price_field?: string
+          symbol?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       exchange_assets: {
         Row: {
           created_at: string

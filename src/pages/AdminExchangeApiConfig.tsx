@@ -108,9 +108,9 @@ const AdminExchangeApiConfig = () => {
     setSaving(true);
     
     try {
-      // Save to database (you can create a table for this or use existing system_config)
+      // Save to database - using type assertion until types are regenerated
       const { error } = await supabase
-        .from('exchange_asset_api_config')
+        .from('exchange_asset_api_config' as any)
         .upsert({
           symbol: symbol?.toUpperCase(),
           api_url: apiUrl,
