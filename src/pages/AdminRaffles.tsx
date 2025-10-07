@@ -147,8 +147,8 @@ const AdminRaffles = () => {
       const ticketCount = parseInt(formData.ticket_count);
       const goalValue = parseFloat(formData.goal_value);
       
-      // Calculate entry cost based on ticket count and goal value
-      const entryCost = Math.ceil(goalValue / ticketCount);
+      // Calculate entry cost based on ticket count and goal value (allow fractions)
+      const entryCost = parseFloat((goalValue / ticketCount).toFixed(2));
       
       const raffleData = {
         title: formData.title,
@@ -391,7 +391,7 @@ const AdminRaffles = () => {
                         Preço do bilhete será calculado automaticamente: Meta ÷ Quantidade de bilhetes
                         {formData.goal_value && formData.ticket_count && (
                           <span className="block text-primary font-semibold mt-1">
-                            = {Math.ceil(parseFloat(formData.goal_value) / parseInt(formData.ticket_count))} RZ por bilhete
+                            = {(parseFloat(formData.goal_value) / parseInt(formData.ticket_count)).toFixed(2)} RZ por bilhete
                           </span>
                         )}
                       </p>

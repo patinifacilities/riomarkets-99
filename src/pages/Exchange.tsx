@@ -123,14 +123,8 @@ const ExchangeNew = () => {
     if (numValue > 1000000000) return;
     
     setFromAmount(cleanValue);
-    // Apply conversion rate if asset is selected
-    if (selectedAsset && swapDirection === 'brl-to-rioz') {
-      setToAmount((numValue / assetPrice).toFixed(0));
-    } else if (selectedAsset && swapDirection === 'rioz-to-brl') {
-      setToAmount((numValue * assetPrice).toFixed(0));
-    } else {
-      setToAmount(cleanValue);
-    }
+    // 1 RIOZ = 1 USD, so no conversion needed
+    setToAmount(cleanValue);
   };
 
   const formatNumber = (value: string) => {
