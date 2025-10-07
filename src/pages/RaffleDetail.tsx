@@ -35,6 +35,10 @@ interface RaffleEntry {
   created_at: string;
 }
 
+interface UserRaffleEntry {
+  raffle_id: string;
+}
+
 const RaffleDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -45,6 +49,7 @@ const RaffleDetail = () => {
   const [loading, setLoading] = useState(true);
   const [entering, setEntering] = useState(false);
   const [amount, setAmount] = useState(10);
+  const [hasUserTickets, setHasUserTickets] = useState(false);
 
   const fetchRaffle = async () => {
     if (!id) return;
@@ -82,10 +87,32 @@ const RaffleDetail = () => {
     setRecentEntries(data || []);
   };
 
+  const checkUserTickets = async () => {
+    if (!user?.id || !id) {
+      setHasUserTickets(false);
+      return;
+    }
+    
+    try {
+      const { data, error } = await supabase
+        .from('raffle_entries')
+        .select('raffle_id')
+        .eq('user_id', user.id)
+        .eq('raffle_id', id)
+        .limit(1);
+      
+      if (error) throw error;
+      setHasUserTickets((data || []).length > 0);
+    } catch (error) {
+      console.error('Error checking user tickets:', error);
+      setHasUserTickets(false);
+    }
+  };
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await Promise.all([fetchRaffle(), fetchRecentEntries()]);
+      await Promise.all([fetchRaffle(), fetchRecentEntries(), checkUserTickets()]);
       setLoading(false);
     };
 
@@ -190,11 +217,7 @@ const RaffleDetail = () => {
       window.dispatchEvent(new Event('forceProfileRefresh'));
       await fetchRaffle();
       await fetchRecentEntries();
-      
-      // Navigate to tickets page after successful purchase
-      setTimeout(() => {
-        navigate('/raffle-tickets');
-      }, 1500);
+      await checkUserTickets();
     } catch (error) {
       console.error('Error entering raffle:', error);
       toast.error('Erro ao participar da rifa');
@@ -376,6 +399,22 @@ const RaffleDetail = () => {
               >
                 {entering ? 'Processando...' : 'Confirmar'}
               </Button>
+
+              {hasUserTickets && user && (
+                <Button 
+                  variant="outline"
+                  onClick={() => navigate('/raffle-tickets')}
+                  className="w-full relative overflow-hidden flex items-center justify-center gap-2 bg-gradient-to-r from-[#ffd700]/20 via-[#ffed4e]/20 to-[#ffd700]/20 border-[#ffd700]/30 hover:from-[#ffd700]/30 hover:via-[#ffed4e]/30 hover:to-[#ffd700]/30"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ffd700]/30 to-transparent animate-shimmer-slow" 
+                    style={{ backgroundSize: '200% 100%' }}
+                  />
+                  <Ticket className="w-4 h-4 relative z-10 text-[#ffd700]" />
+                  <span className="relative z-10 font-bold bg-gradient-to-r from-[#ffd700] via-[#ffed4e] to-[#ffd700] bg-clip-text text-transparent">
+                    Meus Bilhetes
+                  </span>
+                </Button>
+              )}
             </div>
           </Card>
 

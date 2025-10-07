@@ -235,23 +235,25 @@ const MarketDetail = () => {
                   
                    <div className="space-y-4">
                       <div>
-                        <Label htmlFor="bet-amount" className="mb-2 block">Quantidade para opinar</Label>
+                        <Label htmlFor="bet-amount" className="mb-2 block">
+                          Quantidade para opinar
+                          <span className="ml-2 text-xs text-muted-foreground">
+                            Saldo: {(userProfile?.saldo_moeda || 0).toLocaleString()} Rioz
+                          </span>
+                        </Label>
                         <div className="relative">
                           <Input
                             id="bet-amount"
                             type="text"
                             value={betAmountDisplay}
                             onChange={handleBetAmountChange}
-                            placeholder="0"
+                            placeholder="Digite a quantidade..."
                             className="text-right pr-16"
                             disabled={!authUser || (userProfile?.saldo_moeda || 0) === 0}
                           />
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                             Rioz
                           </span>
-                        </div>
-                        <div className="mt-1 text-xs text-muted-foreground text-right">
-                          Saldo: {(userProfile?.saldo_moeda || 0).toLocaleString()} Rioz
                         </div>
                       </div>
                       
@@ -289,7 +291,7 @@ const MarketDetail = () => {
                        <div className="text-sm text-muted-foreground mb-2">Opção selecionada:</div>
                        <div className="text-lg font-semibold text-primary mb-2">{selectedOption.toUpperCase()}</div>
                        <div className="text-sm text-muted-foreground mb-1">Valor Opinado: {betAmount.toLocaleString()} Rioz</div>
-                       <div className="text-sm text-muted-foreground mb-1">Retorno estimado: {((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))).toLocaleString()} Rioz</div>
+                       <div className="text-sm text-muted-foreground mb-1">Lucro estimado: {(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString()} Rioz</div>
                          <div className="relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-yellow-500/50 shadow-xl">
                            {/* Gold fill based on slider progress - resets at 100% after 1.5s */}
                            <div 
@@ -307,21 +309,21 @@ const MarketDetail = () => {
                                 color: sliderProgress > 0.1 ? '#374151' : 'rgb(234, 179, 8, 0.8)',
                                 transition: 'none'
                               }}
-                            >
-                              RETORNO ESTIMADO
-                            </span>
-                            <div 
-                              className="text-2xl font-bold mt-1"
-                              style={{
-                                color: sliderProgress > 0.1 ? '#374151' : 'transparent',
-                                backgroundImage: sliderProgress > 0.1 ? 'none' : 'linear-gradient(to right, rgb(250, 204, 21), rgb(234, 179, 8), rgb(202, 138, 4))',
-                                backgroundClip: sliderProgress > 0.1 ? 'unset' : 'text',
-                                WebkitBackgroundClip: sliderProgress > 0.1 ? 'unset' : 'text',
-                                transition: 'none'
-                              }}
-                            >
-                              R$ {(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </div>
+                             >
+                               LUCRO ESTIMADO
+                             </span>
+                             <div 
+                               className="text-2xl font-bold mt-1"
+                               style={{
+                                 color: sliderProgress > 0.1 ? '#374151' : 'transparent',
+                                 backgroundImage: sliderProgress > 0.1 ? 'none' : 'linear-gradient(to right, rgb(250, 204, 21), rgb(234, 179, 8), rgb(202, 138, 4))',
+                                 backgroundClip: sliderProgress > 0.1 ? 'unset' : 'text',
+                                 WebkitBackgroundClip: sliderProgress > 0.1 ? 'unset' : 'text',
+                                 transition: 'none'
+                               }}
+                             >
+                               {(((betAmount || 1) * (selectedOption === 'sim' ? (market.odds?.sim || 1.5) : (market.odds?.não || market.odds?.nao || 1.5))) - (betAmount || 1)).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Rioz
+                             </div>
                           </div>
                         </div>
                      </div>
