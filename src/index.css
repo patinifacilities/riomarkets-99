@@ -383,6 +383,24 @@
     background-color: #FFDFEC !important;
   }
 
+  /* Light mode: Force dark text/icons on green backgrounds */
+  .light button[style*="background-color: #00ff90"],
+  .light button[style*="backgroundColor: #00ff90"],
+  .light button.bg-\[#00ff90\],
+  .light div[style*="background-color: #00ff90"],
+  .light div[style*="backgroundColor: #00ff90"] {
+    color: #1f2937 !important;
+  }
+
+  .light button[style*="background-color: #00ff90"] svg,
+  .light button[style*="backgroundColor: #00ff90"] svg,
+  .light button.bg-\[#00ff90\] svg,
+  .light div[style*="background-color: #00ff90"] svg,
+  .light div[style*="backgroundColor: #00ff90"] svg {
+    color: #1f2937 !important;
+    fill: #1f2937 !important;
+  }
+
   /* Background styles */
   .bg-app {
     background: hsl(var(--background));

@@ -19,15 +19,21 @@ export function DarkModeToggle() {
     const applyBrandingTheme = async () => {
       if (resolvedTheme === 'light') {
         try {
+          // First, check if whitemode theme exists
           const { data, error } = await supabase
             .from('branding_config')
             .select('*')
-            .eq('active_theme', 'whitemode')
             .order('created_at', { ascending: false })
             .limit(1)
             .maybeSingle();
 
           if (data && !error) {
+            // Update the active_theme to whitemode
+            await supabase
+              .from('branding_config')
+              .update({ active_theme: 'whitemode' })
+              .eq('id', data.id);
+
             const root = document.documentElement;
             
             // Convert hex to HSL
@@ -62,15 +68,34 @@ export function DarkModeToggle() {
             };
 
             // Apply white mode theme colors
-            root.style.setProperty('--background', hexToHSL(data.background_color));
-            root.style.setProperty('--primary', hexToHSL(data.primary_color));
-            root.style.setProperty('--success', hexToHSL(data.success_color));
+            root.style.setProperty('--background', '0 0% 100%');
+            root.style.setProperty('--primary', '155 100% 35%');
+            root.style.setProperty('--success', '160 100% 40%');
           }
         } catch (error) {
           console.error('Error applying branding theme:', error);
         }
       } else {
-        // Reset to default dark theme
+        // Reset to default dark theme and update branding config
+        try {
+          const { data } = await supabase
+            .from('branding_config')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (data) {
+            // Update back to theme1 (default)
+            await supabase
+              .from('branding_config')
+              .update({ active_theme: 'theme1' })
+              .eq('id', data.id);
+          }
+        } catch (error) {
+          console.error('Error resetting branding theme:', error);
+        }
+
         const root = document.documentElement;
         root.style.removeProperty('--background');
         root.style.removeProperty('--primary');

@@ -171,9 +171,9 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   return (
     <>
       <div className={cn(
-        "bg-card/40 backdrop-blur-xl border border-border rounded-2xl overflow-hidden transition-all duration-300 group relative",
-        "hover:border-border/50 hover:shadow-lg",
-        "hover:scale-[1.02] hover:-translate-y-1",
+        "bg-card/40 backdrop-blur-xl border border-border rounded-2xl overflow-hidden transition-all duration-200 ease-out group relative",
+        "hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5",
+        "hover:scale-[1.01] hover:-translate-y-0.5",
         className
       )}>
         {/* Em Atualização Overlay */}
@@ -253,7 +253,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
               <Button
                 onClick={(e) => handleBetClick(e, 'sim')}
                 disabled={market.status !== 'aberto'}
-                className="h-11 transition-all duration-300 font-semibold rounded-xl hover:scale-105 hover:shadow-lg hover:shadow-[#00ff90]/50 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none light:text-gray-900 dark:text-gray-900"
+                className="h-11 transition-all duration-300 font-semibold rounded-xl hover:scale-105 hover:shadow-lg hover:shadow-[#00ff90]/50 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none dark:text-gray-900 light:text-gray-800"
                 style={{ backgroundColor: '#00ff90' }}
               >
                 SIM - {yesOdds.toFixed(2)}x
