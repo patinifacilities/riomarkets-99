@@ -110,8 +110,7 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
     { 
       title: 'Branding', 
       icon: Settings, 
-      path: '/admin/branding',
-      color: 'text-[#00ff90] hover:text-[#00ff90]'
+      path: '/admin/branding'
     }
   ];
 
@@ -175,13 +174,10 @@ export const AdminSidebar = ({ isOpen, onToggle }: AdminSidebarProps) => {
                 className={`
                   flex items-center gap-3 px-3 py-2 rounded-lg transition-colors
                   ${isActive 
-                    ? item.path === '/admin/branding' 
-                      ? 'text-black' 
-                      : 'bg-primary text-primary-foreground'
+                    ? 'bg-primary text-primary-foreground'
                     : `hover:bg-muted text-muted-foreground hover:text-foreground ${item.color || ''}`
                   }
                 `}
-                style={isActive && item.path === '/admin/branding' ? { backgroundColor: '#00ff90' } : {}}
                 onClick={() => {
                   // Keep sidebar open on all screen sizes
                   // Sidebar should remain persistent for navigation

@@ -39,6 +39,7 @@ const AdminBranding = () => {
   const [saving, setSaving] = useState(false);
   const [config, setConfig] = useState<BrandingConfig | null>(null);
   const [uploading, setUploading] = useState<{[key: string]: boolean}>({});
+  const [selectedTheme, setSelectedTheme] = useState<'original' | 'custom'>('custom');
 
   useEffect(() => {
     if (user) {
@@ -75,21 +76,33 @@ const AdminBranding = () => {
     
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('branding_config')
-        .update({
-          logo_url: config.logo_url,
-          logo_white_url: config.logo_white_url,
-          logo_black_url: config.logo_black_url,
-          logo_light_url: config.logo_light_url,
+      const updateData = {
+        logo_url: config.logo_url,
+        logo_white_url: config.logo_white_url,
+        logo_black_url: config.logo_black_url,
+        logo_light_url: config.logo_light_url,
+        active_theme: selectedTheme,
+        updated_at: new Date().toISOString()
+      };
+
+      // Only include color changes if custom theme is selected
+      if (selectedTheme === 'custom') {
+        Object.assign(updateData, {
           background_color: config.background_color,
           primary_color: config.primary_color,
           success_color: config.success_color,
-          updated_at: new Date().toISOString()
-        })
+        });
+      }
+
+      const { error } = await supabase
+        .from('branding_config')
+        .update(updateData)
         .eq('id', config.id);
 
       if (error) throw error;
+
+      // Reload page to apply theme changes
+      window.location.reload();
       
       toast({
         title: 'Sucesso!',
@@ -104,6 +117,19 @@ const AdminBranding = () => {
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleThemeChange = (theme: 'original' | 'custom') => {
+    setSelectedTheme(theme);
+    if (theme === 'original') {
+      // Reset to original colors
+      setConfig(prev => prev ? {
+        ...prev,
+        background_color: '#0A101A',
+        primary_color: '#ff2389',
+        success_color: '#00ff90'
+      } : null);
     }
   };
 
@@ -227,9 +253,50 @@ const AdminBranding = () => {
             </Button>
           </div>
 
+          {/* Theme Selection */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5" />
+                Seleção de Tema
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <Button
+                  variant={selectedTheme === 'original' ? 'default' : 'outline'}
+                  onClick={() => handleThemeChange('original')}
+                  className="h-auto py-4"
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    <Sparkles className="w-6 h-6" />
+                    <span className="font-semibold">Tema Original</span>
+                    <span className="text-xs text-muted-foreground">Cores padrão do sistema</span>
+                  </div>
+                </Button>
+                <Button
+                  variant={selectedTheme === 'custom' ? 'default' : 'outline'}
+                  onClick={() => handleThemeChange('custom')}
+                  className="h-auto py-4"
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    <Palette className="w-6 h-6" />
+                    <span className="font-semibold">Tema Custom</span>
+                    <span className="text-xs text-muted-foreground">Personalize as cores</span>
+                  </div>
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {selectedTheme === 'original' 
+                  ? 'O tema original usa as cores padrão do sistema. O modo claro/escuro funcionará normalmente.'
+                  : 'O tema custom permite personalizar background e cores principais. O modo claro/escuro funcionará normalmente.'}
+              </p>
+            </CardContent>
+          </Card>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Color Customization */}
-            <Card>
+            <Card className={selectedTheme === 'original' ? 'opacity-50 pointer-events-none' : ''}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Palette className="w-5 h-5" />

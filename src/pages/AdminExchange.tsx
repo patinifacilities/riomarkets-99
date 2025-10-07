@@ -14,6 +14,8 @@ import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { TransactionsPagination } from '@/components/transactions/TransactionsPagination';
+import { Search } from 'lucide-react';
 
 interface ExchangeAsset {
   id: string;
@@ -47,6 +49,9 @@ const AdminExchange = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState<{[key: string]: boolean}>({});
   const [exchangeEnabled, setExchangeEnabled] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const ITEMS_PER_PAGE = 25;
 
   useEffect(() => {
     fetchSystemConfig();
@@ -158,8 +163,7 @@ const AdminExchange = () => {
         .from('exchange_orders')
         .select('*')
         .eq('status', 'filled')
-        .order('created_at', { ascending: false })
-        .limit(100);
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       
@@ -186,6 +190,22 @@ const AdminExchange = () => {
       setLoading(false);
     }
   };
+
+  // Filter and paginate orders
+  const filteredOrders = orders.filter(order => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      order.profiles?.nome?.toLowerCase().includes(searchLower) ||
+      order.profiles?.email?.toLowerCase().includes(searchLower) ||
+      order.side.toLowerCase().includes(searchLower)
+    );
+  });
+
+  const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
+  const paginatedOrders = filteredOrders.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   const handleToggleActive = async (assetId: string, currentStatus: boolean) => {
     try {
@@ -385,6 +405,20 @@ const AdminExchange = () => {
           <Card>
             <CardHeader>
               <CardTitle>Histórico de Conversões</CardTitle>
+              <div className="mt-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Pesquisar por nome, email ou operação..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -409,7 +443,7 @@ const AdminExchange = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {orders.map((order) => (
+                      {paginatedOrders.map((order) => (
                         <TableRow key={order.id}>
                           <TableCell className="whitespace-nowrap">
                             {format(new Date(order.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
@@ -433,13 +467,22 @@ const AdminExchange = () => {
                     </TableBody>
                   </Table>
 
-                  {orders.length === 0 && !loading && (
+                  {filteredOrders.length === 0 && !loading && (
                     <div className="flex justify-center items-center py-12">
                       <div className="flex flex-col items-center gap-3">
-                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
-                        <p className="text-sm text-muted-foreground">Carregando conversões...</p>
+                        <p className="text-sm text-muted-foreground">
+                          {searchTerm ? 'Nenhuma conversão encontrada com esses critérios.' : 'Nenhuma conversão realizada ainda.'}
+                        </p>
                       </div>
                     </div>
+                  )}
+                  
+                  {filteredOrders.length > 0 && (
+                    <TransactionsPagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={setCurrentPage}
+                    />
                   )}
                 </div>
               )}

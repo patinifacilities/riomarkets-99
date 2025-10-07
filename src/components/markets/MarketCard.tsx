@@ -216,7 +216,7 @@ const MarketCard = ({ market }: MarketCardProps) => {
               <Link to={`/market/${market.id}`} className="block">
                 <Button
                   size="sm"
-                  className="w-full bg-[#00FF91] hover:bg-[#00FF91]/90 text-gray-900 dark:text-black font-medium py-2 px-3 rounded-lg shadow-sm"
+                  className="w-full bg-[#00FF91] hover:bg-[#00FF91]/90 text-black font-medium py-2 px-3 rounded-lg shadow-sm"
                 >
                   SIM - {(market.odds?.sim || 1.5).toFixed(2)}x
                 </Button>
