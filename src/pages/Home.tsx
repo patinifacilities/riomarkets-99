@@ -225,56 +225,39 @@ const Home = () => {
     const slides: Array<{ type: 'market' | 'image' | 'fast' | 'text', data: any }> = [];
     const seenSlides = new Set<string>();
     
-    if (slideOrder.length === 0) {
-      // Fallback: show selected markets + custom images
-      sliderMarkets.forEach(m => {
-        if (!seenSlides.has(m.id)) {
-          slides.push({ type: 'market' as const, data: m });
-          seenSlides.add(m.id);
-        }
-      });
+    // Respect the order from admin panel
+    slideOrder.forEach((item: any) => {
+      const id = typeof item === 'string' ? item : item.id;
+      const isHidden = typeof item === 'object' && item.hidden;
       
-      sliderCustomImages.forEach(img => {
-        if (!seenSlides.has(img.id)) {
+      // Skip hidden slides
+      if (isHidden) return;
+      
+      // Skip duplicates
+      if (seenSlides.has(id)) return;
+      
+      if (id === 'text-card') {
+        seenSlides.add(id);
+        slides.push({ type: 'text' as const, data: null });
+      } else if (id === 'fast-card') {
+        seenSlides.add(id);
+        slides.push({ type: 'fast' as const, data: null });
+      } else if (id.startsWith('custom-')) {
+        const img = sliderCustomImages.find(i => i.id === id);
+        if (img) {
+          seenSlides.add(id);
           slides.push({ type: 'image' as const, data: img });
-          seenSlides.add(img.id);
         }
-      });
-    } else {
-      // Respect the order from admin panel
-      slideOrder.forEach((item: any) => {
-        const id = typeof item === 'string' ? item : item.id;
-        const isHidden = typeof item === 'object' && item.hidden;
-        
-        // Skip hidden slides
-        if (isHidden) return;
-        
-        // Skip duplicates
-        if (seenSlides.has(id)) return;
-        
-        if (id === 'text-card') {
+      } else {
+        // Only show markets selected in "Mercados Selecionados"
+        if (!sliderMarketIds.includes(id)) return;
+        const market = sliderMarkets.find(m => m.id === id);
+        if (market) {
           seenSlides.add(id);
-          slides.push({ type: 'text' as const, data: null });
-        } else if (id === 'fast-card') {
-          seenSlides.add(id);
-          slides.push({ type: 'fast' as const, data: null });
-        } else if (id.startsWith('custom-')) {
-          const img = sliderCustomImages.find(i => i.id === id);
-          if (img) {
-            seenSlides.add(id);
-            slides.push({ type: 'image' as const, data: img });
-          }
-        } else {
-          // Only show markets selected in "Mercados Selecionados"
-          if (!sliderMarketIds.includes(id)) return;
-          const market = sliderMarkets.find(m => m.id === id);
-          if (market) {
-            seenSlides.add(id);
-            slides.push({ type: 'market' as const, data: market });
-          }
+          slides.push({ type: 'market' as const, data: market });
         }
-      });
-    }
+      }
+    });
     
     return slides;
   }, [slideOrder, sliderMarkets, sliderCustomImages, sliderMarketIds]);
@@ -294,14 +277,15 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      {/* Hero Carousel Section */}
-      <div className="relative overflow-hidden border-b border-border/50 bg-gradient-to-r from-background via-primary/5 to-background">
-        {/* Stars Background Effect */}
-        <div className="absolute inset-0 opacity-20">
-          <StarsBackground />
-        </div>
-        <div className="container mx-auto px-4 py-12 relative z-10">
-          <Carousel
+      {/* Hero Carousel Section - Only show if there are slides */}
+      {orderedSlides.length > 0 && (
+        <div className="relative overflow-hidden border-b border-border/50 bg-gradient-to-r from-background via-primary/5 to-background">
+          {/* Stars Background Effect */}
+          <div className="absolute inset-0 opacity-20">
+            <StarsBackground />
+          </div>
+          <div className="container mx-auto px-4 py-12 relative z-10">
+            <Carousel
             opts={{
               align: "start",
               loop: true,
@@ -557,6 +541,7 @@ const Home = () => {
           </Carousel>
         </div>
       </div>
+      )}
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">

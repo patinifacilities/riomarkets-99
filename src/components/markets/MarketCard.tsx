@@ -56,10 +56,8 @@ const MarketCard = ({ market }: MarketCardProps) => {
   const noRecompensa = market.odds?.não || market.odds?.nao || 1.5;
 
   return (
-    <Card className={`market-card transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-[1.01] border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm ${
-      isHovered ? 'ring-2 ring-primary/50 shadow-[0_0_20px_rgba(255,35,137,0.3)]' : ''
-    }`}>
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5 pointer-events-none transition-opacity duration-300 hover:opacity-80"></div>
+    <Card className="market-card transition-all duration-300 hover:shadow-lg border-primary/20 bg-gradient-to-br from-card via-card to-card/50 backdrop-blur-sm">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-[#ff2389]/5 pointer-events-none"></div>
       <CardContent className="p-4 space-y-4 relative z-10">
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
@@ -100,8 +98,12 @@ const MarketCard = ({ market }: MarketCardProps) => {
         {/* Pool Info */}
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
-            <TrendingUp className="w-3 h-3" />
-            {pool?.total_pool || 0} RIOZ total
+            <img 
+              src="/storage/v1/object/public/assets/asset_a435aa1c-9553-4fad-8609-5bd54ef07447_1759612614765.png" 
+              alt="Rioz"
+              className="w-4 h-4 object-contain"
+            />
+            Vol {pool?.total_pool || 0} Rioz
           </div>
           <div className="flex items-center gap-1">
             <Eye className="w-3 h-3" />
@@ -216,30 +218,22 @@ const MarketCard = ({ market }: MarketCardProps) => {
             </div>
           ) : (
             <>
-              <Button
-                size="sm"
-                className="bg-[#00FF91] hover:bg-[#00FF91]/90 text-black font-medium py-2 px-3 rounded-lg"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleBetClick('sim');
-                }}
-              >
-                SIM {(market.odds?.sim || 1.5).toFixed(2)}x
-              </Button>
-              <Button
-                size="sm"
-                className="bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-medium py-2 px-3 rounded-lg hover:shadow-[0_0_20px_rgba(255,35,137,0.5)] transition-all duration-300"
-                onMouseEnter={() => setHoveredCard(market.id)}
-                onMouseLeave={() => setHoveredCard(null)}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleBetClick('não');
-                }}
-              >
-                NÃO {(market.odds?.não || market.odds?.nao || 1.5).toFixed(2)}x
-              </Button>
+              <Link to={`/market/${market.id}`} className="block">
+                <Button
+                  size="sm"
+                  className="w-full bg-[#00FF91] hover:bg-[#00FF91]/90 text-black font-medium py-2 px-3 rounded-lg"
+                >
+                  SIM - {(market.odds?.sim || 1.5).toFixed(2)}x
+                </Button>
+              </Link>
+              <Link to={`/market/${market.id}`} className="block">
+                <Button
+                  size="sm"
+                  className="w-full bg-[#ff2389] hover:bg-[#ff2389]/90 text-white font-medium py-2 px-3 rounded-lg transition-all duration-300"
+                >
+                  NÃO - {(market.odds?.não || market.odds?.nao || 1.5).toFixed(2)}x
+                </Button>
+              </Link>
             </>
           )}
         </div>
