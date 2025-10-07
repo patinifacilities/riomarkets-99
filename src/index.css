@@ -304,10 +304,10 @@
   
   /* Set dark as default and add light theme overrides */
   :root {
-    /* Dark theme - Fixed background #0A101A */
-    --background: 10 16 26 !important;  /* #0A101A - forced */
+    /* Dark theme - Default background #0A101A */
+    --background: 10 16 26;  /* #0A101A */
     --foreground: 210 20% 98%;
-    --card: 10 16 26 !important;  /* #0A101A - forced */
+    --card: 10 16 26;  /* #0A101A */
     --card-foreground: 210 20% 98%;
     --popover: 210 13% 7%;
     --popover-foreground: 210 20% 98%;
