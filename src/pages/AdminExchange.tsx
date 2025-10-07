@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Upload, ToggleLeft, ToggleRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,6 +40,7 @@ interface ExchangeOrder {
 }
 
 const AdminExchange = () => {
+  const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { data: profile, isLoading: profileLoading } = useProfile(user?.id);
   const { toast } = useToast();
@@ -383,6 +384,14 @@ const AdminExchange = () => {
                         }}
                         disabled={uploading[asset.id]}
                       />
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(`/admin/exchange/api-config/${asset.symbol.toLowerCase()}`)}
+                      >
+                        Configurar API
+                      </Button>
 
                       <div className="flex items-center gap-2">
                         <Label htmlFor={`switch-${asset.id}`} className="text-sm">

@@ -32,6 +32,7 @@ const Raffles = () => {
   const [raffles, setRaffles] = useState<Raffle[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasTickets, setHasTickets] = useState(false);
+  const [topRaffleId, setTopRaffleId] = useState<string | null>(null);
 
   const fetchRaffles = async () => {
     try {
@@ -44,6 +45,14 @@ const Raffles = () => {
 
       if (error) throw error;
       setRaffles(data || []);
+      
+      // Find raffle with highest current_value
+      if (data && data.length > 0) {
+        const maxRaffle = data.reduce((prev, current) => 
+          (prev.current_value > current.current_value) ? prev : current
+        );
+        setTopRaffleId(maxRaffle.id);
+      }
     } catch (error) {
       console.error('Error fetching raffles:', error);
     } finally {
@@ -164,10 +173,15 @@ const Raffles = () => {
             const timeUntilStart = getTimeUntilStart(raffle.start_date);
             const hasStarted = !timeUntilStart;
 
+            const isTopRaffle = raffle.id === topRaffleId;
+            
             return (
               <Card 
                 key={raffle.id} 
-                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                className={cn(
+                  "overflow-hidden hover:shadow-lg transition-shadow cursor-pointer relative",
+                  isTopRaffle && "ring-2 ring-orange-500 shadow-[0_0_30px_rgba(255,165,0,0.3)]"
+                )}
                 onClick={() => navigate(`/raffles/${raffle.id}`)}
               >
                 {raffle.image_url && (
@@ -177,6 +191,17 @@ const Raffles = () => {
                       alt={raffle.title}
                       className="w-full h-full object-cover"
                     />
+                    
+                    {/* Fire badge for top raffle */}
+                    {isTopRaffle && (
+                      <div className="absolute top-2 left-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 backdrop-blur-sm border border-orange-300 shadow-lg animate-pulse">
+                        <span className="text-white text-xs font-bold flex items-center gap-1">
+                          <img src="/src/assets/hot-fire.png" alt="fire" className="w-4 h-4" />
+                          QUENTE
+                        </span>
+                      </div>
+                    )}
+                    
                     {/* Countdown badge */}
                     {raffle.ends_at && (
                       <div className="absolute top-2 right-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-sm border border-white/20 animate-pulse">

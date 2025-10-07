@@ -234,9 +234,28 @@ const MarketDetail = () => {
                   </h3>
                   
                    <div className="space-y-4">
-                      {(userProfile?.saldo_moeda || 0) > 0 ? (
-                        <></>
-                      ) : (
+                      <div>
+                        <Label htmlFor="bet-amount" className="mb-2 block">Quantidade para opinar</Label>
+                        <div className="relative">
+                          <Input
+                            id="bet-amount"
+                            type="text"
+                            value={betAmountDisplay}
+                            onChange={handleBetAmountChange}
+                            placeholder="0"
+                            className="text-right pr-16"
+                            disabled={!authUser || (userProfile?.saldo_moeda || 0) === 0}
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                            Rioz
+                          </span>
+                        </div>
+                        <div className="mt-1 text-xs text-muted-foreground text-right">
+                          Saldo: {(userProfile?.saldo_moeda || 0).toLocaleString()} Rioz
+                        </div>
+                      </div>
+                      
+                      {(userProfile?.saldo_moeda || 0) === 0 && (
                         <div className="p-4 bg-muted/50 rounded-lg text-center">
                           <p className="text-sm text-muted-foreground mb-3">
                             Você precisa de Rioz Coin para opinar neste mercado
@@ -389,8 +408,12 @@ const MarketDetail = () => {
                                   setBetAmount(0);
                                 }
 
+                                // Play coin sound
+                                const audio = new Audio('/sounds/coin.mp3');
+                                audio.play().catch(e => console.log('Audio play failed:', e));
+                                
                                 toast({
-                                  title: "✓ Opinião enviada com sucesso!",
+                                  title: "✅ Opinião enviada com sucesso!",
                                  description: `Você opinou ${selectedOption.toUpperCase()} com ${betAmount} RIOZ`,
                                  className: "fixed bottom-24 md:bottom-4 right-4 rounded-2xl z-50 bg-[#00ff90] text-black border-[#00ff90]"
                                 });
