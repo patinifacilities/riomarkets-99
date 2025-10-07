@@ -147,6 +147,11 @@ const AdminRaffles = () => {
       const ticketCount = parseInt(formData.ticket_count);
       const goalValue = parseFloat(formData.goal_value);
       
+      if (!formData.title || !formData.prize_description || !ticketCount || !goalValue) {
+        toast.error('Preencha todos os campos obrigatórios');
+        return;
+      }
+      
       // Calculate entry cost based on ticket count and goal value (allow fractions)
       const entryCost = parseFloat((goalValue / ticketCount).toFixed(2));
       
@@ -155,7 +160,7 @@ const AdminRaffles = () => {
         description: formData.description || null,
         prize_description: formData.prize_description,
         image_url: primaryImage,
-        payout_value: parseFloat(formData.payout_value),
+        payout_value: parseFloat(formData.payout_value) || 0,
         goal_value: goalValue,
         ticket_count: ticketCount,
         entry_cost: entryCost,
@@ -170,23 +175,29 @@ const AdminRaffles = () => {
           .update(raffleData as any)
           .eq('id', editingRaffle.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
         toast.success('Rifa atualizada com sucesso!');
       } else {
         const { error } = await supabase
           .from('raffles')
           .insert(raffleData);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
         toast.success('Rifa criada com sucesso!');
       }
 
       setDialogOpen(false);
       resetForm();
       fetchRaffles();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving raffle:', error);
-      toast.error('Erro ao salvar a rifa');
+      toast.error(error?.message || 'Erro ao salvar a rifa');
     }
   };
 

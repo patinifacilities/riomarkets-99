@@ -38,28 +38,7 @@ const AdminGatewayConfigCrypto = () => {
     clientSecret: 'uhA4vISXjWF8cs/FsZf0ewSITf0WTqwnc+GDkgidj3c=',
     feePercent: 1.5,
     minAmount: 10,
-    maxAmount: 500000,
-    permissions: [
-      'createinvoice',
-      'listinvoices',
-      'findinvoice',
-      'invoicepayouts',
-      'listinvoicehistory',
-      'createwallet',
-      'getwallets',
-      'getwalletbyid',
-      'createaddress',
-      'getwalletaddresse',
-      'getwalletaddresses',
-      'getwallettransactions',
-      'getwallettransaction',
-      'spendrequest',
-      'confirmspendingfunds',
-      'createclientwebhook',
-      'getwebhooks',
-      'updatewebhook',
-      'deletewebhook'
-    ]
+    maxAmount: 500000
   });
 
   const handleSave = () => {

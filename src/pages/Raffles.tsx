@@ -191,9 +191,10 @@ const Raffles = () => {
                     
                     {/* Fire badge for top raffle - replaces countdown */}
                     {isTopRaffle ? (
-                      <div className="absolute top-2 right-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 backdrop-blur-sm border border-orange-300 shadow-lg animate-pulse">
-                        <span className="text-white text-xs font-bold flex items-center gap-1">
-                          <Flame className="w-4 h-4" />
+                      <div className="absolute top-2 right-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 backdrop-blur-sm border border-orange-300 shadow-lg shadow-orange-500/50 animate-pulse">
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer-slow" style={{ backgroundSize: '200% 100%' }} />
+                        <span className="text-white text-xs font-bold flex items-center gap-1 relative z-10">
+                          <Flame className="w-4 h-4 animate-bounce" />
                           QUENTE
                         </span>
                       </div>

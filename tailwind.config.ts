@@ -149,6 +149,16 @@ export default {
             backgroundPosition: "-200% center",
           },
         },
+        "scale-out": {
+          "0%": {
+            opacity: "1",
+            transform: "scale(1)",
+          },
+          "100%": {
+            opacity: "0",
+            transform: "scale(0.95)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -157,6 +167,7 @@ export default {
         "fade-in": "fade-in 0.3s ease-out",
         "shimmer": "shimmer 2s ease-in-out infinite",
         "shimmer-slow": "shimmer-slow var(--shimmer-duration, 3s) linear infinite",
+        "scale-out": "scale-out 0.3s ease-out forwards",
       },
     },
   },

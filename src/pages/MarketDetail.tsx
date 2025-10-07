@@ -397,28 +397,35 @@ const MarketDetail = () => {
 
                               if (orderBookError) throw orderBookError;
 
-                                // Add shrink animation to confirmation area
+                              // Add shrink animation to confirmation area
                                 const confirmArea = document.querySelector('[data-confirm-area]');
                                 if (confirmArea) {
                                   confirmArea.classList.add('animate-scale-out');
                                   setTimeout(() => {
                                     setSelectedOption('');
                                     setBetAmount(0);
-                                  }, 200);
+                                    
+                                    // Show success notification after animation
+                                    toast({
+                                      title: "✅ Opinião enviada com sucesso!",
+                                      description: `Você opinou ${selectedOption.toUpperCase()} com ${betAmount} RIOZ`,
+                                      className: "fixed bottom-24 md:bottom-4 right-4 rounded-2xl z-50 bg-[#00ff90] text-black border-[#00ff90]"
+                                    });
+                                  }, 300);
                                 } else {
                                   setSelectedOption('');
                                   setBetAmount(0);
+                                  
+                                  toast({
+                                    title: "✅ Opinião enviada com sucesso!",
+                                    description: `Você opinou ${selectedOption.toUpperCase()} com ${betAmount} RIOZ`,
+                                    className: "fixed bottom-24 md:bottom-4 right-4 rounded-2xl z-50 bg-[#00ff90] text-black border-[#00ff90]"
+                                  });
                                 }
 
                                 // Play coin sound
                                 const audio = new Audio('/sounds/coin.mp3');
                                 audio.play().catch(e => console.log('Audio play failed:', e));
-                                
-                                toast({
-                                  title: "✅ Opinião enviada com sucesso!",
-                                 description: `Você opinou ${selectedOption.toUpperCase()} com ${betAmount} RIOZ`,
-                                 className: "fixed bottom-24 md:bottom-4 right-4 rounded-2xl z-50 bg-[#00ff90] text-black border-[#00ff90]"
-                                });
 
                              setSelectedOption('');
                              setBetAmount(0);
