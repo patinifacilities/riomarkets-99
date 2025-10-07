@@ -30,6 +30,8 @@ const ExchangeNew = () => {
   const [allAssets, setAllAssets] = useState<{symbol: string, name: string, icon_url: string | null, is_active: boolean}[]>([]);
   const [exchangeEnabled, setExchangeEnabled] = useState(true);
   const [riozIconUrl, setRiozIconUrl] = useState<string | null>(null);
+  const [selectedAsset, setSelectedAsset] = useState<{symbol: string, name: string, icon_url: string | null} | null>(null);
+  const [assetPrice, setAssetPrice] = useState<number>(1);
 
   useEffect(() => {
     fetchSystemConfig();
@@ -121,7 +123,14 @@ const ExchangeNew = () => {
     if (numValue > 1000000000) return;
     
     setFromAmount(cleanValue);
-    setToAmount(cleanValue);
+    // Apply conversion rate if asset is selected
+    if (selectedAsset && swapDirection === 'brl-to-rioz') {
+      setToAmount((numValue / assetPrice).toFixed(0));
+    } else if (selectedAsset && swapDirection === 'rioz-to-brl') {
+      setToAmount((numValue * assetPrice).toFixed(0));
+    } else {
+      setToAmount(cleanValue);
+    }
   };
 
   const formatNumber = (value: string) => {
@@ -255,7 +264,10 @@ const ExchangeNew = () => {
             <h1 className="text-4xl font-bold text-foreground">Exchange</h1>
           </div>
           <p className="text-muted-foreground text-lg">
-            Converta entre BRL e RIOZ (1 RIOZ = 1 USD)
+            {selectedAsset 
+              ? `Converta BRL para ${selectedAsset.name} • R$ ${assetPrice.toFixed(2)}` 
+              : 'Converta entre BRL e RIOZ (1 RIOZ = 1 USD)'
+            }
           </p>
         </div>
 
@@ -331,10 +343,31 @@ const ExchangeNew = () => {
                                 asset.is_active ? 'cursor-pointer hover:bg-[#0A101A]' : 'opacity-60 cursor-not-allowed'
                               }`}
                               disabled={!asset.is_active}
-                              onClick={() => {
+                              onClick={async () => {
                                 if (asset.is_active) {
-                                  // Don't toggle direction, just update the state if needed
-                                  // The asset is already handled by the swap logic
+                                  setSelectedAsset(asset);
+                                  
+                                  // Fetch asset price from API
+                                  try {
+                                    const { data, error } = await supabase.functions.invoke('get-crypto-price', {
+                                      body: { symbol: asset.symbol }
+                                    });
+                                    
+                                    if (error) throw error;
+                                    setAssetPrice(data.price);
+                                    
+                                    toast({
+                                      title: `${asset.name} selecionado`,
+                                      description: `Taxa: R$ ${data.price.toFixed(2)}`,
+                                    });
+                                  } catch (error) {
+                                    console.error('Error fetching asset price:', error);
+                                    toast({
+                                      title: "Erro",
+                                      description: "Não foi possível obter a cotação",
+                                      variant: "destructive"
+                                    });
+                                  }
                                 }
                               }}
                             >

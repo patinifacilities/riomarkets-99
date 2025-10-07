@@ -251,16 +251,69 @@ export const NewsManagement = () => {
     }
   };
 
+  const handleAutoScrape = async () => {
+    try {
+      setIsScraping(true);
+      toast({
+        title: "Scraping automático iniciado",
+        description: "Buscando notícias das fontes configuradas...",
+      });
+
+      const { data, error } = await supabase.functions.invoke('scrape-news-auto');
+
+      if (error) throw error;
+
+      if (!data?.success) {
+        throw new Error('Erro ao fazer scrape automático');
+      }
+
+      toast({
+        title: "Scraping concluído!",
+        description: `${data.scraped} notícias adicionadas de ${data.sources} fontes.`,
+      });
+
+      loadNews();
+    } catch (error) {
+      console.error('Error in auto scrape:', error);
+      toast({
+        title: "Erro",
+        description: error instanceof Error ? error.message : "Erro ao fazer scrape automático",
+        variant: "destructive"
+      });
+    } finally {
+      setIsScraping(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Gerenciar Notícias</h2>
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={handleAutoScrape}
+            disabled={isScraping}
+            className="gap-2"
+          >
+            {isScraping ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                Processando...
+              </>
+            ) : (
+              <>
+                <LinkIcon className="w-4 h-4" />
+                Scrape Automático
+              </>
+            )}
+          </Button>
+          
           <Dialog open={isScrapeDialogOpen} onOpenChange={setIsScrapeDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" className="gap-2">
                 <LinkIcon className="w-4 h-4" />
-                Scrape Notícia
+                Scrape Manual
               </Button>
             </DialogTrigger>
             <DialogContent>

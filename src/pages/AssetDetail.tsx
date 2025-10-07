@@ -55,6 +55,7 @@ const AssetDetail = () => {
     const saved = localStorage.getItem('assetDetailBetAmount');
     return saved ? parseInt(saved) : 100;
   });
+  const [userBalance, setUserBalance] = useState(0);
   const [selectedResult, setSelectedResult] = useState<FastPoolResult | null>(null);
   const [resultModalOpen, setResultModalOpen] = useState(false);
   const [opinionNotifications, setOpinionNotifications] = useState<{id: string, text: string, side?: 'subiu' | 'desceu', timestamp: number}[]>([]);

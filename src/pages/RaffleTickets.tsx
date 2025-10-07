@@ -65,12 +65,17 @@ const RaffleTickets = () => {
     
     entries.forEach(entry => {
       const raffleId = entry.raffle_id;
+      const entryTickets = Array.isArray(entry.ticket_numbers) ? entry.ticket_numbers : [];
+      
       if (raffleMap.has(raffleId)) {
         const existing = raffleMap.get(raffleId)!;
         existing.amount_paid += entry.amount_paid;
-        existing.ticket_numbers = [...existing.ticket_numbers, ...(entry.ticket_numbers || [])];
+        existing.ticket_numbers = [...(existing.ticket_numbers || []), ...entryTickets];
       } else {
-        raffleMap.set(raffleId, { ...entry, ticket_numbers: entry.ticket_numbers || [] });
+        raffleMap.set(raffleId, { 
+          ...entry, 
+          ticket_numbers: entryTickets
+        });
       }
     });
     
@@ -145,7 +150,7 @@ const RaffleTickets = () => {
                 })}
                 status={raffle.status}
                 imageUrl={raffle.image_url}
-                onClick={() => setSelectedTickets({ title: raffle.title, numbers: entry.ticket_numbers })}
+                onClick={() => setSelectedTickets({ title: raffle.title, numbers: entry.ticket_numbers || [] })}
                 isTopTicket={isTopTicket}
               />
             );
