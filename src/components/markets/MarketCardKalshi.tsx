@@ -155,17 +155,13 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
     opt.label.toLowerCase().includes('não') || opt.label.toLowerCase().includes('no')
   );
 
-  // Calculate odds from pool percentages
-  const calculateOdds = (chance: number) => {
-    if (chance === 0) return 1.5;
-    return Math.max(1.01, 100 / chance);
-  };
+  // Use configured odds from market.odds or fallback to calculated odds
+  const yesOdds = market.odds?.sim || (yesOption?.chance ? Math.max(1.01, 100 / yesOption.chance) : 1.5);
+  const noOdds = market.odds?.nao || (noOption?.chance ? Math.max(1.01, 100 / noOption.chance) : 1.5);
 
   // Use real pool percentages or default to 50/50
   const yesPercentage = yesOption?.chance || 50;
   const noPercentage = noOption?.chance || 50;
-  const yesOdds = calculateOdds(yesPercentage);
-  const noOdds = calculateOdds(noPercentage);
 
   // Hot market logic
   const isHot = (stats?.vol_24h && stats.vol_24h > 100) || 
@@ -226,7 +222,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
           {/* Content */}
           <div className="p-5">
             {/* Title */}
-            <h3 className="text-base font-semibold text-white mb-4 line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+            <h3 className="text-base font-semibold text-foreground mb-4 line-clamp-2 leading-snug transition-colors">
               {market.titulo}
             </h3>
 
@@ -307,7 +303,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                       ))
                     )}
                   </div>
-                  <span className="ml-1.5 font-medium">+{stats?.participantes || 13}</span>
+                  <span className="ml-1.5 font-medium text-foreground">+{stats?.participantes || 13}</span>
                 </div>
                 
                 <div className="flex items-center gap-1">
@@ -316,11 +312,11 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                     alt="Rioz"
                     className="w-4 h-4 object-contain"
                   />
-                  <span>Vol {formatVolume(detailedPool?.totalPool || stats?.vol_total || 0)} Rioz</span>
+                  <span className="text-foreground">Vol {formatVolume(detailedPool?.totalPool || stats?.vol_total || 0)} Rioz</span>
                 </div>
               </div>
               
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 text-foreground">
                 <Clock className="w-3.5 h-3.5" />
                 <span>{formatTimeLeft(market.end_date)}</span>
               </div>
@@ -328,18 +324,18 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
 
             {/* Additional details for slider */}
             {isSlider && (
-              <div className="mt-4 pt-4 border-t border-gray-800 space-y-2">
+              <div className="mt-4 pt-4 border-t border-border space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Volume 24h:</span>
-                  <span className="text-white font-medium">{formatVolume((detailedPool?.totalPool || stats?.vol_total || 0) * 0.3)}</span>
+                  <span className="text-muted-foreground">Volume 24h:</span>
+                  <span className="text-foreground font-medium">{formatVolume((detailedPool?.totalPool || stats?.vol_total || 0) * 0.3)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Categoria:</span>
-                  <span className="text-white capitalize">{market.categoria}</span>
+                  <span className="text-muted-foreground">Categoria:</span>
+                  <span className="text-foreground capitalize">{market.categoria}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Status:</span>
-                  <span className="text-white capitalize">{market.status}</span>
+                  <span className="text-muted-foreground">Status:</span>
+                  <span className="text-foreground capitalize">{market.status}</span>
                 </div>
               </div>
             )}
