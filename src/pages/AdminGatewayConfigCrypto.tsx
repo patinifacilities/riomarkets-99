@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Shield, Save } from 'lucide-react';
+import { ArrowLeft, Shield, Save, Check } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -33,12 +33,33 @@ const AdminGatewayConfigCrypto = () => {
 
   const [config, setConfig] = useState({
     enabled: true,
-    btcAddress: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
-    ethAddress: '0x742F35Cc6634C0532925a3b8D42CFA03e05eaCd8',
+    apiUrl: 'https://a-api.coinpayments.net',
+    clientId: 'd1219c256f7d4653b2b24759def7f66e',
+    clientSecret: 'uhA4vISXjWF8cs/FsZf0ewSITf0WTqwnc+GDkgidj3c=',
     feePercent: 1.5,
     minAmount: 10,
     maxAmount: 500000,
-    webhookUrl: 'https://api.riozmarkets.com/webhook/crypto'
+    permissions: [
+      'createinvoice',
+      'listinvoices',
+      'findinvoice',
+      'invoicepayouts',
+      'listinvoicehistory',
+      'createwallet',
+      'getwallets',
+      'getwalletbyid',
+      'createaddress',
+      'getwalletaddresse',
+      'getwalletaddresses',
+      'getwallettransactions',
+      'getwallettransaction',
+      'spendrequest',
+      'confirmspendingfunds',
+      'createclientwebhook',
+      'getwebhooks',
+      'updatewebhook',
+      'deletewebhook'
+    ]
   });
 
   const handleSave = () => {
@@ -127,51 +148,108 @@ const AdminGatewayConfigCrypto = () => {
               </CardContent>
             </Card>
 
-            {/* Configurações Crypto */}
+            {/* Configuração da API CoinPayments */}
             <Card className="bg-card-secondary border-border-secondary">
               <CardHeader>
-                <CardTitle>Configurações de Carteiras</CardTitle>
+                <CardTitle>Configuração da API CoinPayments</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="btcAddress">Endereço Bitcoin (BTC)</Label>
+                  <Label htmlFor="apiUrl">API URL</Label>
                   <Input
-                    id="btcAddress"
-                    type="text"
-                    value={config.btcAddress}
-                    onChange={(e) => setConfig(prev => ({ ...prev, btcAddress: e.target.value }))}
-                    placeholder="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Endereço da carteira Bitcoin para receber pagamentos
-                  </p>
-                </div>
-
-                <div>
-                  <Label htmlFor="ethAddress">Endereço Ethereum (ETH)</Label>
-                  <Input
-                    id="ethAddress"
-                    type="text"
-                    value={config.ethAddress}
-                    onChange={(e) => setConfig(prev => ({ ...prev, ethAddress: e.target.value }))}
-                    placeholder="0x742F35Cc6634C0532925a3b8D42CFA03e05eaCd8"
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Endereço da carteira Ethereum para receber pagamentos
-                  </p>
-                </div>
-
-                <div>
-                  <Label htmlFor="webhookUrl">URL do Webhook</Label>
-                  <Input
-                    id="webhookUrl"
+                    id="apiUrl"
                     type="url"
-                    value={config.webhookUrl}
-                    onChange={(e) => setConfig(prev => ({ ...prev, webhookUrl: e.target.value }))}
-                    placeholder="https://api.riozmarkets.com/webhook/crypto"
+                    value={config.apiUrl}
+                    onChange={(e) => setConfig(prev => ({ ...prev, apiUrl: e.target.value }))}
+                    placeholder="https://a-api.coinpayments.net"
                   />
                   <p className="text-sm text-muted-foreground mt-1">
-                    URL para receber notificações de pagamento
+                    URL base da API CoinPayments
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="clientId">Client ID</Label>
+                  <Input
+                    id="clientId"
+                    type="text"
+                    value={config.clientId}
+                    onChange={(e) => setConfig(prev => ({ ...prev, clientId: e.target.value }))}
+                    placeholder="d1219c256f7d4653b2b24759def7f66e"
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    ID do cliente fornecido pela CoinPayments
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="clientSecret">Client Secret</Label>
+                  <Input
+                    id="clientSecret"
+                    type="password"
+                    value={config.clientSecret}
+                    onChange={(e) => setConfig(prev => ({ ...prev, clientSecret: e.target.value }))}
+                    placeholder="••••••••••••••••••••••••••••••••"
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Chave secreta do cliente (mantida confidencial)
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Permissões da API */}
+            <Card className="bg-card-secondary border-border-secondary">
+              <CardHeader>
+                <CardTitle>Permissões da API</CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Permissões configuradas para a integração CoinPayments
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {[
+                    { id: 'createinvoice', label: 'Create Invoice', description: 'Adiciona a permissão createinvoice' },
+                    { id: 'listinvoices', label: 'List Invoices', description: 'Adiciona a permissão listinvoices' },
+                    { id: 'findinvoice', label: 'Find Invoice', description: 'Adiciona a permissão findinvoice' },
+                    { id: 'invoicepayouts', label: 'Invoice Payouts', description: 'Adiciona a permissão invoicepayouts' },
+                    { id: 'listinvoicehistory', label: 'List Invoice History', description: 'Adiciona a permissão listinvoicehistory' },
+                    { id: 'createwallet', label: 'Create Wallet', description: 'Adiciona a permissão createwallet' },
+                    { id: 'getwallets', label: 'Get Wallets', description: 'Adiciona a permissão getwallets' },
+                    { id: 'getwalletbyid', label: 'Get Wallet By ID', description: 'Adiciona a permissão getwalletbyid' },
+                    { id: 'createaddress', label: 'Create Address', description: 'Adiciona a permissão createaddress' },
+                    { id: 'getwalletaddresse', label: 'Get Wallet Address', description: 'Adiciona a permissão getwalletaddresse' },
+                    { id: 'getwalletaddresses', label: 'Get Wallet Addresses', description: 'Adiciona a permissão getwalletaddresses' },
+                    { id: 'getwallettransactions', label: 'Get Wallet Transactions', description: 'Adiciona a permissão getwallettransactions' },
+                    { id: 'getwallettransaction', label: 'Get Wallet Transaction', description: 'Adiciona a permissão getwallettransaction' },
+                    { id: 'spendrequest', label: 'Spend Request', description: 'Adiciona a permissão spendrequest' },
+                    { id: 'confirmspendingfunds', label: 'Confirm Spending Funds', description: 'Adiciona a permissão confirmspendingfunds' },
+                    { id: 'createclientwebhook', label: 'Create Client Webhook', description: 'Adiciona a permissão createclientwebhook' },
+                    { id: 'getwebhooks', label: 'Get Webhooks', description: 'Adiciona a permissão getwebhooks' },
+                    { id: 'updatewebhook', label: 'Update Webhook', description: 'Adiciona a permissão updatewebhook' },
+                    { id: 'deletewebhook', label: 'Delete Webhook', description: 'Adiciona a permissão deletewebhook' }
+                  ].map((permission) => (
+                    <div
+                      key={permission.id}
+                      className="p-4 rounded-lg bg-primary/10 border border-primary/20 flex items-start gap-3"
+                    >
+                      <div className="mt-0.5 p-1 rounded-full bg-primary/20">
+                        <Check className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold text-sm text-foreground">{permission.label}</div>
+                        <div className="text-xs text-muted-foreground mt-0.5">{permission.description}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 p-4 rounded-lg bg-success/10 border border-success/20">
+                  <div className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-success" />
+                    <span className="font-semibold text-success">Todas as permissões habilitadas</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    A integração tem acesso completo a todos os recursos da API CoinPayments
                   </p>
                 </div>
               </CardContent>
