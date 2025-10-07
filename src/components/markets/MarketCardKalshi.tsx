@@ -257,7 +257,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
               <Button
                 onClick={(e) => handleBetClick(e, 'sim')}
                 disabled={market.status !== 'aberto'}
-                className="h-11 transition-all duration-300 font-semibold rounded-xl text-gray-900 hover:scale-105 hover:shadow-lg hover:shadow-[#00ff90]/50 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
+                className="h-11 transition-all duration-300 font-semibold rounded-xl hover:scale-105 hover:shadow-lg hover:shadow-[#00ff90]/50 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none light:text-gray-900 dark:text-gray-900"
                 style={{ backgroundColor: '#00ff90' }}
               >
                 SIM - {yesOdds.toFixed(2)}x

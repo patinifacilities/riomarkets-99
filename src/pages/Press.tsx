@@ -73,8 +73,8 @@ export default function Press() {
       </Helmet>
 
       <div className="min-h-screen relative">
-        {/* Background with stars */}
-        <div className="fixed inset-0 z-0 overflow-hidden">
+        {/* Background with stars - hidden in light mode */}
+        <div className="fixed inset-0 z-0 overflow-hidden dark:block hidden">
           <div 
             className="absolute inset-0"
             style={{

@@ -41,6 +41,12 @@ const THEMES = {
     background_color: '#0f1419',
     primary_color: '#1DA1F2',
     success_color: '#17BF63',
+  },
+  whitemode: {
+    name: 'White Mode',
+    background_color: '#ffffff',
+    primary_color: '#00b86b',
+    success_color: '#00b86b',
   }
 };
 
@@ -308,7 +314,7 @@ const AdminBranding = () => {
     }
   };
 
-  const applyTheme = (themeName: 'theme1' | 'theme2' | 'custom') => {
+  const applyTheme = (themeName: 'theme1' | 'theme2' | 'whitemode' | 'custom') => {
     if (!config) return;
     
     // Save current state to history
@@ -426,11 +432,11 @@ const AdminBranding = () => {
                 </div>
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex gap-4">
+            <CardContent className="flex gap-4 flex-wrap">
               <Button
                 onClick={() => applyTheme('theme1')}
                 variant={config.active_theme === 'theme1' ? 'default' : 'outline'}
-                className="flex-1"
+                className="flex-1 min-w-[120px]"
                 disabled={!customThemeEnabled}
               >
                 {THEMES.theme1.name}
@@ -438,15 +444,23 @@ const AdminBranding = () => {
               <Button
                 onClick={() => applyTheme('theme2')}
                 variant={config.active_theme === 'theme2' ? 'default' : 'outline'}
-                className="flex-1"
+                className="flex-1 min-w-[120px]"
                 disabled={!customThemeEnabled}
               >
                 {THEMES.theme2.name}
               </Button>
               <Button
+                onClick={() => applyTheme('whitemode')}
+                variant={config.active_theme === 'whitemode' ? 'default' : 'outline'}
+                className="flex-1 min-w-[120px]"
+                disabled={!customThemeEnabled}
+              >
+                {THEMES.whitemode.name}
+              </Button>
+              <Button
                 onClick={() => applyTheme('custom')}
                 variant={config.active_theme === 'custom' ? 'default' : 'outline'}
-                className="flex-1"
+                className="flex-1 min-w-[120px]"
                 disabled={!customThemeEnabled}
               >
                 Custom

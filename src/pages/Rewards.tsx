@@ -79,8 +79,8 @@ export default function Rewards() {
 
   return (
     <div className="min-h-screen relative pb-32">
-      {/* Exchange background - same as Exchange page */}
-      <div className="fixed inset-0 top-16 z-0 overflow-hidden">
+      {/* Exchange background - hidden in light mode */}
+      <div className="fixed inset-0 top-16 z-0 overflow-hidden dark:block hidden">
         <div 
           className="absolute inset-0"
           style={{

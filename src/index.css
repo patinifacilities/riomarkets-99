@@ -66,7 +66,7 @@
 
     /* Accent colors */
     --accent: 155 100% 45%;
-    --accent-foreground: 0 0% 6%;
+    --accent-foreground: 210 13% 5%;
     --accent-muted: 155 100% 45% / 0.1;
 
     /* Borders and inputs - Kalshi-style subtle */
@@ -349,7 +349,7 @@
   .light {
     --background: 0 0% 100%;
     --foreground: 222 47% 11%;
-    --card: 0 0% 98%;
+    --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
@@ -363,7 +363,7 @@
     --accent: 155 100% 35%;
     --accent-foreground: 0 0% 100%;
     --success: 160 100% 40%;
-    --success-foreground: 0 0% 100%;
+    --success-foreground: 222 47% 11%;
     --danger: 328 100% 54%;
     --danger-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
@@ -374,7 +374,7 @@
     --card-secondary: 0 0% 98%;
     --border-secondary: 214 32% 88%;
     --bg-app: 0 0% 100%;
-    --bg-card: 0 0% 98%;
+    --bg-card: 0 0% 100%;
     --border-soft: 214 32% 91%;
   }
 
