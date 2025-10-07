@@ -30,11 +30,11 @@
 @layer base {
   :root {
     /* Dark theme - Default background #0A101A */
-    --background: 10 16 26;  /* #0A101A */
+    --background: 218 44% 7%;  /* #0A101A */
     --foreground: 210 20% 98%;
 
     /* Card system */
-    --card: 10 16 26;  
+    --card: 218 44% 7%;  /* #0A101A */
     --card-foreground: 210 20% 98%;
 
     --popover: 210 13% 7%;
@@ -305,9 +305,9 @@
   /* Set dark as default and add light theme overrides */
   :root {
     /* Dark theme - Default background #0A101A */
-    --background: 10 16 26;  /* #0A101A */
+    --background: 218 44% 7%;  /* #0A101A */
     --foreground: 210 20% 98%;
-    --card: 10 16 26;  /* #0A101A */
+    --card: 218 44% 7%;  /* #0A101A */
     --card-foreground: 210 20% 98%;
     --popover: 210 13% 7%;
     --popover-foreground: 210 20% 98%;
