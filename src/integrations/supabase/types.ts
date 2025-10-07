@@ -1097,6 +1097,7 @@ export type Database = {
           created_at: string
           id: string
           raffle_id: string
+          ticket_numbers: number[] | null
           user_id: string
         }
         Insert: {
@@ -1104,6 +1105,7 @@ export type Database = {
           created_at?: string
           id?: string
           raffle_id: string
+          ticket_numbers?: number[] | null
           user_id: string
         }
         Update: {
@@ -1111,6 +1113,7 @@ export type Database = {
           created_at?: string
           id?: string
           raffle_id?: string
+          ticket_numbers?: number[] | null
           user_id?: string
         }
         Relationships: [
@@ -2015,6 +2018,10 @@ export type Database = {
       generate_orderbook_levels: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      generate_raffle_ticket_numbers: {
+        Args: { p_quantity: number; p_raffle_id: string }
+        Returns: number[]
       }
       get_market_pools: {
         Args: { market_id: string }

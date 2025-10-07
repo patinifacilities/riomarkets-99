@@ -8,12 +8,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { RaffleTicketCard } from '@/components/raffle/RaffleTicketCard';
+import { RaffleTicketDetailModal } from '@/components/raffle/RaffleTicketDetailModal';
 
 interface RaffleEntry {
   id: string;
   raffle_id: string;
   amount_paid: number;
   created_at: string;
+  ticket_numbers: number[];
   raffles: {
     id: string;
     title: string;
@@ -27,6 +29,7 @@ const RaffleTickets = () => {
   const { user } = useAuth();
   const [entries, setEntries] = useState<RaffleEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTickets, setSelectedTickets] = useState<{ title: string; numbers: number[] } | null>(null);
 
   const fetchEntries = async () => {
     if (!user) return;
@@ -45,7 +48,7 @@ const RaffleTickets = () => {
           )
         `)
         .eq('user_id', user.id)
-        .order('amount_paid', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       setEntries(data || []);
@@ -56,7 +59,7 @@ const RaffleTickets = () => {
     }
   };
 
-  // Consolidate entries by raffle - sum all tickets for each raffle
+  // Consolidate entries by raffle - sum all tickets and collect ticket numbers
   const consolidatedEntries = useMemo(() => {
     const raffleMap = new Map<string, RaffleEntry>();
     
@@ -65,6 +68,7 @@ const RaffleTickets = () => {
       if (raffleMap.has(raffleId)) {
         const existing = raffleMap.get(raffleId)!;
         existing.amount_paid += entry.amount_paid;
+        existing.ticket_numbers = [...existing.ticket_numbers, ...entry.ticket_numbers];
       } else {
         raffleMap.set(raffleId, { ...entry });
       }
@@ -141,12 +145,21 @@ const RaffleTickets = () => {
                 })}
                 status={raffle.status}
                 imageUrl={raffle.image_url}
-                onClick={() => navigate(`/raffles/${raffle.id}`)}
+                onClick={() => setSelectedTickets({ title: raffle.title, numbers: entry.ticket_numbers })}
                 isTopTicket={isTopTicket}
               />
             );
           })}
         </div>
+      )}
+
+      {selectedTickets && (
+        <RaffleTicketDetailModal
+          isOpen={!!selectedTickets}
+          onClose={() => setSelectedTickets(null)}
+          raffleTitle={selectedTickets.title}
+          ticketNumbers={selectedTickets.numbers}
+        />
       )}
     </div>
   );

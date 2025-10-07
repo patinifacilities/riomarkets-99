@@ -308,7 +308,7 @@ const MarketDetail = () => {
                                 transition: 'none'
                               }}
                             >
-                              LUCRO ESTIMADO
+                              RETORNO ESTIMADO
                             </span>
                             <div 
                               className="text-2xl font-bold mt-1"
@@ -717,7 +717,7 @@ const MarketDetail = () => {
                                 color: (sliderProgress > 0.3 && sliderProgress < 1) ? '#374151' : 'rgba(234, 179, 8, 0.5)'
                               }}
                             >
-                              LUCRO ESTIMADO
+                              RETORNO ESTIMADO
                             </span>
                             <div 
                               className="text-2xl font-bold mt-1 transition-colors duration-300"

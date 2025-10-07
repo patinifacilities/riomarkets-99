@@ -12,34 +12,72 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
+    const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
     const { symbol = 'BTC' } = await req.json();
+    const symbolUpper = symbol.toUpperCase();
 
-    // Use CoinGecko API for real-time crypto prices
-    const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${getCoinId(symbol)}&vs_currencies=usd`);
-    
-    if (!response.ok) {
-      throw new Error(`CoinGecko API error: ${response.status}`);
-    }
+    // Get API config for this symbol
+    const { data: apiConfig } = await supabaseClient
+      .from('exchange_asset_api_config')
+      .select('*')
+      .eq('symbol', symbolUpper)
+      .single();
 
-    const data = await response.json();
-    const coinId = getCoinId(symbol);
-    const price = data[coinId]?.usd;
+    let price: number;
 
-    if (!price) {
-      throw new Error(`Price not found for ${symbol}`);
+    if (apiConfig) {
+      // Use configured API
+      console.log(`Fetching ${symbolUpper} from configured API: ${apiConfig.api_url}`);
+      const response = await fetch(apiConfig.api_url);
+      
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Extract price using configured field path
+      const fieldPath = apiConfig.price_field.split('.');
+      let extractedPrice = data;
+      for (const field of fieldPath) {
+        extractedPrice = extractedPrice[field];
+      }
+
+      price = parseFloat(extractedPrice);
+
+      // For RIOZ (1 USD), convert to BRL
+      if (symbolUpper === 'RIOZ') {
+        const usdBrlResponse = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const usdBrlData = await usdBrlResponse.json();
+        price = usdBrlData.rates.BRL; // 1 USD = X BRL
+      }
+    } else {
+      // Fallback: Use CoinGecko for crypto
+      const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${getCoinId(symbolUpper)}&vs_currencies=brl`);
+      
+      if (!response.ok) {
+        throw new Error(`CoinGecko API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const coinId = getCoinId(symbolUpper);
+      price = data[coinId]?.brl;
+
+      if (!price) {
+        throw new Error(`Price not found for ${symbolUpper}`);
+      }
     }
 
     return new Response(
       JSON.stringify({ 
-        symbol,
+        symbol: symbolUpper,
         price,
         timestamp: new Date().toISOString(),
-        source: 'coingecko'
+        source: apiConfig ? 'configured' : 'coingecko'
       }),
       { 
         headers: { 

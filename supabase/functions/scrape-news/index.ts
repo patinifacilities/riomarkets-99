@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,19 +14,21 @@ interface NewsSource {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
 
-    console.log('🔍 Starting news scraping process...');
+    console.log('Starting news scraping...');
 
-    // Get active news sources
-    const { data: sources, error: sourcesError } = await supabase
+    // Fetch active news sources
+    const { data: sources, error: sourcesError } = await supabaseClient
       .from('news_sources')
       .select('*')
       .eq('is_active', true);
@@ -36,144 +38,117 @@ serve(async (req) => {
       throw sourcesError;
     }
 
-    if (!sources || sources.length === 0) {
-      console.log('No active sources found');
-      return new Response(
-        JSON.stringify({ message: 'No active sources to scrape' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    console.log(`📰 Found ${sources.length} active sources`);
+    console.log(`Found ${sources?.length || 0} active news sources`);
 
     let totalScraped = 0;
-    let totalErrors = 0;
+    let errors = 0;
 
-    // Process each source
-    for (const source of sources as NewsSource[]) {
+    // Scrape each source
+    for (const source of (sources || [])) {
       try {
-        console.log(`Scraping ${source.name} (${source.url})`);
-
-        // Fetch the webpage
+        console.log(`Scraping ${source.name}...`);
+        
         const response = await fetch(source.url, {
           headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          },
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+          }
         });
-
+        
         if (!response.ok) {
           console.error(`Failed to fetch ${source.name}: ${response.status}`);
-          totalErrors++;
+          errors++;
           continue;
         }
 
         const html = await response.text();
-
-        // Simple scraping - look for common news patterns
-        // This is a basic implementation - in production you'd want more sophisticated parsing
-        const titleMatches = html.match(/<h[1-3][^>]*>(.*?)<\/h[1-3]>/gi) || [];
-        const linkMatches = html.match(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi) || [];
-
-        // Extract potential news articles
-        const articles: Array<{
-          title: string;
-          url: string;
-          summary: string | null;
-        }> = [];
-
-        for (let i = 0; i < Math.min(titleMatches.length, 10); i++) {
-          const titleMatch = titleMatches[i];
-          const title = titleMatch.replace(/<[^>]*>/g, '').trim();
+        
+        // Basic regex to extract article titles and links
+        const articleMatches = html.matchAll(/<a[^>]*href="([^"]*)"[^>]*>([^<]+)<\/a>/gi);
+        const articles = [];
+        
+        for (const match of articleMatches) {
+          const url = match[1];
+          const title = match[2].trim();
           
-          // Find corresponding link
-          let articleUrl = source.url;
-          for (const linkMatch of linkMatches) {
-            if (linkMatch.toLowerCase().includes(title.toLowerCase().substring(0, 20))) {
-              const urlMatch = linkMatch.match(/href="([^"]*)"/);
-              if (urlMatch) {
-                articleUrl = urlMatch[1];
-                if (!articleUrl.startsWith('http')) {
-                  const baseUrl = new URL(source.url);
-                  articleUrl = `${baseUrl.protocol}//${baseUrl.host}${articleUrl}`;
-                }
-                break;
-              }
-            }
-          }
-
-          if (title.length > 10 && title.length < 200) {
+          // Filter out navigation, menu items, etc.
+          if (title.length > 20 && title.length < 200 && 
+              !title.includes('menu') && 
+              !title.includes('Menu') &&
+              url.includes('http')) {
             articles.push({
               title,
-              url: articleUrl,
-              summary: null,
+              url: url.startsWith('http') ? url : `${source.url}${url}`,
             });
           }
         }
 
         console.log(`Found ${articles.length} potential articles from ${source.name}`);
 
-        // Insert articles into press_mentions
-        for (const article of articles) {
+        // Save unique articles to database
+        for (const article of articles.slice(0, 5)) { // Limit to 5 per source
           // Check if article already exists
-          const { data: existing } = await supabase
+          const { data: existing } = await supabaseClient
             .from('press_mentions')
             .select('id')
             .eq('url', article.url)
             .single();
 
           if (!existing) {
-            const { error: insertError } = await supabase
+            const { error: insertError } = await supabaseClient
               .from('press_mentions')
               .insert({
                 title: article.title,
-                summary: article.summary,
+                url: article.url,
                 vehicle: source.name,
                 logo_url: source.logo_url,
-                url: article.url,
-                published_at: new Date().toISOString(),
-                status: 'draft', // Set as draft for admin review
+                status: 'published', // Auto-publish scraped news
+                published_at: new Date().toISOString()
               });
 
-            if (insertError) {
-              console.error(`Error inserting article: ${insertError.message}`);
-            } else {
+            if (!insertError) {
               totalScraped++;
             }
           }
         }
 
         // Update last_scraped_at
-        await supabase
+        await supabaseClient
           .from('news_sources')
           .update({ last_scraped_at: new Date().toISOString() })
           .eq('id', source.id);
 
       } catch (error) {
         console.error(`Error scraping ${source.name}:`, error);
-        totalErrors++;
+        errors++;
       }
     }
 
-    console.log(`✅ Scraping complete: ${totalScraped} articles scraped, ${totalErrors} errors`);
+    console.log(`Scraping complete. Total: ${totalScraped}, Errors: ${errors}`);
 
     return new Response(
       JSON.stringify({
         success: true,
         totalScraped,
-        totalErrors,
-        sourcesProcessed: sources.length,
+        errors,
+        sources: sources?.length || 0
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
     );
 
   } catch (error) {
-    console.error('Error in scrape-news function:', error);
+    console.error('Fatal error in scrape-news:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ 
+        success: false, 
+        error: errorMessage
+      }),
       {
-        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
       }
     );
   }
