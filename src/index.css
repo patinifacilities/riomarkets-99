@@ -65,9 +65,9 @@
     --destructive-foreground: 210 20% 98%;
 
     /* Accent colors */
-    --accent: 160 100% 50%;
+    --accent: 155 100% 45%;
     --accent-foreground: 0 0% 6%;
-    --accent-muted: 160 100% 50% / 0.1;
+    --accent-muted: 155 100% 45% / 0.1;
 
     /* Borders and inputs - Kalshi-style subtle */
     --border: 210 13% 15%;
@@ -333,9 +333,9 @@
     --danger-muted: 328 100% 54% / 0.1;
     --destructive: 328 100% 54%;
     --destructive-foreground: 210 20% 98%;
-    --accent: 160 100% 50%;
+    --accent: 155 100% 45%;
     --accent-foreground: 0 0% 6%;
-    --accent-muted: 160 100% 50% / 0.1;
+    --accent-muted: 155 100% 45% / 0.1;
     --border: 210 13% 15%;
     --border-soft: 210 13% 10%;
     --input: 210 13% 9%;
@@ -349,7 +349,7 @@
   .light {
     --background: 0 0% 100%;
     --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
+    --card: 0 0% 98%;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
@@ -360,8 +360,8 @@
     --secondary-foreground: 222 47% 11%;
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 155 100% 35%;
+    --accent-foreground: 0 0% 100%;
     --success: 160 100% 40%;
     --success-foreground: 0 0% 100%;
     --danger: 328 100% 54%;
@@ -374,7 +374,7 @@
     --card-secondary: 0 0% 98%;
     --border-secondary: 214 32% 88%;
     --bg-app: 0 0% 100%;
-    --bg-card: 0 0% 100%;
+    --bg-card: 0 0% 98%;
     --border-soft: 214 32% 91%;
   }
 

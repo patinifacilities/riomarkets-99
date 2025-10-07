@@ -5,8 +5,9 @@ import { Market } from '@/types';
 import BetModal from './BetModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
-import { useProfiles } from '@/hooks/useProfiles';
 import { useMarketPoolDetailed } from '@/hooks/useMarketPoolsDetailed';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useMarketRewards } from '@/hooks/useMarketRewards';
 import { useMarketStats } from '@/hooks/useMarketStats';
 import { useIsWatched, useToggleWatchlist } from '@/hooks/useWatchlist';
@@ -30,7 +31,6 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   
   const { user } = useAuth();
   const { data: profile } = useProfile();
-  const { data: allProfiles = [] } = useProfiles();
   const detailedPool = useMarketPoolDetailed(market);
   const { data: marketRewards } = useMarketRewards(market.id);
   const { data: stats } = useMarketStats(market.id);
@@ -38,14 +38,48 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   const toggleWatchlist = useToggleWatchlist();
   const { toast } = useToast();
 
-  // Get random 2 users with profile pictures
-  const getRandomUserAvatars = () => {
-    const usersWithPics = allProfiles.filter(p => p.profile_pic_url);
-    const shuffled = [...usersWithPics].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 2);
-  };
+  // Get users who actually placed orders on this market
+  const { data: marketParticipants = [] } = useQuery({
+    queryKey: ['market-participants', market.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('market_orders')
+        .select('user_id, profiles!inner(id, nome, profile_pic_url)')
+        .eq('market_id', market.id)
+        .eq('status', 'active')
+        .limit(20);
 
-  const randomUsers = getRandomUserAvatars();
+      if (error) {
+        console.error('Error fetching market participants:', error);
+        return [];
+      }
+
+      // Get unique users
+      const uniqueUsers = Array.from(
+        new Map(data.map(item => [item.user_id, item.profiles])).values()
+      );
+
+      // Shuffle and get 2 random participants
+      const shuffled = uniqueUsers.sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, 2);
+    },
+  });
+
+  // Generate modern bit-style avatars for users without profile pics
+  const generateAvatar = (userId: string, color: string) => {
+    return (
+      <div 
+        className="w-6 h-6 rounded-full border-2 border-[#1a1a1a] shadow-lg ring-1 ring-white/10 flex items-center justify-center text-[8px] font-bold"
+        style={{ 
+          background: `linear-gradient(135deg, ${color} 0%, ${color}cc 100%)`,
+          boxShadow: `0 0 8px ${color}40`,
+          color: '#fff'
+        }}
+      >
+        {userId.substring(0, 2).toUpperCase()}
+      </div>
+    );
+  };
 
   const handleBetClick = (e: React.MouseEvent, opcao: string) => {
     e.preventDefault();
@@ -141,21 +175,11 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   return (
     <>
       <div className={cn(
-        "bg-[#1a1a1a]/40 backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden transition-all duration-500 group relative",
-        "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.12] before:via-white/[0.04] before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-all before:duration-700 before:pointer-events-none",
-        "after:absolute after:inset-0 after:rounded-2xl after:opacity-0 hover:after:opacity-100 after:transition-all after:duration-700 after:pointer-events-none",
-        "after:bg-[radial-gradient(circle_at_var(--mouse-x)_var(--mouse-y),rgba(255,255,255,0.15)_0%,rgba(255,255,255,0.08)_30%,transparent_70%)]",
-        "hover:border-white/[0.15] hover:shadow-[0_10px_40px_-12px_rgba(255,255,255,0.15),0_0_60px_-15px_rgba(0,255,144,0.1)]",
+        "bg-card/40 backdrop-blur-xl border border-border rounded-2xl overflow-hidden transition-all duration-300 group relative",
+        "hover:border-border/50 hover:shadow-lg",
         "hover:scale-[1.02] hover:-translate-y-1",
         className
-      )}
-      onMouseMove={(e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
-        e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
-      }}>
+      )}>
         {/* Em Atualização Overlay */}
         {(market as any).paused && (
           <div className="absolute inset-0 bg-background/90 backdrop-blur-md z-30 rounded-2xl flex items-center justify-center">
@@ -250,25 +274,31 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
             </div>
 
             {/* Footer Stats with User Avatars */}
-            <div className="flex items-center justify-between text-xs text-gray-500">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
                   <div className="flex -space-x-2">
-                    {randomUsers.length > 0 ? (
-                      randomUsers.map((user, i) => (
-                        <img
-                          key={user.id}
-                          src={user.profile_pic_url}
-                          alt={user.nome}
-                          className="w-6 h-6 rounded-full border-2 border-[#1a1a1a] shadow-lg ring-1 ring-white/10 transition-all duration-300 hover:scale-110 hover:z-10 object-cover"
-                        />
+                    {marketParticipants.length > 0 ? (
+                      marketParticipants.map((participant: any, i) => (
+                        participant.profile_pic_url ? (
+                          <img
+                            key={participant.id}
+                            src={participant.profile_pic_url}
+                            alt={participant.nome}
+                            className="w-6 h-6 rounded-full border-2 border-background shadow-lg ring-1 ring-white/10 transition-all duration-300 hover:scale-110 hover:z-10 object-cover"
+                          />
+                        ) : (
+                          <React.Fragment key={participant.id}>
+                            {generateAvatar(participant.id, i === 0 ? '#00ff90' : '#ff2389')}
+                          </React.Fragment>
+                        )
                       ))
                     ) : (
-                      // Fallback to colored circles if no users with pics
+                      // Fallback to colored circles if no participants
                       ['#00ff90', '#ff2389'].map((color, i) => (
                         <div 
                           key={i}
-                          className="w-6 h-6 rounded-full border-2 border-[#1a1a1a] shadow-lg ring-1 ring-white/10"
+                          className="w-6 h-6 rounded-full border-2 border-background shadow-lg ring-1 ring-white/10"
                           style={{ 
                             background: `linear-gradient(135deg, ${color} 0%, ${color}aa 100%)`,
                             boxShadow: `0 0 8px ${color}40`
