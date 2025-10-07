@@ -188,7 +188,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
         )}
         <Link to={`/market/${market.id}`} className="block">
           {/* Image Header */}
-          <div className="relative h-40 overflow-hidden bg-[#2a2a2a]">
+          <div className="relative h-40 overflow-hidden bg-[#0A101A]">
             {(market.thumbnail_url || market.image_url || market.photo_url) && (
               <img 
                 src={market.thumbnail_url || market.image_url || market.photo_url}
@@ -228,7 +228,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
 
             {/* Probability Bar */}
             <div className="mb-4">
-              <div className="relative h-2.5 bg-[#2a2a2a] rounded-full overflow-hidden flex group">
+              <div className="relative h-2.5 bg-[#0A101A] rounded-full overflow-hidden flex group">
                 <div 
                   className="transition-all duration-700 ease-out relative before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:animate-[shimmer_2s_ease-in-out_infinite]"
                   style={{ 

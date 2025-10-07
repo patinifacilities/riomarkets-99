@@ -20,8 +20,8 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
         <ThemeProvider 
           attribute="class" 
-          defaultTheme="dark" 
-          enableSystem={true}
+          defaultTheme="light" 
+          enableSystem={false}
           storageKey="rio-markets-theme"
           disableTransitionOnChange={false}
           themes={['light', 'dark']}

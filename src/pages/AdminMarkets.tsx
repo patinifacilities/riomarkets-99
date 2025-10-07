@@ -270,7 +270,7 @@ const AdminMarkets = () => {
               </div>
               <Button 
                 onClick={() => setShowDeleted(!showDeleted)}
-                style={{ backgroundColor: showDeleted ? '#2a2a2a' : '#ff2389' }}
+                style={{ backgroundColor: showDeleted ? '#0A101A' : '#ff2389' }}
                 className="gap-2 min-h-[44px] text-white hover:opacity-90"
               >
                 <Trash2 className="w-4 h-4" />

@@ -40,9 +40,32 @@ const MarketDetail = () => {
   
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [betAmount, setBetAmount] = useState<number>(0);
+  const [betAmountDisplay, setBetAmountDisplay] = useState<string>('');
   const [showBetModal, setShowBetModal] = useState(false);
   const [sliderProgress, setSliderProgress] = useState<number>(0);
   const [rulesExpanded, setRulesExpanded] = useState(false);
+
+  // Format number with thousand separators
+  const formatNumber = (value: number): string => {
+    return value.toLocaleString('pt-BR');
+  };
+
+  // Parse formatted string back to number
+  const parseFormattedNumber = (value: string): number => {
+    return parseInt(value.replace(/\D/g, '')) || 0;
+  };
+
+  // Handle bet amount input with auto-formatting
+  const handleBetAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, '');
+    const numericValue = parseInt(rawValue) || 0;
+    
+    // Limit to max balance
+    const limitedValue = Math.min(numericValue, userProfile?.saldo_moeda || 0);
+    
+    setBetAmount(limitedValue);
+    setBetAmountDisplay(limitedValue > 0 ? formatNumber(limitedValue) : '');
+  };
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -593,14 +616,16 @@ const MarketDetail = () => {
                           </Label>
                           <Input
                             id="bet-amount"
-                            type="number"
+                            type="text"
+                            inputMode="numeric"
                             placeholder="Digite a quantidade..."
-                            value={betAmount || ''}
-                            onChange={(e) => setBetAmount(Number(e.target.value) || 0)}
-                            min="5"
-                            max={userProfile?.saldo_moeda || 0}
-                            className="mt-2"
+                            value={betAmountDisplay}
+                            onChange={handleBetAmountChange}
+                            className="mt-2 text-lg font-semibold"
                           />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Mín: 5 RIOZ | Máx: {formatNumber(userProfile?.saldo_moeda || 0)} RIOZ
+                          </p>
                         </div>
                       </>
                     ) : !authUser ? (

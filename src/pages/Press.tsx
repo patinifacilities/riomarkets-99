@@ -78,7 +78,7 @@ export default function Press() {
           <div 
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%)'
+              background: 'linear-gradient(180deg, #0a0a0a 0%, #0A101A 50%, #0a0a0a 100%)'
             }}
           >
             <StarsBackground />
