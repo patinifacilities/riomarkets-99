@@ -312,28 +312,40 @@
   /* Set dark as default and add light theme overrides */
   :root {
     /* Dark theme is now default */
-    --background: 211 45% 7%;
+    --background: 16 19 26;  /* #10131A */
     --foreground: 210 20% 98%;
-    --card: 210 13% 7%;
+    --card: 16 19 26;  
     --card-foreground: 210 20% 98%;
     --popover: 210 13% 7%;
     --popover-foreground: 210 20% 98%;
     --primary: 155 100% 45%;
     --primary-foreground: 210 13% 5%;
+    --primary-glow: 155 100% 55%;
     --secondary: 0 0% 6%;
     --secondary-foreground: 210 20% 98%;
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 65%;
-    --accent: 160 100% 50%;
-    --accent-foreground: 0 0% 6%;
+    --success: 160 100% 50%;
+    --success-foreground: 0 0% 6%;
+    --success-muted: 160 100% 50% / 0.1;
+    --danger: 328 100% 54%;
+    --danger-foreground: 210 20% 98%;
+    --danger-muted: 328 100% 54% / 0.1;
     --destructive: 328 100% 54%;
     --destructive-foreground: 210 20% 98%;
+    --accent: 160 100% 50%;
+    --accent-foreground: 0 0% 6%;
+    --accent-muted: 160 100% 50% / 0.1;
     --border: 210 13% 15%;
+    --border-soft: 210 13% 10%;
     --input: 210 13% 9%;
     --ring: 160 100% 50%;
+    --brand-green: 160 100% 50%;
+    --brand-pink: 328 100% 54%;
+    --brand-dark: 210 13% 5%;
   }
 
-  /* Light theme overrides */
+  /* Light theme overrides - COMPLETE replacement */
   .light {
     --background: 0 0% 100%;
     --foreground: 222 47% 11%;

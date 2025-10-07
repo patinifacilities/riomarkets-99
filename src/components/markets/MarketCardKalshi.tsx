@@ -5,6 +5,7 @@ import { Market } from '@/types';
 import BetModal from './BetModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
+import { useProfiles } from '@/hooks/useProfiles';
 import { useMarketPoolDetailed } from '@/hooks/useMarketPoolsDetailed';
 import { useMarketRewards } from '@/hooks/useMarketRewards';
 import { useMarketStats } from '@/hooks/useMarketStats';
@@ -14,8 +15,6 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import riozCoin from '@/assets/rioz-coin.png';
-import hotFire from '@/assets/hot-fire.png';
 
 interface MarketCardKalshiProps {
   market: Market;
@@ -31,12 +30,22 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
   
   const { user } = useAuth();
   const { data: profile } = useProfile();
+  const { data: allProfiles = [] } = useProfiles();
   const detailedPool = useMarketPoolDetailed(market);
   const { data: marketRewards } = useMarketRewards(market.id);
   const { data: stats } = useMarketStats(market.id);
   const isWatched = useIsWatched(market.id);
   const toggleWatchlist = useToggleWatchlist();
   const { toast } = useToast();
+
+  // Get random 2 users with profile pictures
+  const getRandomUserAvatars = () => {
+    const usersWithPics = allProfiles.filter(p => p.profile_pic_url);
+    const shuffled = [...usersWithPics].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 2);
+  };
+
+  const randomUsers = getRandomUserAvatars();
 
   const handleBetClick = (e: React.MouseEvent, opcao: string) => {
     e.preventDefault();
@@ -104,7 +113,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
     }
   };
 
-  // Get yes/no percentages from actual pool data
+  // Get yes/no percentages and odds from actual pool data
   const yesOption = detailedPool?.options.find(opt => 
     opt.label.toLowerCase().includes('sim') || opt.label.toLowerCase().includes('yes')
   );
@@ -112,22 +121,22 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
     opt.label.toLowerCase().includes('não') || opt.label.toLowerCase().includes('no')
   );
 
+  // Calculate odds from pool percentages
+  const calculateOdds = (chance: number) => {
+    if (chance === 0) return 1.5;
+    return Math.max(1.01, 100 / chance);
+  };
+
   // Use real pool percentages or default to 50/50
   const yesPercentage = yesOption?.chance || 50;
   const noPercentage = noOption?.chance || 50;
+  const yesOdds = calculateOdds(yesPercentage);
+  const noOdds = calculateOdds(noPercentage);
 
   // Hot market logic
   const isHot = (stats?.vol_24h && stats.vol_24h > 100) || 
                 (stats?.participantes && stats.participantes > 5) ||
                 market.destaque;
-
-  // Random color assignment for only 2 profile avatars with fade gradient
-  const getRandomAvatarColors = () => {
-    const colors = ['#00ff90', '#ff2389'];
-    return Math.random() > 0.5 ? colors : colors.reverse();
-  };
-  
-  const avatarColors = getRandomAvatarColors();
 
   return (
     <>
@@ -219,7 +228,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
               </div>
             </div>
 
-            {/* SIM/NÃO Buttons */}
+            {/* SIM/NÃO Buttons with Odds */}
             <div className="grid grid-cols-2 gap-3 mb-4">
               <Button
                 onClick={(e) => handleBetClick(e, 'sim')}
@@ -227,7 +236,7 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                 className="h-11 transition-all duration-300 font-semibold rounded-xl text-gray-900 hover:scale-105 hover:shadow-lg hover:shadow-[#00ff90]/50 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
                 style={{ backgroundColor: '#00ff90' }}
               >
-                SIM
+                SIM - {yesOdds.toFixed(2)}x
               </Button>
               
               <Button
@@ -236,36 +245,48 @@ const MarketCardKalshi = React.memo(function MarketCardKalshi({ market, classNam
                 className="h-11 transition-all duration-300 font-semibold rounded-xl text-white hover:scale-105 hover:shadow-lg hover:shadow-[#ff2389]/50 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
                 style={{ backgroundColor: '#ff2389' }}
               >
-                NÃO
+                NÃO - {noOdds.toFixed(2)}x
               </Button>
             </div>
 
-            {/* Footer Stats */}
+            {/* Footer Stats with User Avatars */}
             <div className="flex items-center justify-between text-xs text-gray-500">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
                   <div className="flex -space-x-2">
-                    {avatarColors.map((color, i) => (
-                      <div 
-                        key={i}
-                        className="w-6 h-6 rounded-full border-2 border-[#1a1a1a] shadow-lg ring-1 ring-white/10 transition-all duration-300 hover:scale-110 hover:z-10"
-                        style={{ 
-                          background: `linear-gradient(135deg, ${color} 0%, ${color}aa 100%)`,
-                          boxShadow: `0 0 8px ${color}40`
-                        }}
-                      />
-                    ))}
+                    {randomUsers.length > 0 ? (
+                      randomUsers.map((user, i) => (
+                        <img
+                          key={user.id}
+                          src={user.profile_pic_url}
+                          alt={user.nome}
+                          className="w-6 h-6 rounded-full border-2 border-[#1a1a1a] shadow-lg ring-1 ring-white/10 transition-all duration-300 hover:scale-110 hover:z-10 object-cover"
+                        />
+                      ))
+                    ) : (
+                      // Fallback to colored circles if no users with pics
+                      ['#00ff90', '#ff2389'].map((color, i) => (
+                        <div 
+                          key={i}
+                          className="w-6 h-6 rounded-full border-2 border-[#1a1a1a] shadow-lg ring-1 ring-white/10"
+                          style={{ 
+                            background: `linear-gradient(135deg, ${color} 0%, ${color}aa 100%)`,
+                            boxShadow: `0 0 8px ${color}40`
+                          }}
+                        />
+                      ))
+                    )}
                   </div>
                   <span className="ml-1.5 font-medium">+{stats?.participantes || 13}</span>
                 </div>
                 
                 <div className="flex items-center gap-1">
                   <img 
-                    src={riozCoin} 
-                    alt="RIOZ" 
-                    className="w-3.5 h-3.5"
+                    src="/storage/v1/object/public/assets/asset_a435aa1c-9553-4fad-8609-5bd54ef07447_1759612614765.png" 
+                    alt="Rioz"
+                    className="w-4 h-4 object-contain"
                   />
-                  <span>{formatVolume(detailedPool?.totalPool || stats?.vol_total || 0)}</span>
+                  <span>Vol {formatVolume(detailedPool?.totalPool || stats?.vol_total || 0)} Rioz</span>
                 </div>
               </div>
               
