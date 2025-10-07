@@ -876,17 +876,13 @@ const Fast = () => {
 
   return (
     <div className="min-h-[100dvh] relative overflow-hidden pb-20">
-      {/* Background gradient with stars - hidden in light mode */}
-      <div className="fixed inset-0 top-16 z-0 overflow-hidden dark:block hidden">
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(180deg, #0A101A 0%, #0A101A 50%, #0A101A 100%)'
-          }}
-        >
-          <StarsBackground />
-        </div>
+      {/* Background gradient with stars */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <StarsBackground />
       </div>
+      
+      {/* Content wrapper with proper z-index */}
+      <div className="relative z-10">
       {/* Hide elements on mobile, fix z-index for loading, and add animations */}
       <style>{`
         @media (max-width: 768px) {
@@ -1428,6 +1424,7 @@ const Fast = () => {
         result={selectedResult}
         pool={selectedResult?.fast_pools}
       />
+      </div>
     </div>
   );
 };
