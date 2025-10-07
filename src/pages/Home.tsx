@@ -293,14 +293,14 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       {/* Hero Carousel Section */}
-      <div className="relative overflow-hidden border-b border-border">
+      <div className="relative overflow-hidden border-b border-border/50 bg-gradient-to-r from-background via-primary/5 to-background">
         {/* Stars Background Effect */}
-        <div className="absolute inset-0 opacity-30">
+        <div className="absolute inset-0 opacity-20">
           <StarsBackground />
         </div>
-        <div className="container mx-auto px-4 py-8 relative z-10">
+        <div className="container mx-auto px-4 py-12 relative z-10">
           <Carousel
             opts={{
               align: "start",
@@ -560,10 +560,10 @@ const Home = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        {/* Search and Filters - Improved for white mode */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6 items-center">
+        {/* Search and Filters - Modern Design */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-8 items-center">
           <div className="group relative flex-1 max-w-md w-full sm:w-auto">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary/70 group-hover:text-primary transition-colors duration-300 z-10" strokeWidth={2.5} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors duration-300 z-10" strokeWidth={2.5} />
             <Input
               placeholder="Pesquisar Mercados"
               value={searchTerm}
@@ -627,10 +627,10 @@ const Home = () => {
             </button>
             
             <Select value={selectedStatus[0] || 'active'} onValueChange={(val) => setSelectedStatus([val])}>
-              <SelectTrigger className="w-[120px] bg-card/80 dark:bg-card/50 border-border/40 text-foreground backdrop-blur-sm">
+              <SelectTrigger className="w-[120px] bg-card/80 dark:bg-card/50 border-border/40 text-foreground backdrop-blur-sm rounded-xl">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-card border-border">
+              <SelectContent className="bg-card border-border rounded-xl">
                 <SelectItem value="active">Open</SelectItem>
                 <SelectItem value="ending">Ending</SelectItem>
                 <SelectItem value="closed">Closed</SelectItem>
@@ -638,10 +638,10 @@ const Home = () => {
             </Select>
             
             <Select value="all">
-              <SelectTrigger className="w-[140px] bg-[#1a1a1a] border-[#2a2a2a] text-white">
+              <SelectTrigger className="w-[140px] bg-card/80 dark:bg-card/50 border-border/40 text-foreground backdrop-blur-sm rounded-xl">
                 <SelectValue placeholder="All Tokens" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-[#2a2a2a]">
+              <SelectContent className="bg-card border-border rounded-xl">
                 <SelectItem value="all">All Tokens</SelectItem>
                 <SelectItem value="rioz">RIOZ</SelectItem>
               </SelectContent>
@@ -654,13 +654,19 @@ const Home = () => {
         {isLoading ? (
           <MarketGridSkeleton />
         ) : sortedAndFilteredMarkets.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-muted-foreground text-lg">
+          <div className="text-center py-20">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-4">
+              <Search className="w-10 h-10 text-primary/50" />
+            </div>
+            <p className="text-muted-foreground text-lg font-medium">
               Nenhum mercado encontrado.
+            </p>
+            <p className="text-muted-foreground/60 text-sm mt-2">
+              Tente ajustar seus filtros de busca
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {sortedAndFilteredMarkets.map((market, index) => (
               <MarketCardKalshi 
                 key={market.id} 

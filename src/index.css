@@ -335,21 +335,21 @@
 
   /* Light theme overrides */
   .light {
-    --background: 240 10% 98%;
-    --foreground: 222 84% 5%;
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 222 84% 5%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 84% 5%;
+    --popover-foreground: 222 47% 11%;
     --primary: 155 100% 35%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 155 100% 45%;
     --secondary: 210 40% 96%;
-    --secondary-foreground: 222 84% 5%;
+    --secondary-foreground: 222 47% 11%;
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
-    --accent: 160 100% 40%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
     --success: 160 100% 40%;
     --success-foreground: 0 0% 100%;
     --danger: 328 100% 54%;
@@ -358,9 +358,12 @@
     --destructive-foreground: 0 0% 100%;
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 160 100% 40%;
+    --ring: 155 100% 35%;
     --card-secondary: 0 0% 98%;
     --border-secondary: 214 32% 88%;
+    --bg-app: 0 0% 100%;
+    --bg-card: 0 0% 100%;
+    --border-soft: 214 32% 91%;
   }
 
   /* Light theme Fast page selected button background */

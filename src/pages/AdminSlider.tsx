@@ -386,21 +386,51 @@ const AdminSlider = () => {
             <CardTitle>Configurações do Slider</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <Label htmlFor="slider-delay">Intervalo de Transição (segundos)</Label>
-              <Input
-                id="slider-delay"
-                type="number"
-                min="3"
-                max="30"
-                value={sliderDelay}
-                onChange={(e) => setSliderDelay(parseInt(e.target.value) || 7)}
-                className="max-w-xs"
-              />
-              <p className="text-sm text-muted-foreground">
-                Define quantos segundos cada slide ficará visível antes de passar para o próximo. 
-                O slider continuará passando mesmo se o usuário clicar, mas pausará se clicar e segurar.
-              </p>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="slider-delay">Intervalo de Transição (segundos)</Label>
+                <Input
+                  id="slider-delay"
+                  type="number"
+                  min="3"
+                  max="30"
+                  value={sliderDelay}
+                  onChange={(e) => setSliderDelay(parseInt(e.target.value) || 7)}
+                  className="max-w-xs"
+                />
+                <p className="text-sm text-muted-foreground">
+                  Define quantos segundos cada slide ficará visível antes de passar para o próximo. 
+                  O slider continuará passando mesmo se o usuário clicar, mas pausará se clicar e segurar.
+                </p>
+              </div>
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-accent/20">
+                <div className="space-y-1">
+                  <Label htmlFor="disable-all-slides" className="font-semibold">Desativar Todos os Slides</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Liga/desliga a exibição de todos os slides de uma vez
+                  </p>
+                </div>
+                <Button
+                  id="disable-all-slides"
+                  variant={slideOrder.every(s => s.hidden) ? "destructive" : "default"}
+                  onClick={() => {
+                    const allHidden = slideOrder.every(s => s.hidden);
+                    setSlideOrder(prev => prev.map(s => ({ ...s, hidden: !allHidden })));
+                  }}
+                >
+                  {slideOrder.every(s => s.hidden) ? (
+                    <>
+                      <Eye className="h-4 w-4 mr-2" />
+                      Ativar Todos
+                    </>
+                  ) : (
+                    <>
+                      <EyeOff className="h-4 w-4 mr-2" />
+                      Desativar Todos
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
