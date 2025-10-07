@@ -553,7 +553,7 @@ const Home = () => {
               placeholder="Pesquisar Mercados"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 h-14 bg-card/50 border-2 border-border/50 hover:border-primary/30 text-foreground placeholder:text-muted-foreground/60 rounded-2xl backdrop-blur-xl transition-all duration-300 focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20"
+              className="pl-12 h-14 bg-card/50 border border-border/50 hover:border-primary/30 text-foreground placeholder:text-muted-foreground/60 rounded-2xl backdrop-blur-xl transition-all duration-300 focus-visible:border-primary/50 focus-visible:ring-1 focus-visible:ring-primary/20"
             />
           </div>
           
